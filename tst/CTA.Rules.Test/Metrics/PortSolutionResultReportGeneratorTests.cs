@@ -1,11 +1,12 @@
-﻿using System;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using Codelyzer.Analysis;
 using Codelyzer.Analysis.Model;
 using CTA.Rules.Metrics;
 using CTA.Rules.Models;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 
 namespace CTA.Rules.Test.Metrics
@@ -255,8 +256,9 @@ Count: 400";
     ""projectGuid"": ""N/A""
   }
 ]";
-            
-            Assert.AreEqual(expectedJsonReport, ReportGenerator.PortSolutionResultJsonReport.Trim());
+            var unformattedReport = ReportGenerator.PortSolutionResultJsonReport.Trim();
+            var formattedReport = JValue.Parse(unformattedReport).ToString(Formatting.Indented);
+            Assert.AreEqual(expectedJsonReport, formattedReport);
         }
     }
 }

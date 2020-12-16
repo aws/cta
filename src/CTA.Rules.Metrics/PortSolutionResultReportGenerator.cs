@@ -63,7 +63,7 @@ namespace CTA.Rules.Metrics
                 .Concat(BuildErrorMetrics)
                 .ToList();
 
-            PortSolutionResultJsonReport = JsonConvert.SerializeObject(allMetrics, Formatting.Indented);
+            PortSolutionResultJsonReport = JsonConvert.SerializeObject(allMetrics);
             return PortSolutionResultJsonReport;
         }
 

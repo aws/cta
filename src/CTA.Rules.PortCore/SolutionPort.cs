@@ -161,7 +161,7 @@ namespace CTA.Rules.PortCore
                 reportGenerator.GenerateAndExportReports();
 
                 LogHelper.LogInformation("Generating Post-Build Report");
-                LogHelper.LogError(Constants.MetricsTag, reportGenerator.PortSolutionResultJsonReport);
+                LogHelper.LogError($"{Constants.MetricsTag}: {reportGenerator.PortSolutionResultJsonReport}");
             }
             return _portSolutionResult;
         }

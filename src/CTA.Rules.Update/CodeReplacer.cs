@@ -9,7 +9,6 @@ using Microsoft.CodeAnalysis;
 using System.Text.RegularExpressions;
 using System;
 using System.Threading.Tasks;
-using System.Collections.Concurrent;
 
 namespace CTA.Rules.Update
 {
@@ -26,7 +25,7 @@ namespace CTA.Rules.Update
         public Dictionary<string, List<GenericActionExecution>> Run(ProjectActions projectActions, ProjectType projectType)
         {
             IEnumerable<FileActions> fileActions = projectActions.FileActions;
-            ConcurrentDictionary<string, List<GenericActionExecution>> actionsPerProject = new ConcurrentDictionary<string, List<GenericActionExecution>>();
+            Dictionary<string, List<GenericActionExecution>> actionsPerProject = new Dictionary<string, List<GenericActionExecution>>();
 
             var parallelOptions = new ParallelOptions() { MaxDegreeOfParallelism = Constants.ThreadCount };
 
@@ -55,7 +54,7 @@ namespace CTA.Rules.Update
                         var processedActions = ValidateActions(oneRewriter.allActions, result);
                         processedActions = AddActionsWithoutExecutions(currentFileActions, oneRewriter.allActions);
 
-                        actionsPerProject.TryAdd(sourceFileBuildResult.SourceFileFullPath, processedActions);
+                        actionsPerProject.Add(sourceFileBuildResult.SourceFileFullPath, processedActions);
                     }
                 }
                 catch (Exception ex)
@@ -105,9 +104,9 @@ namespace CTA.Rules.Update
                 LogHelper.LogInformation(projectLevelAction.Description);
             }
 
-            actionsPerProject.TryAdd(Constants.Project, projectRunActions);
+            actionsPerProject.Add(Constants.Project, projectRunActions);
 
-            return actionsPerProject.ToDictionary(d => d.Key, d => d.Value);
+            return actionsPerProject;
         }
 
         private List<GenericActionExecution> AddActionsWithoutExecutions(FileActions currentFileActions, List<GenericActionExecution> allActions)
