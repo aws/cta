@@ -58,7 +58,7 @@ namespace CTA.Rules.Actions
             return func;
         }
 
-        public Func<string, ProjectType, string> GetCreateMvc3FolderHierarchyAction(string empty)
+        public Func<string, ProjectType, string> GetCreateNet3FolderHierarchyAction(string empty)
         {
             Func<string, ProjectType, string> func = (string projectDir, ProjectType projectType) =>
             {
@@ -70,7 +70,7 @@ namespace CTA.Rules.Actions
             return func;
         }
 
-        public Func<string, ProjectType, string> GetCreateMvc5FolderHierarchyAction(string empty)
+        public Func<string, ProjectType, string> GetCreateNet5FolderHierarchyAction(string empty)
         {
             Func<string, ProjectType, string> func = (string projectDir, ProjectType projectType) =>
             {
@@ -82,7 +82,7 @@ namespace CTA.Rules.Actions
             return func;
         }
 
-        public Func<string, ProjectType, string> GetMigrateWebConfigAction(string empty)
+        public Func<string, ProjectType, string> GetMigrateConfigAction(string empty)
         {
             Func<string, ProjectType, string> func = (string projectDir, ProjectType projectType) =>
             {

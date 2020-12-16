@@ -54,6 +54,11 @@ namespace CTA.Rules.Actions
         {
             string projectNamespace = GetProjectNamespace();
 
+            var file = string.Concat(projectDir, "/" + fileType.ToString() + ".cs");
+            if(File.Exists(file))
+            {
+                File.Move(file, string.Concat(file, ".bak"));
+            }
             File.WriteAllText(string.Concat(projectDir, "/" + fileType.ToString() + ".cs"), GetStartupFileContent(projectNamespace, projectType, fileType));
 
             LogChange(string.Format("Created " + fileType.ToString() + ".cs file using {0} template", projectType.ToString()));
