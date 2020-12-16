@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+
+  <ItemGroup>
+    <PackageReference Include="Buildalyzer" Version="3.0.1" />
+    <PackageReference Include="Buildalyzer.Logger" Version="3.0.1" />
+    <PackageReference Include="Buildalyzer.Workspaces" Version="3.0.1" />
+    <PackageReference Include="Codelyzer.Analysis" Version="1.2.36-alpha-gfac142e986" />
+    <PackageReference Include="Codelyzer.Analysis.Model" Version="1.2.36-alpha-gfac142e986" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.6.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="System.ComponentModel.Annotations" Version="4.7.0" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <ProjectReference Include="..\CTA.Rules.Config\CTA.Rules.Config.csproj" />
+  </ItemGroup>
+
+</Project>

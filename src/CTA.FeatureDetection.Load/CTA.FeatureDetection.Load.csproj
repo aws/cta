@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CTA.FeatureDetection.Common\CTA.FeatureDetection.Common.csproj" />
+    <ProjectReference Include="..\CTA.FeatureDetection.ProjectType\CTA.FeatureDetection.ProjectType.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Input\default.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

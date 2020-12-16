@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Codelyzer.Analysis" Version="1.2.36-alpha-gfac142e986" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CTA.FeatureDetection.Common\CTA.FeatureDetection.Common.csproj" />
+  </ItemGroup>
+
+</Project>

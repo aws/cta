@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CTA.Rules.Actions\CTA.Rules.Actions.csproj" />
+    <ProjectReference Include="..\CTA.Rules.Analysis\CTA.Rules.Analysis.csproj" />
+    <ProjectReference Include="..\CTA.Rules.Config\CTA.Rules.Config.csproj" />
+    <ProjectReference Include="..\CTA.Rules.Metrics\CTA.Rules.Metrics.csproj" />
+    <ProjectReference Include="..\CTA.Rules.Models\CTA.Rules.Models.csproj" />
+    <ProjectReference Include="..\CTA.Rules.ProjectFile\CTA.Rules.ProjectFile.csproj" />
+    <ProjectReference Include="..\CTA.Rules.RuleFiles\CTA.Rules.RuleFiles.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+	  <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Examples\Projects\**" />
+    <EmbeddedResource Remove="Examples\Projects\**" />
+    <None Remove="Examples\Projects\**" />
+  </ItemGroup>
+
+  <ItemGroup> 
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.5.0" /> 
+    <PackageReference Include="NUnit3TestAdapter" Version="3.15.1" />
+    <PackageReference Include="Moq" Version="4.14.7" /> 
+    <PackageReference Include="NUnit" Version="3.12.0" />
+    <PackageReference Include="coverlet.collector" Version="1.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\CTA.FeatureDetection.Common\CTA.FeatureDetection.Common.csproj" />
+    <ProjectReference Include="..\..\src\CTA.FeatureDetection.Load\CTA.FeatureDetection.Load.csproj" />
+    <ProjectReference Include="..\..\src\CTA.FeatureDetection.ProjectType\CTA.FeatureDetection.ProjectType.csproj" />
+    <ProjectReference Include="..\..\src\CTA.FeatureDetection\CTA.FeatureDetection.csproj" />
+    <ProjectReference Include="..\..\src\CTA.Rules.Config\CTA.Rules.Config.csproj" />
+  </ItemGroup>
+
+</Project>

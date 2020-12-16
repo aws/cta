@@ -1,0 +1,19 @@
+﻿{
+  "FeatureGroups": [
+    {
+      "FeatureScope": "Project",
+      "CompiledFeatureAssemblies": [],
+      "ConfiguredFeatures": [
+        {
+          "Name": "FeatureWithNonexistentProperty",
+          "Condition": {
+            "Type": "XmlFileQuery",
+            "Properties": {
+              "NonexistentFeatureProperty": "This value doesn't matter"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+﻿{
+  "FeatureGroups": [
+    {
+      "FeatureScope": "SourceCode",
+      "CompiledFeatureAssemblies": [
+        {
+          "AssemblyPath": "ThisDoesNotExist.dll",
+          "CompiledFeatureNamespaces": [
+            {
+              "Namespace": "CTA.FeatureDetection.ProjectType.CompiledFeatures",
+              "CompiledFeatureMetadata": [
+                {
+                  "Name": "AspNetMvcFeature",
+                  "ClassName": "AspNetMvcFeature"
+                },
+                {
+                  "Name": "AspNetWebApiFeature",
+                  "ClassName": "AspNetWebApiFeature"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "ConfiguredFeatures": []
+    }
+  ]
+}

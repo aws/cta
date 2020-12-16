@@ -1,0 +1,48 @@
+﻿{
+  "Name": "MvcMusicStore.ViewModels",
+  "Version": "1.0.0",
+  "Packages": [
+    {
+      "Name": "MvcMusicStore",
+      "Type": "Project"
+    }
+  ],
+  "Recommendations": [
+    {
+      "Type": "Namespace",
+      "Name": "MvcMusicStore.ViewModels",
+      "Value": "MvcMusicStore.ViewModels",
+      "KeyType": "Name",
+      "ContainingType": "",
+      "RecommendedActions": [
+        {
+          "Source": "Amazon",
+          "Preferred": "Yes",
+          "TargetFrameworks": [
+            {
+              "Name": "netcoreapp3.1",
+              "TargetCPU": [ "x86", "x64", "ARM64" ]
+            },
+            {
+              "Name": "net5.0",
+              "TargetCPU": [ "x86", "x64", "ARM64" ]
+            }
+          ],
+          "Description": "Replace namespacee with a new namespace",
+          "Actions": [
+            {
+              "Name": "RenameNamespace",
+              "Type": "Namespace",
+              "Value": "MvcMusicStore.ChangedViewModels",
+              "Description": "Replace namespace with a new namespace",
+              "ActionValidation": {
+                "Contains": "notvalid;",
+                "NotContains": "notvalidtoo"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
