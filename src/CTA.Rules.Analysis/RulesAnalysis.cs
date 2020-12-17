@@ -359,8 +359,9 @@ namespace CTA.Rules.Analyzer
                 || fileAction.NamespaceActions.Any() 
                 || fileAction.ObjectCreationExpressionActions.Any())
             {
-                token.TextSpan = textSpan;
-                fileAction.NodeTokens.Add(token);
+                var nodeToken = NodeToken.CopyToken(token);
+                nodeToken.TextSpan = textSpan;
+                fileAction.NodeTokens.Add(nodeToken);
             }
 
             AddPackages(token.PackageActions, textSpan);
@@ -434,8 +435,9 @@ namespace CTA.Rules.Analyzer
 
             if (fileAction.ClassDeclarationActions.Any() || fileAction.InterfaceDeclarationActions.Any() || fileAction.MethodDeclarationActions.Any())
             {
-                token.TextSpan = textSpan;
-                fileAction.NodeTokens.Add(token);
+                var nodeToken = NodeToken.CopyToken(token);
+                nodeToken.TextSpan = textSpan;
+                fileAction.NodeTokens.Add(nodeToken);
             }
         }
     }
