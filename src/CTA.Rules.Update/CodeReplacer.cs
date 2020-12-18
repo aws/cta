@@ -9,6 +9,7 @@ using Microsoft.CodeAnalysis;
 using System.Text.RegularExpressions;
 using System;
 using System.Threading.Tasks;
+using System.Collections.Concurrent;
 
 namespace CTA.Rules.Update
 {
@@ -17,7 +18,8 @@ namespace CTA.Rules.Update
         private ProjectConfiguration _projectConfiguration;
         private IEnumerable<SourceFileBuildResult> _sourceFileBuildResults;
 
-        public CodeReplacer(List<SourceFileBuildResult> sourceFileBuildResults, ProjectConfiguration projectConfiguration) {
+        public CodeReplacer(List<SourceFileBuildResult> sourceFileBuildResults, ProjectConfiguration projectConfiguration)
+        {
             _sourceFileBuildResults = sourceFileBuildResults;
             _projectConfiguration = projectConfiguration;
         }
@@ -25,7 +27,8 @@ namespace CTA.Rules.Update
         public Dictionary<string, List<GenericActionExecution>> Run(ProjectActions projectActions, ProjectType projectType)
         {
             IEnumerable<FileActions> fileActions = projectActions.FileActions;
-            Dictionary<string, List<GenericActionExecution>> actionsPerProject = new Dictionary<string, List<GenericActionExecution>>();
+
+            ConcurrentDictionary<string, List<GenericActionExecution>> actionsPerProject = new ConcurrentDictionary<string, List<GenericActionExecution>>();
 
             var parallelOptions = new ParallelOptions() { MaxDegreeOfParallelism = Constants.ThreadCount };
 
@@ -54,7 +57,10 @@ namespace CTA.Rules.Update
                         var processedActions = ValidateActions(oneRewriter.allActions, result);
                         processedActions = AddActionsWithoutExecutions(currentFileActions, oneRewriter.allActions);
 
-                        actionsPerProject.Add(sourceFileBuildResult.SourceFileFullPath, processedActions);
+                        if (!actionsPerProject.TryAdd(sourceFileBuildResult.SourceFileFullPath, processedActions))
+                        {
+                            throw new FilePortingException(sourceFileBuildResult.SourceFilePath, new Exception("File already exists in collection"));
+                        }
                     }
                 }
                 catch (Exception ex)
@@ -67,7 +73,7 @@ namespace CTA.Rules.Update
             var projectRunActions = new List<GenericActionExecution>();
 
             //Project Level Actions
-            foreach(var projectLevelAction in projectActions.ProjectLevelActions)
+            foreach (var projectLevelAction in projectActions.ProjectLevelActions)
             {
                 var projectActionExecution = new GenericActionExecution(projectLevelAction, _projectConfiguration.ProjectPath);
                 projectActionExecution.TimesRun = 1;
@@ -104,9 +110,12 @@ namespace CTA.Rules.Update
                 LogHelper.LogInformation(projectLevelAction.Description);
             }
 
-            actionsPerProject.Add(Constants.Project, projectRunActions);
+            if(!actionsPerProject.TryAdd(Constants.Project, projectRunActions))
+            {
+                LogHelper.LogError(new FilePortingException(Constants.Project, new Exception("Error adding project to actions collection")));
+            }
 
-            return actionsPerProject;
+            return actionsPerProject.ToDictionary(a => a.Key, a => a.Value);
         }
 
         private List<GenericActionExecution> AddActionsWithoutExecutions(FileActions currentFileActions, List<GenericActionExecution> allActions)
@@ -150,9 +159,9 @@ namespace CTA.Rules.Update
                 var actionValidation = action.ActionValidation;
                 var actionValid = true;
 
-                if(actionValidation == null) { continue; }
+                if (actionValidation == null) { continue; }
 
-                if(!string.IsNullOrEmpty(actionValidation.Contains) && !trimmedResult.Contains(actionValidation.Contains))
+                if (!string.IsNullOrEmpty(actionValidation.Contains) && !trimmedResult.Contains(actionValidation.Contains))
                 {
                     //Validation token is not in the result source file:
                     actionValid = false;

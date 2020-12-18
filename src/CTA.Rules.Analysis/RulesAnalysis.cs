@@ -45,7 +45,7 @@ namespace CTA.Rules.Analyzer
                 {
                     _projectActions.FileActions.Add(fileAction);
                 }
-            });     
+            });
             return _projectActions;
         }
 
@@ -354,12 +354,12 @@ namespace CTA.Rules.Analyzer
 
             if (fileAction.AttributeActions.Any()
                 || fileAction.IdentifierNameActions.Any()
-                || fileAction.InvocationExpressionActions.Any() 
-                || fileAction.Usingactions.Any() 
-                || fileAction.NamespaceActions.Any() 
+                || fileAction.InvocationExpressionActions.Any()
+                || fileAction.Usingactions.Any()
+                || fileAction.NamespaceActions.Any()
                 || fileAction.ObjectCreationExpressionActions.Any())
             {
-                var nodeToken = NodeToken.CopyToken(token);
+                var nodeToken = token.Clone();
                 nodeToken.TextSpan = textSpan;
                 fileAction.NodeTokens.Add(nodeToken);
             }
@@ -401,7 +401,7 @@ namespace CTA.Rules.Analyzer
                     Value = c.Value,
                     Description = c.Description,
                     Name = c.Name,
-                    Type =c.Type,
+                    Type = c.Type,
                     TextSpan = textSpan,
                     ActionValidation = c.ActionValidation,
                     ClassDeclarationActionFunc = c.ClassDeclarationActionFunc
@@ -435,7 +435,7 @@ namespace CTA.Rules.Analyzer
 
             if (fileAction.ClassDeclarationActions.Any() || fileAction.InterfaceDeclarationActions.Any() || fileAction.MethodDeclarationActions.Any())
             {
-                var nodeToken = NodeToken.CopyToken(token);
+                var nodeToken = token.Clone();
                 nodeToken.TextSpan = textSpan;
                 fileAction.NodeTokens.Add(nodeToken);
             }
