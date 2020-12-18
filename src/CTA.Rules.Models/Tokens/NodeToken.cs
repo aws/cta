@@ -49,29 +49,7 @@ namespace CTA.Rules.Models.Tokens
         public List<ProjectLevelAction> ProjectLevelActions { get; set; }
         public List<ProjectLevelAction> ProjectFileActions { get; set; }
 
-        public static NodeToken CopyToken(NodeToken sourceToken) => new NodeToken()
-        {
-            Key = sourceToken.Key,
-            Namespace = sourceToken.Namespace,
-            Type = sourceToken.Type,
-            FullKey = sourceToken.FullKey,
-            TextSpan = sourceToken.TextSpan,
-            Description = sourceToken.Description,
-            TargetCPU = sourceToken.TargetCPU,
-            AttributeActions = sourceToken.AttributeActions,
-            AttributeListActions = sourceToken.AttributeListActions,
-            ClassDeclarationActions = sourceToken.ClassDeclarationActions,
-            InterfaceDeclarationActions = sourceToken.InterfaceDeclarationActions,
-            MethodDeclarationActions = sourceToken.MethodDeclarationActions,
-            UsingActions = sourceToken.UsingActions,
-            IdentifierNameActions = sourceToken.IdentifierNameActions,
-            InvocationExpressionActions = sourceToken.InvocationExpressionActions,
-            NamespaceActions = sourceToken.NamespaceActions,
-            ObjectCreationExpressionActions = sourceToken.ObjectCreationExpressionActions,
-            PackageActions = sourceToken.PackageActions,
-            ProjectLevelActions = sourceToken.ProjectLevelActions,
-            ProjectFileActions = sourceToken.ProjectFileActions
-        };
+        public NodeToken Clone() => (NodeToken)this.MemberwiseClone();
 
     }
 }
