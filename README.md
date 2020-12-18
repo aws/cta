@@ -3,7 +3,7 @@
 
 ## Introduction
 
-Code translation assistant is a tool to help users automate some of their porting experience using a set of predefined rules and actions. The rules file is used to find patterns in the user code and compile a list of applicable actions. These actions are later run to modify the code, in addition to making some project changes when applicable. 
+Code translation assistant helps users automate some of their porting experience using a set of predefined rules and actions. The rules file is used to find patterns in the user code and compile a list of applicable actions. These actions are later run to modify the code, in addition to making some project changes when applicable. 
 
 ## Getting Started
 
