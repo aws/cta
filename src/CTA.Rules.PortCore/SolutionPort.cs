@@ -113,7 +113,7 @@ namespace CTA.Rules.PortCore
                             }
                             matchedFiles.Add(fileName);
                         }
-                        catch (Exception ex)
+                        catch (Exception)
                         {
                             //We are checking which files have a recommendation, some of them won't
                         }
@@ -178,7 +178,7 @@ namespace CTA.Rules.PortCore
                     File.WriteAllBytes(zipFile, fileContents);
                     ZipFile.ExtractToDirectory(zipFile, executingPath, true);
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     LogHelper.LogError("Unable to download resources");
                 }

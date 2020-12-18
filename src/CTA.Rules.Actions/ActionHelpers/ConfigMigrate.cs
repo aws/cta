@@ -56,7 +56,7 @@ namespace CTA.Rules.Actions
                         webConfig = (configuration)ser.Deserialize(reader);
                     }
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     LogHelper.LogError("Error processing web.config file {0}", webConfigFileDir);
                 }
