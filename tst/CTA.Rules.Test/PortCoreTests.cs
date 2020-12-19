@@ -46,19 +46,19 @@ namespace CTA.Rules.Test
         }
 
         [Test]
-        public async Task TestSampleWebApi5Solution()
+        public void TestSampleWebApi5Solution()
         {
-            await TestWebApi("net5.0");
+            TestWebApi("net5.0");
         }
 
         [Test]
-        public async Task TestSampleWebApi3Solution()
+        public void TestSampleWebApi3Solution()
         {
-            await TestWebApi("netcoreapp3.1");
-            await TestWebApi("net5.0", Path.Combine(tempDir, "netcoreapp3.1"));
+            TestWebApi("netcoreapp3.1");
+            TestWebApi("net5.0", Path.Combine(tempDir, "netcoreapp3.1"));
         }
 
-        private async Task TestWebApi(string version, string solutionDir = "")
+        private void TestWebApi(string version, string solutionDir = "")
         {
             TestSolutionAnalysis results;
 
@@ -109,12 +109,12 @@ namespace CTA.Rules.Test
         }
 
         [Test]
-        public async Task TestSampleWebApiWithReferences3Solution()
+        public void TestSampleWebApiWithReferences3Solution()
         {
-            await TestWebApiWithReferences("netcoreapp3.1");
+            TestWebApiWithReferences("netcoreapp3.1");
         }
 
-        private async Task TestWebApiWithReferences(string version)
+        private void TestWebApiWithReferences(string version)
         {
             TestSolutionAnalysis results = AnalyzeSolution("WebApiWithReferences.sln", tempDir, downloadLocation, version);
 
@@ -170,18 +170,18 @@ namespace CTA.Rules.Test
         }
 
         [Test]
-        public async Task TestMvcMusicStore5()
+        public void TestMvcMusicStore5()
         {
-            await TestMvcMusicStore("net5.0");
+            TestMvcMusicStore("net5.0");
         }
 
         [Test]
-        public async Task TestMvcMusicStore3()
-        {
-            await TestMvcMusicStore("netcoreapp3.1");
+        public void TestMvcMusicStore3()
+        { 
+            TestMvcMusicStore("netcoreapp3.1");
         }
 
-        private async Task TestMvcMusicStore(string version)
+        private void TestMvcMusicStore(string version)
         {
             TestSolutionAnalysis results = AnalyzeSolution("MvcMusicStore.sln", tempDir, downloadLocation, version);
 
