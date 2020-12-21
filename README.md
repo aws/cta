@@ -8,7 +8,7 @@ Code translation assistant helps users automate some of their porting experience
 ## Getting Started
 
 * Clone the Git repository.
-* Load the solution Codelyzer.sln using Visual Studio or Rider.
+* Load the solution CTA.Rules.sln using Visual Studio or Rider.
 * Create a "Run/Debug" Configuration for the "CTA.Rules.PortCore" project.
     * The project will pre-load rules for porting your framework solution to .net core if you use the argument -d true to load these rules
 * Provide command line arguments for a solution and output path, then run the application. List of arguments below:
