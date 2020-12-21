@@ -55,7 +55,7 @@ namespace CTA.Rules.Test
         }
 
         [Test]
-        public async Task TestSampleWebApiSolution()
+        public void TestSampleWebApiSolution()
         {
             //We don't care about version for CTA-only rules:
             string version = "net5.0";
@@ -127,7 +127,7 @@ namespace CTA.Rules.Test
         }
 
         [Test]
-        public async Task TestMvcMusicStore()
+        public void TestMvcMusicStore()
         {
             //We don't care about version for CTA-only rules:
             string version = "net5.0";
@@ -216,7 +216,7 @@ namespace CTA.Rules.Test
         }
 
         [Test]
-        public async Task ConvertHierarchalToNamespaceFile()
+        public void ConvertHierarchicalToNamespaceFile()
         {
             var dir = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "CTAFiles");
             var consolidatedFile = Directory.EnumerateFiles(dir, "consolidated.json").FirstOrDefault();
@@ -236,7 +236,7 @@ namespace CTA.Rules.Test
         }
 
         [Test]
-        public async Task LoggerTest()
+        public void LoggerTest()
         {
             LogHelper.LogError(new Exception("Test message 1"));
             LogHelper.LogError("Test message 1");

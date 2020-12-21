@@ -1,17 +1,11 @@
 ﻿using CTA.Rules.Config;
-using CTA.Rules.Metrics;
 using CTA.Rules.Models;
 using Codelyzer.Analysis.Model;
-using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using Newtonsoft.Json.Schema;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net.Http;
-using System.Security.Cryptography.Pkcs;
 using System.Threading.Tasks;
 
 namespace CTA.Rules.RuleFiles
@@ -26,7 +20,6 @@ namespace CTA.Rules.RuleFiles
         private string _overrideFile;
         private string _assembliesDir;
         private IEnumerable<Reference> _projectReferences;
-        private ProjectConfiguration _projectConfiguration;
 
         /// <summary>
         /// Initializes a new RulesFileLoader

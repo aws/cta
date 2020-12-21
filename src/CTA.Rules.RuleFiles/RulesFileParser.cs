@@ -2,9 +2,6 @@
 using CTA.Rules.Config;
 using CTA.Rules.Models;
 using CTA.Rules.Models.Tokens;
-using CTA.Rules.Update;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -589,7 +586,7 @@ namespace CTA.Rules.RuleFiles
                 }
                 catch (Exception ex)
                 {
-                    LogHelper.LogDebug(string.Format("Error parsing action type {0}", action.Type));
+                    LogHelper.LogError(ex, string.Format("Error parsing action type {0}", action.Type));
                 }
             }
         }

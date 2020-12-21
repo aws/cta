@@ -113,7 +113,7 @@ namespace CTA.Rules.PortCore
                             }
                             matchedFiles.Add(fileName);
                         }
-                        catch (Exception ex)
+                        catch (Exception) 
                         {
                             //We are checking which files have a recommendation, some of them won't
                         }
@@ -174,13 +174,13 @@ namespace CTA.Rules.PortCore
                 try
                 {
                     var zipFile = Path.Combine(executingPath, "resources.zip");
-                    var fileContents = httpClient.GetByteArrayAsync(string.Concat(Constants.S3CTAFiles)).Result;
+                    var fileContents = httpClient.GetByteArrayAsync(Constants.S3CTAFiles).Result;
                     File.WriteAllBytes(zipFile, fileContents);
                     ZipFile.ExtractToDirectory(zipFile, executingPath, true);
                 }
                 catch (Exception ex)
                 {
-                    LogHelper.LogError("Unable to download resources");
+                    LogHelper.LogError(ex, string.Format("Unable to download resources from {0}", Constants.S3CTAFiles));
                 }
             }
         }

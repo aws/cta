@@ -1,16 +1,10 @@
 ﻿using CTA.Rules.Config;
 using CTA.Rules.Models;
-using Microsoft.Build.Definition;
-using Microsoft.Build.Evaluation;
-using Microsoft.Extensions.Logging;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Xml.Linq;
 
 namespace CTA.Rules.ProjectFile
@@ -168,7 +162,7 @@ namespace CTA.Rules.ProjectFile
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 //If we're using a framework csproj, we will get an error. No need to catch since we're overwriting the csproj file
             }
@@ -181,7 +175,7 @@ namespace CTA.Rules.ProjectFile
 
                 _packages = packages.Union(_packages).ToDictionary(d => d.Key, d => d.Value);
             }
-            catch(Exception ex)
+            catch(Exception)
             {
                 //If we're using a framework csproj, we will get an error. No need to catch since we're overwriting the csproj file
             }
@@ -195,7 +189,7 @@ namespace CTA.Rules.ProjectFile
 
                 _projectReferences = projects.Union(_projectReferences).Distinct().ToList();
             }
-            catch(Exception ex)
+            catch(Exception)
             {
                 //If we're using a framework csproj, we will get an error. No need to catch since we're overwriting the csproj file
             }
@@ -207,7 +201,7 @@ namespace CTA.Rules.ProjectFile
                     _projectType = ProjectType.WebClassLibrary;
                 }
             }
-            catch(Exception ex)
+            catch(Exception)
             {
                 //If we're using a framework csproj, we will get an error. No need to catch since we're overwriting the csproj file
             }

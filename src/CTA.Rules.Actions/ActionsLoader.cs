@@ -1,16 +1,13 @@
-﻿using CTA.Rules.Actions;
-using CTA.Rules.Config;
+﻿using CTA.Rules.Config;
 using CTA.Rules.Models;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Editing;
-using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Loader;
-using System.Text;
 
 namespace CTA.Rules.Actions
 {
@@ -281,7 +278,7 @@ namespace CTA.Rules.Actions
                         {
                             result = GetJsonParameters(value.ToString(), method);
                         }
-                        catch (Exception ex)
+                        catch (Exception)
                         {
                             result = new List<string>() { value };
                         }

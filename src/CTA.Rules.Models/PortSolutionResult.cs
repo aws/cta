@@ -93,7 +93,7 @@ namespace CTA.Rules.Models
                     analyzerResult.Dispose();
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 foreach (var analyzerResult in analyzerResults)
                 {
