@@ -1,4 +1,4 @@
-# Code Translation Assistant (CTA)
+# Code translation assistant
 ![Build Test](https://github.com/aws/cta/workflows/Build%20Test/badge.svg)
 
 ## Introduction
