@@ -3,7 +3,7 @@
 
 ## Introduction
 
-Code translation assistant helps users automate some of their porting experience using a set of predefined rules and actions. The rules file is used to find patterns in the user code and compile a list of applicable actions. These actions are later run to modify the code, in addition to making some project changes when applicable. 
+Code translation assistant helps users automate some of their porting experience using a set of predefined rules and actions. The rules file is used to find patterns in the user code and compile a list of applicable actions. These actions are later run to modify the code, in addition to making some project changes when applicable. This feature is used in [Porting Assistant for .NET](https://github.com/aws/porting-assistant-dotnet-client) to provide an automated porting experience.
 
 ## Getting Started
 
