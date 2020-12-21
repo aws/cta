@@ -43,22 +43,22 @@ namespace CTA.Rules.Actions
         /// <returns></returns>
         private configuration ProcessWebConfig(string projectDir)
         {
-            string webConfigFileDir = Path.Combine(projectDir, "web.config");
+            string webConfigFile = Path.Combine(projectDir, "web.config");
 
             configuration webConfig = null;
-            if (File.Exists(webConfigFileDir))
+            if (File.Exists(webConfigFile))
             {
                 try
                 {
-                    using (FileStream reader = File.OpenRead(webConfigFileDir))
+                    using (FileStream reader = File.OpenRead(webConfigFile))
                     {
                         XmlSerializer ser = new XmlSerializer(typeof(configuration));
                         webConfig = (configuration)ser.Deserialize(reader);
                     }
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
-                    LogHelper.LogError("Error processing web.config file {0}", webConfigFileDir);
+                    LogHelper.LogError(ex, string.Format("Error processing web.config file {0}", webConfigFile));
                 }
             }
             return webConfig;

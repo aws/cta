@@ -584,9 +584,9 @@ namespace CTA.Rules.RuleFiles
                             }
                     }
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
-                    LogHelper.LogDebug(string.Format("Error parsing action type {0}", action.Type));
+                    LogHelper.LogError(ex, string.Format("Error parsing action type {0}", action.Type));
                 }
             }
         }
