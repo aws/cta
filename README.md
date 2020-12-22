@@ -1,9 +1,47 @@
-# Code translation assistant
+# Code translation in Porting Assistant for .NET
 ![Build Test](https://github.com/aws/cta/workflows/Build%20Test/badge.svg)
 
-## Introduction
+Porting Assistant for .NET is an analysis tool that scans .NET Framework applications and generates a .NET Core compatibility assessment, helping customers port their applications to Linux faster.
 
-Code translation assistant helps users automate some of their porting experience using a set of predefined rules and actions. The rules file is used to find patterns in the user code and compile a list of applicable actions. These actions are later run to modify the code, in addition to making some project changes when applicable. This feature is used in [Porting Assistant for .NET](https://github.com/aws/porting-assistant-dotnet-client) to provide an automated porting experience.
+Porting Assistant for .NET scans .NET Framework applications to identify incompatibilities with .NET Core, finds known replacements, generates detailed compatibility assessment reports and makes changes to the source code to fix common issues encountered while porting an application from .NET Framework to .NET Core. This reduces the manual effort involved in modernizing applications to Linux.
+
+The code translation package contains the source of the engine that allow developers to define recommendations to fix incompatible patterns in the source code when porting from .NET Framework to .NET Core or .NET 5.
+
+For more information about Porting Assistant and to try the tool, please refer to the documentation: https://aws.amazon.com/porting-assistant-dotnet/
+
+# Introduction
+
+Code translation feature helps users automate some of their porting experience when converting their applications from .NET Framework to .NET Core. It identifies common issues such as usage of Entity Framework or ASP.NET MVC and makes changes to the source code to reduce the amount of work needed to port applications from .NET Framework to .NET Core or .NET 5. 
+
+In order to perform code translations, code translation relies on a set of predefined rules and actions. The rules files define patterns that the code translation package searches for in the user code, the tool then performs actions specified in the rules files to fix the issues that were identified. Below we have highlighted some examples of rules that are already available. 
+
+#### ASP .NET MVC:
+If you’re porting your MVC project to .NET Core or .NET 5, below are some of the steps that Porting Assistant will do:
+
+* Creates a new project file that uses the SDK for Web projects
+* Update the namespaces to use the new Microsoft.AspNetCore.Mvc
+* Update the project structure and move your static files (CSS, JavaScript, images, etc.) into the static files folder
+* Add the required template files to start your application (Program.cs and Startup.cs)
+* Archive framework files that are no longer needed (global.asax, BundleConfig.cs, etc.)
+
+#### Database Connectivity:
+Whether you’re using ADO .NET or Entity Framework, Porting Assistant for .NET can help you with the porting process.
+
+ADO .NET:
+Porting Assistant for .NET will add the needed packages to the csproj files. In addition, it will scan your code and automatically update any references to the framework ADO .NET namespace, System.Data.SqlClient, to the new .NET core or .NET 5 compatible package, Microsoft.Data.SqlClient
+
+Entity Framework:
+Users who have dependencies on Entity Framework in their projects will also see their porting experience enhanced. During porting, Porting assistant will automatically:
+
+* Add the NuGet packages for EF Core
+* Update the namespaces in your code files
+* Add an OnConfiguring method to your DbContext classes to allow you to easily connect to your database
+
+In some cases, and depending where you store your connection strings, the porting process will also migrate your connection strings to the new appsettings file in .NET Core.
+
+In addition to the above rules, Porting Assistant will apply other rules depending on your code. We have a list of around 20 rules and 40 actions that are grouped by namespace, and are [open source](https://github.com/aws/porting-assistant-dotnet-datastore). We will continue enhancing and adding to this list, and welcome any contributions from the community.
+
+
 
 ## Getting Started
 
