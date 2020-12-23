@@ -21,8 +21,6 @@ namespace CTA.Rules.Actions
         {
             Func<string, ProjectType, string> func = (string projectDir, ProjectType projectType) =>
             {
-                bool isArchiveFiles = false;
-
                 List<string> archived = new List<string>();
                 List<string> deleted = new List<string>();
 
@@ -42,7 +40,6 @@ namespace CTA.Rules.Actions
 
                 foreach (string s in result)
                 {
-                    isArchiveFiles = true;
                     if (!s.EndsWith(".bak"))
                     {
                         string backupFile = string.Concat(s, ".bak");
