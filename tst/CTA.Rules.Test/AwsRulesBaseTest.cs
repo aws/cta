@@ -125,7 +125,8 @@ namespace CTA.Rules.Test
 
                     result.SolutionAnalysisResult = str.ToString();
 
-                    solutionPort.Run();
+                    var runResult = solutionPort.Run();
+                    result.SolutionRunResult = runResult;
 
                     foreach (var project in result.ProjectResults)
                     {

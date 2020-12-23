@@ -22,11 +22,11 @@ namespace CTA.Rules.Actions
             Func<string, ProjectType, List<string>, Dictionary<string, string>, List<string>, string> func
                 = (string projectDir, ProjectType projectType, List<string> targetVersion, Dictionary<string, string> packageReferences, List<string> projectReferences) =>
             {
-                ProjectFileCreator projectFileCreator = new ProjectFileCreator(projectDir, targetVersion ,
+                ProjectFileCreator projectFileCreator = new ProjectFileCreator(projectDir, targetVersion,
                     packageReferences, projectReferences.ToList(), projectType);
 
-                projectFileCreator.Create();
-                return "";
+                var result = projectFileCreator.Create();
+                return result ? "Project file created" : string.Empty;
             };
 
             return func;

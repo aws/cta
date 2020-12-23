@@ -76,6 +76,7 @@ namespace CTA.Rules.PortCore
 
         private void InitSolutionRewriter(List<AnalyzerResult> analyzerResults, List<PortCoreConfiguration> solutionConfiguration)
         {
+            CheckCache();
             CheckResources();
             InitRules(solutionConfiguration, analyzerResults);
             _solutionRewriter = new SolutionRewriter(analyzerResults, solutionConfiguration.ToList<ProjectConfiguration>());
@@ -173,15 +174,40 @@ namespace CTA.Rules.PortCore
             {
                 try
                 {
-                    var zipFile = Path.Combine(executingPath, "resources.zip");
-                    var fileContents = httpClient.GetByteArrayAsync(Constants.S3CTAFiles).Result;
-                    File.WriteAllBytes(zipFile, fileContents);
+                    var zipFile = Utils.DownloadFile(Constants.S3CTAFiles, Constants.ResourcesFile);                    
                     ZipFile.ExtractToDirectory(zipFile, executingPath, true);
                 }
                 catch (Exception ex)
                 {
                     LogHelper.LogError(ex, string.Format("Unable to download resources from {0}", Constants.S3CTAFiles));
                 }
+            }
+        }
+
+        private void CheckCache()
+        {
+            var createdTime = Directory.GetCreationTime(Constants.RulesDefaultPath);
+            if(createdTime.AddDays(1) < DateTime.Now)
+            {
+                ResetCache();
+            }
+        }
+        public static void ResetCache()
+        {
+            try
+            {
+                if(Directory.Exists(Constants.RulesDefaultPath))
+                {
+                    Directory.Delete(Constants.RulesDefaultPath, true);
+                }
+                if (File.Exists(Constants.ResourcesFile))
+                {
+                    File.Delete(Constants.ResourcesFile);
+                }
+            }
+            catch (Exception ex)
+            {
+                LogHelper.LogError(ex, "Error while deleting directory");
             }
         }
 

@@ -19,7 +19,7 @@ namespace CTA.Rules.ProjectFile
         private ProjectType _projectType;
 
 
-        private const string csCoreProjSyntaxWeb = @"
+        public const string csCoreProjSyntaxWeb = @"
                 <Project Sdk=""{0}"">
                     <PropertyGroup>
                         <TargetFramework>{1}</TargetFramework>
@@ -27,7 +27,7 @@ namespace CTA.Rules.ProjectFile
                     {2}
                 </Project>";
         
-        private const string csCoreProjSyntaxWebClassLibrary = @"
+        public const string csCoreProjSyntaxWebClassLibrary = @"
                 <Project Sdk=""{0}"">
                     <PropertyGroup>
                         <TargetFramework>{1}</TargetFramework>
@@ -38,7 +38,7 @@ namespace CTA.Rules.ProjectFile
                     {2}
                 </Project>";
 
-        private const string csCoreProjSyntaxClassLibrary = @"
+        public const string csCoreProjSyntaxClassLibrary = @"
                 <Project Sdk=""{0}"">
                     <PropertyGroup>
                         <TargetFramework>{1}</TargetFramework>
@@ -68,7 +68,7 @@ namespace CTA.Rules.ProjectFile
             {
                 return _targetVersions[0];
             }
-            return string.Empty;
+            return Constants.DefaultCoreVersion;
         }
 
         //TODO Get project references and add to new project
@@ -76,26 +76,35 @@ namespace CTA.Rules.ProjectFile
         /// Replaces the current project file with a new file 
         /// </summary>
         /// <param name="projectFile">Current project file</param>
-        public void Create()
+        public bool Create()
         {
-            string sdkName = Constants.ClassLibrarySdkName;
-            string csProj = csCoreProjSyntaxClassLibrary;
-
-            if (_projectType == ProjectType.Mvc || _projectType == ProjectType.WebApi)
+            try
             {
-                csProj = csCoreProjSyntaxWeb;
-                sdkName = Constants.WebSdkName;
-            }
-            else if (_projectType == ProjectType.WebClassLibrary)
-            {
-                csProj = csCoreProjSyntaxWebClassLibrary;
-            }
+                string sdkName = Constants.ClassLibrarySdkName;
+                string csProj = csCoreProjSyntaxClassLibrary;
 
-            string packages = GetPackagesSection();
-            string projects = GetProjectReferencesSection();
-            
-            string csProjContent = string.Format(csProj, sdkName, GetTargetVersions(), string.Concat(AddItemGroup(packages), AddItemGroup(projects)));
-            File.WriteAllText(_projectFile, csProjContent);
+                if (_projectType == ProjectType.Mvc || _projectType == ProjectType.WebApi)
+                {
+                    csProj = csCoreProjSyntaxWeb;
+                    sdkName = Constants.WebSdkName;
+                }
+                else if (_projectType == ProjectType.WebClassLibrary)
+                {
+                    csProj = csCoreProjSyntaxWebClassLibrary;
+                }
+
+                string packages = GetPackagesSection();
+                string projects = GetProjectReferencesSection();
+
+                string csProjContent = string.Format(csProj, sdkName, GetTargetVersions(), string.Concat(AddItemGroup(packages), AddItemGroup(projects)));
+                File.WriteAllText(_projectFile, csProjContent);
+            }
+            catch (Exception ex)
+            {
+                LogHelper.LogError(ex, "Error while creating project file for {0}", _projectFile);
+                return false;
+            }
+            return true;
         }
 
         private string AddItemGroup(string content)

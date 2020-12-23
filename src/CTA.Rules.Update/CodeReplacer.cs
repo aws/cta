@@ -77,13 +77,14 @@ namespace CTA.Rules.Update
             {
                 var projectActionExecution = new GenericActionExecution(projectLevelAction, _projectConfiguration.ProjectPath);
                 projectActionExecution.TimesRun = 1;
+                var runResult = string.Empty;
                 if (!_projectConfiguration.IsMockRun)
                 {
                     if (projectLevelAction.ProjectLevelActionFunc != null)
                     {
                         try
                         {
-                            projectLevelAction.ProjectLevelActionFunc(_projectConfiguration.ProjectPath, projectType);
+                            runResult = projectLevelAction.ProjectLevelActionFunc(_projectConfiguration.ProjectPath, projectType);
                         }
                         catch (Exception ex)
                         {
@@ -96,7 +97,7 @@ namespace CTA.Rules.Update
                     {
                         try
                         {
-                            projectLevelAction.ProjectFileActionFunc(_projectConfiguration.ProjectPath, projectType, _projectConfiguration.TargetVersions, projectActions.PackageActions.Distinct().ToDictionary(p => p.Name, p => p.Version), projectActions.ProjectReferenceActions.ToList());
+                            runResult = projectLevelAction.ProjectFileActionFunc(_projectConfiguration.ProjectPath, projectType, _projectConfiguration.TargetVersions, projectActions.PackageActions.Distinct().ToDictionary(p => p.Name, p => p.Version), projectActions.ProjectReferenceActions.ToList());
                         }
                         catch (Exception ex)
                         {
@@ -106,8 +107,12 @@ namespace CTA.Rules.Update
                         }
                     }
                 }
-                projectRunActions.Add(projectActionExecution);
-                LogHelper.LogInformation(projectLevelAction.Description);
+                if (!string.IsNullOrEmpty(runResult))
+                {
+                    projectActionExecution.Description = string.Concat(projectActionExecution.Description, ": ", runResult);
+                    projectRunActions.Add(projectActionExecution);
+                    LogHelper.LogInformation(projectLevelAction.Description);
+                }
             }
 
             if(!actionsPerProject.TryAdd(Constants.Project, projectRunActions))

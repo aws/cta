@@ -1,4 +1,5 @@
 ﻿using CTA.Rules.Actions;
+using CTA.Rules.Models;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -43,6 +44,18 @@ namespace CTA.Rules.Test.Actions
 
             var expectedResult = "Console.WriteLine(\"SomeText\")";
             Assert.AreEqual(expectedResult, newNode.ToFullString());
+        }
+
+
+        [Test]
+        public void ObjectCreationExpressionActionEquals()
+        {
+            var objectCreationExpressionAction = new ObjectCreationExpressionAction() { Key = "Test", Value = "Test2", ObjectCreationExpressionGenericActionFunc = _objectCreationExpressionActions.GetReplaceObjectinitializationAction("Test") };
+            var cloned = objectCreationExpressionAction.Clone();
+            Assert.True(objectCreationExpressionAction.Equals(cloned));
+
+            cloned.Value = "DifferentValue";
+            Assert.False(objectCreationExpressionAction.Equals(cloned));
         }
     }
 }

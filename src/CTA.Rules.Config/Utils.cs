@@ -102,7 +102,34 @@ namespace CTA.Rules.Config
                 throw new Newtonsoft.Json.JsonException($"Invalid {typeToValidate}:{Environment.NewLine}{errorMessageBuilder}");
             }
         }
-
         public static string EscapeAllWhitespace(string src) => Regex.Replace(src, @"(\s+)|(\\n)|(\\r)|(\\t)|(\n)|(\r)|(\t)", string.Empty);
+
+        public static string DownloadFile(string fileUrl, string destinationFile, int retryCount = Constants.DownloadRetryCount)
+        {
+            int retryAttempts = 0;
+
+            using (var httpClient = new HttpClient())
+            {
+                while (retryAttempts < retryCount)
+                {
+                    try
+                    {
+                        var fileContents = httpClient.GetByteArrayAsync(fileUrl).Result;
+                        File.WriteAllBytes(destinationFile, fileContents);
+                        break;
+                    }
+                    catch (Exception ex)
+                    {
+                        retryAttempts++;
+                        if(retryAttempts == retryCount)
+                        {
+                            throw ex;
+                        }
+                    }
+                }
+            }
+
+            return destinationFile;
+        }
     }
 }

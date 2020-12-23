@@ -4,6 +4,8 @@ using Newtonsoft.Json;
 using System;
 using System.IO;
 using System.Text;
+using System.Xml.Linq;
+using System.Linq;
 using System.Xml.Serialization;
 
 namespace CTA.Rules.Actions
@@ -18,22 +20,48 @@ namespace CTA.Rules.Actions
             _projectDir = Directory.GetParent(projectDir).FullName;
             _projectType = projectType;
         }
-        public void Run()
+        public string Run()
         {
-            MigrateWebConfig();
+            return MigrateWebConfig();
         }
         /// <summary>
         /// Migrates the web.config file, if it exists
         /// </summary>
         /// <param name="projectDir">Directory of the project</param>
         /// <param name="projectType">Type of the project</param>
-        private void MigrateWebConfig()
+        private string MigrateWebConfig()
         {
-            configuration config = ProcessWebConfig(_projectDir);
-            if (config != null)
+            var isConfigFound = string.Empty;
+
+            var configXml = LoadWebConfig(_projectDir);
+            if (configXml == null) { return isConfigFound; }
+
+            var config = ProcessWebConfig(configXml);
+            if (!string.IsNullOrEmpty(config))
             {
+                isConfigFound = "Found and migrated settings from web.config";
                 AddAppSettingsJsonFile(config, TemplateHelper.GetTemplateFileContent("", _projectType, "appsettings.json"), _projectDir);
             }
+
+            return isConfigFound;
+        }
+        private XDocument LoadWebConfig(string projectDir)
+        {
+            string webConfigFile = Path.Combine(projectDir, "web.config");
+
+            if (File.Exists(webConfigFile))
+            {
+                try
+                {
+                    var webConfig = XDocument.Load(webConfigFile);
+                    return webConfig;
+                }
+                catch (Exception ex)
+                {
+                    LogHelper.LogError(ex, string.Format("Error processing web.config file {0}", webConfigFile));
+                }
+            }
+            return null;
         }
 
         /// <summary>
@@ -41,28 +69,54 @@ namespace CTA.Rules.Actions
         /// </summary>
         /// <param name="projectDir">The project directory containing the web.config file</param>
         /// <returns></returns>
-        private configuration ProcessWebConfig(string projectDir)
+        private string ProcessWebConfig(XDocument webConfig)
         {
-            string webConfigFile = Path.Combine(projectDir, "web.config");
+            StringBuilder config = new StringBuilder();
 
-            configuration webConfig = null;
-            if (File.Exists(webConfigFile))
+            webConfig.Descendants()?.Where(d => d.Name == "connectionStrings")?.Descendants()?.ToList().ForEach(connectionString =>
             {
                 try
                 {
-                    using (FileStream reader = File.OpenRead(webConfigFile))
+                    var name = connectionString.Attributes()?.First(a => a.Name?.ToString().ToLower() == "name").Value;
+                    var value = connectionString.Attributes()?.First(a => a.Name?.ToString().ToLower() == "connectionstring").Value?.Replace(@"\", @"\\");
+
+                    config.Append("\"").Append(name).Append("\"").Append(":").Append("\"").Append(value).Append("\"").Append(",");
+                }
+                catch (Exception ex)
+                {
+                    LogHelper.LogError(ex, "Error while parsing connection string");
+                }
+            });
+
+            //This means, we found at least one connection string:
+            if (config.Length > 0)
+            {
+                config.Remove(config.Length - 1, 1);
+                config.Insert(0, "\"ConnectionStrings\": { ");
+                config.Append("},");
+            }
+
+            webConfig.Descendants()?.First(d => d.Name == "appSettings")?.Descendants()?.ToList().ForEach(appSetting =>
+            {
+                try
+                {
+                    var key = appSetting.Attributes()?.First(a => a.Name?.ToString().ToLower() == "key").Value;
+                    var value = appSetting.Attributes()?.First(a => a.Name?.ToString().ToLower() == "value").Value;
+                    if (!Constants.appSettingsExclusions.Contains(key))
                     {
-                        XmlSerializer ser = new XmlSerializer(typeof(configuration));
-                        webConfig = (configuration)ser.Deserialize(reader);
+                        config.Append("\"").Append(key).Append("\"").Append(":").Append("\"").Append(value).Append("\"").Append(",");
                     }
                 }
                 catch (Exception ex)
                 {
-                    LogHelper.LogError(ex, string.Format("Error processing web.config file {0}", webConfigFile));
+                    LogHelper.LogError(ex, "Error while parsing appsettings");
                 }
-            }
-            return webConfig;
+            });
+
+            return config.ToString();
         }
+
+
 
         /// <summary>
         /// Adds a config (json) file using the project template, then populates it with data from appsettings and connectionstrings in web.config
@@ -70,46 +124,16 @@ namespace CTA.Rules.Actions
         /// <param name="webConfig">The object representing the web.config file</param>
         /// <param name="templateContent">The template file to be used</param>
         /// <param name="projectDir">The project directory where this file will be created</param>
-        private void AddAppSettingsJsonFile(configuration webConfig, string templateContent, string projectDir)
+        private void AddAppSettingsJsonFile(string content, string templateContent, string projectDir)
         {
-            StringBuilder str = new StringBuilder();
+            string fileContent = templateContent.Insert(1, content);
 
-            if (webConfig.connectionStrings != null)
-            {
-                //Connection Strings
-                foreach (var connectionString in webConfig.connectionStrings)
-                {
-                    // Escape any backslashes in connection string value
-                    var formattedConnectionString = connectionString.connectionString.Replace(@"\", @"\\");
-                    str.Append("\"").Append(connectionString.name).Append("\"").Append(":").Append("\"").Append(formattedConnectionString).Append("\"").Append(",");
-                }
-                str.Remove(str.Length - 1, 1);
-                str.Insert(0, "\"ConnectionStrings\": { ");
-                str.Append("},");
-            }
+            var obj = JsonConvert.DeserializeObject(fileContent);
+            fileContent = JsonConvert.SerializeObject(obj, Formatting.Indented);
 
-            if (webConfig.appSettings != null)
-            {
-                //App settings:
-                foreach (var setting in webConfig.appSettings)
-                {
-                    if (!Constants.appSettingsExclusions.Contains(setting.key))
-                    {
-                        str.Append("\"").Append(setting.key).Append("\"").Append(":").Append("\"").Append(setting.value).Append("\"").Append(",");
-                    }
-                }
-            }
-            if (str.Length > 0)
-            {
-                string fileContent = templateContent.Insert(1, str.ToString());
-
-                var obj = JsonConvert.DeserializeObject(fileContent);
-                fileContent = JsonConvert.SerializeObject(obj, Formatting.Indented);
-
-                // Any escaped backslashes were duplicated when the content was deserialized and serialized
-                File.WriteAllText(Path.Combine(projectDir, "appsettings.json"), fileContent.Replace(@"\\", @"\"));
-                LogChange(string.Format("Create appsettings.json file using web.config settings"));
-            }
+            // Any escaped backslashes were duplicated when the content was deserialized and serialized
+            File.WriteAllText(Path.Combine(projectDir, "appsettings.json"), fileContent.Replace(@"\\", @"\"));
+            LogChange(string.Format("Create appsettings.json file using web.config settings"));
         }
         private void LogChange(string message)
         {

@@ -10,7 +10,6 @@ public class Rootobject
     }
     public List<Namespace> NameSpaces { get; set; }
 }
-//TODO: Re-name  Namespace => NameSpaceOfAssembly , @Class => ClassOfNameSpace , Method => MethodOfClass ... etc...
 public class Namespace
 {
     public Namespace()

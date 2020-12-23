@@ -29,20 +29,23 @@ namespace CTA.Rules.Actions
             //This assumes the main namespace has not been changed (matches the project dir name):
             return Path.GetFileNameWithoutExtension(_projectFile);
         }
-        public void Run()
+        public string Run()
         {
-
+            string runResult = string.Empty;
             if (_projectType == ProjectType.Mvc)
             {
                 CreateMvcDirs(_projectDir);
                 CreateStartupFiles(_projectDir, _projectType, FileTypeCreation.Program);
                 CreateStartupFiles(_projectDir, _projectType, FileTypeCreation.Startup);
+                runResult = "Mvc project detected. Created static files, Program.cs, and Startup.cs";
             }
             if (_projectType == ProjectType.WebApi)
             {
                 CreateStartupFiles(_projectDir, _projectType, FileTypeCreation.Program);
                 CreateStartupFiles(_projectDir, _projectType, FileTypeCreation.Startup);
+                runResult = "Web API project detected. Created Program.cs and Startup.cs";
             }
+            return runResult;
         }
         /// <summary>
         /// Create files based on the project type
