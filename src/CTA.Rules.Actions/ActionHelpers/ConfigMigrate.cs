@@ -15,6 +15,8 @@ namespace CTA.Rules.Actions
         private string _projectDir;
         private ProjectType _projectType;
 
+
+
         public ConfigMigrate(string projectDir, ProjectType projectType)
         {
             _projectDir = Directory.GetParent(projectDir).FullName;
@@ -40,14 +42,14 @@ namespace CTA.Rules.Actions
             if (!string.IsNullOrEmpty(config))
             {
                 isConfigFound = "Found and migrated settings from web.config";
-                AddAppSettingsJsonFile(config, TemplateHelper.GetTemplateFileContent("", _projectType, "appsettings.json"), _projectDir);
+                AddAppSettingsJsonFile(config, TemplateHelper.GetTemplateFileContent("", _projectType, Constants.appSettingsJson), _projectDir);
             }
 
             return isConfigFound;
         }
         private XDocument LoadWebConfig(string projectDir)
         {
-            string webConfigFile = Path.Combine(projectDir, "web.config");
+            string webConfigFile = Path.Combine(projectDir, Constants.webConfig);
 
             if (File.Exists(webConfigFile))
             {
@@ -73,12 +75,12 @@ namespace CTA.Rules.Actions
         {
             StringBuilder config = new StringBuilder();
 
-            webConfig.Descendants()?.Where(d => d.Name == "connectionStrings")?.Descendants()?.ToList().ForEach(connectionString =>
+            webConfig.Descendants()?.Where(d => d.Name.ToString().ToLower() == Constants.connectionstrings)?.Descendants()?.ToList().ForEach(connectionString =>
             {
                 try
                 {
-                    var name = connectionString.Attributes()?.First(a => a.Name?.ToString().ToLower() == "name").Value;
-                    var value = connectionString.Attributes()?.First(a => a.Name?.ToString().ToLower() == "connectionstring").Value?.Replace(@"\", @"\\");
+                    var name = connectionString.Attributes()?.First(a => a.Name?.ToString().ToLower() == Constants.name).Value;
+                    var value = connectionString.Attributes()?.First(a => a.Name?.ToString().ToLower() == Constants.connectionstring).Value?.Replace(@"\", @"\\");
 
                     config.Append("\"").Append(name).Append("\"").Append(":").Append("\"").Append(value).Append("\"").Append(",");
                 }
@@ -92,16 +94,18 @@ namespace CTA.Rules.Actions
             if (config.Length > 0)
             {
                 config.Remove(config.Length - 1, 1);
-                config.Insert(0, "\"ConnectionStrings\": { ");
+                config.Insert(0, "\": { ");
+                config.Insert(0, Constants.ConnectionStrings);
+                config.Insert(0, "\"");
                 config.Append("},");
             }
 
-            webConfig.Descendants()?.First(d => d.Name == "appSettings")?.Descendants()?.ToList().ForEach(appSetting =>
+            webConfig.Descendants()?.First(d => d.Name?.ToString().ToLower() == Constants.appSettings)?.Descendants()?.ToList().ForEach(appSetting =>
             {
                 try
                 {
-                    var key = appSetting.Attributes()?.First(a => a.Name?.ToString().ToLower() == "key").Value;
-                    var value = appSetting.Attributes()?.First(a => a.Name?.ToString().ToLower() == "value").Value;
+                    var key = appSetting.Attributes()?.First(a => a.Name?.ToString().ToLower() == Constants.key).Value;
+                    var value = appSetting.Attributes()?.First(a => a.Name?.ToString().ToLower() == Constants.value).Value;
                     if (!Constants.appSettingsExclusions.Contains(key))
                     {
                         config.Append("\"").Append(key).Append("\"").Append(":").Append("\"").Append(value).Append("\"").Append(",");
@@ -132,7 +136,7 @@ namespace CTA.Rules.Actions
             fileContent = JsonConvert.SerializeObject(obj, Formatting.Indented);
 
             // Any escaped backslashes were duplicated when the content was deserialized and serialized
-            File.WriteAllText(Path.Combine(projectDir, "appsettings.json"), fileContent.Replace(@"\\", @"\"));
+            File.WriteAllText(Path.Combine(projectDir, Constants.appSettingsJson), fileContent.Replace(@"\\", @"\"));
             LogChange(string.Format("Create appsettings.json file using web.config settings"));
         }
         private void LogChange(string message)

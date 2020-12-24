@@ -76,5 +76,16 @@ namespace CTA.Rules.Config
         public const string ProjectRecommendationFile = "project.all";
 
         public const string MetricsTag = "CTA_METRICS_TAG";
+
+        //Config migration
+        public const string appSettingsJson = "appsettings.json";
+        public const string appSettings = "appsettings";
+        public const string webConfig = "web.config";
+        public const string name = "name";
+        public const string connectionstrings = "connectionstrings";
+        public const string connectionstring = "connectionstring";
+        public const string key = "key";
+        public const string value = "value";
+        public const string ConnectionStrings = "ConnectionStrings";
     }
 }
