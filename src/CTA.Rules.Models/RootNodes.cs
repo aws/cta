@@ -11,10 +11,10 @@ namespace CTA.Rules.Models
         {
             Attributetokens = new HashSet<AttributeToken>();
             Classdeclarationtokens = new HashSet<ClassDeclarationToken>();
-            Elementaccesstokens = new HashSet<ElementAccessToken>();
+            ElementAccesstokens = new HashSet<ElementAccessToken>();
             Identifiernametokens = new HashSet<IdentifierNameToken>();
             Invocationexpressiontokens = new HashSet<InvocationExpressionToken>();
-            Memberaccesstokens = new HashSet<MemberAccessToken>();
+            MemberAccesstokens = new HashSet<MemberAccessToken>();
             Usingdirectivetokens = new HashSet<UsingDirectiveToken>();
             MethodDeclarationTokens = new HashSet<MethodDeclarationToken>();
             ObjectCreationExpressionTokens = new HashSet<ObjectCreationExpressionToken>();
@@ -27,10 +27,10 @@ namespace CTA.Rules.Models
         public HashSet<AttributeToken> Attributetokens { get; set; }
         public HashSet<ClassDeclarationToken> Classdeclarationtokens { get; set; }
         public HashSet<InterfaceDeclarationToken> InterfaceDeclarationTokens { get; set; }
-        public HashSet<ElementAccessToken> Elementaccesstokens { get; set; }
+        public HashSet<ElementAccessToken> ElementAccesstokens { get; set; }
         public HashSet<IdentifierNameToken> Identifiernametokens { get; set; }
         public HashSet<InvocationExpressionToken> Invocationexpressiontokens { get; set; }
-        public HashSet<MemberAccessToken> Memberaccesstokens { get; set; }
+        public HashSet<MemberAccessToken> MemberAccesstokens { get; set; }
         public HashSet<UsingDirectiveToken> Usingdirectivetokens { get; set; }
         public HashSet<MethodDeclarationToken> MethodDeclarationTokens { get; set; }
         public HashSet<NamespaceToken> NamespaceTokens { get; set; }

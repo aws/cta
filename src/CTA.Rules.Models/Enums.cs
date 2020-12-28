@@ -14,6 +14,9 @@ namespace CTA.Rules.Models
         Package,
         Namespace,
         ObjectCreation,
+        MethodDeclaration,
+        ElementAccess,
+        MemberAccess,
         Project,
         ProjectFile
     }

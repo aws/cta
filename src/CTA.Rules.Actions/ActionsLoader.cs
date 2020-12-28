@@ -219,6 +219,12 @@ namespace CTA.Rules.Actions
         public Func<string, ProjectType, List<string>, Dictionary<string, string>, List<string>, string> GetProjectFileActions(string name, dynamic value) =>
             GetAction<Func<string, ProjectType, List<string>, Dictionary<string, string>, List<string>, string>>
                 (projectFileActions, projectFileObject, name, value);
+        public Func<SyntaxGenerator, ElementAccessExpressionSyntax, ElementAccessExpressionSyntax> GetElementAccessExpressionActions(string name, dynamic value) =>
+            GetAction<Func<SyntaxGenerator, ElementAccessExpressionSyntax, ElementAccessExpressionSyntax>>
+                (elementAccessActions, elementAccessObject, name, value);
+        public Func<SyntaxGenerator, MemberAccessExpressionSyntax, MemberAccessExpressionSyntax> GetMemberAccessExpressionActions(string name, dynamic value) =>
+            GetAction<Func<SyntaxGenerator, MemberAccessExpressionSyntax, MemberAccessExpressionSyntax>>
+                (memberAccessActions, memberAccessObject, name, value);
 
         /// <summary>
         /// Gets the action by invoking the methods that will create it

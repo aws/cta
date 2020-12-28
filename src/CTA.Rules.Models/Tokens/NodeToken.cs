@@ -19,6 +19,8 @@ namespace CTA.Rules.Models.Tokens
             IdentifierNameActions = new List<IdentifierNameAction>();
             InvocationExpressionActions = new List<InvocationExpressionAction>();
             MethodDeclarationActions = new List<MethodDeclarationAction>();
+            ElementAccessActions = new List<ElementAccessAction>();
+            MemberAccessActions = new List<MemberAccessAction>();
             NamespaceActions = new List<NamespaceAction>();
             ObjectCreationExpressionActions = new List<ObjectCreationExpressionAction>();
             PackageActions = new List<PackageAction>();
@@ -40,6 +42,8 @@ namespace CTA.Rules.Models.Tokens
         public List<ClassDeclarationAction> ClassDeclarationActions { get; set; }
         public List<InterfaceDeclarationAction> InterfaceDeclarationActions { get; set; }
         public List<MethodDeclarationAction> MethodDeclarationActions { get; set; }
+        public List<ElementAccessAction> ElementAccessActions { get; set; }
+        public List<MemberAccessAction> MemberAccessActions { get; set; }
         public List<UsingAction> UsingActions { get; set; }
         public List<IdentifierNameAction> IdentifierNameActions { get; set; }
         public List<InvocationExpressionAction> InvocationExpressionActions { get; set; }

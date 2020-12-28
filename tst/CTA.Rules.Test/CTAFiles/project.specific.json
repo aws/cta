@@ -53,6 +53,12 @@
               "Type": "Identifier",
               "Value": "{\"Identifier\": \"SomethingElse\",\"ClassFullKey\": \"MvcMusicStore.Controllers.ShoppingCartController\"}",
               "Description": "Replace object type ShoppingCartViewModel with SomethingElse"
+            },
+            {
+              "Name": "ReplaceIdentifierInsideClass",
+              "Type": "Identifier",
+              "Value": {"Identifier": "SomethingElse","ClassFullKey": "MvcMusicStore.Controllers.ShoppingCartController"},
+              "Description": "Replace object type ShoppingCartViewModel with SomethingElse"
             }
           ]
         }

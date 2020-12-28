@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Reflection;
 using System.Xml.Linq;
 using CTA.Rules.Actions;
 using CTA.Rules.Models;
@@ -64,6 +65,47 @@ namespace CTA.Rules.Test.Actions.ActionHelpers
             Assert.True(appSettingsContent.Contains(appSetting2));
             Assert.True(appSettingsContent.Contains(connectionString1));
             Assert.True(appSettingsContent.Contains(connectionString2));
+        }
+
+
+        [Test]
+        public void LoadWebConfigWithErrors()
+        {
+            // Get private method to invoke
+            var projectType = ProjectType.ClassLibrary;
+            ConfigMigrate configMigrateInstance = new ConfigMigrate(Directory.GetCurrentDirectory(), projectType);
+            Type configMigrateType = configMigrateInstance.GetType();
+
+            var loadWebConfigMethod = TestUtils.GetPrivateMethod(configMigrateType, "LoadWebConfig");
+
+
+            var invalidWebConfig = @"
+<configuration>
+    <appSettings>
+        <add key=""webpages:Version"" value=""1.0.0.0""/>
+    </appSettings>
+    <runtime>
+        <assemblyBinding xmlns=""urn:schemas-microsoft-com:asm.v1"">
+            <dependentAssembly>
+                <assemblyIdentity name=""System.Web.Mvc"" publicKeyToken=""31bf3856ad364e35""/>
+                <bindingRedirect oldVersion=""3.0.0.0-3.0.0.1"" newVersion=""3.0.0.1""/>
+            </dependentAssembly>
+        </assemblyBinding>
+    </runtime>
+    <connectionStrings>
+    </connectionStrings> 
+    <UnclosedTag
+</configuration>
+";
+
+            var projectDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            File.WriteAllText(Path.Combine(projectDir, "web.config"), invalidWebConfig);
+
+
+            // Invoke method and read contents of method output
+            var doc = (string)loadWebConfigMethod.Invoke(configMigrateInstance, new object[] { projectDir });
+
+            Assert.Null(doc);
         }
     }
 }
