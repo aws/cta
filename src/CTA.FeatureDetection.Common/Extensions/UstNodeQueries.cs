@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Codelyzer.Analysis;
 using Codelyzer.Analysis.Model;
 
 namespace CTA.FeatureDetection.Common.Extensions
@@ -26,6 +25,26 @@ namespace CTA.FeatureDetection.Common.Extensions
         public static IEnumerable<UstNode> GetInvocationExpressionsBySemanticDefinition(this UstNode node,
                 string semanticOriginalDefinition)
             => node.AllInvocationExpressions().Where(i => i.SemanticOriginalDefinition == semanticOriginalDefinition);
+
+        /// <summary>
+        /// Searches a syntax tree to identify all invocation expression nodes with a specified semantic return type
+        /// </summary>
+        /// <param name="node">Syntax tree node to start searching from</param>
+        /// <param name="semanticReturnType">Semantic return type to look for</param>
+        /// <returns>Collection of invocation expression nodes with the specified semantic return type</returns>
+        public static IEnumerable<UstNode> GetInvocationExpressionsBySemanticReturnType(this UstNode node,
+                string semanticReturnType)
+            => node.AllInvocationExpressions().Where(i => i.SemanticReturnType == semanticReturnType);
+
+        /// <summary>
+        /// Searches a syntax tree to identify all invocation expression nodes with any of the specified semantic return types
+        /// </summary>
+        /// <param name="node">Syntax tree node to start searching from</param>
+        /// <param name="semanticReturnTypes">Semantic return types to look for</param>
+        /// <returns>Collection of invocation expression nodes with any of the specified semantic return types</returns>
+        public static IEnumerable<UstNode> GetInvocationExpressionsBySemanticReturnType(this UstNode node,
+                IEnumerable<string> semanticReturnTypes)
+            => node.AllInvocationExpressions().Where(i => semanticReturnTypes.Contains(i.SemanticReturnType));
 
         /// <summary>
         /// Determines if a syntax tree has any invocation expression nodes with the specified semantic definition

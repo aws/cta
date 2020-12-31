@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Codelyzer.Analysis.Model;
 
@@ -26,6 +27,15 @@ namespace CTA.FeatureDetection.Common.Extensions
             => project.SourceFileResults
                 .SelectMany(n => n.AllClasses())
                 .Any(c => c.BaseTypeOriginalDefinition == typeOriginalDefinition);
+
+        /// <summary>
+        /// Gets class declaration nodes in a ProjectWorkspace with the specified base type
+        /// </summary>
+        /// <param name="project">ProjectWorkspace to search</param>
+        /// <param name="baseTypeOriginalDefinition">Original Definition of the base type being searched for</param>
+        /// <returns>Collection of class declaration nodes in the project with the specified base type</returns>
+        public static IEnumerable<UstNode> GetClassDeclarationsWithBaseType(this ProjectWorkspace project, string baseTypeOriginalDefinition)
+            => project.SourceFileResults.SelectMany(r => r.GetDeclaredClassesByBaseType(baseTypeOriginalDefinition));
 
         /// <summary>
         /// Determines if a specified directory exists in the project directory and is non-empty

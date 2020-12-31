@@ -8,6 +8,28 @@ namespace CTA.FeatureDetection.Tests.FeatureDetection.ProjectType.Extensions
     public class FeatureDetectionResultQueriesTests
     {
         [Test]
+        public void IsNetCoreMvcProject_Returns_True_If_NetCoreMvcFeature_Is_Present()
+        {
+            var mockResult = new FeatureDetectionResult
+            {
+                FeatureStatus = {{Constants.AspNetCoreMvcFeatureName, true}}
+            };
+
+            Assert.True(mockResult.IsCoreMvcProject());
+        }
+
+        [Test]
+        public void IsNetCoreWebApiProject_Returns_True_If_NetCoreWebApiFeature_Is_Present()
+        {
+            var mockResult = new FeatureDetectionResult
+            {
+                FeatureStatus = { { Constants.AspNetCoreWebApiFeatureName, true } }
+            };
+
+            Assert.True(mockResult.IsCoreWebApiProject());
+        }
+
+        [Test]
         public void IsMvcProject_Returns_True_If_MvcFeature_Is_Present()
         {
             var mockResult = new FeatureDetectionResult

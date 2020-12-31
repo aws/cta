@@ -19,7 +19,14 @@ namespace CTA.FeatureDetection.Tests.FeatureDetection.Load.Loaders
             var loadedFeatures = FeatureLoader.LoadFeaturesFromNamespace(assembly, namespaceSuffix);
             var loadedFeatureNames = loadedFeatures.Select(f => f.Name);
 
-            var expectedFeatureNames = new[] { nameof(AspNetMvcFeature), nameof(AspNetWebApiFeature), nameof(WebClassLibraryFeature) };
+            var expectedFeatureNames = new[]
+            {
+                nameof(AspNetMvcFeature), 
+                nameof(AspNetWebApiFeature), 
+                nameof(AspNetCoreMvcFeature), 
+                nameof(AspNetCoreWebApiFeature), 
+                nameof(WebClassLibraryFeature)
+            };
 
             CollectionAssert.AreEquivalent(expectedFeatureNames, loadedFeatureNames);
         }

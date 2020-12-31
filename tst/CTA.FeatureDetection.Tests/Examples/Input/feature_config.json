@@ -18,6 +18,14 @@
                   "ClassName": "AspNetWebApiFeature"
                 },
                 {
+                  "Name": "AspNetCoreMvcFeature",
+                  "ClassName": "AspNetCoreMvcFeature"
+                },
+                {
+                  "Name": "AspNetCoreWebApiFeature",
+                  "ClassName": "AspNetCoreWebApiFeature"
+                },
+                {
                   "Name": "WebClassLibraryFeature",
                   "ClassName": "WebClassLibraryFeature"
                 }

@@ -6,20 +6,40 @@ namespace CTA.FeatureDetection.ProjectType.Extensions
     public static class FeatureDetectionResultQueries
     {
         /// <summary>
-        /// Queries a FeatureDetectionResult object to determine if the project is a WebAPI project
+        /// Queries a FeatureDetectionResult object to determine if the project is a .NET Core WebAPI project
         /// </summary>
         /// <param name="featureDetectionResult">Result from feature detection</param>
-        /// <returns>Whether or not the project is a WebAPI project</returns>
+        /// <returns>Whether or not the project is a .NET Core WebAPI project</returns>
+        public static bool IsCoreWebApiProject(this FeatureDetectionResult featureDetectionResult)
+        {
+            return featureDetectionResult.FeatureStatus.GetValueOrDefault(Constants.AspNetCoreWebApiFeatureName, false);
+        }
+
+        /// <summary>
+        /// Queries a FeatureDetectionResult object to determine if the project is a .NET Core MVC project
+        /// </summary>
+        /// <param name="featureDetectionResult">Result from feature detection</param>
+        /// <returns>Whether or not the project is a .NET Core MVC project</returns>
+        public static bool IsCoreMvcProject(this FeatureDetectionResult featureDetectionResult)
+        { 
+            return featureDetectionResult.FeatureStatus.GetValueOrDefault(Constants.AspNetCoreMvcFeatureName, false);
+        }
+
+        /// <summary>
+        /// Queries a FeatureDetectionResult object to determine if the project is a .NET Framework WebAPI project
+        /// </summary>
+        /// <param name="featureDetectionResult">Result from feature detection</param>
+        /// <returns>Whether or not the project is a .NET Framework WebAPI project</returns>
         public static bool IsWebApiProject(this FeatureDetectionResult featureDetectionResult)
         {
             return featureDetectionResult.FeatureStatus.GetValueOrDefault(Constants.AspNetWebApiFeatureName, false);
         }
 
         /// <summary>
-        /// Queries a FeatureDetectionResult object to determine if the project is an MVC project
+        /// Queries a FeatureDetectionResult object to determine if the project is a .NET Framework MVC project
         /// </summary>
         /// <param name="featureDetectionResult">Result from feature detection</param>
-        /// <returns>Whether or not the project is an MVC project</returns>
+        /// <returns>Whether or not the project is a .NET Framework MVC project</returns>
         public static bool IsMvcProject(this FeatureDetectionResult featureDetectionResult)
         { 
             return featureDetectionResult.FeatureStatus.GetValueOrDefault(Constants.AspNetMvcFeatureName, false);

@@ -85,6 +85,36 @@ namespace CTA.FeatureDetection.Tests.FeatureDetection.Common.Extensions
         }
 
         [Test]
+        public void GetInvocationExpressionsBySemanticReturnType_Returns_InvocationExpressions_With_SemanticReturnType()
+        {
+            var semanticReturnType = "ViewResult";
+            var projectName = MvcProjectName; 
+            var sourceFileName = "HomeController.cs";
+            var projectWorkspace = MvcAnalyzerResults
+                .First(r => r.ProjectResult.ProjectName == projectName)
+                .ProjectResult;
+            var node = projectWorkspace.SourceFileResults
+                .First(r => r.FilePath.EndsWith(sourceFileName));
+
+            Assert.True(node.GetInvocationExpressionsBySemanticReturnType(semanticReturnType).Count() == 3);
+        }
+
+        [Test]
+        public void GetInvocationExpressionsBySemanticReturnType_Returns_InvocationExpressions_With_SemanticReturnTypes()
+        {
+            var semanticReturnTypes = new[] {"ViewResult"};
+            var projectName = MvcProjectName; 
+            var sourceFileName = "HomeController.cs";
+            var projectWorkspace = MvcAnalyzerResults
+                .First(r => r.ProjectResult.ProjectName == projectName)
+                .ProjectResult;
+            var node = projectWorkspace.SourceFileResults
+                .First(r => r.FilePath.EndsWith(sourceFileName));
+
+            Assert.True(node.GetInvocationExpressionsBySemanticReturnType(semanticReturnTypes).Count() == 3);
+        }
+
+        [Test]
         public void ContainsUsingDirectiveWithIdentifier_Returns_True_If_UsingDirective_Is_Found()
         {
             var identifier = "System.Web.Mvc";

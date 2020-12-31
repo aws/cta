@@ -11,13 +11,10 @@ namespace CTA.FeatureDetection
         static void Main(string[] args)
         {
             /* Select a test project */
-            //var solutionPath = Path.Combine("..", "..", "..", "..", "FeatureDetection.Tests", "Examples", "Projects", "ProjectType_Test", "ProjectType_Test.sln");
-            //var solutionPath = Path.Combine("..", "..", "..", "..", "FeatureDetection.Tests", "Examples", "Projects", "EF6_Test", "EF6_Test.sln");
-            var solutionPath = Path.Combine("..", "..", "..", "..", "FeatureDetection.Tests", "Examples", "Projects", "Test_Solution_For_FeatureDetection", "Test_Solution_For_FeatureDetection.sln");
+            var solutionPath = Path.Combine("oath", "to", "solution.sln");
 
             /* Select a feature config file*/
-            var featureConfigFilePath = Path.Combine("..", "..", "..", "..", "FeatureDetection.Tests", "Examples", "Input", "feature_config.json");
-
+            var featureConfigFilePath = Path.Combine("..", "..", "..", "..", "..", "tst", "CTA.FeatureDetection.Tests", "Examples", "Input", "feature_config.json");
 
             // Identify all features in a given project
             var featureDetector = new FeatureDetector(featureConfigFilePath);
