@@ -11,7 +11,7 @@ namespace CTA.FeatureDetection
         static void Main(string[] args)
         {
             /* Select a test project */
-            var solutionPath = Path.Combine("oath", "to", "solution.sln");
+            var solutionPath = Path.Combine("path", "to", "solution.sln");
 
             /* Select a feature config file*/
             var featureConfigFilePath = Path.Combine("..", "..", "..", "..", "..", "tst", "CTA.FeatureDetection.Tests", "Examples", "Input", "feature_config.json");
