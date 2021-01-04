@@ -318,6 +318,30 @@ namespace CTA.Rules.RuleFiles
                                         break;
                                     }
 
+                                case ActionTypes.MethodDeclaration:
+                                    {
+                                        var token = new MethodDeclarationToken() { Key = recommendation.Name, Description = recommendedActions.Description, TargetCPU = targetCPUs, Namespace = @namespace.Name, FullKey = recommendation.Value, Type = recommendation.ContainingType };
+                                        if (!_rootNodes.MethodDeclarationTokens.Contains(token)) { _rootNodes.MethodDeclarationTokens.Add(token); }
+                                        ParseActions(token, recommendedActions.Actions);
+                                        break;
+                                    }
+
+                                case ActionTypes.ElementAccess:
+                                    {
+                                        var token = new ElementAccessToken () { Key = recommendation.Name, Description = recommendedActions.Description, TargetCPU = targetCPUs, Namespace = @namespace.Name, FullKey = recommendation.Value, Type = recommendation.ContainingType };
+                                        if (!_rootNodes.ElementAccesstokens.Contains(token)) { _rootNodes.ElementAccesstokens.Add(token); }
+                                        ParseActions(token, recommendedActions.Actions);
+                                        break;
+                                    }
+
+                                case ActionTypes.MemberAccess:
+                                    {
+                                        var token = new MemberAccessToken() { Key = recommendation.Name, Description = recommendedActions.Description, TargetCPU = targetCPUs, Namespace = @namespace.Name, FullKey = recommendation.Value, Type = recommendation.ContainingType };
+                                        if (!_rootNodes.MemberAccesstokens.Contains(token)) { _rootNodes.MemberAccesstokens.Add(token); }
+                                        ParseActions(token, recommendedActions.Actions);
+                                        break;
+                                    }
+
                                 case ActionTypes.Project:
                                     {
                                         var token = new ProjectToken() { Key = recommendation.Name, Description = recommendedActions.Description, TargetCPU = targetCPUs, Namespace = @namespace.Name, FullKey = recommendation.Value };
@@ -511,6 +535,60 @@ namespace CTA.Rules.RuleFiles
                                         Name = action.Name,
                                         Type = action.Type,
                                         ObjectCreationExpressionGenericActionFunc = actionFunc
+                                    });
+                                }
+                                break;
+                            }
+                        case ActionTypes.MethodDeclaration:
+                            {
+                                var actionFunc = actionsLoader.GetMethodDeclarationAction(action.Name, action.Value);
+                                if (actionFunc != null)
+                                {
+                                    nodeToken.MethodDeclarationActions.Add(new MethodDeclarationAction()
+                                    {
+                                        Key = nodeToken.Key,
+                                        Value = GetActionValue(action.Value),
+                                        Description = action.Description,
+                                        ActionValidation = action.ActionValidation,
+                                        Name = action.Name,
+                                        Type = action.Type,
+                                        MethodDeclarationActionFunc = actionFunc
+                                    });
+                                }
+                                break;
+                            }
+                        case ActionTypes.ElementAccess:
+                            {
+                                var actionFunc = actionsLoader.GetElementAccessExpressionActions(action.Name, action.Value);
+                                if (actionFunc != null)
+                                {
+                                    nodeToken.MemberAccessActions.Add(new MemberAccessAction()
+                                    {
+                                        Key = nodeToken.Key,
+                                        Value = GetActionValue(action.Value),
+                                        Description = action.Description,
+                                        ActionValidation = action.ActionValidation,
+                                        Name = action.Name,
+                                        Type = action.Type,
+                                        MemberAccessActionFunc = actionFunc
+                                    });
+                                }
+                                break;
+                            }
+                        case ActionTypes.MemberAccess:
+                            {
+                                var actionFunc = actionsLoader.GetMemberAccessExpressionActions(action.Name, action.Value);
+                                if (actionFunc != null)
+                                {
+                                    nodeToken.MemberAccessActions.Add(new MemberAccessAction()
+                                    {
+                                        Key = nodeToken.Key,
+                                        Value = GetActionValue(action.Value),
+                                        Description = action.Description,
+                                        ActionValidation = action.ActionValidation,
+                                        Name = action.Name,
+                                        Type = action.Type,
+                                        MemberAccessActionFunc = actionFunc
                                     });
                                 }
                                 break;

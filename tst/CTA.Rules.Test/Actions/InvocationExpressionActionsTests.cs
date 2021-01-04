@@ -1,5 +1,6 @@
 ﻿using System;
 using CTA.Rules.Actions;
+using CTA.Rules.Models;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -34,6 +35,18 @@ namespace CTA.Rules.Test.Actions
 
             var expectedResult = "Math.Abs(-1).ToString()";
             Assert.AreEqual(expectedResult, newNode.ToFullString());
+        }
+
+
+        [Test]
+        public void InvocationExpressionEquals()
+        {
+            var invocationExpressionAction = new InvocationExpressionAction() { Key = "Test", Value = "Test2", InvocationExpressionActionFunc = _invocationExpressionActions.GetAddCommentAction("Test") };
+            var cloned = invocationExpressionAction.Clone();
+            Assert.True(invocationExpressionAction.Equals(cloned));
+
+            cloned.Value = "DifferentValue";
+            Assert.False(invocationExpressionAction.Equals(cloned));
         }
     }
 }

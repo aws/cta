@@ -8,12 +8,11 @@ using NUnit.Framework;
 
 namespace CTA.Rules.Test.Actions
 {
-    public class AttributeActionsTests
+    public class AttributeListActionsTests
     {
-        private const string OriginalAttribute = "Serializable";
-        private AttributeActions _attributeActions;
+        private AttributeListActions _attributeListActions;
         private SyntaxGenerator _syntaxGenerator;
-        private AttributeSyntax _node;
+        private AttributeListSyntax _node;
 
         [SetUp]
         public void SetUp()
@@ -21,29 +20,30 @@ namespace CTA.Rules.Test.Actions
             var workspace = new AdhocWorkspace();
             var language = LanguageNames.CSharp;
             _syntaxGenerator = SyntaxGenerator.GetGenerator(workspace, language);
-            _attributeActions = new AttributeActions();
-            _node = SyntaxFactory.Attribute(SyntaxFactory.IdentifierName(SyntaxFactory.ParseToken(OriginalAttribute)));
+            _attributeListActions = new AttributeListActions();
+            var seperatedList = SyntaxFactory.SeparatedList<AttributeSyntax>();
+            seperatedList.Add(SyntaxFactory.Attribute(SyntaxFactory.ParseName("Test")));            
+            _node = SyntaxFactory.AttributeList(seperatedList);
         }
 
         [Test]
-        public void GetChangeAttributeAction_Changes_Attribute_To_Specified_Value()
+        public void AttributeListAddComment()
         {
-            const string newAttributeName = "NewAttribute";
-            var changeAttributeFunc = _attributeActions.GetChangeAttributeAction(newAttributeName);
+            const string comment = "This is a comment";
+            var changeAttributeFunc = _attributeListActions.GetAddCommentAction(comment);
             var newNode = changeAttributeFunc(_syntaxGenerator, _node);
 
-            Assert.AreEqual(OriginalAttribute, _node.ToString());
-            Assert.AreEqual(newAttributeName, newNode.ToString());
+            StringAssert.Contains(comment, newNode.ToFullString());
         }
 
         [Test]
-        public void AttributeActionComparison()
+        public void AttributeListActionComparison()
         {
             var attributeAction = new AttributeAction()
             {
                 Key = "Test",
                 Value = "Test2",
-                AttributeActionFunc = _attributeActions.GetChangeAttributeAction("NewAttribute")
+                AttributeListActionFunc = _attributeListActions.GetAddCommentAction("NewAttribute")
             };
 
             var cloned = attributeAction.Clone();

@@ -330,21 +330,21 @@ ActionValidation	| An optional action validation that runs on the file after its
    "ActionValidation": {"Contains": "","NotContains": ""}
 }
 {
-   "Name": "CreateMvc3FolderHierarchy",
+   "Name": "CreateNet3FolderHierarchy",
    "Type": "Project",
    "Value": "", //Parameter(s) passed to the action
    "Description": "Sample Description for the actions",
    "ActionValidation": {"Contains": "","NotContains": ""}
 }
 {
-   "Name": "CreateMvc5FolderHierarchy",
+   "Name": "CreateNet5FolderHierarchy",
    "Type": "Project",
    "Value": "", //Parameter(s) passed to the action
    "Description": "Sample Description for the actions",
    "ActionValidation": {"Contains": "","NotContains": ""}
 }
 {
-   "Name": "MigrateWebConfig",
+   "Name": "MigrateConfig",
    "Type": "Project",
    "Value": "", //Parameter(s) passed to the action
    "Description": "Sample Description for the actions",

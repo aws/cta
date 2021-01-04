@@ -55,6 +55,7 @@ namespace CTA.Rules.Test
         public void TestSampleWebApi3Solution()
         {
             TestWebApi("netcoreapp3.1");
+            SolutionPort.ResetCache();
             TestWebApi("net5.0", Path.Combine(tempDir, "netcoreapp3.1"));
         }
 
@@ -106,6 +107,23 @@ namespace CTA.Rules.Test
 
             //Check that correct version is used
             Assert.True(csProjContent.IndexOf(string.Concat(">", version, "<")) > 0);
+
+            //Check project actions
+            var webApiProjectActions = results.SolutionRunResult.ProjectResults.First(p => p.ProjectFile.EndsWith("SampleWebApi.csproj"))
+                .ExecutedActions.First(a => a.Key == "Project").Value;
+
+
+            //When running it the first time
+            if (string.IsNullOrEmpty(solutionDir))
+            {
+                Assert.AreEqual(webApiProjectActions.Count, 3);
+            }
+
+            //When running the second time
+            else
+            {
+                Assert.AreEqual(webApiProjectActions.Count, 1);
+            }
         }
 
         [Test]
@@ -120,6 +138,7 @@ namespace CTA.Rules.Test
 
             StringAssert.Contains("IActionResult", results.SolutionAnalysisResult);
             StringAssert.Contains("Startup", results.SolutionAnalysisResult);
+                       
 
             var webProjectFile = results.ProjectResults.Where(p => p.CsProjectPath.EndsWith("WebApiWithReferences.csproj")).FirstOrDefault();
             FileAssert.Exists(webProjectFile.CsProjectPath);
@@ -167,6 +186,18 @@ namespace CTA.Rules.Test
             Assert.True(webCsProjContent.IndexOf(@"..\TestReference2\TestReference2.csproj""") > 0);
 
             Assert.True(webCsProjContent.IndexOf("Newtonsoft.Json") > 0);
+
+            //Check project actions
+            var classlibrary1Actions = results.SolutionRunResult.ProjectResults.First(p => p.ProjectFile.EndsWith("TestReference.csproj"))
+                .ExecutedActions.First(a => a.Key == "Project").Value;
+            var classlibrary2Actions = results.SolutionRunResult.ProjectResults.First(p => p.ProjectFile.EndsWith("TestReference2.csproj"))
+                .ExecutedActions.First(a => a.Key == "Project").Value;
+            var webApiProjectActions = results.SolutionRunResult.ProjectResults.First(p => p.ProjectFile.EndsWith("WebApiWithReferences.csproj"))
+                .ExecutedActions.First(a => a.Key == "Project").Value;
+
+            Assert.AreEqual(classlibrary1Actions.Count, 2);
+            Assert.AreEqual(classlibrary2Actions.Count, 2);
+            Assert.AreEqual(webApiProjectActions.Count, 3);
         }
 
         [Test]
@@ -236,6 +267,13 @@ namespace CTA.Rules.Test
 
 
             Assert.True(csProjContent.IndexOf("Newtonsoft.Json") > 0);
+
+
+            //Check project actions
+            var mvcProjectActions = results.SolutionRunResult.ProjectResults.First(p => p.ProjectFile.EndsWith("MvcMusicStore.csproj"))
+                .ExecutedActions.First(a => a.Key == "Project").Value;
+
+            Assert.AreEqual(mvcProjectActions.Count, 4);
         }
 
         [TearDown]

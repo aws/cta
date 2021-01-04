@@ -1,4 +1,5 @@
 ﻿using CTA.Rules.Actions;
+using CTA.Rules.Models;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -95,6 +96,17 @@ class MyClass
 {{
 }}";
             Assert.AreEqual(expectedResult, newNode.ToFullString());
+        }
+
+        [Test]
+        public void ClassDeclarationEquals()
+        {
+            var classAction = new ClassDeclarationAction() { Key = "Test", Value = "Test2", ClassDeclarationActionFunc = _classActions.GetAddAttributeAction("Test") };
+            var cloned = classAction.Clone();
+            Assert.True(classAction.Equals(cloned));
+
+            cloned.Value = "DifferentValue";
+            Assert.False(classAction.Equals(cloned));
         }
     }
 }

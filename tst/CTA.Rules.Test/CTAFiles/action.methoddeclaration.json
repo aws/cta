@@ -1,0 +1,42 @@
+﻿{
+  "Name": "MvcMusicStore.ViewModels",
+  "Version": "1.0.0",
+  "Packages": [
+    {
+      "Name": "MvcMusicStore",
+      "Type": "Project"
+    }
+  ],
+  "Recommendations": [
+    {
+      "Type": "MethodDeclaration",
+      "Name": "MigrateShoppingCart",
+      "Value": "MvcMusicStore.Controllers.AccountController.MigrateShoppingCart",
+      "RecommendedActions": [
+        {
+          "Source": "Amazon",
+          "Preferred": "Yes",
+          "TargetFrameworks": [
+            {
+              "Name": "netcoreapp3.1",
+              "TargetCPU": [ "x86", "x64", "ARM64" ]
+            },
+            {
+              "Name": "net5.0",
+              "TargetCPU": [ "x86", "x64", "ARM64" ]
+            }
+          ],
+          "Description": "Add a comment",
+          "Actions": [
+            {
+              "Name": "AddComment",
+              "Type": "MethodDeclaration",
+              "Value": "The text of the comment",
+              "Description": "Add a comment to a method declaration"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

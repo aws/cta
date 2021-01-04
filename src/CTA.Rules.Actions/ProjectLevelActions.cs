@@ -21,7 +21,8 @@ namespace CTA.Rules.Actions
         {
             Func<string, ProjectType, string> func = (string projectDir, ProjectType projectType) =>
             {
-                StringBuilder logResult = new StringBuilder();
+                List<string> archived = new List<string>();
+                List<string> deleted = new List<string>();
 
                 projectDir = Directory.GetParent(projectDir).FullName;
 
@@ -45,14 +46,16 @@ namespace CTA.Rules.Actions
                         if (File.Exists(backupFile))
                         {
                             File.Delete(backupFile);
-                            logResult.Append(string.Format("Deleted file {0}", backupFile));
+                            deleted.Add(backupFile);
                         }
                         File.Move(s, string.Concat(s, ".bak"));
-                        logResult.Append(string.Format("Archived file {0}", s));
+                        archived.Add(s);
                     }
                 }
 
-                return logResult.ToString();
+                return string.Concat(
+                    deleted.Count > 0 ? string.Concat("Deleted: ", string.Join(",", deleted)) : string.Empty,
+                    archived.Count > 0 ? string.Concat("Archived: ", string.Join(",", archived)) : string.Empty);
             };
 
             return func;
@@ -63,8 +66,7 @@ namespace CTA.Rules.Actions
             Func<string, ProjectType, string> func = (string projectDir, ProjectType projectType) =>
             {
                 FolderUpdate folderUpdate = new FolderUpdate(projectDir, projectType);
-                folderUpdate.Run();
-                return "";
+                return folderUpdate.Run();
             };
 
             return func;
@@ -75,8 +77,7 @@ namespace CTA.Rules.Actions
             Func<string, ProjectType, string> func = (string projectDir, ProjectType projectType) =>
             {
                 FolderUpdate folderUpdate = new FolderUpdate(projectDir, projectType);
-                folderUpdate.Run();
-                return "";
+                return folderUpdate.Run();
             };
 
             return func;
@@ -87,52 +88,10 @@ namespace CTA.Rules.Actions
             Func<string, ProjectType, string> func = (string projectDir, ProjectType projectType) =>
             {
                 ConfigMigrate configMigrate = new ConfigMigrate(projectDir, projectType);
-                configMigrate.Run();
-                return "";
+                return configMigrate.Run();                 
             };
 
             return func;
         }
-        
-        //public Func<SyntaxGenerator, Project, SyntaxNode, Project> GetAddDocumentAction(string fileName)
-        //{
-        //    Func<SyntaxGenerator, Project, SyntaxNode, Project> AddDocument = (SyntaxGenerator syntaxGenerator, Project project, SyntaxNode root) =>
-        //    {
-        //        if (root == null)
-        //        {
-        //            root = syntaxGenerator.ClassDeclaration("Test");
-        //        }
-
-        //        var solution = project.Solution;
-        //        var workspace = solution.Workspace;
-
-        //        string document = @"
-        //            using System;
-        //            namespace Temp
-        //            {
-        //                public static class Test
-        //                {
-        //                }
-        //            }
-        //            ";
-
-
-        //        var dir = Directory.GetParent(project.FilePath);
-        //    //project = project.AddDocument(fileName, root, filePath: string.Concat(dir, @"\", fileName));
-
-        //        var doc = project.AddDocument("Test.cs", SyntaxFactory.ParseCompilationUnit(document), new string[] { "TestFolder" }, filePath: string.Concat(dir, @"\", fileName));
-
-        //        var newSolution = doc.Project.Solution;
-
-        //        bool result = workspace.TryApplyChanges(newSolution);
-
-
-
-
-
-        //        return project;
-        //    };
-        //    return AddDocument;
-        //}
     }
 }

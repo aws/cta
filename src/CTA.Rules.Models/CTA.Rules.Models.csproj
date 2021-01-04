@@ -4,6 +4,10 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Compile Remove="CsProjFile.cs" />
+  </ItemGroup>
+
 
   <ItemGroup>
     <PackageReference Include="Buildalyzer" Version="3.0.1" />

@@ -11,9 +11,6 @@ namespace CTA.Rules.Models
         {
 
         }
-        public ActionValidationException(string message) : base(message)
-        {
-        }
 
         public static string GetActionValidationException(string actionType, string actionName)
         {

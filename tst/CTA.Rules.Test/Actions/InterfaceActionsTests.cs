@@ -1,4 +1,5 @@
 ﻿using CTA.Rules.Actions;
+using CTA.Rules.Models;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Editing;
@@ -49,6 +50,18 @@ interface ISomeInterface
 {{
 }}";
             Assert.AreEqual(expectedResult, newNode.ToFullString());
+        }
+
+
+        [Test]
+        public void InterfaceDeclarationEquals()
+        {
+            var interfaceAction = new InterfaceDeclarationAction() { Key = "Test", Value = "Test2", InterfaceDeclarationActionFunc = _interfaceActions.GetAddAttributeAction("Test") };
+            var cloned = interfaceAction.Clone();
+            Assert.True(interfaceAction.Equals(cloned));
+
+            cloned.Value = "DifferentValue";
+            Assert.False(interfaceAction.Equals(cloned));
         }
     }
 }

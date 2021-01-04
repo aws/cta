@@ -24,6 +24,7 @@ namespace CTA.Rules.Config
         public static HashSet<string> CoreVersions = new HashSet<string>() { "netcoreapp3.1" };
 
         public static string RulesDefaultPath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Input"));
+        public static string ResourcesFile = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "resources.zip"));
         public static string DefaultCoreVersion = "netcoreapp3.1";
 
         public static string JsonFileSchema = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), Path.Combine(new string[] { "..", "..", "..", "..", ".." })
@@ -35,6 +36,9 @@ namespace CTA.Rules.Config
 
         public const int ThreadCount = 10;
         public const int MaxRecursionDepth = 100000;
+
+
+        public const int DownloadRetryCount = 3;
 
         public const string Templates = "Templates";
 
@@ -72,5 +76,16 @@ namespace CTA.Rules.Config
         public const string ProjectRecommendationFile = "project.all";
 
         public const string MetricsTag = "CTA_METRICS_TAG";
+
+        //Config migration
+        public const string appSettingsJson = "appsettings.json";
+        public const string appSettings = "appsettings";
+        public const string webConfig = "web.config";
+        public const string name = "name";
+        public const string connectionstrings = "connectionstrings";
+        public const string connectionstring = "connectionstring";
+        public const string key = "key";
+        public const string value = "value";
+        public const string ConnectionStrings = "ConnectionStrings";
     }
 }
