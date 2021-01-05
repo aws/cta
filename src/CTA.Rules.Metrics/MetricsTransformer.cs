@@ -26,6 +26,46 @@ namespace CTA.Rules.Metrics
             return genericActionExecutionsMetrics;
         }
 
+        internal static IEnumerable<TargetVersionMetric> TransformTargetVersions(MetricsContext context, ProjectResult projectResult)
+        {
+            var projectFile = projectResult.ProjectFile;
+            var targetVersions = projectResult.TargetVersions;
+            var targetVersionMetrics = new List<TargetVersionMetric>();
+            foreach (var targetVersion in targetVersions)
+            {
+                targetVersionMetrics.Add(new TargetVersionMetric(context, targetVersion, projectFile));
+            }
+
+            return targetVersionMetrics;
+        }
+
+        internal static IEnumerable<UpgradePackageMetric> TransformUpgradePackages(MetricsContext context, ProjectResult projectResult)
+        {
+            var projectFile = projectResult.ProjectFile;
+            var upgradePackages = projectResult.UpgradePackages;
+            var upgradePackagesMetric = new List<UpgradePackageMetric>();
+            foreach (var upgradePackage in upgradePackages)
+            {
+                upgradePackagesMetric.Add(new UpgradePackageMetric(context, upgradePackage, projectFile));
+            }
+
+            return upgradePackagesMetric;
+        }
+
+
+        internal static IEnumerable<ActionPackageMetric> TransformActionPackages(MetricsContext context, ProjectResult projectResult)
+        {
+            var projectFile = projectResult.ProjectFile;
+            var actionPackages = projectResult.ActionPackages;
+            var actionPackagesMetric = new List<ActionPackageMetric>();
+            foreach (var actionPackage in actionPackages)
+            {
+                actionPackagesMetric.Add(new ActionPackageMetric(context, actionPackage, projectFile));
+            }
+
+            return actionPackagesMetric;
+        }
+
         internal static IEnumerable<DownloadedFilesMetric> TransformDownloadedFiles(MetricsContext context, IEnumerable<string> downloadedFiles)
         {
             var downloadedFilesMetrics = new List<DownloadedFilesMetric>();

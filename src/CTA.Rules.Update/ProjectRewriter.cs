@@ -32,7 +32,12 @@ namespace CTA.Rules.Update
         /// <param name="rulesEngineConfiguration">ProjectConfiguration for this project</param>
         public ProjectRewriter(AnalyzerResult analyzerResult, ProjectConfiguration rulesEngineConfiguration)
         {
-            _projectResult = new ProjectResult() { ProjectFile = rulesEngineConfiguration.ProjectPath };
+            _projectResult = new ProjectResult()
+            {
+                ProjectFile = rulesEngineConfiguration.ProjectPath,
+                TargetVersions = rulesEngineConfiguration.TargetVersions,
+                UpgradePackages = rulesEngineConfiguration.PackageReferences.Select(p => new PackageAction() { Name = p.Key, Version = p.Value }).ToList()
+            };
 
             _sourceFileBuildResults = analyzerResult?.ProjectBuildResult?.SourceFileBuildResults;
             _sourceFileResults = analyzerResult?.ProjectResult?.SourceFileResults;
@@ -60,6 +65,7 @@ namespace CTA.Rules.Update
                 {
                     projectActions.ProjectReferenceActions.Add(Config.Utils.GetRelativePath(RulesEngineConfiguration.ProjectPath, p));
                 });
+                _projectResult.ActionPackages = projectActions.PackageActions.Distinct().ToList();
 
                 foreach (var p in RulesEngineConfiguration.PackageReferences)
                 {

@@ -36,6 +36,8 @@ namespace CTA.Rules.Config
 
         public const int ThreadCount = 10;
         public const int MaxRecursionDepth = 100000;
+        public const int DefaultThreadSleepTime = 2000;
+        public const int CacheExpiryHours = 1;
 
 
         public const int DownloadRetryCount = 3;

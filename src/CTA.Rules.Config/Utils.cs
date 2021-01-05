@@ -6,6 +6,7 @@ using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using NJsonSchema.Generation;
 using NJsonSchema.Validation;
 
@@ -121,6 +122,8 @@ namespace CTA.Rules.Config
                     catch (Exception ex)
                     {
                         retryAttempts++;
+                        Thread.Sleep(Constants.DefaultThreadSleepTime);
+
                         if(retryAttempts == retryCount)
                         {
                             throw ex;

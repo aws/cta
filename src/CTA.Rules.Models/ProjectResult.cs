@@ -7,9 +7,15 @@ namespace CTA.Rules.Models
 {
     public class ProjectResult
     {
+        public List<PackageAction> UpgradePackages { get; set; }
+        public List<PackageAction> ActionPackages { get; set; }
+        public List<string> TargetVersions { get; set; }
+
         public ProjectResult()
         {
             ExecutedActions = new Dictionary<string, List<GenericActionExecution>>();
+            UpgradePackages = new List<PackageAction>();
+            ActionPackages = new List<PackageAction>();
         }
         public string ProjectFile { get; set; }
         public ProjectActions ProjectActions { get; set; }
@@ -18,6 +24,32 @@ namespace CTA.Rules.Models
         public override string ToString()
         {
             StringBuilder stringBuilder = new StringBuilder();
+
+            stringBuilder.AppendLine("---------------------------");
+            stringBuilder.AppendLine("Target Versions:");
+            stringBuilder.AppendLine("---------------------------");
+            foreach(var version in TargetVersions)
+            {
+                stringBuilder.AppendLine(version);
+            }
+            
+
+            stringBuilder.AppendLine("---------------------------");
+            stringBuilder.AppendLine("Upgrade packages:");
+            stringBuilder.AppendLine("---------------------------");
+            foreach(var package in UpgradePackages)
+            {
+                stringBuilder.AppendLine($"{package.Name},{package.Version}");
+            }
+
+            stringBuilder.AppendLine("---------------------------");
+            stringBuilder.AppendLine("Action packages:");
+            stringBuilder.AppendLine("---------------------------");
+            foreach (var package in ActionPackages)
+            {
+                stringBuilder.AppendLine($"{package.Name},{package.Version}");
+            }
+
             foreach (var fileName in ExecutedActions.Keys)
             {
                 stringBuilder.AppendLine("---------------------------");

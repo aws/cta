@@ -16,6 +16,9 @@ namespace CTA.Rules.Metrics
         public PortSolutionResult PortSolutionResult { get; set; }
         public IEnumerable<ReferencesMetric> ReferencesMetrics { get; set; }
         public IEnumerable<DownloadedFilesMetric> DownloadedFilesMetrics { get; set; }
+        public IEnumerable<TargetVersionMetric> TargetVersionMetrics { get; set; }
+        public IEnumerable<UpgradePackageMetric> UpgradePackageMetrics { get; set; }
+        public IEnumerable<ActionPackageMetric> ActionPackageMetrics { get; set; }
         public IEnumerable<GenericActionExecutionMetric> GenericActionExecutionMetrics { get; set; }
         public IEnumerable<BuildErrorMetric> BuildErrorMetrics { get; set; }
         public string PortSolutionResultJsonReport { get; set; }
@@ -45,20 +48,32 @@ namespace CTA.Rules.Metrics
             DownloadedFilesMetrics = MetricsTransformer.TransformDownloadedFiles(Context, PortSolutionResult.DownloadedFiles);
 
             // Gather project-level metrics
+            var targetVersionMetrics = new List<TargetVersionMetric>();
+            var upgradePackageMetrics = new List<UpgradePackageMetric>();
+            var actionPackageMetrics = new List<ActionPackageMetric>();
             var actionExecutionMetrics = new List<GenericActionExecutionMetric>();
+
             foreach (var projectResult in PortSolutionResult.ProjectResults)
             {
-                var executedActionMetrics = MetricsTransformer.TransformGenericActionExecutions(Context, projectResult);
-                actionExecutionMetrics.AddRange(executedActionMetrics);
+                targetVersionMetrics.AddRange(MetricsTransformer.TransformTargetVersions(Context, projectResult));
+                upgradePackageMetrics.AddRange(MetricsTransformer.TransformUpgradePackages(Context, projectResult));
+                actionPackageMetrics.AddRange(MetricsTransformer.TransformActionPackages(Context, projectResult));
+                actionExecutionMetrics.AddRange(MetricsTransformer.TransformGenericActionExecutions(Context, projectResult));
             }
+            TargetVersionMetrics = targetVersionMetrics;
+            UpgradePackageMetrics = upgradePackageMetrics;
+            ActionPackageMetrics = actionPackageMetrics;
             GenericActionExecutionMetrics = actionExecutionMetrics;
-        }
+        } 
 
         private string GeneratePortSolutionResultJsonReport()
         {
             var allMetrics = new List<CTAMetric>();
             allMetrics = allMetrics.Concat(ReferencesMetrics)
                 .Concat(DownloadedFilesMetrics)
+                .Concat(TargetVersionMetrics)
+                .Concat(UpgradePackageMetrics)
+                .Concat(ActionPackageMetrics)
                 .Concat(GenericActionExecutionMetrics)
                 .Concat(BuildErrorMetrics)
                 .ToList();

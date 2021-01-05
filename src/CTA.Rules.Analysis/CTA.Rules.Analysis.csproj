@@ -12,10 +12,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Codelyzer.Analysis" Version="1.2.36-alpha-gfac142e986" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\CTA.Rules.Config\CTA.Rules.Config.csproj" />
     <ProjectReference Include="..\CTA.Rules.Metrics\CTA.Rules.Metrics.csproj" />
     <ProjectReference Include="..\CTA.Rules.Models\CTA.Rules.Models.csproj" />
