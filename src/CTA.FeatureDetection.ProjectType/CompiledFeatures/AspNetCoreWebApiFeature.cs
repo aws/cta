@@ -2,6 +2,7 @@
 using CTA.FeatureDetection.Common.Extensions;
 using CTA.FeatureDetection.Common.Models.Features.Base;
 using System.Linq;
+using Codelyzer.Analysis.Model;
 
 namespace CTA.FeatureDetection.ProjectType.CompiledFeatures
 {
@@ -34,12 +35,19 @@ namespace CTA.FeatureDetection.ProjectType.CompiledFeatures
                 .Concat(classesDerivedFromControllerBaseClass)
                 .Concat(classesDerivedFromControllerClass);
 
-            var publicMethodsInControllerClasses =
-                allControllers.SelectMany(c => c.GetPublicMethodDeclarations());
-            var publicMethodsReturningViewObject = publicMethodsInControllerClasses.SelectMany(m =>
-                m.GetInvocationExpressionsBySemanticReturnType(Constants.NetCoreViewResultTypes));
+            var publicMethodsInControllerClasses = allControllers
+                .SelectMany(c => c.GetPublicMethodDeclarations())
+                .ToList();
+            var publicMethodsReturningNonViewObject = publicMethodsInControllerClasses
+                .SelectMany(m => m.AllReturnStatements())
+                .Where(r => !Constants.NetCoreViewResultTypes.Contains(r.SemanticReturnType));
+            var publicMethodsReturningNothing = publicMethodsInControllerClasses
+                .Where(m => m.AllReturnStatements().IsNullOrEmpty());
+            var publicMethodsNotReturningViewObject = publicMethodsReturningNonViewObject
+                .Concat(publicMethodsReturningNothing);
 
-            var isPresent = classesWithApiControllerAttribute.Any() || publicMethodsReturningViewObject.Any();
+
+            var isPresent = classesWithApiControllerAttribute.Any() || publicMethodsNotReturningViewObject.Any();
 
             return isPresent;
         }
