@@ -9,7 +9,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Codelyzer.Analysis" Version="1.2.36-alpha-gfac142e986" />
+    <PackageReference Include="Codelyzer.Analysis" Version="1.2.47-alpha-gacd3c02c4b" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
   </ItemGroup>
 

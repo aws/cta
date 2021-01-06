@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using Codelyzer.Analysis;
+using Codelyzer.Analysis.Model;
 using CTA.FeatureDetection.Common.Extensions;
 using CTA.FeatureDetection.Common.Models.Features.Base;
 
@@ -18,11 +19,14 @@ namespace CTA.FeatureDetection.ProjectType.CompiledFeatures
         public override bool IsPresent(AnalyzerResult analyzerResult)
         {
             var project = analyzerResult.ProjectResult;
-            var controllerClassDeclarations = project.GetClassDeclarationsWithBaseType(Constants.NetCoreMvcControllerOriginalDefinition);
-            var returnsViewObjectFromControllerClasses = controllerClassDeclarations.Any(c => c.GetInvocationExpressionsBySemanticReturnType(Constants.NetCoreViewResultTypes).Any());
+            var controllerClassDeclarations = project.GetClassDeclarationsByBaseType(Constants.NetCoreMvcControllerOriginalDefinition);
+            var returnStatementsFromPublicMethods = controllerClassDeclarations.SelectMany(c => 
+                    c.GetPublicMethodDeclarations())
+                .SelectMany(m => m.AllReturnStatements());
+            var viewObjectReturnTypes = returnStatementsFromPublicMethods
+                .Where(r => Constants.NetCoreViewResultTypes.Contains(r.SemanticReturnType));
 
-            var isPresent = returnsViewObjectFromControllerClasses
-                && project.ContainsNonEmptyDirectory(Constants.MvcViewsDirectory);
+            var isPresent = viewObjectReturnTypes.Any();
 
             return isPresent;
         }

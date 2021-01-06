@@ -13,7 +13,7 @@ namespace CTA.FeatureDetection.Tests.FeatureDetection.ProjectType
                 $"Expected project type of {CoreMvcProjectName} to be CoreMVC.");
 
             featureName = "AspNetCoreWebApiFeature";
-            Assert.False(_coreMvcFeatureDetectionResult.FeatureStatus[featureName],
+            Assert.True(_coreMvcFeatureDetectionResult.FeatureStatus[featureName],
                 $"Expected project type of {CoreMvcProjectName} to not be CoreWebApi.");
         }
 

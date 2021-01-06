@@ -7,13 +7,14 @@
             "ViewResult",
             "PartialViewResult"
         };
+        public const string ApiControllerAttributeType = "ApiControllerAttribute";
         public const string NetCoreMvcControllerOriginalDefinition = "Microsoft.AspNetCore.Mvc.Controller";
         public const string NetCoreMvcControllerBaseOriginalDefinition = "Microsoft.AspNetCore.Mvc.ControllerBase";
+        public const string MvcControllerOriginalDefinition = "System.Web.Mvc.Controller";
+        public const string WebApiControllerOriginalDefinition = "System.Web.Http.ApiController";
         public const string SystemWebReferenceIdentifier = "System.Web";
         public const string WebApiNugetReferenceIdentifier = "Microsoft.AspNet.WebApi";
-        public const string WebApiControllerOriginalDefinition = "System.Web.Http.ApiController";
         public const string MvcNugetReferenceIdentifier = "Microsoft.AspNet.Mvc";
-        public const string MvcControllerOriginalDefinition = "System.Web.Mvc.Controller";
         public const string MvcViewsDirectory = "Views";
 
         public const string AspNetMvcFeatureName = "AspNetMvcFeature";

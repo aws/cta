@@ -29,13 +29,22 @@ namespace CTA.FeatureDetection.Common.Extensions
                 .Any(c => c.BaseTypeOriginalDefinition == typeOriginalDefinition);
 
         /// <summary>
-        /// Gets class declaration nodes in a ProjectWorkspace with the specified base type
+        /// Gets all class declaration nodes in a ProjectWorkspace
         /// </summary>
         /// <param name="project">ProjectWorkspace to search</param>
-        /// <param name="baseTypeOriginalDefinition">Original Definition of the base type being searched for</param>
         /// <returns>Collection of class declaration nodes in the project with the specified base type</returns>
-        public static IEnumerable<UstNode> GetClassDeclarationsWithBaseType(this ProjectWorkspace project, string baseTypeOriginalDefinition)
-            => project.SourceFileResults.SelectMany(r => r.GetDeclaredClassesByBaseType(baseTypeOriginalDefinition));
+        public static IEnumerable<ClassDeclaration> GetAllClassDeclarations(this ProjectWorkspace project)
+            => project.SourceFileResults.SelectMany(r => r.AllClasses());
+
+        /// <summary>
+        /// Gets all class declaration nodes in a ProjectWorkspace derived from a specified base type
+        /// </summary>
+        /// <param name="project">ProjectWorkspace to search</param>
+        /// <param name="baseTypeOriginalDefinition">ProjectWorkspace to search</param>
+        /// <returns>Collection of class declaration nodes in the project with the specified base type</returns>
+        public static IEnumerable<ClassDeclaration> GetClassDeclarationsByBaseType(this ProjectWorkspace project, 
+            string baseTypeOriginalDefinition)
+            => project.GetAllClassDeclarations().Where(c => c.HasBaseType(baseTypeOriginalDefinition));
 
         /// <summary>
         /// Determines if a specified directory exists in the project directory and is non-empty

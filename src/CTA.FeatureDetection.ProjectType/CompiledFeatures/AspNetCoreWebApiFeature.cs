@@ -20,12 +20,26 @@ namespace CTA.FeatureDetection.ProjectType.CompiledFeatures
         public override bool IsPresent(AnalyzerResult analyzerResult)
         {
             var project = analyzerResult.ProjectResult;
-            var controllerBaseClassDeclarations = project.GetClassDeclarationsWithBaseType(Constants.NetCoreMvcControllerBaseOriginalDefinition);
-            var controllerClassDeclarations = project.GetClassDeclarationsWithBaseType(Constants.NetCoreMvcControllerOriginalDefinition);
-            var returnsViewObjectFromControllerClasses = controllerClassDeclarations.Any(c => c.GetInvocationExpressionsBySemanticReturnType(Constants.NetCoreViewResultTypes).Any());
+            var projectClassDeclarations = project.GetAllClassDeclarations().ToList();
 
-            var isPresent = (controllerBaseClassDeclarations.Any() && !controllerClassDeclarations.Any())
-                            || (controllerClassDeclarations.Any() && !returnsViewObjectFromControllerClasses);
+            var classesWithApiControllerAttribute = projectClassDeclarations
+                .Where(c => c.HasAttribute(Constants.ApiControllerAttributeType))
+                .ToList();
+
+            var classesDerivedFromControllerBaseClass = projectClassDeclarations
+                .Where(c => c.HasBaseType(Constants.NetCoreMvcControllerBaseOriginalDefinition));
+            var classesDerivedFromControllerClass = projectClassDeclarations
+                .Where(c => c.HasBaseType(Constants.NetCoreMvcControllerOriginalDefinition));
+            var allControllers = classesWithApiControllerAttribute
+                .Concat(classesDerivedFromControllerBaseClass)
+                .Concat(classesDerivedFromControllerClass);
+
+            var publicMethodsInControllerClasses =
+                allControllers.SelectMany(c => c.GetPublicMethodDeclarations());
+            var publicMethodsReturningViewObject = publicMethodsInControllerClasses.SelectMany(m =>
+                m.GetInvocationExpressionsBySemanticReturnType(Constants.NetCoreViewResultTypes));
+
+            var isPresent = classesWithApiControllerAttribute.Any() || publicMethodsReturningViewObject.Any();
 
             return isPresent;
         }

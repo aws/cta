@@ -47,6 +47,17 @@ namespace CTA.FeatureDetection.Tests.FeatureDetection.Common.Extensions
         }
 
         [Test]
+        public void GetAllClassDeclarations_Returns_All_Class_Declaration_Nodes_In_Project()
+        {
+            var projectName = MvcProjectName;
+            var projectWorkspace = MvcAnalyzerResults
+                .First(r => r.ProjectResult.ProjectName == projectName)
+                .ProjectResult;
+
+            Assert.AreEqual(5, projectWorkspace.GetAllClassDeclarations().Count());
+        }
+
+        [Test]
         public void ContainsNonEmptyDirectory_Returns_True_If_Directory_Is_Found_With_Contents()
         {
             var directoryName = "Views";
