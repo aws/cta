@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using Codelyzer.Analysis;
 using Codelyzer.Analysis.Model;
+using CTA.Rules.Config;
 using CTA.Rules.Metrics;
 using CTA.Rules.Models;
 using Newtonsoft.Json;
@@ -65,6 +66,8 @@ namespace CTA.Rules.Test.Metrics
                 new Models.ProjectResult
                 {
                     ProjectFile = projectPath,
+                    TargetVersions = new List<string>() {Constants.DefaultCoreVersion},
+                    UpgradePackages = new List<PackageAction>() {new PackageAction() { Name = "Newtonsoft.Json", Version="12.0.0.0" } },
                     ExecutedActions = new Dictionary<string, List<GenericActionExecution>>
                     {
                         { "FilePath1", new List<GenericActionExecution>
@@ -128,6 +131,17 @@ ProjectResults
 ----------------------
 Showing results for: temp/project.csproj
 ----------------------
+---------------------------
+Target Versions:
+---------------------------
+netcoreapp3.1
+---------------------------
+Upgrade packages:
+---------------------------
+Newtonsoft.Json,12.0.0.0
+---------------------------
+Action packages:
+---------------------------
 ---------------------------
 Executed Actions for file: FilePath1
 ---------------------------
@@ -194,6 +208,21 @@ Count: 400";
     ""metricName"": ""RulesFile"",
     ""downloadedFile"": ""project.all.json"",
     ""solutionPath"": ""5fa9de0cb5af2d468dfb1702b1e342f47de2df9a195dabb3be2d04f9c2767482""
+  },
+  {
+    ""metricsType"": ""CTA"",
+    ""metricName"": ""TargetVersion"",
+    ""targetVersion"": ""netcoreapp3.1"",
+    ""solutionPath"": ""5fa9de0cb5af2d468dfb1702b1e342f47de2df9a195dabb3be2d04f9c2767482"",
+    ""projectGuid"": ""1234-5678""
+  },
+  {
+    ""metricsType"": ""CTA"",
+    ""metricName"": ""UpgradePackage"",
+    ""packageName"": ""Newtonsoft.Json"",
+    ""packageVersion"": ""12.0.0.0"",
+    ""solutionPath"": ""5fa9de0cb5af2d468dfb1702b1e342f47de2df9a195dabb3be2d04f9c2767482"",
+    ""projectGuid"": ""1234-5678""
   },
   {
     ""metricsType"": ""CTA"",

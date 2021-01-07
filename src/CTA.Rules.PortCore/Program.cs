@@ -45,7 +45,7 @@ namespace CTA.Rules.PortCore
                         RulesPath = cli.RulesPath,
                         IsMockRun = cli.IsMockRun,
                         UseDefaultRules = cli.DefaultRules,
-                        TargetVersions = new List<string> { cli.Version }
+                        TargetVersions = new List<string> { cli.Version }       
                     };
 
                     configs.Add(projectConfiguration);

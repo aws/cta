@@ -9,6 +9,10 @@ namespace CTA.Rules.Models
 {
     public class PortSolutionResult : SolutionResult
     {
+        public HashSet<string> References { get; set; }
+        public HashSet<string> DownloadedFiles { get; set; }
+        public string SolutionPath { get; set; }
+
         public PortSolutionResult(string solutionPath) : base()
         {
             SolutionPath = solutionPath;
@@ -23,9 +27,6 @@ namespace CTA.Rules.Models
             DownloadedFiles = new HashSet<string>();
             this.ProjectResults = solutionResult.ProjectResults;
         }
-        public HashSet<string> References { get; set; }
-
-        public HashSet<string> DownloadedFiles { get; set; }
 
         // Solution build errors grouped by project
         private Dictionary<string, Dictionary<string, int>> _buildErrors;
@@ -46,8 +47,6 @@ namespace CTA.Rules.Models
                 _buildErrors = value;
             }
         }
-
-        public string SolutionPath { get; set; }
 
         public void AddSolutionResult(SolutionResult solutionResult)
         {

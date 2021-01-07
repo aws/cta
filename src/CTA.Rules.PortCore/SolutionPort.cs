@@ -174,7 +174,7 @@ namespace CTA.Rules.PortCore
             {
                 try
                 {
-                    var zipFile = Utils.DownloadFile(Constants.S3CTAFiles, Constants.ResourcesFile);                    
+                    var zipFile = Utils.DownloadFile(Constants.S3CTAFiles, Constants.ResourcesFile);
                     ZipFile.ExtractToDirectory(zipFile, executingPath, true);
                 }
                 catch (Exception ex)
@@ -187,11 +187,12 @@ namespace CTA.Rules.PortCore
         private void CheckCache()
         {
             var createdTime = Directory.GetCreationTime(Constants.RulesDefaultPath);
-            if(createdTime.AddDays(1) < DateTime.Now)
+            if(createdTime.AddHours(Constants.CacheExpiryHours) < DateTime.Now)
             {
                 ResetCache();
             }
         }
+
         public static void ResetCache()
         {
             try
