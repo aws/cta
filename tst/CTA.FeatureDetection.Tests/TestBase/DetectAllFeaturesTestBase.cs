@@ -18,11 +18,15 @@ namespace CTA.FeatureDetection.Tests.TestBase
         protected static FeatureDetector FeatureDetector { get; private set; }
         protected static string TestProjectDirectory { get; private set; }
 
+        protected FeatureDetectionResult _coreMvcFeatureDetectionResult;
+        protected FeatureDetectionResult _coreWebApiFeatureDetectionResult;
         protected FeatureDetectionResult _ef6FeatureDetectionResult;
         protected FeatureDetectionResult _mvcFeatureDetectionResult;
         protected FeatureDetectionResult _webApiFeatureDetectionResult;
         protected FeatureDetectionResult _webClassLibraryFeatureDetectionResult;
 
+        protected string CoreMvcProjectName => "CoreMVC";
+        protected string CoreWebApiProjectName => "CoreWebApi";
         protected string Ef6ProjectName => "EF6_Test";
         protected string MvcProjectName => "ASP.NET-MVC-Framework";
         protected string WebApiProjectName => "WebApi-Framework";
@@ -33,6 +37,8 @@ namespace CTA.FeatureDetection.Tests.TestBase
         {
             TestProjectDirectory = TestUtils.GetTestAssemblySourceDirectory(typeof(TestUtils));
             FeatureDetector = TestProjectsSetupFixture.FeatureDetector;
+            _coreMvcFeatureDetectionResult = TestProjectsSetupFixture.CoreMvcFeatureDetectionResult;
+            _coreWebApiFeatureDetectionResult = TestProjectsSetupFixture.CoreWebApiFeatureDetectionResult;
             _ef6FeatureDetectionResult = TestProjectsSetupFixture.Ef6FeatureDetectionResult;
             _mvcFeatureDetectionResult = TestProjectsSetupFixture.MvcFeatureDetectionResult;
             _webApiFeatureDetectionResult = TestProjectsSetupFixture.WebApiFeatureDetectionResult;
