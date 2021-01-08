@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using CTA.Rules.Models;
 
 namespace CTA.Rules.Metrics
@@ -24,6 +25,24 @@ namespace CTA.Rules.Metrics
             }
 
             return genericActionExecutionsMetrics;
+        }
+
+        internal static IEnumerable<GenericActionMetric> TransformProjectActions(MetricsContext context, ProjectResult projectResult)
+        {
+            var projectFile = projectResult.ProjectFile;
+            var detectedActionsByFile = projectResult.ProjectActions?.FileActions.ToList();
+            var genericActions = new List<GenericActionMetric>();
+            foreach (var fileAction in detectedActionsByFile)
+            {
+                var fileName = fileAction.FilePath;
+                var actionExecutions = fileAction.AllActions;
+                foreach (var actionExecution in actionExecutions)
+                {
+                    genericActions.Add(new GenericActionMetric(context, actionExecution, fileName, projectFile));
+                }
+            }
+
+            return genericActions;
         }
 
         internal static IEnumerable<TargetVersionMetric> TransformTargetVersions(MetricsContext context, ProjectResult projectResult)

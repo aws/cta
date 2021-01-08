@@ -29,7 +29,14 @@ namespace CTA.Rules.Actions
                     }
                 }
 
-                node = node.WithBaseList(node.BaseList.WithTypes(newBaseTypes));
+                if (newBaseTypes.Count == 0)
+                {
+                    node = node.WithBaseList(null);
+                }
+                else
+                {
+                    node = node.WithBaseList(node.BaseList.WithTypes(newBaseTypes));
+                }
                 return node;
             };
 

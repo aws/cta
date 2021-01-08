@@ -9,7 +9,8 @@ namespace CTA.Rules.Metrics
     {
         // Match pattern for compiler error codes
         // example: "CS1234: "
-        private const string BuildErrorCodePattern = "CS[0-9]{4}"; 
+        private const string BuildErrorCodePattern = "CS[0-9]{4}";
+        private const string BuildErrorCodeDefaultPattern = "OTHER";
 
         [JsonProperty("metricName", Order = 10)]
         public string MetricName => "BuildError";
@@ -44,7 +45,7 @@ namespace CTA.Rules.Metrics
             var matches = pattern.Matches(buildError);
             var errorCode = matches.FirstOrDefault(m => buildError.StartsWith(m.Value))?.Value;
 
-            return errorCode ?? string.Empty;
+            return errorCode ?? BuildErrorCodeDefaultPattern;
         }
     }
 }

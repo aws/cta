@@ -19,6 +19,7 @@ namespace CTA.Rules.Metrics
         public IEnumerable<TargetVersionMetric> TargetVersionMetrics { get; set; }
         public IEnumerable<UpgradePackageMetric> UpgradePackageMetrics { get; set; }
         public IEnumerable<ActionPackageMetric> ActionPackageMetrics { get; set; }
+        public IEnumerable<GenericActionMetric> GenericActionMetrics { get; set; }
         public IEnumerable<GenericActionExecutionMetric> GenericActionExecutionMetrics { get; set; }
         public IEnumerable<BuildErrorMetric> BuildErrorMetrics { get; set; }
         public string PortSolutionResultJsonReport { get; set; }
@@ -51,6 +52,7 @@ namespace CTA.Rules.Metrics
             var targetVersionMetrics = new List<TargetVersionMetric>();
             var upgradePackageMetrics = new List<UpgradePackageMetric>();
             var actionPackageMetrics = new List<ActionPackageMetric>();
+            var actionMetrics = new List<GenericActionMetric>();
             var actionExecutionMetrics = new List<GenericActionExecutionMetric>();
 
             foreach (var projectResult in PortSolutionResult.ProjectResults)
@@ -58,11 +60,14 @@ namespace CTA.Rules.Metrics
                 targetVersionMetrics.AddRange(MetricsTransformer.TransformTargetVersions(Context, projectResult));
                 upgradePackageMetrics.AddRange(MetricsTransformer.TransformUpgradePackages(Context, projectResult));
                 actionPackageMetrics.AddRange(MetricsTransformer.TransformActionPackages(Context, projectResult));
+                actionMetrics.AddRange(MetricsTransformer.TransformProjectActions(Context, projectResult));
                 actionExecutionMetrics.AddRange(MetricsTransformer.TransformGenericActionExecutions(Context, projectResult));
             }
+
             TargetVersionMetrics = targetVersionMetrics;
             UpgradePackageMetrics = upgradePackageMetrics;
             ActionPackageMetrics = actionPackageMetrics;
+            GenericActionMetrics = actionMetrics;
             GenericActionExecutionMetrics = actionExecutionMetrics;
         } 
 
@@ -74,6 +79,7 @@ namespace CTA.Rules.Metrics
                 .Concat(TargetVersionMetrics)
                 .Concat(UpgradePackageMetrics)
                 .Concat(ActionPackageMetrics)
+                .Concat(GenericActionMetrics)
                 .Concat(GenericActionExecutionMetrics)
                 .Concat(BuildErrorMetrics)
                 .ToList();
