@@ -109,7 +109,7 @@ class MyClass
             nodeWithClass = removeBaseClassMethod(_syntaxGenerator, nodeWithClass);
 
             //Make sure the inheritance symbol is removed when last base class is removed:
-            StringAssert.Contains(nodeWithClass.ToFullString(), ":");
+            StringAssert.DoesNotContain(":", nodeWithClass.ToFullString());
         }
 
         [Test]
