@@ -164,10 +164,10 @@ namespace CTA.Rules.Update
                 var actionValidation = action.ActionValidation;
                 var actionValid = true;
 
+                if (actionValidation == null) { continue; }
+
                 var contains = !string.IsNullOrEmpty(actionValidation.Contains) ? Utils.EscapeAllWhitespace(actionValidation.Contains) : "";
                 var notContains = !string.IsNullOrEmpty(actionValidation.NotContains) ? Utils.EscapeAllWhitespace(actionValidation.NotContains) : "";
-
-                if (actionValidation == null) { continue; }
 
                 if (!string.IsNullOrEmpty(contains) && !trimmedResult.Contains(contains))
                 {
