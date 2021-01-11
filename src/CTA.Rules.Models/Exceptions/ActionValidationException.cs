@@ -14,7 +14,7 @@ namespace CTA.Rules.Models
 
         public static string GetActionValidationException(string actionType, string actionName)
         {
-            return string.Format("Error while validation action {0}-{1}", actionType, actionName);
+            return string.Format("Error while validating action {0}-{1}", actionType, actionName);
         }
     }
 }

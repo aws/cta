@@ -228,12 +228,13 @@ namespace CTA.Rules.RuleFiles
                     RecommendedActions recommendedActions = recommendation.RecommendedActions
                         .Where(ra => ra.Preferred == "Yes" && ra.TargetFrameworks.Any(t=> t.Name.Equals(_targetFramework))).FirstOrDefault();
 
-                    if (recommendedActions == null)
+                    //There are recommendations, but none of them are preferred
+                    if (recommendedActions == null && recommendation.RecommendedActions.Count > 0)
                     {
-                        LogHelper.LogError("No preferred recommendation set for recommendation {0}", recommendation.Value);
+                        LogHelper.LogError("No preferred recommendation set for recommendation {0} with target framework {1}", recommendation.Value, _targetFramework);
                         continue;
                     }
-                    else
+                    else if (recommendedActions != null)
                     {
                         if (recommendedActions.Actions != null && recommendedActions.Actions.Count > 0)
                         {
@@ -328,7 +329,7 @@ namespace CTA.Rules.RuleFiles
 
                                 case ActionTypes.ElementAccess:
                                     {
-                                        var token = new ElementAccessToken () { Key = recommendation.Name, Description = recommendedActions.Description, TargetCPU = targetCPUs, Namespace = @namespace.Name, FullKey = recommendation.Value, Type = recommendation.ContainingType };
+                                        var token = new ElementAccessToken() { Key = recommendation.Name, Description = recommendedActions.Description, TargetCPU = targetCPUs, Namespace = @namespace.Name, FullKey = recommendation.Value, Type = recommendation.ContainingType };
                                         if (!_rootNodes.ElementAccesstokens.Contains(token)) { _rootNodes.ElementAccesstokens.Add(token); }
                                         ParseActions(token, recommendedActions.Actions);
                                         break;
@@ -354,11 +355,8 @@ namespace CTA.Rules.RuleFiles
                                     break;
                             }
                         }
-
-
-                    }     
+                    }
                 }
-
             }
         }        
 
