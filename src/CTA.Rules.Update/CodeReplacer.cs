@@ -164,15 +164,18 @@ namespace CTA.Rules.Update
                 var actionValidation = action.ActionValidation;
                 var actionValid = true;
 
+                var contains = !string.IsNullOrEmpty(actionValidation.Contains) ? Utils.EscapeAllWhitespace(actionValidation.Contains) : "";
+                var notContains = !string.IsNullOrEmpty(actionValidation.NotContains) ? Utils.EscapeAllWhitespace(actionValidation.NotContains) : "";
+
                 if (actionValidation == null) { continue; }
 
-                if (!string.IsNullOrEmpty(actionValidation.Contains) && !trimmedResult.Contains(actionValidation.Contains))
+                if (!string.IsNullOrEmpty(contains) && !trimmedResult.Contains(contains))
                 {
                     //Validation token is not in the result source file:
                     actionValid = false;
                 }
 
-                if (!string.IsNullOrEmpty(actionValidation.NotContains) && trimmedResult.Contains(actionValidation.NotContains))
+                if (!string.IsNullOrEmpty(notContains) && trimmedResult.Contains(notContains))
                 {
                     //Validation Negative token is in the result source file:
                     actionValid = false;

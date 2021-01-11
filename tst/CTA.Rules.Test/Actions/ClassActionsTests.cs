@@ -99,6 +99,20 @@ class MyClass
         }
 
         [Test]
+        public void RemoveLastBaseClass()
+        {
+            var baseClassname = "ControllerBase";
+            var addBaseClass = _classActions.GetAddBaseClassAction(baseClassname);
+            var removeBaseClassMethod = _classActions.GetRemoveBaseClassAction(baseClassname);
+
+            var nodeWithClass = addBaseClass(_syntaxGenerator, _node);
+            nodeWithClass = removeBaseClassMethod(_syntaxGenerator, nodeWithClass);
+
+            //Make sure the inheritance symbol is removed when last base class is removed:
+            StringAssert.DoesNotContain(":", nodeWithClass.ToFullString());
+        }
+
+        [Test]
         public void ClassDeclarationEquals()
         {
             var classAction = new ClassDeclarationAction() { Key = "Test", Value = "Test2", ClassDeclarationActionFunc = _classActions.GetAddAttributeAction("Test") };

@@ -68,6 +68,32 @@ namespace CTA.Rules.Test.Metrics
                     ProjectFile = projectPath,
                     TargetVersions = new List<string>() {Constants.DefaultCoreVersion},
                     UpgradePackages = new List<PackageAction>() {new PackageAction() { Name = "Newtonsoft.Json", Version="12.0.0.0" } },
+                    ProjectActions = new ProjectActions() {
+                        FileActions = new BlockingCollection<FileActions>()
+                        {
+                            new FileActions()
+                            {
+                                FilePath="FilePath1", 
+                                AttributeActions = new HashSet<AttributeAction>() 
+                                {
+                                    new AttributeAction() 
+                                    { 
+                                        Key = "SampleKey1",
+                                        Type = "GA1 Type",
+                                        Name = "GA1 Name",
+                                        Value = "GA1 Value",
+                                    },
+                                    new AttributeAction()
+                                    {
+                                        Key = "SampleKey2",
+                                        Type = "GA2 Type",
+                                        Name = "GA2 Name",
+                                        Value = "GA2 Value",
+                                    }
+                                } 
+                            }
+                        } 
+                    },
                     ExecutedActions = new Dictionary<string, List<GenericActionExecution>>
                     {
                         { "FilePath1", new List<GenericActionExecution>
@@ -226,6 +252,26 @@ Count: 400";
   },
   {
     ""metricsType"": ""CTA"",
+    ""metricName"": ""GenericAction"",
+    ""actionName"": ""GA1 Name"",
+    ""actionType"": ""GA1 Type"",
+    ""actionValue"": ""GA1 Value"",
+    ""solutionPath"": ""5fa9de0cb5af2d468dfb1702b1e342f47de2df9a195dabb3be2d04f9c2767482"",
+    ""projectGuid"": ""1234-5678"",
+    ""filePath"": ""eb98c1d648bc61064bdeaca9523a49e51bb3312f28f59376fb385e1569c77822""
+  },
+  {
+    ""metricsType"": ""CTA"",
+    ""metricName"": ""GenericAction"",
+    ""actionName"": ""GA2 Name"",
+    ""actionType"": ""GA2 Type"",
+    ""actionValue"": ""GA2 Value"",
+    ""solutionPath"": ""5fa9de0cb5af2d468dfb1702b1e342f47de2df9a195dabb3be2d04f9c2767482"",
+    ""projectGuid"": ""1234-5678"",
+    ""filePath"": ""eb98c1d648bc61064bdeaca9523a49e51bb3312f28f59376fb385e1569c77822""
+  },
+  {
+    ""metricsType"": ""CTA"",
     ""metricName"": ""ActionExecution"",
     ""actionName"": ""GA1 Name"",
     ""actionType"": ""GA1 Type"",
@@ -260,7 +306,7 @@ Count: 400";
   {
     ""metricsType"": ""CTA"",
     ""metricName"": ""BuildError"",
-    ""buildErrorCode"": """",
+    ""buildErrorCode"": ""OTHER"",
     ""buildError"": ""BuildError2"",
     ""count"": 200,
     ""solutionPath"": ""5fa9de0cb5af2d468dfb1702b1e342f47de2df9a195dabb3be2d04f9c2767482"",
@@ -269,7 +315,7 @@ Count: 400";
   {
     ""metricsType"": ""CTA"",
     ""metricName"": ""BuildError"",
-    ""buildErrorCode"": """",
+    ""buildErrorCode"": ""OTHER"",
     ""buildError"": ""BuildError3"",
     ""count"": 300,
     ""solutionPath"": ""5fa9de0cb5af2d468dfb1702b1e342f47de2df9a195dabb3be2d04f9c2767482"",
@@ -278,7 +324,7 @@ Count: 400";
   {
     ""metricsType"": ""CTA"",
     ""metricName"": ""BuildError"",
-    ""buildErrorCode"": """",
+    ""buildErrorCode"": ""OTHER"",
     ""buildError"": ""BuildError4"",
     ""count"": 400,
     ""solutionPath"": ""5fa9de0cb5af2d468dfb1702b1e342f47de2df9a195dabb3be2d04f9c2767482"",
