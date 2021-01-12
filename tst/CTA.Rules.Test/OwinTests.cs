@@ -30,18 +30,18 @@ namespace CTA.Rules.Test
         }
 
         [Test]
-        public async Task TestAspNetRoutes5Solution()
+        public void TestAspNetRoutes5Solution()
         {
-            await TestAspNetRoutes("net5.0");
+            TestAspNetRoutes("net5.0");
         }
 
         [Test]
-        public async Task TestAspNetRoutes3Solution()
+        public void TestAspNetRoutes3Solution()
         {
-            await TestAspNetRoutes("netcoreapp3.1");
+            TestAspNetRoutes("netcoreapp3.1");
         }
 
-        private async Task TestAspNetRoutes(string version)
+        private void TestAspNetRoutes(string version)
         {
             TestSolutionAnalysis results = AnalyzeSolution("AspNetRoutes.sln", tempDir, downloadLocation, version);
 
@@ -81,18 +81,18 @@ namespace CTA.Rules.Test
         }
 
         [Test]
-        public async Task TestBranchingPipelines5Solution()
+        public void TestBranchingPipelines5Solution()
         {
-            await TestBranchingPipelines("net5.0");
+            TestBranchingPipelines("net5.0");
         }
 
         [Test]
-        public async Task TestBranchingPipelines3Solution()
+        public void TestBranchingPipelines3Solution()
         {
-            await TestBranchingPipelines("netcoreapp3.1");
+            TestBranchingPipelines("netcoreapp3.1");
         }
 
-        private async Task TestBranchingPipelines(string version)
+        private void TestBranchingPipelines(string version)
         {
             TestSolutionAnalysis results = AnalyzeSolution("BranchingPipelines.sln", tempDir, downloadLocation, version);
 
@@ -127,18 +127,18 @@ namespace CTA.Rules.Test
         }
 
         [Test]
-        public async Task TestEmbedded5Solution()
+        public void TestEmbedded5Solution()
         {
-            await TestEmbedded("net5.0");
+            TestEmbedded("net5.0");
         }
 
         [Test]
-        public async Task TestEmbedded3Solution()
+        public void TestEmbedded3Solution()
         {
-            await TestEmbedded("netcoreapp3.1");
+            TestEmbedded("netcoreapp3.1");
         }
 
-        private async Task TestEmbedded(string version)
+        private void TestEmbedded(string version)
         {
             TestSolutionAnalysis results = AnalyzeSolution("Embedded.sln", tempDir, downloadLocation, version);
 
@@ -164,18 +164,18 @@ namespace CTA.Rules.Test
         }
 
         [Test]
-        public async Task TestCustomServer5Solution()
+        public void TestCustomServer5Solution()
         {
-            await TestCustomServer("net5.0");
+            TestCustomServer("net5.0");
         }
 
         [Test]
-        public async Task TestCustomServer3Solution()
+        public void TestCustomServer3Solution()
         {
-            await TestCustomServer("netcoreapp3.1");
+            TestCustomServer("netcoreapp3.1");
         }
 
-        private async Task TestCustomServer(string version)
+        private void TestCustomServer(string version)
         {
             TestSolutionAnalysis results = AnalyzeSolution("CustomServer.sln", tempDir, downloadLocation, version);
 
@@ -209,18 +209,18 @@ namespace CTA.Rules.Test
         }
 
         [Test]
-        public async Task TestHelloWorld5Solution()
+        public void TestHelloWorld5Solution()
         {
-            await TestHelloWorld("net5.0");
+            TestHelloWorld("net5.0");
         }
 
         [Test]
-        public async Task TestHelloWorld3Solution()
+        public void TestHelloWorld3Solution()
         {
-            await TestHelloWorld("netcoreapp3.1");
+            TestHelloWorld("netcoreapp3.1");
         }
 
-        private async Task TestHelloWorld(string version)
+        private void TestHelloWorld(string version)
         {
             TestSolutionAnalysis results = AnalyzeSolution("HelloWorld.sln", tempDir, downloadLocation, version);
 
@@ -240,18 +240,18 @@ namespace CTA.Rules.Test
         }
 
         [Test]
-        public async Task TestHelloWorldRawOwin5Solution()
+        public void TestHelloWorldRawOwin5Solution()
         {
-            await TestHelloWorldRawOwin("net5.0");
+            TestHelloWorldRawOwin("net5.0");
         }
 
         [Test]
-        public async Task TestHelloWorldRawOwin3Solution()
+        public void TestHelloWorldRawOwin3Solution()
         {
-            await TestHelloWorldRawOwin("netcoreapp3.1");
+            TestHelloWorldRawOwin("netcoreapp3.1");
         }
 
-        private async Task TestHelloWorldRawOwin(string version)
+        private void TestHelloWorldRawOwin(string version)
         {
             TestSolutionAnalysis results = AnalyzeSolution("HelloWorldRawOwin.sln", tempDir, downloadLocation, version);
 
@@ -264,18 +264,18 @@ namespace CTA.Rules.Test
         }
 
         [Test]
-        public async Task TestOwinSelfHostSample5Solution()
+        public void TestOwinSelfHostSample5Solution()
         {
-            await TestOwinSelfHostSample("net5.0");
+            TestOwinSelfHostSample("net5.0");
         }
 
         [Test]
-        public async Task TestOwinSelfHostSample3Solution()
+        public void TestOwinSelfHostSample3Solution()
         {
-            await TestOwinSelfHostSample("netcoreapp3.1");
+            TestOwinSelfHostSample("netcoreapp3.1");
         }
 
-        private async Task TestOwinSelfHostSample(string version)
+        private void TestOwinSelfHostSample(string version)
         {
             TestSolutionAnalysis results = AnalyzeSolution("OwinSelfhostSample.sln", tempDir, downloadLocation, version);
 
@@ -294,18 +294,18 @@ namespace CTA.Rules.Test
         }
 
         [Test]
-        public async Task TestSignalR5Solution()
+        public void TestSignalR5Solution()
         {
-            await TestSignalR("net5.0");
+            TestSignalR("net5.0");
         }
 
         [Test]
-        public async Task TestSignalR3Solution()
+        public void TestSignalR3Solution()
         {
-            await TestSignalR("netcoreapp3.1");
+            TestSignalR("netcoreapp3.1");
         }
 
-        private async Task TestSignalR(string version)
+        private void TestSignalR(string version)
         {
             TestSolutionAnalysis results = AnalyzeSolution("SignalR.sln", tempDir, downloadLocation, version);
 
@@ -324,18 +324,18 @@ namespace CTA.Rules.Test
         }
 
         [Test]
-        public async Task TestStaticFilesSample5Solution()
+        public void TestStaticFilesSample5Solution()
         {
-            await TestStaticFilesSample("net5.0");
+            TestStaticFilesSample("net5.0");
         }
 
         [Test]
-        public async Task TestStaticFilesSample3Solution()
+        public void TestStaticFilesSample3Solution()
         {
-            await TestStaticFilesSample("netcoreapp3.1");
+            TestStaticFilesSample("netcoreapp3.1");
         }
 
-        private async Task TestStaticFilesSample(string version)
+        private void TestStaticFilesSample(string version)
         {
             TestSolutionAnalysis results = AnalyzeSolution("StaticFilesSample.sln", tempDir, downloadLocation, version);
 
@@ -357,18 +357,18 @@ namespace CTA.Rules.Test
         }
 
         [Test]
-        public async Task TestWebApi5Solution()
+        public void TestWebApi5Solution()
         {
-            await TestWebApi("net5.0");
+            TestWebApi("net5.0");
         }
 
         [Test]
-        public async Task TestWebApi3Solution()
+        public void TestWebApi3Solution()
         {
-            await TestWebApi("netcoreapp3.1");
+            TestWebApi("netcoreapp3.1");
         }
 
-        private async Task TestWebApi(string version)
+        private void TestWebApi(string version)
         {
             TestSolutionAnalysis results = AnalyzeSolution("OwinWebApi.sln", tempDir, downloadLocation, version);
 
@@ -383,18 +383,18 @@ namespace CTA.Rules.Test
         }
 
         [Test]
-        public async Task TestWebSocketSample5Solution()
+        public void TestWebSocketSample5Solution()
         {
-            await TestWebSocketSample("net5.0");
+            TestWebSocketSample("net5.0");
         }
 
         [Test]
-        public async Task TestWebSocketSample3Solution()
+        public void TestWebSocketSample3Solution()
         {
-            await TestWebSocketSample("netcoreapp3.1");
+            TestWebSocketSample("netcoreapp3.1");
         }
 
-        private async Task TestWebSocketSample(string version)
+        private void TestWebSocketSample(string version)
         {
             TestSolutionAnalysis results = AnalyzeSolution("WebSocketSample.sln", tempDir, downloadLocation, version);
 
