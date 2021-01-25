@@ -152,5 +152,23 @@ namespace CTA.Rules.Actions
             };
             return RenameClass;
         }
+        public Func<SyntaxGenerator, ClassDeclarationSyntax, ClassDeclarationSyntax> GetReplaceMethodModifiersAction(string methodName, string modifiers)
+        {
+            Func<SyntaxGenerator, ClassDeclarationSyntax, ClassDeclarationSyntax> ReplaceMethodModifiers = (SyntaxGenerator syntaxGenerator, ClassDeclarationSyntax node) =>
+            {
+                var allMembers = node.Members.ToList();
+                var allMethods = allMembers.OfType<MethodDeclarationSyntax>();
+                var replaceMethod = allMethods.Where(m => m.Identifier.ToString() == methodName).FirstOrDefault();
+                allMembers.Remove(replaceMethod);
+                SyntaxTokenList tokenList = new SyntaxTokenList(SyntaxFactory.ParseTokens(modifiers));
+                var newMethod = replaceMethod.WithModifiers(tokenList);
+                allMembers.Add(replaceMethod);
+
+                node = node.WithMembers(node.Members.Replace(replaceMethod, newMethod)).NormalizeWhitespace();
+
+                return node;
+            };
+            return ReplaceMethodModifiers;
+        }
     }
 }
