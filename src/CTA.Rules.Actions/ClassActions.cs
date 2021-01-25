@@ -136,9 +136,15 @@ namespace CTA.Rules.Actions
             {
                 var allMembers = node.Members.ToList();
                 var allMethods = allMembers.OfType<MethodDeclarationSyntax>();
-                var removeMethod = allMethods.Where(m => m.Identifier.ToString() == methodName).FirstOrDefault();
-                allMembers.Remove(removeMethod);
-                node = node.RemoveNode(removeMethod, SyntaxRemoveOptions.KeepNoTrivia).NormalizeWhitespace();
+                if(allMethods.Count() > 0)
+                {
+                    var removeMethod = allMethods.Where(m => m.Identifier.ToString() == methodName);
+                    if(removeMethod.Count() > 0)
+                    {
+                        node = node.RemoveNode(removeMethod.FirstOrDefault(), SyntaxRemoveOptions.KeepNoTrivia).NormalizeWhitespace();
+                    }
+                }
+                
                 return node;
             };
             return AddMethod;
@@ -158,13 +164,17 @@ namespace CTA.Rules.Actions
             {
                 var allMembers = node.Members.ToList();
                 var allMethods = allMembers.OfType<MethodDeclarationSyntax>();
-                var replaceMethod = allMethods.Where(m => m.Identifier.ToString() == methodName).FirstOrDefault();
-                allMembers.Remove(replaceMethod);
-                SyntaxTokenList tokenList = new SyntaxTokenList(SyntaxFactory.ParseTokens(modifiers));
-                var newMethod = replaceMethod.WithModifiers(tokenList);
-                allMembers.Add(replaceMethod);
+                if(allMethods.Count() > 0)
+                {
+                    var replaceMethod = allMethods.Where(m => m.Identifier.ToString() == methodName);
+                    if(replaceMethod.Count() > 0)
+                    {
+                        SyntaxTokenList tokenList = new SyntaxTokenList(SyntaxFactory.ParseTokens(modifiers));
+                        var newMethod = replaceMethod.FirstOrDefault().WithModifiers(tokenList);
 
-                node = node.WithMembers(node.Members.Replace(replaceMethod, newMethod)).NormalizeWhitespace();
+                        node = node.WithMembers(node.Members.Replace(replaceMethod.FirstOrDefault(), newMethod)).NormalizeWhitespace();
+                    }
+                }
 
                 return node;
             };
