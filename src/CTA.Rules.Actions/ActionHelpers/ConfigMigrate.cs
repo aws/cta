@@ -9,6 +9,7 @@ using System.Linq;
 using System.Xml.Serialization;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
+using System.Configuration;
 
 namespace CTA.Rules.Actions
 {
@@ -49,7 +50,7 @@ namespace CTA.Rules.Actions
 
             return isConfigFound;
         }
-        private XDocument LoadWebConfig(string projectDir)
+        private Configuration LoadWebConfig(string projectDir)
         {
             string webConfigFile = Path.Combine(projectDir, Constants.webConfig);
 
@@ -57,8 +58,9 @@ namespace CTA.Rules.Actions
             {
                 try
                 {
-                    var webConfig = XDocument.Load(webConfigFile);
-                    return webConfig;
+                    var fileMap = new ExeConfigurationFileMap() { ExeConfigFilename = webConfigFile };
+                    var configuration = ConfigurationManager.OpenMappedExeConfiguration(fileMap, ConfigurationUserLevel.None);
+                    return configuration;
                 }
                 catch (Exception ex)
                 {
@@ -73,7 +75,7 @@ namespace CTA.Rules.Actions
         /// </summary>
         /// <param name="webConfig">The XML representation of the web.config file</param>
         /// <returns>A JSON object representing the appSettings.json file </returns>
-        private JObject ProcessWebConfig(XDocument webConfig, string templateContent)
+        private JObject ProcessWebConfig(Configuration webConfig, string templateContent)
         {
             var connectionStringsObjects = GetConnectionStrings(webConfig);
             var appSettingsObjects = GetAppSettingObjects(webConfig);
@@ -103,24 +105,20 @@ namespace CTA.Rules.Actions
         /// </summary>
         /// <param name="webConfig"></param>
         /// <returns></returns>
-        private Dictionary<string, string> GetConnectionStrings(XDocument webConfig)
+        private Dictionary<string, string> GetConnectionStrings(Configuration webConfig)
         {
             Dictionary<string, string> connectionStringObjects = new Dictionary<string, string>();
-            webConfig.Descendants()?.Where(d => d.Name.ToString().ToLower() == Constants.connectionstrings)?.Descendants()?.ToList().ForEach(connectionString =>
-            {
-                try
-                {
-                    var name = connectionString.Attributes()?.First(a => a.Name?.ToString().ToLower() == Constants.name).Value;
-                    var value = connectionString.Attributes()?.First(a => a.Name?.ToString().ToLower() == Constants.connectionstring).Value;
+            var connectionStrings = webConfig.ConnectionStrings?.ConnectionStrings;
 
-                    connectionStringObjects.Add(name, value);
+            if (connectionStrings != null)
+            {
+                foreach (ConnectionStringSettings connectionString in connectionStrings)
+                {
+                    connectionStringObjects.Add(connectionString.Name, connectionString.ConnectionString);
                     _hasData = true;
                 }
-                catch (Exception ex)
-                {
-                    LogHelper.LogError(ex, "Error while parsing connection string");
-                }
-            });
+            }
+
             return connectionStringObjects;
         }
 
@@ -129,28 +127,22 @@ namespace CTA.Rules.Actions
         /// </summary>
         /// <param name="webConfig"></param>
         /// <returns></returns>
-        private Dictionary<string, string> GetAppSettingObjects(XDocument webConfig)
+        private Dictionary<string, string> GetAppSettingObjects(Configuration webConfig)
         {
             Dictionary<string, string> appSettingsObjects = new Dictionary<string, string>();
+            var appSettings = webConfig.AppSettings?.Settings;
 
-            webConfig.Descendants()?.Where(d => d.Name?.ToString().ToLower() == Constants.appSettings)?.Descendants()?.ToList().ForEach(appSetting =>
+            if (appSettings != null)
             {
-                try
+                foreach (KeyValueConfigurationElement appSetting in appSettings)
                 {
-                    var key = appSetting.Attributes()?.First(a => a.Name?.ToString().ToLower() == Constants.key).Value;
-                    var value = appSetting.Attributes()?.First(a => a.Name?.ToString().ToLower() == Constants.value).Value;
-                    if (!Constants.appSettingsExclusions.Contains(key))
+                    if (!Constants.appSettingsExclusions.Contains(appSetting.Key))
                     {
-                        appSettingsObjects.Add(key, value);
-                        _hasData = true;
+                        appSettingsObjects.Add(appSetting.Key, appSetting.Value);
                     }
+                    _hasData = true;
                 }
-                catch (Exception ex)
-                {
-                    LogHelper.LogError(ex, "Error while parsing appsettings");
-                }
-            });
-
+            }
             return appSettingsObjects;
         }
 

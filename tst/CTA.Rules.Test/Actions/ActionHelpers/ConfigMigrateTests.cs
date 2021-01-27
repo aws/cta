@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Configuration;
 using System.IO;
 using System.Reflection;
 using System.Xml.Linq;
@@ -19,6 +20,7 @@ namespace CTA.Rules.Test.Actions.ActionHelpers
             ConfigMigrate configMigrateInstance = new ConfigMigrate(Directory.GetCurrentDirectory(), projectType);            
             Type configMigrateType = configMigrateInstance.GetType();
 
+            var loadWebConfigMethod = TestUtils.GetPrivateMethod(configMigrateType, "LoadWebConfig");
             var processWebConfigMethod = TestUtils.GetPrivateMethod(configMigrateType, "ProcessWebConfig");
             var addAppSettingsJsonFileMethod = TestUtils.GetPrivateMethod(configMigrateType, "AddAppSettingsJsonFile");
 
@@ -27,7 +29,7 @@ namespace CTA.Rules.Test.Actions.ActionHelpers
             var connectionStringWithBackSlash = @"Data Source=(LocalDb)\v11.0;Initial Catalog=ContosoUniversity2;Integrated Security=SSPI;";
             var connectionString2 = @"Data Source=Test;Initial Catalog=ContosoUniversity1;Integrated Security=SSPI;";
 
-            var webConfig = XDocument.Parse(string.Format(@"
+            var webConfig = string.Format(@"
 <configuration>
     <appSettings>
         <add key=""webpages:Version"" value=""1.0.0.0""/>
@@ -47,20 +49,24 @@ namespace CTA.Rules.Test.Actions.ActionHelpers
         <add name=""MvcMusicStoreAuth"" connectionString=""{3}"" providerName=""System.Data.SqlClient"" />
     </connectionStrings> 
 </configuration>
-", appSetting1, appSetting2, connectionStringWithBackSlash, connectionString2));
+", appSetting1, appSetting2, connectionStringWithBackSlash, connectionString2);
+
+            File.WriteAllText("web.config", webConfig);
 
             var templateContent = @"{}";
             var outputDir = "";
 
+            var configuration = (Configuration)loadWebConfigMethod.Invoke(configMigrateInstance, new object[] { outputDir });
 
             // Invoke method and read contents of method output
-            var content = (JObject)processWebConfigMethod.Invoke(configMigrateInstance, new object[] { webConfig, templateContent });
-            
+            var content = (JObject)processWebConfigMethod.Invoke(configMigrateInstance, new object[] { configuration, templateContent });
+
             var methodParams = new object[] { content, outputDir };
             addAppSettingsJsonFileMethod.Invoke(configMigrateInstance, methodParams);
 
             var appSettingsContent = File.ReadAllText(Path.Combine(outputDir, "appsettings.json"));
             File.Delete(Path.Combine(outputDir, "appsettings.json"));
+            File.Delete(Path.Combine(outputDir, "web.config"));
 
             Assert.True(appSettingsContent.Contains(appSetting1));
             Assert.True(appSettingsContent.Contains(appSetting2));
@@ -76,13 +82,14 @@ namespace CTA.Rules.Test.Actions.ActionHelpers
             ConfigMigrate configMigrateInstance = new ConfigMigrate(Directory.GetCurrentDirectory(), projectType);
             Type configMigrateType = configMigrateInstance.GetType();
 
+            var loadWebConfigMethod = TestUtils.GetPrivateMethod(configMigrateType, "LoadWebConfig");
             var processWebConfigMethod = TestUtils.GetPrivateMethod(configMigrateType, "ProcessWebConfig");
             var addAppSettingsJsonFileMethod = TestUtils.GetPrivateMethod(configMigrateType, "AddAppSettingsJsonFile");
 
             var connectionStringWithBackSlash = @"Data Source=(LocalDb)\v11.0;Initial Catalog=ContosoUniversity2;Integrated Security=SSPI;";
             var connectionString2 = @"Data Source=Test;Initial Catalog=ContosoUniversity1;Integrated Security=SSPI;";
 
-            var webConfig = XDocument.Parse(string.Format(@"
+            var webConfig = string.Format(@"
 <configuration>
     <runtime>
         <assemblyBinding xmlns=""urn:schemas-microsoft-com:asm.v1"">
@@ -97,20 +104,24 @@ namespace CTA.Rules.Test.Actions.ActionHelpers
         <add name=""MvcMusicStoreAuth"" connectionString=""{1}"" providerName=""System.Data.SqlClient"" />
     </connectionStrings> 
 </configuration>
-", connectionStringWithBackSlash, connectionString2));
+", connectionStringWithBackSlash, connectionString2);
+
+            File.WriteAllText("web.config", webConfig);
 
             var templateContent = @"{}";
             var outputDir = "";
 
+            var configuration = (Configuration)loadWebConfigMethod.Invoke(configMigrateInstance, new object[] { outputDir });
 
             // Invoke method and read contents of method output
-            var content = (JObject)processWebConfigMethod.Invoke(configMigrateInstance, new object[] { webConfig, templateContent });
+            var content = (JObject)processWebConfigMethod.Invoke(configMigrateInstance, new object[] { configuration, templateContent });
 
             var methodParams = new object[] { content, outputDir };
             addAppSettingsJsonFileMethod.Invoke(configMigrateInstance, methodParams);
 
             var appSettingsContent = File.ReadAllText(Path.Combine(outputDir, "appsettings.json"));
             File.Delete(Path.Combine(outputDir, "appsettings.json"));
+            File.Delete(Path.Combine(outputDir, "web.config"));
 
             Assert.True(appSettingsContent.Contains(connectionStringWithBackSlash.Replace(@"\", @"\\")));
             Assert.True(appSettingsContent.Contains(connectionString2));
