@@ -138,9 +138,9 @@ namespace CTA.Rules.Actions
             {
                 var allMembers = node.Members.ToList();
                 var allMethods = allMembers.OfType<MethodDeclarationSyntax>();
-                if(allMethods.Count() > 0)
+                if(allMethods.Any())
                 {
-                    var removeMethod = allMethods.Where(m => m.Identifier.ToString() == methodName).FirstOrDefault();
+                    var removeMethod = allMethods.FirstOrDefault(m => m.Identifier.ToString() == methodName);
                     if(removeMethod != null)
                     {
                         node = node.RemoveNode(removeMethod, SyntaxRemoveOptions.KeepNoTrivia).NormalizeWhitespace();
@@ -166,17 +166,15 @@ namespace CTA.Rules.Actions
             {
                 var allMembers = node.Members.ToList();
                 var allMethods = allMembers.OfType<MethodDeclarationSyntax>();
-                if(allMethods.Count() > 0)
+                if(allMethods.Any())
                 {
-                    var replaceMethod = allMethods.Where(m => m.Identifier.ToString() == methodName).FirstOrDefault();
+                    var replaceMethod = allMethods.FirstOrDefault(m => m.Identifier.ToString() == methodName);
                     if(replaceMethod != null )
                     {
-                        string[] modifierList = modifiers.Split(new char[] { ' ', ','});
-                        var verifiedModifiers = modifierList.Where(m => CTA.Rules.Config.Constants.supportedMethodModifiers.Contains(m.ToLower()));
-                        if(modifierList.Count() == verifiedModifiers.Count())
+                        var allModifiersAreValid = modifiers.Split(new char[] { ' ', ',' }).All(m => Constants.SupportedMethodModifiers.Contains(m));
+                        if(allModifiersAreValid)
                         {
-                            string supportedModifier = String.Join(" ", verifiedModifiers);
-                            SyntaxTokenList tokenList = new SyntaxTokenList(SyntaxFactory.ParseTokens(supportedModifier));
+                            SyntaxTokenList tokenList = new SyntaxTokenList(SyntaxFactory.ParseTokens(modifiers));
                             var newMethod = replaceMethod.WithModifiers(tokenList);
 
                             node = node.WithMembers(node.Members.Replace(replaceMethod, newMethod)).NormalizeWhitespace();
