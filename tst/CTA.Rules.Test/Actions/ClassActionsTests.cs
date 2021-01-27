@@ -119,7 +119,7 @@ class MyClass
             var methodNode = SyntaxFactory.MethodDeclaration(SyntaxFactory.ParseTypeName("void"), methodName);
             var nodeWithMethod = _node.AddMembers(methodNode);
 
-            var modifier = "private";
+            var modifier = "private async extern";
             var replaceModifier = _classActions.GetReplaceMethodModifiersAction(methodName, modifier);
 
             var node = replaceModifier(_syntaxGenerator, nodeWithMethod);

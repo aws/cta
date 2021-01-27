@@ -1,10 +1,12 @@
 ﻿using CTA.Rules.Config;
+using CTA.Rules.Models;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Classification;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Editing;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace CTA.Rules.Actions
@@ -138,10 +140,10 @@ namespace CTA.Rules.Actions
                 var allMethods = allMembers.OfType<MethodDeclarationSyntax>();
                 if(allMethods.Count() > 0)
                 {
-                    var removeMethod = allMethods.Where(m => m.Identifier.ToString() == methodName);
-                    if(removeMethod.Count() > 0)
+                    var removeMethod = allMethods.Where(m => m.Identifier.ToString() == methodName).FirstOrDefault();
+                    if(removeMethod != null)
                     {
-                        node = node.RemoveNode(removeMethod.FirstOrDefault(), SyntaxRemoveOptions.KeepNoTrivia).NormalizeWhitespace();
+                        node = node.RemoveNode(removeMethod, SyntaxRemoveOptions.KeepNoTrivia).NormalizeWhitespace();
                     }
                 }
                 
@@ -166,13 +168,19 @@ namespace CTA.Rules.Actions
                 var allMethods = allMembers.OfType<MethodDeclarationSyntax>();
                 if(allMethods.Count() > 0)
                 {
-                    var replaceMethod = allMethods.Where(m => m.Identifier.ToString() == methodName);
-                    if(replaceMethod.Count() > 0)
+                    var replaceMethod = allMethods.Where(m => m.Identifier.ToString() == methodName).FirstOrDefault();
+                    if(replaceMethod != null )
                     {
-                        SyntaxTokenList tokenList = new SyntaxTokenList(SyntaxFactory.ParseTokens(modifiers));
-                        var newMethod = replaceMethod.FirstOrDefault().WithModifiers(tokenList);
+                        string[] modifierList = modifiers.Split(new char[] { ' ', ','});
+                        var verifiedModifiers = modifierList.Where(m => CTA.Rules.Config.Constants.supportedMethodModifiers.Contains(m.ToLower()));
+                        if(modifierList.Count() == verifiedModifiers.Count())
+                        {
+                            string supportedModifier = String.Join(" ", verifiedModifiers);
+                            SyntaxTokenList tokenList = new SyntaxTokenList(SyntaxFactory.ParseTokens(supportedModifier));
+                            var newMethod = replaceMethod.WithModifiers(tokenList);
 
-                        node = node.WithMembers(node.Members.Replace(replaceMethod.FirstOrDefault(), newMethod)).NormalizeWhitespace();
+                            node = node.WithMembers(node.Members.Replace(replaceMethod, newMethod)).NormalizeWhitespace();
+                        }
                     }
                 }
 
