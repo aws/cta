@@ -85,22 +85,25 @@ namespace CTA.Rules.Actions
         /// <param name="projectDir">Directory of the project</param>
         private void CreateMvcDirs(string projectDir)
         {
-            string wwwrootdir = string.Concat(projectDir, @"\wwwroot");
-            string contentdir = string.Concat(projectDir, @"\Content");
-            string scriptsdir = string.Concat(projectDir, @"\Scripts");
+            string wwwrootdir = Path.Combine(projectDir, Constants.wwwroot);
+            string contentdir = string.Concat(projectDir, Constants.Content);
+            string scriptsdir = string.Concat(projectDir, Constants.Scripts);
+
+            string targetContentDir = string.Concat(wwwrootdir, Constants.Content);
+            string targetScriptsDir = string.Concat(wwwrootdir, Constants.Scripts);
 
             Directory.CreateDirectory(wwwrootdir);
 
-            LogChange(string.Format("Create wwwroot dir at {0}", projectDir));
-            if (Directory.Exists(contentdir))
+            LogChange(string.Format("Create {0} dir at {1}", Constants.wwwroot, projectDir));
+            if (Directory.Exists(contentdir) && !Directory.Exists(targetContentDir))
             {
-                Directory.Move(contentdir, string.Concat(wwwrootdir, @"\Content"));
-                LogChange(string.Format("Move Content folder to {0}", wwwrootdir));
+                Directory.Move(contentdir, targetContentDir);
+                LogChange(string.Format("Move {0} folder to {1}", Constants.Content, wwwrootdir));
             }
-            if (Directory.Exists(scriptsdir))
+            if (Directory.Exists(scriptsdir) && !Directory.Exists(targetScriptsDir))
             {
-                Directory.Move(scriptsdir, string.Concat(wwwrootdir, @"\Scripts"));
-                LogChange(string.Format("Move Scripts folder to {0}", wwwrootdir));
+                Directory.Move(scriptsdir, targetScriptsDir);
+                LogChange(string.Format("Move {0} folder to {1}", Constants.Scripts, wwwrootdir));
             }
         }
 

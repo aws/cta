@@ -7,6 +7,9 @@ using System.Text;
 using System.Xml.Linq;
 using System.Linq;
 using System.Xml.Serialization;
+using Newtonsoft.Json.Linq;
+using System.Collections.Generic;
+using System.Configuration;
 
 namespace CTA.Rules.Actions
 {
@@ -14,13 +17,13 @@ namespace CTA.Rules.Actions
     {
         private string _projectDir;
         private ProjectType _projectType;
-
-
+        private bool _hasData;
 
         public ConfigMigrate(string projectDir, ProjectType projectType)
         {
             _projectDir = Directory.GetParent(projectDir).FullName;
             _projectType = projectType;
+            _hasData = false;
         }
         public string Run()
         {
@@ -38,16 +41,16 @@ namespace CTA.Rules.Actions
             var configXml = LoadWebConfig(_projectDir);
             if (configXml == null) { return isConfigFound; }
 
-            var config = ProcessWebConfig(configXml);
-            if (!string.IsNullOrEmpty(config))
+            var config = ProcessWebConfig(configXml, TemplateHelper.GetTemplateFileContent("", _projectType, Constants.appSettingsJson));
+            if (_hasData)
             {
                 isConfigFound = "Found and migrated settings from web.config";
-                AddAppSettingsJsonFile(config, TemplateHelper.GetTemplateFileContent("", _projectType, Constants.appSettingsJson), _projectDir);
+                AddAppSettingsJsonFile(config, _projectDir);
             }
 
             return isConfigFound;
         }
-        private XDocument LoadWebConfig(string projectDir)
+        private Configuration LoadWebConfig(string projectDir)
         {
             string webConfigFile = Path.Combine(projectDir, Constants.webConfig);
 
@@ -55,8 +58,9 @@ namespace CTA.Rules.Actions
             {
                 try
                 {
-                    var webConfig = XDocument.Load(webConfigFile);
-                    return webConfig;
+                    var fileMap = new ExeConfigurationFileMap() { ExeConfigFilename = webConfigFile };
+                    var configuration = ConfigurationManager.OpenMappedExeConfiguration(fileMap, ConfigurationUserLevel.None);
+                    return configuration;
                 }
                 catch (Exception ex)
                 {
@@ -67,76 +71,105 @@ namespace CTA.Rules.Actions
         }
 
         /// <summary>
-        /// Deserialize web.config file to an object
+        /// Reads data from web.config and writes any relevant entries to appsettings.json file
         /// </summary>
-        /// <param name="projectDir">The project directory containing the web.config file</param>
-        /// <returns></returns>
-        private string ProcessWebConfig(XDocument webConfig)
+        /// <param name="webConfig">The XML representation of the web.config file</param>
+        /// <returns>A JSON object representing the appSettings.json file </returns>
+        private JObject ProcessWebConfig(Configuration webConfig, string templateContent)
         {
-            StringBuilder config = new StringBuilder();
+            var connectionStringsObjects = GetConnectionStrings(webConfig);
+            var appSettingsObjects = GetAppSettingObjects(webConfig);
 
-            webConfig.Descendants()?.Where(d => d.Name.ToString().ToLower() == Constants.connectionstrings)?.Descendants()?.ToList().ForEach(connectionString =>
+            _hasData = connectionStringsObjects.Any() || appSettingsObjects.Any();
+
+            if(_hasData)
             {
-                try
-                {
-                    var name = connectionString.Attributes()?.First(a => a.Name?.ToString().ToLower() == Constants.name).Value;
-                    var value = connectionString.Attributes()?.First(a => a.Name?.ToString().ToLower() == Constants.connectionstring).Value?.Replace(@"\", @"\\");
+                var defaultContent = JsonConvert.DeserializeObject<JObject>(templateContent);
 
-                    config.Append("\"").Append(name).Append("\"").Append(":").Append("\"").Append(value).Append("\"").Append(",");
-                }
-                catch (Exception ex)
+                if (connectionStringsObjects.Count > 0)
                 {
-                    LogHelper.LogError(ex, "Error while parsing connection string");
+                    AddToJsonObject(defaultContent, Constants.ConnectionStrings, connectionStringsObjects);
                 }
-            });
-
-            //This means, we found at least one connection string:
-            if (config.Length > 0)
-            {
-                config.Remove(config.Length - 1, 1);
-                config.Insert(0, "\": { ");
-                config.Insert(0, Constants.ConnectionStrings);
-                config.Insert(0, "\"");
-                config.Append("},");
+                if (appSettingsObjects.Count > 0)
+                {
+                    AddToJsonObject(defaultContent, Constants.appSettings, appSettingsObjects);
+                }
+                return defaultContent;
             }
-
-            webConfig.Descendants()?.First(d => d.Name?.ToString().ToLower() == Constants.appSettings)?.Descendants()?.ToList().ForEach(appSetting =>
+            else
             {
-                try
-                {
-                    var key = appSetting.Attributes()?.First(a => a.Name?.ToString().ToLower() == Constants.key).Value;
-                    var value = appSetting.Attributes()?.First(a => a.Name?.ToString().ToLower() == Constants.value).Value;
-                    if (!Constants.appSettingsExclusions.Contains(key))
-                    {
-                        config.Append("\"").Append(key).Append("\"").Append(":").Append("\"").Append(value).Append("\"").Append(",");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    LogHelper.LogError(ex, "Error while parsing appsettings");
-                }
-            });
-
-            return config.ToString();
+                return null;
+            }
         }
 
+        /// <summary>
+        /// Gets connection strings from web.config file
+        /// </summary>
+        /// <param name="webConfig"></param>
+        /// <returns></returns>
+        private Dictionary<string, string> GetConnectionStrings(Configuration webConfig)
+        {
+            Dictionary<string, string> connectionStringObjects = new Dictionary<string, string>();
+            var connectionStrings = webConfig.ConnectionStrings?.ConnectionStrings;
 
+            if (connectionStrings != null)
+            {
+                foreach (ConnectionStringSettings connectionString in connectionStrings)
+                {
+                    connectionStringObjects.Add(connectionString.Name, connectionString.ConnectionString);
+                }
+            }
+
+            return connectionStringObjects;
+        }
 
         /// <summary>
-        /// Adds a config (json) file using the project template, then populates it with data from appsettings and connectionstrings in web.config
+        /// Gets app settings from web.config file
         /// </summary>
-        /// <param name="webConfig">The object representing the web.config file</param>
-        /// <param name="templateContent">The template file to be used</param>
-        /// <param name="projectDir">The project directory where this file will be created</param>
-        private void AddAppSettingsJsonFile(string content, string templateContent, string projectDir)
+        /// <param name="webConfig"></param>
+        /// <returns></returns>
+        private Dictionary<string, string> GetAppSettingObjects(Configuration webConfig)
         {
-            string fileContent = templateContent.Insert(1, content);
+            Dictionary<string, string> appSettingsObjects = new Dictionary<string, string>();
+            var appSettings = webConfig.AppSettings?.Settings;
 
-            var obj = JsonConvert.DeserializeObject(fileContent);
-            fileContent = JsonConvert.SerializeObject(obj, Formatting.Indented);
+            if (appSettings != null)
+            {
+                foreach (KeyValueConfigurationElement appSetting in appSettings)
+                {
+                    if (!Constants.appSettingsExclusions.Contains(appSetting.Key))
+                    {
+                        appSettingsObjects.Add(appSetting.Key, appSetting.Value);
+                    }
+                }
+            }
+            return appSettingsObjects;
+        }
 
-            // Any escaped backslashes were duplicated when the content was deserialized and serialized
-            File.WriteAllText(Path.Combine(projectDir, Constants.appSettingsJson), fileContent.Replace(@"\\", @"\"));
+        /// <summary>
+        /// Adds data to json object
+        /// </summary>
+        /// <param name="jObject">The object to add data to</param>
+        /// <param name="name">The name of the new entry</param>
+        /// <param name="arrayContent">The content of the new entry</param>
+        private void AddToJsonObject(JObject jObject, string name, Dictionary<string, string> arrayContent)
+        {
+            jObject.AddFirst(
+                new JProperty(name,
+                new JArray(
+                    arrayContent.Select(c =>
+                    new JObject(new JProperty(c.Key, c.Value))))
+                ));
+        }
+
+        /// <summary>
+        /// Writes the appSettings.json file to the project dir
+        /// </summary>        
+        /// <param name="content">The content of the file</param>
+        /// <param name="projectDir">The project directory where this file will be created</param>
+        private void AddAppSettingsJsonFile(JObject content, string projectDir)
+        {
+            File.WriteAllText(Path.Combine(projectDir, Constants.appSettingsJson), content.ToString());
             LogChange(string.Format("Create appsettings.json file using web.config settings"));
         }
         private void LogChange(string message)

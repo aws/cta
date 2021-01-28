@@ -79,6 +79,11 @@ namespace CTA.Rules.Config
 
         public const string MetricsTag = "CTA_METRICS_TAG";
 
+        //Folder migration
+        public const string wwwroot = "wwwroot";
+        public const string Content = "Content";
+        public const string Scripts = "Scripts";
+
         //Config migration
         public const string appSettingsJson = "appsettings.json";
         public const string appSettings = "appsettings";

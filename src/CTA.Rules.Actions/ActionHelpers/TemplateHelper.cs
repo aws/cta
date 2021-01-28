@@ -6,7 +6,7 @@ using System.IO;
 using System.Reflection;
 using System.Text;
 
-namespace CTA.Rules.Actions
+namespace CTA.Rules.Config
 {
     public class TemplateHelper
     {

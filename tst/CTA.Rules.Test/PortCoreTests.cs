@@ -116,13 +116,13 @@ namespace CTA.Rules.Test
             //When running it the first time
             if (string.IsNullOrEmpty(solutionDir))
             {
-                Assert.AreEqual(webApiProjectActions.Count, 3);
+                Assert.AreEqual(webApiProjectActions.Count, 4);
             }
 
             //When running the second time
             else
             {
-                Assert.AreEqual(webApiProjectActions.Count, 1);
+                Assert.AreEqual(webApiProjectActions.Count, 2);
             }
         }
 
@@ -197,7 +197,7 @@ namespace CTA.Rules.Test
 
             Assert.AreEqual(classlibrary1Actions.Count, 2);
             Assert.AreEqual(classlibrary2Actions.Count, 2);
-            Assert.AreEqual(webApiProjectActions.Count, 3);
+            Assert.AreEqual(webApiProjectActions.Count, 4);
         }
 
         [Test]
