@@ -80,6 +80,8 @@ namespace CTA.Rules.Actions
             var connectionStringsObjects = GetConnectionStrings(webConfig);
             var appSettingsObjects = GetAppSettingObjects(webConfig);
 
+            _hasData = connectionStringsObjects.Any() || appSettingsObjects.Any();
+
             if(_hasData)
             {
                 var defaultContent = JsonConvert.DeserializeObject<JObject>(templateContent);
@@ -115,7 +117,6 @@ namespace CTA.Rules.Actions
                 foreach (ConnectionStringSettings connectionString in connectionStrings)
                 {
                     connectionStringObjects.Add(connectionString.Name, connectionString.ConnectionString);
-                    _hasData = true;
                 }
             }
 
@@ -140,7 +141,6 @@ namespace CTA.Rules.Actions
                     {
                         appSettingsObjects.Add(appSetting.Key, appSetting.Value);
                     }
-                    _hasData = true;
                 }
             }
             return appSettingsObjects;
