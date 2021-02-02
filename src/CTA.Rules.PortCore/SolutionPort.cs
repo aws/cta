@@ -77,7 +77,6 @@ namespace CTA.Rules.PortCore
         private void InitSolutionRewriter(List<AnalyzerResult> analyzerResults, List<PortCoreConfiguration> solutionConfiguration)
         {
             CheckCache();
-            CheckResources();
             InitRules(solutionConfiguration, analyzerResults);
             _solutionRewriter = new SolutionRewriter(analyzerResults, solutionConfiguration.ToList<ProjectConfiguration>());
         }
@@ -177,7 +176,7 @@ namespace CTA.Rules.PortCore
             return _portSolutionResult;
         }
 
-        private void CheckResources()
+        private void DownloadResources()
         {
             var executingPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             using (var httpClient = new HttpClient())
@@ -212,6 +211,10 @@ namespace CTA.Rules.PortCore
             }
 
             ResetCache(cleanRecommendations, cleanResources);
+            if (cleanResources)
+            {
+                DownloadResources();
+            }
         }
 
         public static void ResetCache(bool recommendations, bool resources)
