@@ -28,7 +28,7 @@ namespace CTA.Rules.Metrics
         {
             PackageName = packageAction.Name;
             PackageVersion = packageAction.Version;
-            PackageOriginalVersion = packageAction.PreviousVersion;
+            PackageOriginalVersion = packageAction.OriginalVersion;
             SolutionPathHash = context.SolutionPathHash;
             ProjectGuid = context.ProjectGuidMap.GetValueOrDefault(projectPath, "N/A");
         }

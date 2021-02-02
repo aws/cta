@@ -39,7 +39,7 @@ namespace CTA.Rules.Models
             stringBuilder.AppendLine("---------------------------");
             foreach(var package in UpgradePackages)
             {
-                stringBuilder.AppendLine($"{package.Name},{package.PreviousVersion}->{package.Version}");
+                stringBuilder.AppendLine($"{package.Name},{package.OriginalVersion}->{package.Version}");
             }
 
             stringBuilder.AppendLine("---------------------------");

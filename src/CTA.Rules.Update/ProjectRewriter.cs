@@ -39,7 +39,7 @@ namespace CTA.Rules.Update
                 UpgradePackages = rulesEngineConfiguration.PackageReferences.Select(p => new PackageAction()
                 {
                     Name = p.Key,
-                    PreviousVersion = p.Value.Item1,
+                    OriginalVersion = p.Value.Item1,
                     Version = p.Value.Item2
                 }).ToList()
             };
@@ -75,7 +75,7 @@ namespace CTA.Rules.Update
 
                 foreach (var p in RulesEngineConfiguration.PackageReferences)
                 {
-                    projectActions.PackageActions.Add(new PackageAction() { Name = p.Key, PreviousVersion = p.Value.Item1, Version = p.Value.Item2 });
+                    projectActions.PackageActions.Add(new PackageAction() { Name = p.Key, OriginalVersion = p.Value.Item1, Version = p.Value.Item2 });
                 }
                 MergePackages(projectActions.PackageActions);
                 projectActions.ProjectLevelActions = result.ProjectTokens.SelectMany(p => p.ProjectLevelActions).Distinct().ToList();

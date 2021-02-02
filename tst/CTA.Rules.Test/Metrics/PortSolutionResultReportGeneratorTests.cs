@@ -67,7 +67,7 @@ namespace CTA.Rules.Test.Metrics
                 {
                     ProjectFile = projectPath,
                     TargetVersions = new List<string>() {Constants.DefaultCoreVersion},
-                    UpgradePackages = new List<PackageAction>() {new PackageAction() { Name = "Newtonsoft.Json", PreviousVersion="9.0.0", Version="12.0.0" } },
+                    UpgradePackages = new List<PackageAction>() {new PackageAction() { Name = "Newtonsoft.Json", OriginalVersion="9.0.0", Version="12.0.0" } },
                     ProjectActions = new ProjectActions() {
                         FileActions = new BlockingCollection<FileActions>()
                         {

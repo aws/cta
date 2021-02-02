@@ -7,7 +7,7 @@ namespace CTA.Rules.Models
     public class PackageAction
     {
         public string Name { get; set; }
-        public string PreviousVersion { get; set; }
+        public string OriginalVersion { get; set; }
         public string Version = "*"; 
         public TextSpan TextSpan { get; set; }
         public override bool Equals(object obj)
