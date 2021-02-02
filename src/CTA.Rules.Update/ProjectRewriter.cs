@@ -55,7 +55,7 @@ namespace CTA.Rules.Update
         /// Initializes the project rewriter by getting a list of actions that will be run
         /// </summary>
         /// <returns>A list of project actions to be run</returns>
-        public ProjectActions Initialize()
+        public ProjectResult Initialize()
         {
             ProjectActions projectActions = new ProjectActions();
             try
@@ -88,7 +88,7 @@ namespace CTA.Rules.Update
                 LogHelper.LogError(ex, "Error while initializing project {0}", RulesEngineConfiguration.ProjectPath);
             }
 
-            return projectActions;
+            return _projectResult;
         }
 
         /// <summary>
@@ -96,8 +96,8 @@ namespace CTA.Rules.Update
         /// </summary>
         public ProjectResult Run()
         {
-            ProjectActions projectActions = Initialize();
-            return Run(projectActions);
+            var projectResult = Initialize();
+            return Run(projectResult.ProjectActions);
         }
 
         /// <summary>

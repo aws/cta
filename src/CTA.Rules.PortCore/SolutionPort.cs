@@ -145,9 +145,19 @@ namespace CTA.Rules.PortCore
         /// <summary>
         /// Initializes the Solution Port
         /// </summary>
-        public ConcurrentDictionary<string, ProjectActions> AnalysisRun()
+        public SolutionResult AnalysisRun()
         {
-            return _solutionRewriter.AnalysisRun();
+            var solutionResult = _solutionRewriter.AnalysisRun();
+            _portSolutionResult.AddSolutionResult(solutionResult);
+            if (!string.IsNullOrEmpty(_solutionPath))
+            {
+                PortSolutionResultReportGenerator reportGenerator = new PortSolutionResultReportGenerator(_context, _portSolutionResult);
+                reportGenerator.GenerateAnalysisReport();
+
+                LogHelper.LogInformation("Generating Post-Analysis Report");
+                LogHelper.LogError($"{Constants.MetricsTag}: {reportGenerator.PortSolutionResultJsonReport}");
+            }
+            return solutionResult;
         }
 
         /// <summary>

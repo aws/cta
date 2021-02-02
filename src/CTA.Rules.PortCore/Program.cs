@@ -58,10 +58,10 @@ namespace CTA.Rules.PortCore
                 //Solution Rewriter:
                 SolutionPort solutionPort = new SolutionPort(cli.FilePath, configs);
                 var s = solutionPort.AnalysisRun();
-                foreach (var k in s.Keys)
+                foreach (var k in s.ProjectResults)
                 {
-                    Console.WriteLine(k);
-                    Console.WriteLine(s[k].ToString());
+                    Console.WriteLine(k.ProjectFile);
+                    Console.WriteLine(k.ProjectActions.ToString());
                 }
                 var portSolutionResult = solutionPort.Run();
             }

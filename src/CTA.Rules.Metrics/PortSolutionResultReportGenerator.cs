@@ -41,6 +41,30 @@ namespace CTA.Rules.Metrics
             ExportStringToFile(PortSolutionResult.SolutionPath, "PortSolutionResult.txt", PortSolutionResultTextReport);
         }
 
+        public void GenerateAnalysisReport()
+        {
+            GenerateAnalysisMetrics();
+            GenerateAnalyzeSolutionResultJsonReport();            
+        }
+
+        private void GenerateAnalysisMetrics()
+        {
+            var upgradePackageMetrics = new List<UpgradePackageMetric>();
+            var actionPackageMetrics = new List<ActionPackageMetric>();
+            var actionMetrics = new List<GenericActionMetric>();
+
+            foreach (var projectResult in PortSolutionResult.ProjectResults)
+            {
+                upgradePackageMetrics.AddRange(MetricsTransformer.TransformUpgradePackages(Context, projectResult));
+                actionPackageMetrics.AddRange(MetricsTransformer.TransformActionPackages(Context, projectResult));
+                actionMetrics.AddRange(MetricsTransformer.TransformProjectActions(Context, projectResult));
+            }
+
+            UpgradePackageMetrics = upgradePackageMetrics;
+            ActionPackageMetrics = actionPackageMetrics;
+            GenericActionMetrics = actionMetrics;
+        }
+
         private void GenerateMetrics()
         {
             // Gather solution-level metrics
@@ -52,7 +76,6 @@ namespace CTA.Rules.Metrics
             var targetVersionMetrics = new List<TargetVersionMetric>();
             var upgradePackageMetrics = new List<UpgradePackageMetric>();
             var actionPackageMetrics = new List<ActionPackageMetric>();
-            var actionMetrics = new List<GenericActionMetric>();
             var actionExecutionMetrics = new List<GenericActionExecutionMetric>();
 
             foreach (var projectResult in PortSolutionResult.ProjectResults)
@@ -60,16 +83,27 @@ namespace CTA.Rules.Metrics
                 targetVersionMetrics.AddRange(MetricsTransformer.TransformTargetVersions(Context, projectResult));
                 upgradePackageMetrics.AddRange(MetricsTransformer.TransformUpgradePackages(Context, projectResult));
                 actionPackageMetrics.AddRange(MetricsTransformer.TransformActionPackages(Context, projectResult));
-                actionMetrics.AddRange(MetricsTransformer.TransformProjectActions(Context, projectResult));
                 actionExecutionMetrics.AddRange(MetricsTransformer.TransformGenericActionExecutions(Context, projectResult));
             }
 
             TargetVersionMetrics = targetVersionMetrics;
             UpgradePackageMetrics = upgradePackageMetrics;
             ActionPackageMetrics = actionPackageMetrics;
-            GenericActionMetrics = actionMetrics;
             GenericActionExecutionMetrics = actionExecutionMetrics;
-        } 
+        }
+
+        private string GenerateAnalyzeSolutionResultJsonReport()
+        {
+            var allMetrics = new List<CTAMetric>();
+            allMetrics = allMetrics
+                .Concat(UpgradePackageMetrics)
+                .Concat(ActionPackageMetrics)
+                .Concat(GenericActionMetrics)
+                .ToList();
+
+            PortSolutionResultJsonReport = JsonConvert.SerializeObject(allMetrics);
+            return PortSolutionResultJsonReport;
+        }
 
         private string GeneratePortSolutionResultJsonReport()
         {
@@ -79,7 +113,6 @@ namespace CTA.Rules.Metrics
                 .Concat(TargetVersionMetrics)
                 .Concat(UpgradePackageMetrics)
                 .Concat(ActionPackageMetrics)
-                .Concat(GenericActionMetrics)
                 .Concat(GenericActionExecutionMetrics)
                 .Concat(BuildErrorMetrics)
                 .ToList();

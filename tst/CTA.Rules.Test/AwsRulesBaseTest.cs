@@ -107,18 +107,18 @@ namespace CTA.Rules.Test
                     SolutionPort solutionPort = new SolutionPort(solutionPath, solutionPortConfiguration);
                     var analysisRunResult = solutionPort.AnalysisRun();
 
-                    foreach(var projectAction in analysisRunResult.Values)
+                    foreach(var projectResult in analysisRunResult.ProjectResults)
                     {
-                        Assert.IsTrue(projectAction.ToSummaryString()?.Length > 0);
+                        Assert.IsTrue(projectResult.ProjectActions.ToSummaryString()?.Length > 0);
                     }
 
                     StringBuilder str = new StringBuilder();
-                    foreach (var k in analysisRunResult.Keys)
+                    foreach (var projectResult in analysisRunResult.ProjectResults)
                     {
                         StringBuilder projectResults = new StringBuilder();
-                        projectResults.AppendLine(k);
-                        projectResults.AppendLine(analysisRunResult[k].ToString());
-                        result.ProjectResults.Where(p => p.CsProjectPath == k).FirstOrDefault().ProjectAnalysisResult = projectResults.ToString();
+                        projectResults.AppendLine(projectResult.ProjectFile);
+                        projectResults.AppendLine(projectResult.ProjectActions.ToString());
+                        result.ProjectResults.Where(p => p.CsProjectPath == projectResult.ProjectFile).FirstOrDefault().ProjectAnalysisResult = projectResults.ToString();
 
                         str.Append(projectResults);
                     }
