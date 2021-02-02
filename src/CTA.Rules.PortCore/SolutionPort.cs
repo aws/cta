@@ -186,24 +186,43 @@ namespace CTA.Rules.PortCore
 
         private void CheckCache()
         {
-            var createdTime = Directory.GetCreationTime(Constants.RulesDefaultPath);
-            if(createdTime.AddHours(Constants.CacheExpiryHours) < DateTime.Now)
+            var recommendationsTime = Directory.GetCreationTime(Constants.RulesDefaultPath);
+            var resourceExtractedTime = Directory.GetCreationTime(Constants.ResourcesExtractedPath);
+
+            bool cleanRecommendations = false;
+            bool cleanResources = false;
+
+            if(recommendationsTime.AddHours(Constants.CacheExpiryHours) < DateTime.Now)
             {
-                ResetCache();
+                cleanRecommendations = true;
             }
+            if(resourceExtractedTime.AddDays(Constants.CacheExpiryDays) < DateTime.Now)
+            {
+                cleanResources = true;
+            }
+
+            ResetCache(cleanRecommendations, cleanResources);
         }
 
-        public static void ResetCache()
+        public static void ResetCache(bool recommendations, bool resources)
         {
             try
             {
-                if(Directory.Exists(Constants.RulesDefaultPath))
+                if(Directory.Exists(Constants.RulesDefaultPath) && recommendations)
                 {
                     Directory.Delete(Constants.RulesDefaultPath, true);
                 }
-                if (File.Exists(Constants.ResourcesFile))
+                if (File.Exists(Constants.ResourcesFile) && resources)
                 {
                     File.Delete(Constants.ResourcesFile);
+                }
+                if (File.Exists(Constants.DefaultFeaturesFilePath) && resources)
+                {
+                    File.Delete(Constants.DefaultFeaturesFilePath);
+                }
+                if (Directory.Exists(Constants.ResourcesExtractedPath) && resources)
+                {
+                    Directory.Delete(Constants.ResourcesExtractedPath, true);
                 }
             }
             catch (Exception ex)

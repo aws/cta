@@ -55,7 +55,7 @@ namespace CTA.Rules.Test
         public void TestSampleWebApi3Solution()
         {
             TestWebApi("netcoreapp3.1");
-            SolutionPort.ResetCache();
+            SolutionPort.ResetCache(false, false);
             TestWebApi("net5.0", Path.Combine(tempDir, "netcoreapp3.1"));
         }
 
