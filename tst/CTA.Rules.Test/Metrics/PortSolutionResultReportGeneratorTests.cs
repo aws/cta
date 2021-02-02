@@ -67,7 +67,7 @@ namespace CTA.Rules.Test.Metrics
                 {
                     ProjectFile = projectPath,
                     TargetVersions = new List<string>() {Constants.DefaultCoreVersion},
-                    UpgradePackages = new List<PackageAction>() {new PackageAction() { Name = "Newtonsoft.Json", Version="12.0.0.0" } },
+                    UpgradePackages = new List<PackageAction>() {new PackageAction() { Name = "Newtonsoft.Json", PreviousVersion="9.0.0", Version="12.0.0" } },
                     ProjectActions = new ProjectActions() {
                         FileActions = new BlockingCollection<FileActions>()
                         {
@@ -164,7 +164,7 @@ netcoreapp3.1
 ---------------------------
 Upgrade packages:
 ---------------------------
-Newtonsoft.Json,12.0.0.0
+Newtonsoft.Json,9.0.0->12.0.0
 ---------------------------
 Action packages:
 ---------------------------
@@ -246,7 +246,8 @@ Count: 400";
     ""metricsType"": ""CTA"",
     ""metricName"": ""UpgradePackage"",
     ""packageName"": ""Newtonsoft.Json"",
-    ""packageVersion"": ""12.0.0.0"",
+    ""packageVersion"": ""12.0.0"",
+    ""packageOriginalVersion"": ""9.0.0"",
     ""solutionPath"": ""5fa9de0cb5af2d468dfb1702b1e342f47de2df9a195dabb3be2d04f9c2767482"",
     ""projectGuid"": ""1234-5678""
   },

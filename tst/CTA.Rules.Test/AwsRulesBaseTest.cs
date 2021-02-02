@@ -85,8 +85,8 @@ namespace CTA.Rules.Test
                     {
                         ProjectResult project = new ProjectResult();
 
-                        Dictionary<string, string> packages = new Dictionary<string, string>();
-                        packages.Add("Newtonsoft.Json", "*");
+                        Dictionary<string, Tuple<string, string>> packages = new Dictionary<string, Tuple<string, string>>();
+                        packages.Add("Newtonsoft.Json", new Tuple<string, string>("9.0.0", "*"));
                         PortCoreConfiguration projectConfiguration = new PortCoreConfiguration()
                         {
                             ProjectPath = projectFile,

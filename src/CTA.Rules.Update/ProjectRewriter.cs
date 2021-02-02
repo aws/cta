@@ -36,7 +36,12 @@ namespace CTA.Rules.Update
             {
                 ProjectFile = rulesEngineConfiguration.ProjectPath,
                 TargetVersions = rulesEngineConfiguration.TargetVersions,
-                UpgradePackages = rulesEngineConfiguration.PackageReferences.Select(p => new PackageAction() { Name = p.Key, Version = p.Value }).ToList()
+                UpgradePackages = rulesEngineConfiguration.PackageReferences.Select(p => new PackageAction()
+                {
+                    Name = p.Key,
+                    PreviousVersion = p.Value.Item1,
+                    Version = p.Value.Item2
+                }).ToList()
             };
 
             _sourceFileBuildResults = analyzerResult?.ProjectBuildResult?.SourceFileBuildResults;
@@ -65,11 +70,12 @@ namespace CTA.Rules.Update
                 {
                     projectActions.ProjectReferenceActions.Add(Config.Utils.GetRelativePath(RulesEngineConfiguration.ProjectPath, p));
                 });
+
                 _projectResult.ActionPackages = projectActions.PackageActions.Distinct().ToList();
 
                 foreach (var p in RulesEngineConfiguration.PackageReferences)
                 {
-                    projectActions.PackageActions.Add(new PackageAction() { Name = p.Key, Version = p.Value });
+                    projectActions.PackageActions.Add(new PackageAction() { Name = p.Key, PreviousVersion = p.Value.Item1, Version = p.Value.Item2 });
                 }
                 MergePackages(projectActions.PackageActions);
                 projectActions.ProjectLevelActions = result.ProjectTokens.SelectMany(p => p.ProjectLevelActions).Distinct().ToList();
@@ -117,7 +123,9 @@ namespace CTA.Rules.Update
             {
                 foreach(var package in RulesEngineConfiguration.PackageReferences.Keys)
                 {
-                    packageActions.Add(new FilePackageAction() { Name = package, Version = RulesEngineConfiguration.PackageReferences[package] });
+                    var versionTuple = RulesEngineConfiguration.PackageReferences[package];
+                    var version = versionTuple != null ? versionTuple.Item2 ?? "*" : "*";
+                    packageActions.Add(new FilePackageAction() { Name = package, Version = version });
                 }
             }
         }

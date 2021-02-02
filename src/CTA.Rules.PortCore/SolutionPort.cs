@@ -175,7 +175,7 @@ namespace CTA.Rules.PortCore
                 try
                 {
                     var zipFile = Utils.DownloadFile(Constants.S3CTAFiles, Constants.ResourcesFile);
-                    ZipFile.ExtractToDirectory(zipFile, executingPath, true);
+                    ZipFile.ExtractToDirectory(zipFile, executingPath);
                 }
                 catch (Exception ex)
                 {
