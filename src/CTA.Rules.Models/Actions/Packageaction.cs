@@ -7,6 +7,7 @@ namespace CTA.Rules.Models
     public class PackageAction
     {
         public string Name { get; set; }
+        public string OriginalVersion { get; set; }
         public string Version = "*"; 
         public TextSpan TextSpan { get; set; }
         public override bool Equals(object obj)
@@ -19,7 +20,7 @@ namespace CTA.Rules.Models
         public override int GetHashCode()
         {
             return Name.GetHashCode()
-                + 3 * Version.GetHashCode();
+                + 3 * (!string.IsNullOrEmpty(Version) ? Version.GetHashCode() : 0);
         }
     }
 }

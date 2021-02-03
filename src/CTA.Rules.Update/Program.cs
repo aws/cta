@@ -7,6 +7,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+using System.Collections.Concurrent;
 
 namespace CTA.Rules.Update
 {
@@ -47,12 +49,13 @@ namespace CTA.Rules.Update
                 //Solution Rewriter:
                 SolutionRewriter solutionRewriter = new SolutionRewriter(cli.FilePath, configs);
                 var s = solutionRewriter.AnalysisRun();
-                foreach(var k in s.Keys)
+                foreach(var k in s.ProjectResults)
                 {
-                    Console.WriteLine(k);
-                    Console.WriteLine(s[k].ToString());
+                    Console.WriteLine(k.ProjectFile);
+                    Console.WriteLine(k.ProjectActions.ToString());
                 }
-                solutionRewriter.Run(s);
+                
+                solutionRewriter.Run(s.ProjectResults.ToDictionary(p=>p.ProjectFile, p=>p.ProjectActions));
             }
             catch (Exception ex)
             {

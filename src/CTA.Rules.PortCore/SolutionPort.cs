@@ -77,7 +77,6 @@ namespace CTA.Rules.PortCore
         private void InitSolutionRewriter(List<AnalyzerResult> analyzerResults, List<PortCoreConfiguration> solutionConfiguration)
         {
             CheckCache();
-            CheckResources();
             InitRules(solutionConfiguration, analyzerResults);
             _solutionRewriter = new SolutionRewriter(analyzerResults, solutionConfiguration.ToList<ProjectConfiguration>());
         }
@@ -145,9 +144,19 @@ namespace CTA.Rules.PortCore
         /// <summary>
         /// Initializes the Solution Port
         /// </summary>
-        public ConcurrentDictionary<string, ProjectActions> AnalysisRun()
+        public SolutionResult AnalysisRun()
         {
-            return _solutionRewriter.AnalysisRun();
+            var solutionResult = _solutionRewriter.AnalysisRun();
+            _portSolutionResult.AddSolutionResult(solutionResult);
+            if (!string.IsNullOrEmpty(_solutionPath))
+            {
+                PortSolutionResultReportGenerator reportGenerator = new PortSolutionResultReportGenerator(_context, _portSolutionResult);
+                reportGenerator.GenerateAnalysisReport();
+
+                LogHelper.LogInformation("Generating Post-Analysis Report");
+                LogHelper.LogError($"{Constants.MetricsTag}: {reportGenerator.AnalyzeSolutionResultJsonReport}");
+            }
+            return solutionResult;
         }
 
         /// <summary>
@@ -167,7 +176,7 @@ namespace CTA.Rules.PortCore
             return _portSolutionResult;
         }
 
-        private void CheckResources()
+        private void DownloadResources()
         {
             var executingPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             using (var httpClient = new HttpClient())
@@ -186,24 +195,54 @@ namespace CTA.Rules.PortCore
 
         private void CheckCache()
         {
-            var createdTime = Directory.GetCreationTime(Constants.RulesDefaultPath);
-            if(createdTime.AddHours(Constants.CacheExpiryHours) < DateTime.Now)
+            var recommendationsTime = Directory.GetCreationTime(Constants.RulesDefaultPath);
+            var resourceExtractedTime = Directory.GetCreationTime(Constants.ResourcesExtractedPath);
+
+            bool cleanRecommendations = false;
+            bool cleanResources = false;
+
+            if(recommendationsTime.AddHours(Constants.CacheExpiryHours) < DateTime.Now)
             {
-                ResetCache();
+                cleanRecommendations = true;
+            }
+            if(resourceExtractedTime.AddDays(Constants.CacheExpiryDays) < DateTime.Now)
+            {
+                cleanResources = true;
+            }
+
+            ResetCache(cleanRecommendations, cleanResources);
+            if (cleanResources)
+            {
+                DownloadResources();
             }
         }
 
-        public static void ResetCache()
+        public static void ResetCache(bool recommendations, bool resources)
         {
             try
             {
-                if(Directory.Exists(Constants.RulesDefaultPath))
+                if (recommendations)
                 {
-                    Directory.Delete(Constants.RulesDefaultPath, true);
+                    if (Directory.Exists(Constants.RulesDefaultPath))
+                    {
+                        Directory.Delete(Constants.RulesDefaultPath, true);
+                    }
+                    Directory.CreateDirectory(Constants.RulesDefaultPath);
                 }
-                if (File.Exists(Constants.ResourcesFile))
+                if (resources)
                 {
-                    File.Delete(Constants.ResourcesFile);
+                    if (File.Exists(Constants.ResourcesFile))
+                    {
+                        File.Delete(Constants.ResourcesFile);
+                    }
+                    if (File.Exists(Constants.DefaultFeaturesFilePath))
+                    {
+                        File.Delete(Constants.DefaultFeaturesFilePath);
+                    }
+                    if (Directory.Exists(Constants.ResourcesExtractedPath))
+                    {
+                        Directory.Delete(Constants.ResourcesExtractedPath, true);
+                    }
                 }
             }
             catch (Exception ex)

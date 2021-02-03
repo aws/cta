@@ -59,21 +59,20 @@ namespace CTA.Rules.Update
         /// <summary>
         /// Initializes the SolutionRewriter
         /// </summary>
-        public ConcurrentDictionary<string, ProjectActions> AnalysisRun()
+        public SolutionResult AnalysisRun()
         {
-            ConcurrentDictionary<string, ProjectActions> projectActions = new ConcurrentDictionary<string, ProjectActions>();
             var options = new ParallelOptions() { MaxDegreeOfParallelism = Constants.ThreadCount };
             Parallel.ForEach(_rulesRewriters, options, rulesRewriter =>
             {
-                projectActions.GetOrAdd(rulesRewriter.RulesEngineConfiguration.ProjectPath, rulesRewriter.Initialize());
+                _solutionResult.ProjectResults.Add(rulesRewriter.Initialize());
             });
-            return projectActions;
+            return _solutionResult;
         }
 
         /// <summary>
         /// Run the SolutionRewriter using a previously created analysis
         /// </summary>
-        public SolutionResult Run(ConcurrentDictionary<string, ProjectActions> projectActions)
+        public SolutionResult Run(Dictionary<string, ProjectActions> projectActions)
         {
             var options = new ParallelOptions() { MaxDegreeOfParallelism = Constants.ThreadCount };
             Parallel.ForEach(_rulesRewriters, options, rulesRewriter =>

@@ -22,25 +22,25 @@ namespace CTA.FeatureDetection.Tests
         [OneTimeSetUp]
         public void Setup()
         {
-            var jsonFilePath = Path.Combine(TestProjectDirectory, "Examples", "Input", "feature_config.json");
+            var jsonFilePath = Path.Combine(TestProjectDirectory, "Examples", "Templates", "feature_config.json");
             WellDefinedFeatureConfig = FeatureConfigParser.Parse(jsonFilePath);
 
-            jsonFilePath = Path.Combine(TestProjectDirectory, "Examples", "Input", "test_file_with_nonexistent_assembly_path.json");
+            jsonFilePath = Path.Combine(TestProjectDirectory, "Examples", "Templates", "test_file_with_nonexistent_assembly_path.json");
             FeatureConfigWithNonexistentAssembly = FeatureConfigParser.Parse(jsonFilePath);
 
-            jsonFilePath = Path.Combine(TestProjectDirectory, "Examples", "Input", "test_file_with_nonexistent_feature.json");
+            jsonFilePath = Path.Combine(TestProjectDirectory, "Examples", "Templates", "test_file_with_nonexistent_feature.json");
             FeatureConfigWithNonexistentFeature = FeatureConfigParser.Parse(jsonFilePath);
 
-            jsonFilePath = Path.Combine(TestProjectDirectory, "Examples", "Input", "test_file_with_nonexistent_feature_property.json");
+            jsonFilePath = Path.Combine(TestProjectDirectory, "Examples", "Templates", "test_file_with_nonexistent_feature_property.json");
             FeatureConfigWithNonexistentFeatureProperty = FeatureConfigParser.Parse(jsonFilePath);
 
-            jsonFilePath = Path.Combine(TestProjectDirectory, "Examples", "Input", "test_file_with_nonexistent_namespace.json");
+            jsonFilePath = Path.Combine(TestProjectDirectory, "Examples", "Templates", "test_file_with_nonexistent_namespace.json");
             FeatureConfigWithNonexistentNamespace = FeatureConfigParser.Parse(jsonFilePath);
 
-            jsonFilePath = Path.Combine(TestProjectDirectory, "Examples", "Input", "test_file_with_duplicate_features.json");
+            jsonFilePath = Path.Combine(TestProjectDirectory, "Examples", "Templates", "test_file_with_duplicate_features.json");
             FeatureConfigWithDuplicateFeatures = FeatureConfigParser.Parse(jsonFilePath);
 
-            jsonFilePath = Path.Combine(TestProjectDirectory, "Examples", "Input", "test_file_with_invalid_feature.json");
+            jsonFilePath = Path.Combine(TestProjectDirectory, "Examples", "Templates", "test_file_with_invalid_feature.json");
             FeatureConfigWithInvalidFeature = FeatureConfigParser.Parse(jsonFilePath);
         }
     }

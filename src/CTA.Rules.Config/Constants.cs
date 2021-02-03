@@ -24,7 +24,9 @@ namespace CTA.Rules.Config
         public static HashSet<string> CoreVersions = new HashSet<string>() { "netcoreapp3.1" };
 
         public static string RulesDefaultPath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Input"));
+        public static string DefaultFeaturesFilePath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Templates", "default.json"));
         public static string ResourcesFile = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "resources.zip"));
+        public static string ResourcesExtractedPath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Templates"));
         public static string DefaultCoreVersion = "netcoreapp3.1";
 
         public static string JsonFileSchema = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), Path.Combine(new string[] { "..", "..", "..", "..", ".." })
@@ -38,6 +40,7 @@ namespace CTA.Rules.Config
         public const int MaxRecursionDepth = 100000;
         public const int DefaultThreadSleepTime = 2000;
         public const int CacheExpiryHours = 1;
+        public const int CacheExpiryDays = 1;
 
 
         public const int DownloadRetryCount = 3;

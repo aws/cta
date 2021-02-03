@@ -5,10 +5,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Codelyzer.Analysis" Version="1.2.47-alpha-gacd3c02c4b" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\CTA.FeatureDetection.Common\CTA.FeatureDetection.Common.csproj" />
   </ItemGroup>
 

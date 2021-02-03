@@ -36,7 +36,12 @@ namespace CTA.Rules.Update
             {
                 ProjectFile = rulesEngineConfiguration.ProjectPath,
                 TargetVersions = rulesEngineConfiguration.TargetVersions,
-                UpgradePackages = rulesEngineConfiguration.PackageReferences.Select(p => new PackageAction() { Name = p.Key, Version = p.Value }).ToList()
+                UpgradePackages = rulesEngineConfiguration.PackageReferences.Select(p => new PackageAction()
+                {
+                    Name = p.Key,
+                    OriginalVersion = p.Value.Item1,
+                    Version = p.Value.Item2
+                }).ToList()
             };
 
             _sourceFileBuildResults = analyzerResult?.ProjectBuildResult?.SourceFileBuildResults;
@@ -50,7 +55,7 @@ namespace CTA.Rules.Update
         /// Initializes the project rewriter by getting a list of actions that will be run
         /// </summary>
         /// <returns>A list of project actions to be run</returns>
-        public ProjectActions Initialize()
+        public ProjectResult Initialize()
         {
             ProjectActions projectActions = new ProjectActions();
             try
@@ -65,11 +70,12 @@ namespace CTA.Rules.Update
                 {
                     projectActions.ProjectReferenceActions.Add(Config.Utils.GetRelativePath(RulesEngineConfiguration.ProjectPath, p));
                 });
+
                 _projectResult.ActionPackages = projectActions.PackageActions.Distinct().ToList();
 
                 foreach (var p in RulesEngineConfiguration.PackageReferences)
                 {
-                    projectActions.PackageActions.Add(new PackageAction() { Name = p.Key, Version = p.Value });
+                    projectActions.PackageActions.Add(new PackageAction() { Name = p.Key, OriginalVersion = p.Value.Item1, Version = p.Value.Item2 });
                 }
                 MergePackages(projectActions.PackageActions);
                 projectActions.ProjectLevelActions = result.ProjectTokens.SelectMany(p => p.ProjectLevelActions).Distinct().ToList();
@@ -82,7 +88,7 @@ namespace CTA.Rules.Update
                 LogHelper.LogError(ex, "Error while initializing project {0}", RulesEngineConfiguration.ProjectPath);
             }
 
-            return projectActions;
+            return _projectResult;
         }
 
         /// <summary>
@@ -90,8 +96,8 @@ namespace CTA.Rules.Update
         /// </summary>
         public ProjectResult Run()
         {
-            ProjectActions projectActions = Initialize();
-            return Run(projectActions);
+            var projectResult = Initialize();
+            return Run(projectResult.ProjectActions);
         }
 
         /// <summary>
@@ -117,7 +123,9 @@ namespace CTA.Rules.Update
             {
                 foreach(var package in RulesEngineConfiguration.PackageReferences.Keys)
                 {
-                    packageActions.Add(new FilePackageAction() { Name = package, Version = RulesEngineConfiguration.PackageReferences[package] });
+                    var versionTuple = RulesEngineConfiguration.PackageReferences[package];
+                    var version = versionTuple != null ? versionTuple.Item2 ?? "*" : "*";
+                    packageActions.Add(new FilePackageAction() { Name = package, Version = version });
                 }
             }
         }

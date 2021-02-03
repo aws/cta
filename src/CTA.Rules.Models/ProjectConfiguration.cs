@@ -10,13 +10,13 @@ namespace CTA.Rules.Models
         public ProjectConfiguration()
         {
             TargetVersions = new List<string> { Constants.DefaultCoreVersion };
-            PackageReferences = new Dictionary<string, string>();
+            PackageReferences = new Dictionary<string, Tuple<string, string>>();
         }
         public string ProjectPath;
         public List<string> TargetVersions;
         public string AssemblyDir;
         public string RulesPath;
-        public Dictionary<string, string> PackageReferences;
+        public Dictionary<string, Tuple<string, string>> PackageReferences;
         public bool IsMockRun = false;
         public ProjectType ProjectType = ProjectType.ClassLibrary;
     }

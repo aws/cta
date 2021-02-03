@@ -85,10 +85,10 @@ namespace CTA.Rules.Test
             SolutionRewriter solutionRewriter = new SolutionRewriter(solutionPath, solutionConfiguration);
             var analysisRunResult = solutionRewriter.AnalysisRun();
             StringBuilder str = new StringBuilder();
-            foreach (var k in analysisRunResult.Keys)
+            foreach (var projectResult in analysisRunResult.ProjectResults)
             {
-                str.AppendLine(k);
-                str.AppendLine(analysisRunResult[k].ToString());
+                str.AppendLine(projectResult.ProjectFile);
+                str.AppendLine(projectResult.ProjectActions.ToString());
             }
 
 
@@ -96,7 +96,7 @@ namespace CTA.Rules.Test
             StringAssert.Contains("IActionResult", analysisResult);
 
 
-            solutionRewriter.Run(analysisRunResult);
+            solutionRewriter.Run(analysisRunResult.ProjectResults.ToDictionary(p => p.ProjectFile, p => p.ProjectActions));
 
             string projectDir = Directory.GetParent(projectFile).FullName;
 
@@ -157,16 +157,16 @@ namespace CTA.Rules.Test
             SolutionRewriter solutionRewriter = new SolutionRewriter(solutionPath, solutionConfiguration);
             var analysisRunResult = solutionRewriter.AnalysisRun();
             StringBuilder str = new StringBuilder();
-            foreach (var k in analysisRunResult.Keys)
+            foreach (var k in analysisRunResult.ProjectResults)
             {
-                str.AppendLine(k);
-                str.AppendLine(analysisRunResult[k].ToString());
+                str.AppendLine(k.ProjectFile);
+                str.AppendLine(k.ProjectActions.ToString());
             }
 
             var analysisResult = str.ToString();
             StringAssert.Contains("HtmlEncoder", analysisResult);
 
-            solutionRewriter.Run(analysisRunResult);
+            solutionRewriter.Run(analysisRunResult.ProjectResults.ToDictionary(p => p.ProjectFile, p => p.ProjectActions));
 
             string projectDir = Directory.GetParent(projectFile).FullName;
 

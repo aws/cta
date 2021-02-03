@@ -23,7 +23,7 @@ namespace CTA.FeatureDetection.Tests
         private static readonly string _webApiDir = "WebApi";
         private static readonly string _webClassLibraryDir = "WebClassLibrary";
         private static readonly string TestProjectDirectory = TestUtils.GetTestAssemblySourceDirectory(typeof(TestUtils));
-        public static string ConfigFile => Path.Combine(TestProjectDirectory, "Examples", "Input", "feature_config.json");
+        public static string ConfigFile => Path.Combine(TestProjectDirectory, "Examples", "Templates", "feature_config.json");
 
         public static string CoreMvcSolutionName => "CoreMVC.sln";
         public static string CoreWebApiSolutionName => "CoreWebApi.sln";
