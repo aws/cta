@@ -22,6 +22,7 @@ namespace CTA.Rules.Metrics
         public IEnumerable<GenericActionMetric> GenericActionMetrics { get; set; }
         public IEnumerable<GenericActionExecutionMetric> GenericActionExecutionMetrics { get; set; }
         public IEnumerable<BuildErrorMetric> BuildErrorMetrics { get; set; }
+        public string AnalyzeSolutionResultJsonReport { get; set; }
         public string PortSolutionResultJsonReport { get; set; }
         public string PortSolutionResultTextReport { get; set; }
 
@@ -101,8 +102,8 @@ namespace CTA.Rules.Metrics
                 .Concat(GenericActionMetrics)
                 .ToList();
 
-            PortSolutionResultJsonReport = JsonConvert.SerializeObject(allMetrics);
-            return PortSolutionResultJsonReport;
+            AnalyzeSolutionResultJsonReport = JsonConvert.SerializeObject(allMetrics);
+            return AnalyzeSolutionResultJsonReport;
         }
 
         private string GeneratePortSolutionResultJsonReport()

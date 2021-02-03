@@ -35,7 +35,7 @@ namespace CTA.FeatureDetection.Tests.FeatureDetection
         [Test]
         public void FeatureDetector_Loads_Features_In_Specified_Config()
         {
-            var featureConfig = Path.Combine(TestProjectDirectory, "Examples", "Input", "EntityFramework_config_features.json");
+            var featureConfig = Path.Combine(TestProjectDirectory, "Examples", "Templates", "EntityFramework_config_features.json");
             var featureDetector = new FeatureDetector(featureConfig);
             var loadedFeatureSet = featureDetector.LoadedFeatureSet;
             
@@ -46,8 +46,8 @@ namespace CTA.FeatureDetection.Tests.FeatureDetection
         [Test]
         public void FeatureDetector_Loads_Features_In_Specified_Configs()
         {
-            var featureConfig1 = Path.Combine(TestProjectDirectory, "Examples", "Input", "EntityFramework_config_features.json");
-            var featureConfig2 = Path.Combine(TestProjectDirectory, "Examples", "Input", "ProjectType_code_features.json");
+            var featureConfig1 = Path.Combine(TestProjectDirectory, "Examples", "Templates", "EntityFramework_config_features.json");
+            var featureConfig2 = Path.Combine(TestProjectDirectory, "Examples", "Templates", "ProjectType_code_features.json");
             var featureConfigs = new List<string>
             {
                 featureConfig1,

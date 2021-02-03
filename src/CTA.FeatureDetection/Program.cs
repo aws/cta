@@ -14,7 +14,7 @@ namespace CTA.FeatureDetection
             var solutionPath = Path.Combine("path", "to", "solution.sln");
 
             /* Select a feature config file*/
-            var featureConfigFilePath = Path.Combine("..", "..", "..", "..", "..", "tst", "CTA.FeatureDetection.Tests", "Examples", "Input", "feature_config.json");
+            var featureConfigFilePath = Path.Combine("..", "..", "..", "..", "..", "tst", "CTA.FeatureDetection.Tests", "Examples", "Templates", "feature_config.json");
 
             // Identify all features in a given project
             var featureDetector = new FeatureDetector(featureConfigFilePath);

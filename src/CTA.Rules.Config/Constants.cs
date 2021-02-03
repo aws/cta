@@ -24,7 +24,7 @@ namespace CTA.Rules.Config
         public static HashSet<string> CoreVersions = new HashSet<string>() { "netcoreapp3.1" };
 
         public static string RulesDefaultPath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Input"));
-        public static string DefaultFeaturesFilePath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Input", "default.json"));
+        public static string DefaultFeaturesFilePath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Templates", "default.json"));
         public static string ResourcesFile = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "resources.zip"));
         public static string ResourcesExtractedPath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Templates"));
         public static string DefaultCoreVersion = "netcoreapp3.1";

@@ -154,7 +154,7 @@ namespace CTA.Rules.PortCore
                 reportGenerator.GenerateAnalysisReport();
 
                 LogHelper.LogInformation("Generating Post-Analysis Report");
-                LogHelper.LogError($"{Constants.MetricsTag}: {reportGenerator.PortSolutionResultJsonReport}");
+                LogHelper.LogError($"{Constants.MetricsTag}: {reportGenerator.AnalyzeSolutionResultJsonReport}");
             }
             return solutionResult;
         }
@@ -184,7 +184,7 @@ namespace CTA.Rules.PortCore
                 try
                 {
                     var zipFile = Utils.DownloadFile(Constants.S3CTAFiles, Constants.ResourcesFile);
-                    ZipFile.ExtractToDirectory(zipFile, executingPath);
+                    ZipFile.ExtractToDirectory(zipFile, executingPath, true);
                 }
                 catch (Exception ex)
                 {
@@ -221,21 +221,28 @@ namespace CTA.Rules.PortCore
         {
             try
             {
-                if(Directory.Exists(Constants.RulesDefaultPath) && recommendations)
+                if (recommendations)
                 {
-                    Directory.Delete(Constants.RulesDefaultPath, true);
+                    if (Directory.Exists(Constants.RulesDefaultPath))
+                    {
+                        Directory.Delete(Constants.RulesDefaultPath, true);
+                    }
+                    Directory.CreateDirectory(Constants.RulesDefaultPath);
                 }
-                if (File.Exists(Constants.ResourcesFile) && resources)
+                if (resources)
                 {
-                    File.Delete(Constants.ResourcesFile);
-                }
-                if (File.Exists(Constants.DefaultFeaturesFilePath) && resources)
-                {
-                    File.Delete(Constants.DefaultFeaturesFilePath);
-                }
-                if (Directory.Exists(Constants.ResourcesExtractedPath) && resources)
-                {
-                    Directory.Delete(Constants.ResourcesExtractedPath, true);
+                    if (File.Exists(Constants.ResourcesFile))
+                    {
+                        File.Delete(Constants.ResourcesFile);
+                    }
+                    if (File.Exists(Constants.DefaultFeaturesFilePath))
+                    {
+                        File.Delete(Constants.DefaultFeaturesFilePath);
+                    }
+                    if (Directory.Exists(Constants.ResourcesExtractedPath))
+                    {
+                        Directory.Delete(Constants.ResourcesExtractedPath, true);
+                    }
                 }
             }
             catch (Exception ex)

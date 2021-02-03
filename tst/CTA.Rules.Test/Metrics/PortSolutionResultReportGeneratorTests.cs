@@ -128,6 +128,7 @@ namespace CTA.Rules.Test.Metrics
             };
 
             ReportGenerator = new PortSolutionResultReportGenerator(context, portSolutionResult);
+            ReportGenerator.GenerateAnalysisReport();
             ReportGenerator.GenerateAndExportReports();
         }
 
@@ -135,6 +136,44 @@ namespace CTA.Rules.Test.Metrics
         public void TearDown()
         {
             Directory.Delete(_tempDir, true);
+        }
+
+        [Test]
+        public void GenerateAnalysisReport()
+        {
+            var expectedAnalysisReport = @"[
+  {
+    ""metricsType"": ""CTA"",
+    ""metricName"": ""UpgradePackage"",
+    ""packageName"": ""Newtonsoft.Json"",
+    ""packageVersion"": ""12.0.0"",
+    ""packageOriginalVersion"": ""9.0.0"",
+    ""solutionPath"": ""5fa9de0cb5af2d468dfb1702b1e342f47de2df9a195dabb3be2d04f9c2767482"",
+    ""projectGuid"": ""1234-5678""
+  },
+  {
+    ""metricsType"": ""CTA"",
+    ""metricName"": ""GenericAction"",
+    ""actionName"": ""GA1 Name"",
+    ""actionType"": ""GA1 Type"",
+    ""actionValue"": ""GA1 Value"",
+    ""solutionPath"": ""5fa9de0cb5af2d468dfb1702b1e342f47de2df9a195dabb3be2d04f9c2767482"",
+    ""projectGuid"": ""1234-5678"",
+    ""filePath"": ""eb98c1d648bc61064bdeaca9523a49e51bb3312f28f59376fb385e1569c77822""
+  },
+  {
+    ""metricsType"": ""CTA"",
+    ""metricName"": ""GenericAction"",
+    ""actionName"": ""GA2 Name"",
+    ""actionType"": ""GA2 Type"",
+    ""actionValue"": ""GA2 Value"",
+    ""solutionPath"": ""5fa9de0cb5af2d468dfb1702b1e342f47de2df9a195dabb3be2d04f9c2767482"",
+    ""projectGuid"": ""1234-5678"",
+    ""filePath"": ""eb98c1d648bc61064bdeaca9523a49e51bb3312f28f59376fb385e1569c77822""
+  }
+]";
+            var formattedReport = JValue.Parse(ReportGenerator.AnalyzeSolutionResultJsonReport.Trim()).ToString(Formatting.Indented);
+            Assert.AreEqual(expectedAnalysisReport, formattedReport);
         }
 
         [Test]
