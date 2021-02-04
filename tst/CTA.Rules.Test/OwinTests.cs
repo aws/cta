@@ -1,13 +1,6 @@
-﻿using Codelyzer.Analysis;
-using CTA.Rules.Config;
-using CTA.Rules.Test;
-using NUnit.Framework;
-using System.Collections.Generic;
+﻿using NUnit.Framework;
 using System.IO;
-using System.IO.Compression;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CTA.Rules.Test
 {

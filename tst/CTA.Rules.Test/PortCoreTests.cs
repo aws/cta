@@ -2,7 +2,6 @@ using CTA.Rules.PortCore;
 using NUnit.Framework;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace CTA.Rules.Test
 {
