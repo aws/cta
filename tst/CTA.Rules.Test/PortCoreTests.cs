@@ -275,6 +275,24 @@ namespace CTA.Rules.Test
             Assert.AreEqual(mvcProjectActions.Count, 4);
         }
 
+        [Test]
+        public void TestAntlrSampleSolution()
+        {
+            var version = "netcoreapp3.1";
+            TestSolutionAnalysis results = AnalyzeSolution("AntlrSample.sln", tempDir, downloadLocation, version);
+
+            // Verify new .csproj file exists
+            var addsAntlr3RuntimeProjectFile = results.ProjectResults.Where(p => p.CsProjectPath.EndsWith("Adds.Antlr3.Runtime.csproj")).FirstOrDefault();
+            FileAssert.Exists(addsAntlr3RuntimeProjectFile.CsProjectPath);
+
+            // No build errors expected in the ported project
+            Assert.False(results.SolutionRunResult.BuildErrors[addsAntlr3RuntimeProjectFile.CsProjectPath].Any());
+
+            // Verify the new package has been added
+            var csProjectContent = addsAntlr3RuntimeProjectFile.CsProjectContent;
+            StringAssert.Contains("Include=\"Antlr3.Runtime\"", csProjectContent);
+        }
+
         [TearDown]
         public void Cleanup()
         {
