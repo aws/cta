@@ -2,7 +2,6 @@ using CTA.Rules.PortCore;
 using NUnit.Framework;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace CTA.Rules.Test
 {
@@ -274,6 +273,28 @@ namespace CTA.Rules.Test
                 .ExecutedActions.First(a => a.Key == "Project").Value;
 
             Assert.AreEqual(mvcProjectActions.Count, 4);
+        }
+
+        [Test]
+        public void TestAntlrSample3()
+        {
+            TestAntlrSampleSolution("netcoreapp3.1");
+        }
+
+        private void TestAntlrSampleSolution(string version)
+        {
+            TestSolutionAnalysis results = AnalyzeSolution("AntlrSample.sln", tempDir, downloadLocation, version);
+
+            // Verify new .csproj file exists
+            var addsAntlr3RuntimeProjectFile = results.ProjectResults.Where(p => p.CsProjectPath.EndsWith("Adds.Antlr3.Runtime.csproj")).FirstOrDefault();
+            FileAssert.Exists(addsAntlr3RuntimeProjectFile.CsProjectPath);
+
+            // No build errors expected in the ported project
+            Assert.False(results.SolutionRunResult.BuildErrors[addsAntlr3RuntimeProjectFile.CsProjectPath].Any());
+
+            // Verify the new package has been added
+            var csProjectContent = addsAntlr3RuntimeProjectFile.CsProjectContent;
+            StringAssert.Contains("Include=\"Antlr3.Runtime\"", csProjectContent);
         }
 
         [TearDown]

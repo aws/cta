@@ -14,6 +14,7 @@ namespace CTA.Rules.Models
             FileActions = new BlockingCollection<FileActions>();
             PackageActions = new BlockingCollection<PackageAction>();
             ProjectReferenceActions = new BlockingCollection<string>();
+            ProjectLevelActions = new List<ProjectLevelAction>();
         }
         public BlockingCollection<FileActions> FileActions { get; set; }
         public BlockingCollection<PackageAction> PackageActions { get; set; }
