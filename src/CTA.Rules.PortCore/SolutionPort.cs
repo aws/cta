@@ -1,21 +1,21 @@
-﻿using CTA.Rules.Config;
-using CTA.Rules.Models;
-using CTA.Rules.Update;
-using Codelyzer.Analysis;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
+using System.IO.Compression;
 using System.Linq;
+using System.Net.Http;
+using System.Reflection;
+using System.Threading.Tasks;
+using Codelyzer.Analysis;
 using CTA.FeatureDetection;
 using CTA.FeatureDetection.Common.Models;
 using CTA.FeatureDetection.ProjectType.Extensions;
-using System.IO;
+using CTA.Rules.Config;
 using CTA.Rules.Metrics;
-using System.Net.Http;
-using System.Threading.Tasks;
-using System;
+using CTA.Rules.Models;
+using CTA.Rules.Update;
 using Microsoft.Extensions.Logging;
-using System.IO.Compression;
-using System.Reflection;
 
 namespace CTA.Rules.PortCore
 {
@@ -62,7 +62,7 @@ namespace CTA.Rules.PortCore
             InitSolutionRewriter(analyzerResults, solutionConfiguration);
         }
 
-        public SolutionPort(string solutionFilePath,  List<AnalyzerResult> analyzerResults, List<PortCoreConfiguration> solutionConfiguration, ILogger logger = null)
+        public SolutionPort(string solutionFilePath, List<AnalyzerResult> analyzerResults, List<PortCoreConfiguration> solutionConfiguration, ILogger logger = null)
         {
             if (logger != null)
             {
@@ -91,7 +91,7 @@ namespace CTA.Rules.PortCore
             allReferences.Add(Constants.ProjectRecommendationFile);
 
             _portSolutionResult.References = allReferences.ToHashSet<string>();
-            
+
             using (var httpClient = new HttpClient())
             {
                 ConcurrentBag<string> matchedFiles = new ConcurrentBag<string>();
@@ -113,7 +113,7 @@ namespace CTA.Rules.PortCore
                             }
                             matchedFiles.Add(fileName);
                         }
-                        catch (Exception) 
+                        catch (Exception)
                         {
                             //We are checking which files have a recommendation, some of them won't
                         }
@@ -201,11 +201,11 @@ namespace CTA.Rules.PortCore
             bool cleanRecommendations = false;
             bool cleanResources = false;
 
-            if(recommendationsTime.AddHours(Constants.CacheExpiryHours) < DateTime.Now)
+            if (recommendationsTime.AddHours(Constants.CacheExpiryHours) < DateTime.Now)
             {
                 cleanRecommendations = true;
             }
-            if(resourceExtractedTime.AddDays(Constants.CacheExpiryDays) < DateTime.Now)
+            if (resourceExtractedTime.AddDays(Constants.CacheExpiryDays) < DateTime.Now)
             {
                 cleanResources = true;
             }

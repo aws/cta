@@ -20,7 +20,7 @@ namespace CTA.FeatureDetection.ProjectType.CompiledFeatures
         {
             var project = analyzerResult.ProjectResult;
             var controllerClassDeclarations = project.GetClassDeclarationsByBaseType(Constants.NetCoreMvcControllerOriginalDefinition);
-            var returnStatementsFromPublicMethods = controllerClassDeclarations.SelectMany(c => 
+            var returnStatementsFromPublicMethods = controllerClassDeclarations.SelectMany(c =>
                     c.GetPublicMethodDeclarations())
                 .SelectMany(m => m.AllReturnStatements());
             var viewObjectReturnTypes = returnStatementsFromPublicMethods

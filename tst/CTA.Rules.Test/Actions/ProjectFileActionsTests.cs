@@ -1,10 +1,6 @@
 ﻿using CTA.Rules.Actions;
 using CTA.Rules.Config;
 using CTA.Rules.Models;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.Editing;
 using NUnit.Framework;
 using System.Collections.Generic;
 using System.IO;
@@ -23,7 +19,7 @@ namespace CTA.Rules.Test.Actions
         {
             _projectDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             _projectFile = Path.Combine(_projectDir, "sample.csproj");
-            
+
             _projectFileActions = new ProjectFileActions();
         }
 
@@ -76,7 +72,7 @@ namespace CTA.Rules.Test.Actions
                                 @"<?xml version=""1.0"" encoding=""utf-8""?>
 <Project ToolsVersion=""Current"" DefaultTargets=""Build"" xmlns=""http://schemas.microsoft.com/developer/msbuild/2003"">
 </Project>");
-            }            
+            }
         }
     }
 }

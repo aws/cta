@@ -1,6 +1,5 @@
 ﻿
 using Codelyzer.Analysis.Model;
-using System.Security;
 
 namespace CTA.Rules.Models
 {
@@ -8,7 +7,7 @@ namespace CTA.Rules.Models
     {
         public string Name { get; set; }
         public string OriginalVersion { get; set; }
-        public string Version = "*"; 
+        public string Version = "*";
         public TextSpan TextSpan { get; set; }
         public override bool Equals(object obj)
         {

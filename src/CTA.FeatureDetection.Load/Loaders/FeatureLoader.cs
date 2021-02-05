@@ -27,7 +27,7 @@ namespace CTA.FeatureDetection.Load.Loaders
         /// <param name="compiledFeatureAssemblies">Collection of feature assembly metadata</param>
         /// <returns>Collection of compiled feature instances</returns>
         public static HashSet<CompiledFeature> LoadCompiledFeaturesFromAssemblies(
-            FeatureScope featureScope, 
+            FeatureScope featureScope,
             CompiledFeatureAssembly[] compiledFeatureAssemblies)
         {
             var loadedFeatures = new HashSet<CompiledFeature>();

@@ -22,7 +22,7 @@
             this.ActionValidation = genericAction.ActionValidation;
             this.FilePath = filePath;
         }
-        
+
         public string FilePath { get; set; }
         public int TimesRun { get; set; }
         public int InvalidExecutions { get; set; }

@@ -5,7 +5,7 @@ namespace CTA.FeatureDetection.Common.Exceptions
 {
     public class ClassNotFoundException : Exception
     {
-        public ClassNotFoundException(Assembly assembly, string className) 
+        public ClassNotFoundException(Assembly assembly, string className)
             : base(DefaultMessage(assembly, className))
         {
         }

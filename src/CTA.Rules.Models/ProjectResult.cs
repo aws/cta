@@ -1,7 +1,6 @@
-﻿using CTA.Rules.Config;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Text;
+using CTA.Rules.Config;
 
 namespace CTA.Rules.Models
 {
@@ -28,16 +27,16 @@ namespace CTA.Rules.Models
             stringBuilder.AppendLine("---------------------------");
             stringBuilder.AppendLine("Target Versions:");
             stringBuilder.AppendLine("---------------------------");
-            foreach(var version in TargetVersions)
+            foreach (var version in TargetVersions)
             {
                 stringBuilder.AppendLine(version);
             }
-            
+
 
             stringBuilder.AppendLine("---------------------------");
             stringBuilder.AppendLine("Upgrade packages:");
             stringBuilder.AppendLine("---------------------------");
-            foreach(var package in UpgradePackages)
+            foreach (var package in UpgradePackages)
             {
                 stringBuilder.AppendLine($"{package.Name},{package.OriginalVersion}->{package.Version}");
             }

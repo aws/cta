@@ -1,8 +1,8 @@
-﻿using System.IO;
+﻿using CTA.FeatureDetection.Common.Models.Configuration;
 using CTA.Rules.Config;
-using CTA.FeatureDetection.Common.Models.Configuration;
 using NUnit.Framework;
- 
+using System.IO;
+
 namespace CTA.Rules.Test
 {
     public class UtilsTests : AwsRulesBaseTest

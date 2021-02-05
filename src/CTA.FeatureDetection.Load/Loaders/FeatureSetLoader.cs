@@ -4,7 +4,6 @@ using CTA.FeatureDetection.Common.Models.Configuration;
 using CTA.FeatureDetection.Common.Models.Features;
 using CTA.FeatureDetection.Common.Models.Features.Base;
 using CTA.FeatureDetection.Common.Models.Parsers;
-using CTA.FeatureDetection.Load;
 
 namespace CTA.FeatureDetection.Load.Loaders
 {
@@ -34,7 +33,7 @@ namespace CTA.FeatureDetection.Load.Loaders
         /// <returns>FeatureSet containing features specified in config file</returns>
         public static FeatureSet LoadFeatureSetFromFeatureConfigFile(string featureConfigPath)
         {
-            return LoadFeatureSetFromFeatureConfigFiles(new []{ featureConfigPath });
+            return LoadFeatureSetFromFeatureConfigFiles(new[] { featureConfigPath });
         }
 
         /// <summary>
@@ -77,7 +76,7 @@ namespace CTA.FeatureDetection.Load.Loaders
         /// <returns>FeatureSet containing the feature of the specified type</returns>
         public static FeatureSet LoadFeatureSetFromType(Type type)
         {
-            return LoadFeatureSetFromTypes(new[] {type});
+            return LoadFeatureSetFromTypes(new[] { type });
         }
 
         /// <summary>

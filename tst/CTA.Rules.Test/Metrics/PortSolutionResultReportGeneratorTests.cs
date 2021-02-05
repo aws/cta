@@ -1,7 +1,4 @@
-﻿using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.IO;
-using Codelyzer.Analysis;
+﻿using Codelyzer.Analysis;
 using Codelyzer.Analysis.Model;
 using CTA.Rules.Config;
 using CTA.Rules.Metrics;
@@ -9,6 +6,9 @@ using CTA.Rules.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.IO;
 
 namespace CTA.Rules.Test.Metrics
 {
@@ -73,11 +73,11 @@ namespace CTA.Rules.Test.Metrics
                         {
                             new FileActions()
                             {
-                                FilePath="FilePath1", 
-                                AttributeActions = new HashSet<AttributeAction>() 
+                                FilePath="FilePath1",
+                                AttributeActions = new HashSet<AttributeAction>()
                                 {
-                                    new AttributeAction() 
-                                    { 
+                                    new AttributeAction()
+                                    {
                                         Key = "SampleKey1",
                                         Type = "GA1 Type",
                                         Name = "GA1 Name",
@@ -90,9 +90,9 @@ namespace CTA.Rules.Test.Metrics
                                         Name = "GA2 Name",
                                         Value = "GA2 Value",
                                     }
-                                } 
+                                }
                             }
-                        } 
+                        }
                     },
                     ExecutedActions = new Dictionary<string, List<GenericActionExecution>>
                     {
@@ -251,7 +251,7 @@ Count: 400";
 
             Assert.AreEqual(expectedTextReport, ReportGenerator.PortSolutionResultTextReport.Trim());
         }
-        
+
         [Test]
         public void GenerateAndExportReports_Creates_Expected_Json_Report()
         {

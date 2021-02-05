@@ -1,8 +1,8 @@
-﻿using System.IO;
-using CTA.FeatureDetection.Common.Models.Configuration;
+﻿using CTA.FeatureDetection.Common.Models.Configuration;
 using CTA.FeatureDetection.Common.Models.Parsers;
 using CTA.FeatureDetection.Tests.Utils;
 using NUnit.Framework;
+using System.IO;
 
 namespace CTA.FeatureDetection.Tests
 {

@@ -1,8 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
-using Codelyzer.Analysis;
-using Codelyzer.Analysis.Common;
 using CommandLine;
 
 namespace CTA.Rules.PortCore
@@ -11,7 +8,7 @@ namespace CTA.Rules.PortCore
     {
         [Option('p', "project-path", Required = false, HelpText = "Project file path.")]
         public string ProjectPath { get; set; }
-        
+
         [Option('s', "solution-path", Required = false, HelpText = "Solution file path.")]
         public string SolutionPath { get; set; }
 
@@ -30,7 +27,7 @@ namespace CTA.Rules.PortCore
         [Option('m', "mock-run", Required = false, HelpText = "Mock run to generate output only (no changes will be made)")]
         public string IsMockRun { get; set; }
     }
-    
+
     public class PortCoreRulesCli
     {
         public string FilePath;
@@ -53,7 +50,7 @@ namespace CTA.Rules.PortCore
                     else
                     {
                         FilePath = o.SolutionPath;
-                    }                  
+                    }
 
                     RulesPath = o.RulesInputFile;
                     AssembliesDir = o.AssembliesDir;
@@ -76,12 +73,12 @@ namespace CTA.Rules.PortCore
                     }
                 });
         }
-        
+
         static void HandleParseError(IEnumerable<Error> errs)
         {
-            Environment.Exit( -1 );
+            Environment.Exit(-1);
         }
     }
-    
-    
+
+
 }

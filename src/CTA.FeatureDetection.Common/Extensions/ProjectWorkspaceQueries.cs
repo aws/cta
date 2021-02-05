@@ -42,7 +42,7 @@ namespace CTA.FeatureDetection.Common.Extensions
         /// <param name="project">ProjectWorkspace to search</param>
         /// <param name="baseTypeOriginalDefinition">ProjectWorkspace to search</param>
         /// <returns>Collection of class declaration nodes in the project with the specified base type</returns>
-        public static IEnumerable<ClassDeclaration> GetClassDeclarationsByBaseType(this ProjectWorkspace project, 
+        public static IEnumerable<ClassDeclaration> GetClassDeclarationsByBaseType(this ProjectWorkspace project,
             string baseTypeOriginalDefinition)
             => project.GetAllClassDeclarations().Where(c => c.HasBaseType(baseTypeOriginalDefinition));
 

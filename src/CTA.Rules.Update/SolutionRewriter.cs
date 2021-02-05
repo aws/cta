@@ -1,10 +1,9 @@
-﻿using CTA.Rules.Config;
-using CTA.Rules.Models;
-using Codelyzer.Analysis;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Codelyzer.Analysis;
+using CTA.Rules.Config;
+using CTA.Rules.Models;
 
 namespace CTA.Rules.Update
 {

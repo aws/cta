@@ -1,9 +1,4 @@
-﻿using CTA.Rules.Config;
-using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace CTA.Rules.Models
+﻿namespace CTA.Rules.Models
 {
     public class PortCoreConfiguration : ProjectConfiguration
     {

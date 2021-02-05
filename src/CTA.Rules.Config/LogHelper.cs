@@ -1,6 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
+﻿using System;
+using Microsoft.Extensions.Logging;
 
 namespace CTA.Rules.Config
 {
@@ -10,7 +9,7 @@ namespace CTA.Rules.Config
     public class LogHelper
     {
         private static ILogger _logger;
-                
+
 
         public static ILogger Logger
         {
@@ -31,7 +30,7 @@ namespace CTA.Rules.Config
         {
             Logger.LogError(message, args);
         }
-        
+
         public static void LogError(Exception ex, string message = null, params object[] args)
         {
             Logger.LogError(ex, message, args);

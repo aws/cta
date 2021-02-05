@@ -1,7 +1,6 @@
-﻿using CTA.Rules.Config;
+﻿using System.IO;
+using CTA.Rules.Config;
 using CTA.Rules.Models;
-using System.Collections.Generic;
-using System.IO;
 
 namespace CTA.Rules.Actions
 {

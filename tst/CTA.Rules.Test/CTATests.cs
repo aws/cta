@@ -49,7 +49,7 @@ namespace CTA.Rules.Test
             Assert.NotNull(cli.Project);
             Assert.NotNull(cli.FilePath);
             Assert.NotNull(cli.AssembliesDir);
-            Assert.NotNull(cli.IsMockRun);            
+            Assert.NotNull(cli.IsMockRun);
 
         }
 

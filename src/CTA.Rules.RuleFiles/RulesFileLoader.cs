@@ -1,12 +1,12 @@
-﻿using CTA.Rules.Config;
-using CTA.Rules.Models;
-using Codelyzer.Analysis.Model;
-using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Codelyzer.Analysis.Model;
+using CTA.Rules.Config;
+using CTA.Rules.Models;
+using Newtonsoft.Json;
 
 namespace CTA.Rules.RuleFiles
 {
@@ -33,7 +33,7 @@ namespace CTA.Rules.RuleFiles
             try
             {
                 _targetFramework = targetFramework.First();
-                if(targetFramework.Count > 1)
+                if (targetFramework.Count > 1)
                 {
                     LogHelper.LogDebug("Please specify one target version. Multiple target versions is not supported");
                 }
@@ -42,7 +42,7 @@ namespace CTA.Rules.RuleFiles
             {
                 LogHelper.LogError(ex, "Please specify one target version. Multiple target versions is not supported");
             }
-            
+
             _overrideFile = overrideFile;
             _assembliesDir = assembliesDir;
             _projectReferences = projectReferences;
@@ -107,11 +107,11 @@ namespace CTA.Rules.RuleFiles
             overrideTask.Start();
 
             Task.WaitAll(mainNamespaceFileTasks, overrideNamespaceFileTasks, mainFileTask, overrideTask);
-            
-            RulesFileParser rulesFileParser = new RulesFileParser(mainNamespaceFileTasks.Result, 
-                overrideNamespaceFileTasks.Result, 
-                mainFileTask.Result, 
-                overrideTask.Result, 
+
+            RulesFileParser rulesFileParser = new RulesFileParser(mainNamespaceFileTasks.Result,
+                overrideNamespaceFileTasks.Result,
+                mainFileTask.Result,
+                overrideTask.Result,
                 _assembliesDir,
                 _targetFramework
                 );
@@ -157,8 +157,8 @@ namespace CTA.Rules.RuleFiles
                 try
                 {
                     var content = File.ReadAllText(ruleFile);
-                   
-                    var currentNode = JsonConvert.DeserializeObject<Rootobject>(content);                    
+
+                    var currentNode = JsonConvert.DeserializeObject<Rootobject>(content);
                     r.NameSpaces.AddRange(currentNode.NameSpaces);
                 }
                 catch (Exception ex)

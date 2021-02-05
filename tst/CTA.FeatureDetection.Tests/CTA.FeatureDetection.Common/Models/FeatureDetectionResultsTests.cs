@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
-using CTA.FeatureDetection.Common.Models;
+﻿using CTA.FeatureDetection.Common.Models;
 using NUnit.Framework;
+using System.Collections.Generic;
 
 namespace CTA.FeatureDetection.Tests.CTA.FeatureDetection.Common.Models
 {
@@ -26,21 +26,21 @@ namespace CTA.FeatureDetection.Tests.CTA.FeatureDetection.Common.Models
         [Test]
         public void FeatureCohort_Returns_All_Features_In_FeatureStatus()
         {
-            var allFeatures = new List<string> {PresentFeature1, PresentFeature2, AbsentFeature1, AbsentFeature2};
+            var allFeatures = new List<string> { PresentFeature1, PresentFeature2, AbsentFeature1, AbsentFeature2 };
             CollectionAssert.AreEquivalent(allFeatures, FeatureDetectionResult.FeatureCohort);
         }
 
         [Test]
         public void AbsentFeatures_Returns_All_Features_Set_To_False_In_FeatureStatus()
         {
-            var absentFeatures = new List<string> {AbsentFeature1, AbsentFeature2};
+            var absentFeatures = new List<string> { AbsentFeature1, AbsentFeature2 };
             CollectionAssert.AreEquivalent(absentFeatures, FeatureDetectionResult.AbsentFeatures);
         }
 
         [Test]
         public void PresentFeatures_Returns_All_Features_Set_To_True_In_FeatureStatus()
         {
-            var presentFeatures = new List<string> {PresentFeature1, PresentFeature2};
+            var presentFeatures = new List<string> { PresentFeature1, PresentFeature2 };
             CollectionAssert.AreEquivalent(presentFeatures, FeatureDetectionResult.PresentFeatures);
         }
 

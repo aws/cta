@@ -1,14 +1,8 @@
-﻿using CTA.Rules.Models;
-using CTA.Rules.ProjectFile;
-using Microsoft.Build.Tasks;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.Editing;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
+using CTA.Rules.Models;
+using CTA.Rules.ProjectFile;
 
 namespace CTA.Rules.Actions
 {

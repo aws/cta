@@ -14,7 +14,7 @@ namespace CTA.FeatureDetection.Common.Models.Parsers
     public class FeatureConfigParser
     {
         private static ILogger Logger => Log.Logger;
-        private static Dictionary<string, FeatureConfig> _configCache = new Dictionary<string, FeatureConfig>();
+        private static readonly Dictionary<string, FeatureConfig> _configCache = new Dictionary<string, FeatureConfig>();
 
         /// <summary>
         /// Deserializes one or more feature config files
@@ -25,7 +25,7 @@ namespace CTA.FeatureDetection.Common.Models.Parsers
         {
             Logger.LogDebug($"Parsing {configFiles.Count()} feature assembly metadata file(s)...");
             var featureConfigs = configFiles.Select(Parse).Where(c => c != null);
-            
+
             return featureConfigs;
         }
 

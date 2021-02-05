@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -124,7 +123,7 @@ namespace CTA.Rules.Config
                         retryAttempts++;
                         Thread.Sleep(Constants.DefaultThreadSleepTime);
 
-                        if(retryAttempts == retryCount)
+                        if (retryAttempts == retryCount)
                         {
                             throw ex;
                         }

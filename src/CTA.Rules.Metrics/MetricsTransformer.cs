@@ -107,7 +107,7 @@ namespace CTA.Rules.Metrics
             return referencesMetrics;
         }
 
-        internal static IEnumerable<BuildErrorMetric> TransformBuildErrors(MetricsContext context, 
+        internal static IEnumerable<BuildErrorMetric> TransformBuildErrors(MetricsContext context,
             Dictionary<string, Dictionary<string, int>> buildErrorsByProject)
         {
             var buildErrorMetrics = new List<BuildErrorMetric>();

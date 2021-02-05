@@ -1,12 +1,10 @@
 ﻿using System;
-using CTA.Rules.Models;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using Newtonsoft.Json;
-using System.Threading.Tasks;
 using CTA.Rules.Config;
+using CTA.Rules.Models;
+using Newtonsoft.Json;
 
 namespace CTA.Rules.Metrics
 {
@@ -45,7 +43,7 @@ namespace CTA.Rules.Metrics
         public void GenerateAnalysisReport()
         {
             GenerateAnalysisMetrics();
-            GenerateAnalyzeSolutionResultJsonReport();            
+            GenerateAnalyzeSolutionResultJsonReport();
         }
 
         private void GenerateAnalysisMetrics()

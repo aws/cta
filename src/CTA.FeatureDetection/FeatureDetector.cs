@@ -7,9 +7,9 @@ using CTA.FeatureDetection.Common;
 using CTA.FeatureDetection.Common.Models;
 using CTA.FeatureDetection.Common.Models.Configuration;
 using CTA.FeatureDetection.Common.Models.Features;
-using Newtonsoft.Json;
-using Microsoft.Extensions.Logging;
 using CTA.FeatureDetection.Load.Loaders;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 
 namespace CTA.FeatureDetection
 {
@@ -52,8 +52,8 @@ namespace CTA.FeatureDetection
             }
         }
 
-        public FeatureDetector(FeatureConfig featureConfig) 
-            : this(new [] { featureConfig })
+        public FeatureDetector(FeatureConfig featureConfig)
+            : this(new[] { featureConfig })
         {
             try
             {
