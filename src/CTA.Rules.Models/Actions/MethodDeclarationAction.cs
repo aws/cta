@@ -1,7 +1,7 @@
 ﻿
+using System;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Editing;
-using System;
 
 namespace CTA.Rules.Models
 {

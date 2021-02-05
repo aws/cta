@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using Codelyzer.Analysis;
-using Codelyzer.Analysis.Common;
 using CommandLine;
 
 namespace CTA.Rules.Update
@@ -11,7 +9,7 @@ namespace CTA.Rules.Update
     {
         [Option('p', "project-path", Required = true, HelpText = "Project file path.")]
         public string ProjectPath { get; set; }
-        
+
         [Option('s', "solution-path", Required = false, HelpText = "Solution file path.")]
         public string SolutionPath { get; set; }
 
@@ -24,7 +22,7 @@ namespace CTA.Rules.Update
         [Option('m', "mock-run", Required = false, HelpText = "Mock run to generate output only (no changes will be made)")]
         public string IsMockRun { get; set; }
     }
-    
+
     public class RulesCli
     {
         public bool Project;
@@ -44,7 +42,7 @@ namespace CTA.Rules.Update
                     {
                         Project = true;
                         FilePath = o.ProjectPath;
-                    }                 
+                    }
 
                     RulesPath = o.RulesInputFile;
                     AssembliesDir = o.AssembliesDir;
@@ -55,12 +53,12 @@ namespace CTA.Rules.Update
                     }
                 });
         }
-        
+
         static void HandleParseError(IEnumerable<Error> errs)
         {
-            Environment.Exit( -1 );
+            Environment.Exit(-1);
         }
     }
-    
-    
+
+
 }

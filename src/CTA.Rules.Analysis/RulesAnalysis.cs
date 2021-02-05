@@ -1,14 +1,11 @@
-﻿using CTA.Rules.Config;
-using CTA.Rules.Metrics;
-using CTA.Rules.Models;
-using CTA.Rules.Models.Tokens;
-using Codelyzer.Analysis.Model;
-using System;
-using System.Collections.Concurrent;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
+using Codelyzer.Analysis.Model;
+using CTA.Rules.Config;
+using CTA.Rules.Models;
+using CTA.Rules.Models.Tokens;
 
 namespace CTA.Rules.Analyzer
 {
@@ -17,9 +14,9 @@ namespace CTA.Rules.Analyzer
     /// </summary>
     public class RulesAnalysis
     {
-        private RootNodes _rootNodes;
-        private List<RootUstNode> _sourceFileResults;
-        private ProjectActions _projectActions;
+        private readonly RootNodes _rootNodes;
+        private readonly List<RootUstNode> _sourceFileResults;
+        private readonly ProjectActions _projectActions;
 
         /// <summary>
         /// Initializes an RulesAnalysis instance
@@ -39,7 +36,8 @@ namespace CTA.Rules.Analyzer
         public ProjectActions Analyze()
         {
             var options = new ParallelOptions() { MaxDegreeOfParallelism = Constants.ThreadCount };
-            Parallel.ForEach(_sourceFileResults, options, result => {
+            Parallel.ForEach(_sourceFileResults, options, result =>
+            {
                 var fileAction = new FileActions() { FilePath = result.FileFullPath };
                 if (AnalyzeChildren(fileAction, result.Children, 0))
                 {
@@ -74,8 +72,7 @@ namespace CTA.Rules.Analyzer
                             {
                                 var annotation = (Annotation)child;
                                 var compareToken = new AttributeToken() { Key = annotation.Identifier, Namespace = annotation.Reference.Namespace, Type = annotation.SemanticClassType };
-                                AttributeToken token = null;
-                                _rootNodes.Attributetokens.TryGetValue(compareToken, out token);
+                                _rootNodes.Attributetokens.TryGetValue(compareToken, out var token);
                                 if (token != null)
                                 {
                                     AddActions(fileAction, token, child.TextSpan);
@@ -86,8 +83,7 @@ namespace CTA.Rules.Analyzer
                         case IdConstants.UsingDirectiveIdName:
                             {
                                 var compareToken = new UsingDirectiveToken() { Key = child.Identifier };
-                                UsingDirectiveToken token = null;
-                                _rootNodes.Usingdirectivetokens.TryGetValue(compareToken, out token);
+                                _rootNodes.Usingdirectivetokens.TryGetValue(compareToken, out var token);
                                 if (token != null)
                                 {
                                     AddActions(fileAction, token, child.TextSpan);
@@ -98,8 +94,7 @@ namespace CTA.Rules.Analyzer
                         case IdConstants.NamespaceIdName:
                             {
                                 var compareToken = new NamespaceToken() { Key = child.Identifier };
-                                NamespaceToken token = null;
-                                _rootNodes.NamespaceTokens.TryGetValue(compareToken, out token);
+                                _rootNodes.NamespaceTokens.TryGetValue(compareToken, out var token);
                                 if (token != null)
                                 {
                                     AddActions(fileAction, token, child.TextSpan);
@@ -112,8 +107,7 @@ namespace CTA.Rules.Analyzer
                             {
                                 var classType = (ClassDeclaration)child;
                                 var baseToken = new ClassDeclarationToken() { FullKey = classType.BaseType };
-                                ClassDeclarationToken token = null;
-                                _rootNodes.Classdeclarationtokens.TryGetValue(baseToken, out token);
+                                _rootNodes.Classdeclarationtokens.TryGetValue(baseToken, out var token);
 
                                 if (token != null)
                                 {
@@ -177,8 +171,7 @@ namespace CTA.Rules.Analyzer
                         case IdConstants.MethodIdName:
                             {
                                 var compareToken = new MethodDeclarationToken() { FullKey = string.Concat(child.Identifier) };
-                                MethodDeclarationToken token = null;
-                                _rootNodes.MethodDeclarationTokens.TryGetValue(compareToken, out token);
+                                _rootNodes.MethodDeclarationTokens.TryGetValue(compareToken, out var token);
                                 if (token != null)
                                 {
                                     AddNamedActions(fileAction, token, child.Identifier, child.TextSpan);
@@ -192,8 +185,7 @@ namespace CTA.Rules.Analyzer
                             {
                                 InvocationExpression invocationExpression = (InvocationExpression)child;
                                 var compareToken = new InvocationExpressionToken() { Key = invocationExpression.MethodName, Namespace = invocationExpression.Reference.Namespace, Type = invocationExpression.SemanticClassType };
-                                InvocationExpressionToken token = null;
-                                _rootNodes.Invocationexpressiontokens.TryGetValue(compareToken, out token);
+                                _rootNodes.Invocationexpressiontokens.TryGetValue(compareToken, out var token);
                                 if (token != null)
                                 {
                                     AddActions(fileAction, token, child.TextSpan);
@@ -206,8 +198,7 @@ namespace CTA.Rules.Analyzer
                             {
                                 var declarationNode = (DeclarationNode)child;
                                 var compareToken = new IdentifierNameToken() { Key = string.Concat(declarationNode.Reference.Namespace, ".", declarationNode.Identifier), Namespace = declarationNode.Reference.Namespace };
-                                IdentifierNameToken token = null;
-                                _rootNodes.Identifiernametokens.TryGetValue(compareToken, out token);
+                                _rootNodes.Identifiernametokens.TryGetValue(compareToken, out var token);
                                 if (token != null)
                                 {
                                     AddActions(fileAction, token, child.TextSpan);
@@ -221,8 +212,7 @@ namespace CTA.Rules.Analyzer
                                 var objectCreationNode = (ObjectCreationExpression)child;
                                 //Rules based on Object Creation Parent Hierarchy
                                 var compareToken = new ObjectCreationExpressionToken() { Key = objectCreationNode.Identifier, Namespace = objectCreationNode.Reference?.Namespace, Type = objectCreationNode.SemanticClassType };
-                                ObjectCreationExpressionToken token = null;
-                                _rootNodes.ObjectCreationExpressionTokens.TryGetValue(compareToken, out token);
+                                _rootNodes.ObjectCreationExpressionTokens.TryGetValue(compareToken, out var token);
                                 if (token != null)
                                 {
                                     AddActions(fileAction, token, child.TextSpan);
@@ -231,8 +221,7 @@ namespace CTA.Rules.Analyzer
 
                                 //Rules based on Object Creation location within code
                                 var compareTokenLocation = new ObjectCreationExpressionToken() { Key = objectCreationNode.Identifier, Namespace = parentNamespace, Type = parentClass };
-                                ObjectCreationExpressionToken tokenLocation = null;
-                                _rootNodes.ObjectCreationExpressionTokens.TryGetValue(compareTokenLocation, out tokenLocation);
+                                _rootNodes.ObjectCreationExpressionTokens.TryGetValue(compareTokenLocation, out var tokenLocation);
                                 if (tokenLocation != null)
                                 {
                                     AddActions(fileAction, tokenLocation, child.TextSpan);

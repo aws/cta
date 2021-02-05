@@ -1,10 +1,10 @@
-﻿using CTA.Rules.Config;
+﻿using System;
+using System.Linq;
+using CTA.Rules.Config;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Editing;
-using System;
-using System.Linq;
 
 namespace CTA.Rules.Actions
 {

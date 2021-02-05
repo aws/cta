@@ -1,13 +1,13 @@
-﻿using CTA.Rules.Config;
-using CTA.Rules.Models;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.Editing;
-using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Loader;
+using CTA.Rules.Config;
+using CTA.Rules.Models;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Editing;
+using Newtonsoft.Json;
 
 namespace CTA.Rules.Actions
 {
@@ -16,11 +16,11 @@ namespace CTA.Rules.Actions
     /// </summary>
     public class ActionsLoader
     {
-        private List<MethodInfo> compilationUnitActions, attributeActions, attributeListActions, classActions,
+        private readonly List<MethodInfo> compilationUnitActions, attributeActions, attributeListActions, classActions,
         identifierNameActions, invocationExpressionActions, methodDeclarationActions, elementAccessActions,
         objectCreationExpressionActions, memberAccessActions, namespaceActions, projectLevelActions, projectFileActions, interfaceActions;
 
-        private object attributeObject, attributeListObject, classObject, interfaceObject, compilationUnitObject, identifierNameObject
+        private readonly object attributeObject, attributeListObject, classObject, interfaceObject, compilationUnitObject, identifierNameObject
             , invocationExpressionObject, methodDeclarationObject, elementAccessObject, memberAccessObject, objectExpressionObject, namespaceObject, projectLevelObject,
             projectFileObject;
 
@@ -47,138 +47,137 @@ namespace CTA.Rules.Actions
 
             var actionsAssembly = AppDomain.CurrentDomain.GetAssemblies().Where(a => a.FullName.Contains("CTA.Rules.Actions")).FirstOrDefault();
 
-            try
+            var assemblies = new List<Assembly>
             {
-                LoadAssemblyTypes(actionsAssembly);
-            }
-            catch (Exception ex)
-            {
-                LogHelper.LogError(ex, "Error while loading actions assembly");
-                throw ex;
-            }
+                actionsAssembly
+            };
+
             foreach (var path in assemblyPaths)
             {
                 try
                 {
                     var assembly = AssemblyLoadContext.Default.LoadFromAssemblyPath(path);
-                    LoadAssemblyTypes(assembly);
+                    assemblies.Add(assembly);
                 }
                 catch (Exception ex)
                 {
-                    LogHelper.LogError(ex, string.Format("Error loading actions from {0}{1}{2}", path, Environment.NewLine, ex.Message));
+                    LogHelper.LogError(ex, string.Format("Error loading assembly from {0}{1}{2}", path, Environment.NewLine, ex.Message));
                 }
             }
-        }
 
-        /// <summary>
-        /// Loads actions from the provided assembly
-        /// </summary>
-        /// <param name="assembly">Assembly containing Roslyn actions</param>
-        private void LoadAssemblyTypes(Assembly assembly)
-        {
-            var types = assembly.GetTypes().Where(t => t.Name.EndsWith("Actions"));
-
-            attributeObject = Activator.CreateInstance(types.FirstOrDefault(t => t.Name == Constants.AttributeActions));
-            attributeListObject = Activator.CreateInstance(types.FirstOrDefault(t => t.Name == Constants.AttributeListActions));
-            classObject = Activator.CreateInstance(types.FirstOrDefault(t => t.Name == Constants.ClassActions));
-            compilationUnitObject = Activator.CreateInstance(types.FirstOrDefault(t => t.Name == Constants.CompilationUnitActions));
-            identifierNameObject = Activator.CreateInstance(types.FirstOrDefault(t => t.Name == Constants.IdentifierNameActions));
-            invocationExpressionObject = Activator.CreateInstance(types.FirstOrDefault(t => t.Name == Constants.InvocationExpressionActions));
-            methodDeclarationObject = Activator.CreateInstance(types.FirstOrDefault(t => t.Name == Constants.MethodDeclarationActions));
-            elementAccessObject = Activator.CreateInstance(types.FirstOrDefault(t => t.Name == Constants.ElementAccessActions));
-            memberAccessObject = Activator.CreateInstance(types.FirstOrDefault(t => t.Name == Constants.MemberAccessActions));
-            namespaceObject = Activator.CreateInstance(types.FirstOrDefault(t => t.Name == Constants.NamespaceActions));
-            objectExpressionObject = Activator.CreateInstance(types.FirstOrDefault(t => t.Name == Constants.ObjectCreationExpressionActions));
-            projectLevelObject = Activator.CreateInstance(types.FirstOrDefault(t => t.Name == Constants.ProjectLevelActions));
-            interfaceObject = Activator.CreateInstance(types.FirstOrDefault(t => t.Name == Constants.InterfaceActions));
-            projectFileObject = Activator.CreateInstance(types.FirstOrDefault(t => t.Name == Constants.ProjectFileActions));
-
-
-            foreach (var t in types)
+            foreach (var assembly in assemblies)
             {
-                switch (t.Name)
+                try
                 {
-                    case Constants.AttributeActions:
+                    var types = assembly.GetTypes().Where(t => t.Name.EndsWith("Actions"));
+
+                    attributeObject = Activator.CreateInstance(types.FirstOrDefault(t => t.Name == Constants.AttributeActions));
+                    attributeListObject = Activator.CreateInstance(types.FirstOrDefault(t => t.Name == Constants.AttributeListActions));
+                    classObject = Activator.CreateInstance(types.FirstOrDefault(t => t.Name == Constants.ClassActions));
+                    compilationUnitObject = Activator.CreateInstance(types.FirstOrDefault(t => t.Name == Constants.CompilationUnitActions));
+                    identifierNameObject = Activator.CreateInstance(types.FirstOrDefault(t => t.Name == Constants.IdentifierNameActions));
+                    invocationExpressionObject = Activator.CreateInstance(types.FirstOrDefault(t => t.Name == Constants.InvocationExpressionActions));
+                    methodDeclarationObject = Activator.CreateInstance(types.FirstOrDefault(t => t.Name == Constants.MethodDeclarationActions));
+                    elementAccessObject = Activator.CreateInstance(types.FirstOrDefault(t => t.Name == Constants.ElementAccessActions));
+                    memberAccessObject = Activator.CreateInstance(types.FirstOrDefault(t => t.Name == Constants.MemberAccessActions));
+                    namespaceObject = Activator.CreateInstance(types.FirstOrDefault(t => t.Name == Constants.NamespaceActions));
+                    objectExpressionObject = Activator.CreateInstance(types.FirstOrDefault(t => t.Name == Constants.ObjectCreationExpressionActions));
+                    projectLevelObject = Activator.CreateInstance(types.FirstOrDefault(t => t.Name == Constants.ProjectLevelActions));
+                    interfaceObject = Activator.CreateInstance(types.FirstOrDefault(t => t.Name == Constants.InterfaceActions));
+                    projectFileObject = Activator.CreateInstance(types.FirstOrDefault(t => t.Name == Constants.ProjectFileActions));
+
+
+                    foreach (var t in types)
+                    {
+                        switch (t.Name)
                         {
-                            attributeActions.AddRange(GetFuncMethods(t));
-                            break;
+                            case Constants.AttributeActions:
+                                {
+                                    attributeActions.AddRange(GetFuncMethods(t));
+                                    break;
+                                }
+                            case Constants.AttributeListActions:
+                                {
+                                    attributeListActions.AddRange(GetFuncMethods(t));
+                                    break;
+                                }
+                            case Constants.ClassActions:
+                                {
+                                    classActions.AddRange(GetFuncMethods(t));
+                                    break;
+                                }
+                            case Constants.InterfaceActions:
+                                {
+                                    interfaceActions.AddRange(GetFuncMethods(t));
+                                    break;
+                                }
+                            case Constants.CompilationUnitActions:
+                                {
+                                    compilationUnitActions.AddRange(GetFuncMethods(t));
+                                    break;
+                                }
+                            case Constants.IdentifierNameActions:
+                                {
+                                    identifierNameActions.AddRange(GetFuncMethods(t));
+                                    break;
+                                }
+                            case Constants.InvocationExpressionActions:
+                                {
+                                    invocationExpressionActions.AddRange(GetFuncMethods(t));
+                                    break;
+                                }
+                            case Constants.MethodDeclarationActions:
+                                {
+                                    methodDeclarationActions.AddRange(GetFuncMethods(t));
+                                    break;
+                                }
+                            case Constants.ElementAccessActions:
+                                {
+                                    elementAccessActions.AddRange(GetFuncMethods(t));
+                                    break;
+                                }
+                            case Constants.MemberAccessActions:
+                                {
+                                    memberAccessActions.AddRange(GetFuncMethods(t));
+                                    break;
+                                }
+                            case Constants.ObjectCreationExpressionActions:
+                                {
+                                    objectCreationExpressionActions.AddRange(GetFuncMethods(t));
+                                    break;
+                                }
+                            case Constants.NamespaceActions:
+                                {
+                                    namespaceActions.AddRange(GetFuncMethods(t));
+                                    break;
+                                }
+                            case Constants.ProjectLevelActions:
+                                {
+                                    projectLevelActions.AddRange(GetFuncMethods(t));
+                                    break;
+                                }
+                            case Constants.ProjectFileActions:
+                                {
+                                    projectFileActions.AddRange(GetFuncMethods(t));
+                                    break;
+                                }
+                            default:
+                                {
+                                    LogHelper.LogError(string.Format("Action type {0} is not found", t.Name));
+                                    break;
+                                }
                         }
-                    case Constants.AttributeListActions:
-                        {
-                            attributeListActions.AddRange(GetFuncMethods(t));
-                            break;
-                        }
-                    case Constants.ClassActions:
-                        {
-                            classActions.AddRange(GetFuncMethods(t));
-                            break;
-                        }
-                    case Constants.InterfaceActions:
-                        {
-                            interfaceActions.AddRange(GetFuncMethods(t));
-                            break;
-                        }
-                    case Constants.CompilationUnitActions:
-                        {
-                            compilationUnitActions.AddRange(GetFuncMethods(t));
-                            break;
-                        }
-                    case Constants.IdentifierNameActions:
-                        {
-                            identifierNameActions.AddRange(GetFuncMethods(t));
-                            break;
-                        }
-                    case Constants.InvocationExpressionActions:
-                        {
-                            invocationExpressionActions.AddRange(GetFuncMethods(t));
-                            break;
-                        }
-                    case Constants.MethodDeclarationActions:
-                        {
-                            methodDeclarationActions.AddRange(GetFuncMethods(t));
-                            break;
-                        }
-                    case Constants.ElementAccessActions:
-                        {
-                            elementAccessActions.AddRange(GetFuncMethods(t));
-                            break;
-                        }
-                    case Constants.MemberAccessActions:
-                        {
-                            memberAccessActions.AddRange(GetFuncMethods(t));
-                            break;
-                        }
-                    case Constants.ObjectCreationExpressionActions:
-                        {
-                            objectCreationExpressionActions.AddRange(GetFuncMethods(t));
-                            break;
-                        }
-                    case Constants.NamespaceActions:
-                        {
-                            namespaceActions.AddRange(GetFuncMethods(t));
-                            break;
-                        }
-                    case Constants.ProjectLevelActions:
-                        {
-                            projectLevelActions.AddRange(GetFuncMethods(t));
-                            break;
-                        }
-                    case Constants.ProjectFileActions:
-                        {
-                            projectFileActions.AddRange(GetFuncMethods(t));
-                            break;
-                        }
-                    default:
-                        {
-                            LogHelper.LogError(string.Format("Action type {0} is not found", t.Name));
-                            break;
-                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    LogHelper.LogError(ex, string.Format("Error loading actions from {0}", assembly.FullName, ex.Message));
                 }
             }
         }
 
         private List<MethodInfo> GetFuncMethods(Type t) => t.GetMethods().Where(m => m.ReturnType.ToString().Contains("System.Func")).ToList();
-        
+
         private string GetActionName(string name)
         {
             return string.Concat("Get", name, "Action");
@@ -237,7 +236,7 @@ namespace CTA.Rules.Actions
         /// <returns></returns>
         private T GetAction<T>(List<MethodInfo> actions, object invokeObject, string name, dynamic value)
         {
-            T val = default(T);
+            T val = default;
             try
             {
                 string actionName = GetActionName(name);

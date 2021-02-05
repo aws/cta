@@ -1,14 +1,9 @@
-﻿using CTA.Rules.Models;
-using CTA.Rules.ProjectFile;
-using Microsoft.Build.Tasks;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.Editing;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
+using CTA.Rules.Models;
+using Microsoft.CodeAnalysis;
 
 namespace CTA.Rules.Actions
 {
@@ -88,7 +83,7 @@ namespace CTA.Rules.Actions
             Func<string, ProjectType, string> func = (string projectDir, ProjectType projectType) =>
             {
                 ConfigMigrate configMigrate = new ConfigMigrate(projectDir, projectType);
-                return configMigrate.Run();                 
+                return configMigrate.Run();
             };
 
             return func;

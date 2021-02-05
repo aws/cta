@@ -1,12 +1,11 @@
-﻿using System;
-using System.Configuration;
-using System.IO;
-using System.Reflection;
-using System.Xml.Linq;
-using CTA.Rules.Actions;
+﻿using CTA.Rules.Actions;
 using CTA.Rules.Models;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
+using System;
+using System.Configuration;
+using System.IO;
+using System.Reflection;
 
 namespace CTA.Rules.Test.Actions.ActionHelpers
 {
@@ -17,7 +16,7 @@ namespace CTA.Rules.Test.Actions.ActionHelpers
         {
             // Get private method to invoke
             var projectType = ProjectType.ClassLibrary;
-            ConfigMigrate configMigrateInstance = new ConfigMigrate(Directory.GetCurrentDirectory(), projectType);            
+            ConfigMigrate configMigrateInstance = new ConfigMigrate(Directory.GetCurrentDirectory(), projectType);
             Type configMigrateType = configMigrateInstance.GetType();
 
             var loadWebConfigMethod = TestUtils.GetPrivateMethod(configMigrateType, "LoadWebConfig");

@@ -2,8 +2,8 @@
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using CTA.FeatureDetection.Common.Exceptions;
-using CTA.FeatureDetection.Common.Models.Enums;
 using CTA.FeatureDetection.Common.Models.Configuration;
+using CTA.FeatureDetection.Common.Models.Enums;
 using CTA.FeatureDetection.Common.Models.Features.Base;
 
 [assembly: InternalsVisibleTo("CTA.FeatureDetection.Tests")]
@@ -50,8 +50,7 @@ namespace CTA.FeatureDetection.Load.Factories
         /// <returns>Feature instance</returns>
         public static CompiledFeature GetInstance(Type featureType, string name, FeatureScope featureScope)
         {
-            var featureInstance = Activator.CreateInstance(featureType) as CompiledFeature;
-            if (featureInstance == null)
+            if (!(Activator.CreateInstance(featureType) is CompiledFeature featureInstance))
             {
                 throw new InvalidFeatureException(featureType);
             }
@@ -69,8 +68,7 @@ namespace CTA.FeatureDetection.Load.Factories
         /// <returns>Feature instance</returns>
         public static CompiledFeature GetInstance(Type featureType)
         {
-            var featureInstance = Activator.CreateInstance(featureType) as CompiledFeature;
-            if (featureInstance == null)
+            if (!(Activator.CreateInstance(featureType) is CompiledFeature featureInstance))
             {
                 throw new InvalidFeatureException(featureType);
             }

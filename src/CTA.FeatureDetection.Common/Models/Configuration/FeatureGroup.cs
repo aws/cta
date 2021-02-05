@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using CTA.FeatureDetection.Common.Models.Enums;
-using CTA.FeatureDetection.Common.Models.Features.Base;
+﻿using CTA.FeatureDetection.Common.Models.Enums;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 

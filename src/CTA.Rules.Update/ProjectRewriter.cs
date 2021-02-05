@@ -1,16 +1,14 @@
-﻿using CTA.Rules.Analyzer;
-using CTA.Rules.Config;
-using CTA.Rules.Metrics;
-using CTA.Rules.Models;
-using CTA.Rules.RuleFiles;
+﻿using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
 using Codelyzer.Analysis;
 using Codelyzer.Analysis.Build;
 using Codelyzer.Analysis.Model;
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+using CTA.Rules.Analyzer;
+using CTA.Rules.Config;
+using CTA.Rules.Models;
+using CTA.Rules.RuleFiles;
 
 namespace CTA.Rules.Update
 {
@@ -46,7 +44,7 @@ namespace CTA.Rules.Update
 
             _sourceFileBuildResults = analyzerResult?.ProjectBuildResult?.SourceFileBuildResults;
             _sourceFileResults = analyzerResult?.ProjectResult?.SourceFileResults;
-            _projectReferences = analyzerResult?.ProjectBuildResult?.ExternalReferences?.ProjectReferences.Select(p => p.AssemblyLocation).ToList();            
+            _projectReferences = analyzerResult?.ProjectBuildResult?.ExternalReferences?.ProjectReferences.Select(p => p.AssemblyLocation).ToList();
             RulesEngineConfiguration = rulesEngineConfiguration;
 
         }
@@ -119,9 +117,9 @@ namespace CTA.Rules.Update
         /// <param name="packageActions">A list of packages and their versions to add to the project</param>
         private void MergePackages(BlockingCollection<PackageAction> packageActions)
         {
-            if(RulesEngineConfiguration.PackageReferences != null)
+            if (RulesEngineConfiguration.PackageReferences != null)
             {
-                foreach(var package in RulesEngineConfiguration.PackageReferences.Keys)
+                foreach (var package in RulesEngineConfiguration.PackageReferences.Keys)
                 {
                     var versionTuple = RulesEngineConfiguration.PackageReferences[package];
                     var version = versionTuple != null ? versionTuple.Item2 ?? "*" : "*";

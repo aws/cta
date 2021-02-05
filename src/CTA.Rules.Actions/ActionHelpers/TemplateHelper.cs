@@ -1,10 +1,6 @@
-﻿using CTA.Rules.Config;
-using CTA.Rules.Models;
-using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Reflection;
-using System.Text;
+using CTA.Rules.Models;
 
 namespace CTA.Rules.Config
 {

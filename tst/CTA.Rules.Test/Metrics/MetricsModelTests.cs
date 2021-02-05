@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Codelyzer.Analysis;
+﻿using Codelyzer.Analysis;
 using Codelyzer.Analysis.Model;
 using CTA.Rules.Config;
 using CTA.Rules.Metrics;
 using NUnit.Framework;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace CTA.Rules.Test.Metrics
 {

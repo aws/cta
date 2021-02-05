@@ -1,12 +1,12 @@
-﻿using CTA.Rules.Config;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using CTA.Rules.Config;
 using CTA.Rules.Models;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Editing;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace CTA.Rules.Update.Rewriters
 {
@@ -24,7 +24,7 @@ namespace CTA.Rules.Update.Rewriters
             typeof(ParameterSyntax),
             typeof(ObjectCreationExpressionSyntax)};
 
-        public ActionsRewriter(SemanticModel semanticModel, SyntaxGenerator syntaxGenerator, FileActions fileActions) 
+        public ActionsRewriter(SemanticModel semanticModel, SyntaxGenerator syntaxGenerator, FileActions fileActions)
         {
             _semanticModel = semanticModel;
             _syntaxGenerator = syntaxGenerator;
@@ -35,14 +35,14 @@ namespace CTA.Rules.Update.Rewriters
         public override SyntaxNode VisitAttributeList(AttributeListSyntax node)
         {
             AttributeListSyntax attributeListSyntax = (AttributeListSyntax)base.VisitAttributeList(node);
-            
-            foreach(var attributeSyntax in attributeListSyntax.Attributes)
+
+            foreach (var attributeSyntax in attributeListSyntax.Attributes)
             {
                 foreach (var action in _fileActions.AttributeActions)
                 {
                     if (action.Key == attributeSyntax.Name.ToString())
                     {
-                        if(action.AttributeListActionFunc != null)
+                        if (action.AttributeListActionFunc != null)
                         {
                             var actionExecution = new GenericActionExecution(action, _fileActions.FilePath);
                             actionExecution.TimesRun = 1;
@@ -51,14 +51,14 @@ namespace CTA.Rules.Update.Rewriters
                                 attributeListSyntax = action.AttributeListActionFunc(_syntaxGenerator, attributeListSyntax);
                                 LogHelper.LogInformation(string.Format("{0}: {1}", node.SpanStart, action.Description));
                             }
-                            catch(Exception ex)
+                            catch (Exception ex)
                             {
                                 var actionExecutionException = new ActionExecutionException(action.Name, action.Key, ex);
                                 actionExecution.InvalidExecutions = 1;
                                 LogHelper.LogError(actionExecutionException);
                             }
                             allActions.Add(actionExecution);
-                        }                        
+                        }
                     }
                 }
             }
@@ -70,7 +70,7 @@ namespace CTA.Rules.Update.Rewriters
             var attributeSymbol = _semanticModel.GetSymbolInfo(node);
             AttributeSyntax attributeSyntax = (AttributeSyntax)base.VisitAttribute(node);
 
-            foreach(var action in _fileActions.AttributeActions)
+            foreach (var action in _fileActions.AttributeActions)
             {
                 if (action.Key == node.Name.ToString())
                 {

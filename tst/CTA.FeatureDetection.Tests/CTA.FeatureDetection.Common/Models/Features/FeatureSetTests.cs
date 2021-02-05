@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Codelyzer.Analysis;
+﻿using Codelyzer.Analysis;
 using CTA.FeatureDetection.Common.Models.Enums;
 using CTA.FeatureDetection.Common.Models.Features;
 using CTA.FeatureDetection.Common.Models.Features.Base;
 using CTA.FeatureDetection.Load.Loaders;
 using CTA.FeatureDetection.Tests.TestBase;
 using NUnit.Framework;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace CTA.FeatureDetection.Tests.FeatureDetection.Common.Models.Features
 {
@@ -90,7 +90,7 @@ namespace CTA.FeatureDetection.Tests.FeatureDetection.Common.Models.Features
             var configuredFeature = validFeatureSet.ConfiguredFeatures.First();
             configuredFeature.Name = compiledFeature.Name;
 
-            var compiledFeatures = new List<CompiledFeature> {compiledFeature};
+            var compiledFeatures = new List<CompiledFeature> { compiledFeature };
 
             Assert.DoesNotThrow(() =>
             {

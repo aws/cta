@@ -1,7 +1,7 @@
-﻿using System.IO;
-using CTA.FeatureDetection.Common.Models.Parsers;
+﻿using CTA.FeatureDetection.Common.Models.Parsers;
 using CTA.FeatureDetection.Tests.Utils;
 using NUnit.Framework;
+using System.IO;
 
 namespace CTA.FeatureDetection.Tests.FeatureDetection.Common.Models.Parsers
 {
@@ -15,7 +15,7 @@ namespace CTA.FeatureDetection.Tests.FeatureDetection.Common.Models.Parsers
             var jsonFilePath = Path.Combine(_testProjectDirectory, "Examples", "Templates", "feature_config.json");
             var featureConfigInstance = FeatureConfigParser.Parse(jsonFilePath);
 
-            Assert.NotNull(featureConfigInstance); 
+            Assert.NotNull(featureConfigInstance);
         }
 
         [Test]

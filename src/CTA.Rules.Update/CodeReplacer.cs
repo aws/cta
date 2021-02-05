@@ -1,15 +1,14 @@
-﻿using CTA.Rules.Config;
-using CTA.Rules.Models;
-using CTA.Rules.Update.Rewriters;
-using Codelyzer.Analysis.Build;
+﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Microsoft.CodeAnalysis;
-using System.Text.RegularExpressions;
-using System;
 using System.Threading.Tasks;
-using System.Collections.Concurrent;
+using Codelyzer.Analysis.Build;
+using CTA.Rules.Config;
+using CTA.Rules.Models;
+using CTA.Rules.Update.Rewriters;
+using Microsoft.CodeAnalysis;
 
 namespace CTA.Rules.Update
 {
@@ -32,7 +31,8 @@ namespace CTA.Rules.Update
 
             var parallelOptions = new ParallelOptions() { MaxDegreeOfParallelism = Constants.ThreadCount };
 
-            Parallel.ForEach(_sourceFileBuildResults, parallelOptions, sourceFileBuildResult => {
+            Parallel.ForEach(_sourceFileBuildResults, parallelOptions, sourceFileBuildResult =>
+            {
                 try
                 {
                     var currentFileActions = fileActions.Where(f => f.FilePath == sourceFileBuildResult.SourceFileFullPath).FirstOrDefault();
@@ -115,7 +115,7 @@ namespace CTA.Rules.Update
                 }
             }
 
-            if(!actionsPerProject.TryAdd(Constants.Project, projectRunActions))
+            if (!actionsPerProject.TryAdd(Constants.Project, projectRunActions))
             {
                 LogHelper.LogError(new FilePortingException(Constants.Project, new Exception("Error adding project to actions collection")));
             }

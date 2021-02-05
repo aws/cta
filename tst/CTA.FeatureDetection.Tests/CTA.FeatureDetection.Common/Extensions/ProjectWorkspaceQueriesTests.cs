@@ -1,7 +1,7 @@
-﻿using System.Linq;
-using CTA.FeatureDetection.Common.Extensions;
+﻿using CTA.FeatureDetection.Common.Extensions;
 using CTA.FeatureDetection.Tests.TestBase;
 using NUnit.Framework;
+using System.Linq;
 
 namespace CTA.FeatureDetection.Tests.FeatureDetection.Common.Extensions
 {

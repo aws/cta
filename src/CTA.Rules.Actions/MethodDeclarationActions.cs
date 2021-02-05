@@ -1,9 +1,9 @@
-﻿using CTA.Rules.Config;
+﻿using System;
+using CTA.Rules.Config;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Editing;
-using System;
 
 namespace CTA.Rules.Actions
 {

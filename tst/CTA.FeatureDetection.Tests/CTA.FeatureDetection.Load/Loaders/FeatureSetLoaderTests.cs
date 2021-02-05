@@ -1,7 +1,7 @@
-﻿using System.Linq;
-using CTA.FeatureDetection.Load.Loaders;
+﻿using CTA.FeatureDetection.Load.Loaders;
 using CTA.FeatureDetection.ProjectType.CompiledFeatures;
 using NUnit.Framework;
+using System.Linq;
 
 namespace CTA.FeatureDetection.Tests.FeatureDetection.Load.Load
 {

@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using CTA.FeatureDetection.Load.Loaders;
+﻿using CTA.FeatureDetection.Load.Loaders;
 using CTA.FeatureDetection.Tests.TestBase;
 using NUnit.Framework;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 
 namespace CTA.FeatureDetection.Tests.FeatureDetection
 {
@@ -38,7 +38,7 @@ namespace CTA.FeatureDetection.Tests.FeatureDetection
             var featureConfig = Path.Combine(TestProjectDirectory, "Examples", "Templates", "EntityFramework_config_features.json");
             var featureDetector = new FeatureDetector(featureConfig);
             var loadedFeatureSet = featureDetector.LoadedFeatureSet;
-            
+
             Assert.IsEmpty(loadedFeatureSet.CompiledFeatures);
             Assert.True(loadedFeatureSet.ConfiguredFeatures.Count == 9);
         }
@@ -55,7 +55,7 @@ namespace CTA.FeatureDetection.Tests.FeatureDetection
             };
             var featureDetector = new FeatureDetector(featureConfigs);
             var loadedFeatureSet = featureDetector.LoadedFeatureSet;
-            
+
             CollectionAssert.IsNotEmpty(loadedFeatureSet.ConfiguredFeatures);
             CollectionAssert.IsNotEmpty(loadedFeatureSet.CompiledFeatures);
             Assert.True(loadedFeatureSet.ConfiguredFeatures.Count == 9);

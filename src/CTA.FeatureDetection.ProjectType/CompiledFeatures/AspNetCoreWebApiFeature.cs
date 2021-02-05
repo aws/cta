@@ -1,8 +1,8 @@
-﻿using Codelyzer.Analysis;
+﻿using System.Linq;
+using Codelyzer.Analysis;
+using Codelyzer.Analysis.Model;
 using CTA.FeatureDetection.Common.Extensions;
 using CTA.FeatureDetection.Common.Models.Features.Base;
-using System.Linq;
-using Codelyzer.Analysis.Model;
 
 namespace CTA.FeatureDetection.ProjectType.CompiledFeatures
 {

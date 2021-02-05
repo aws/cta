@@ -65,7 +65,8 @@ namespace CTA.Rules.Test
             if (string.IsNullOrEmpty(solutionDir))
             {
                 results = AnalyzeSolution("SampleWebApi.sln", tempDir, downloadLocation, version);
-            }else
+            }
+            else
             {
                 results = AnalyzeSolution("SampleWebApi.sln", solutionDir, downloadLocation, version, true);
             }
@@ -137,7 +138,7 @@ namespace CTA.Rules.Test
 
             StringAssert.Contains("IActionResult", results.SolutionAnalysisResult);
             StringAssert.Contains("Startup", results.SolutionAnalysisResult);
-                       
+
 
             var webProjectFile = results.ProjectResults.Where(p => p.CsProjectPath.EndsWith("WebApiWithReferences.csproj")).FirstOrDefault();
             FileAssert.Exists(webProjectFile.CsProjectPath);
@@ -207,7 +208,7 @@ namespace CTA.Rules.Test
 
         [Test]
         public void TestMvcMusicStore3()
-        { 
+        {
             TestMvcMusicStore("netcoreapp3.1");
         }
 

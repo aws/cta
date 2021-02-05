@@ -22,7 +22,7 @@ namespace CTA.Rules.Test.Actions
             _syntaxGenerator = SyntaxGenerator.GetGenerator(workspace, language);
             _attributeListActions = new AttributeListActions();
             var seperatedList = SyntaxFactory.SeparatedList<AttributeSyntax>();
-            seperatedList.Add(SyntaxFactory.Attribute(SyntaxFactory.ParseName("Test")));            
+            seperatedList.Add(SyntaxFactory.Attribute(SyntaxFactory.ParseName("Test")));
             _node = SyntaxFactory.AttributeList(seperatedList);
         }
 

@@ -1,8 +1,8 @@
-﻿using System.IO;
-using System.Linq;
-using CTA.FeatureDetection.Common.Models;
+﻿using CTA.FeatureDetection.Common.Models;
 using CTA.FeatureDetection.Tests.Utils;
 using NUnit.Framework;
+using System.IO;
+using System.Linq;
 
 namespace CTA.FeatureDetection.Tests.FeatureDetection.EntityFramework
 {

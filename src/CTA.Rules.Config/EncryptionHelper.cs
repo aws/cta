@@ -11,7 +11,7 @@ namespace CTA.Rules.Config
             get
             {
                 _sha256 ??= SHA256.Create();
-                
+
                 return _sha256;
             }
         }

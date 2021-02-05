@@ -1,11 +1,11 @@
-﻿using System.Reflection;
-using System.Text;
-using CTA.FeatureDetection.Common.Exceptions;
+﻿using CTA.FeatureDetection.Common.Exceptions;
 using CTA.FeatureDetection.Common.Models.Configuration;
 using CTA.FeatureDetection.Common.Models.Enums;
 using CTA.FeatureDetection.Load.Factories;
 using CTA.FeatureDetection.ProjectType.CompiledFeatures;
 using NUnit.Framework;
+using System.Reflection;
+using System.Text;
 
 namespace CTA.FeatureDetection.Tests.FeatureDetection.Load.Factories
 {

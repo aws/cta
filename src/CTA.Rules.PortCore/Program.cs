@@ -1,12 +1,10 @@
-﻿using CTA.Rules.Config;
-using CTA.Rules.Models;
-using Codelyzer.Analysis;
-using Microsoft.Extensions.Logging;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Text.RegularExpressions;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
+using CTA.Rules.Config;
+using CTA.Rules.Models;
+using Microsoft.Extensions.Logging;
 
 namespace CTA.Rules.PortCore
 {
@@ -49,7 +47,7 @@ namespace CTA.Rules.PortCore
                         IsMockRun = cli.IsMockRun,
                         UseDefaultRules = cli.DefaultRules,
                         PackageReferences = packageReferences,
-                        TargetVersions = new List<string> { cli.Version }       
+                        TargetVersions = new List<string> { cli.Version }
                     };
 
                     configs.Add(projectConfiguration);

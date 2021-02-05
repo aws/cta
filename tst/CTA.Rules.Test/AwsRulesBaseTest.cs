@@ -1,16 +1,12 @@
-﻿using Codelyzer.Analysis;
-using CTA.Rules.Config;
+﻿using CTA.Rules.Config;
 using CTA.Rules.Models;
 using CTA.Rules.PortCore;
-using CTA.Rules.Update;
 using NUnit.Framework;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Net.Http;
 using System.Text;
 
 namespace CTA.Rules.Test
@@ -107,7 +103,7 @@ namespace CTA.Rules.Test
                     SolutionPort solutionPort = new SolutionPort(solutionPath, solutionPortConfiguration);
                     var analysisRunResult = solutionPort.AnalysisRun();
 
-                    foreach(var projectResult in analysisRunResult.ProjectResults)
+                    foreach (var projectResult in analysisRunResult.ProjectResults)
                     {
                         Assert.IsTrue(projectResult.ProjectActions.ToSummaryString()?.Length > 0);
                     }
@@ -156,13 +152,13 @@ namespace CTA.Rules.Test
             }
 
             var files = source.GetFiles();
-            foreach(var file in files)
+            foreach (var file in files)
             {
                 file.CopyTo(Path.Combine(target.FullName, file.Name));
             }
 
             var dirs = source.GetDirectories();
-            foreach(var dir in dirs)
+            foreach (var dir in dirs)
             {
                 DirectoryInfo destinationSub = new DirectoryInfo(Path.Combine(target.FullName, dir.Name));
                 CopyDirectory(dir, destinationSub);

@@ -1,15 +1,12 @@
-﻿using CTA.Rules.Config;
-using CTA.Rules.Models;
-using Newtonsoft.Json;
-using System;
-using System.IO;
-using System.Text;
-using System.Xml.Linq;
-using System.Linq;
-using System.Xml.Serialization;
-using Newtonsoft.Json.Linq;
+﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.IO;
+using System.Linq;
+using CTA.Rules.Config;
+using CTA.Rules.Models;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace CTA.Rules.Actions
 {
@@ -82,7 +79,7 @@ namespace CTA.Rules.Actions
 
             _hasData = connectionStringsObjects.Any() || appSettingsObjects.Any();
 
-            if(_hasData)
+            if (_hasData)
             {
                 var defaultContent = JsonConvert.DeserializeObject<JObject>(templateContent);
 
