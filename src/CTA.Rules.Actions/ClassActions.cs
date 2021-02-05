@@ -1,10 +1,12 @@
 ﻿using CTA.Rules.Config;
+using CTA.Rules.Models;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Classification;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Editing;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace CTA.Rules.Actions
@@ -136,9 +138,15 @@ namespace CTA.Rules.Actions
             {
                 var allMembers = node.Members.ToList();
                 var allMethods = allMembers.OfType<MethodDeclarationSyntax>();
-                var removeMethod = allMethods.Where(m => m.Identifier.ToString() == methodName).FirstOrDefault();
-                allMembers.Remove(removeMethod);
-                node = node.RemoveNode(removeMethod, SyntaxRemoveOptions.KeepNoTrivia).NormalizeWhitespace();
+                if(allMethods.Any())
+                {
+                    var removeMethod = allMethods.FirstOrDefault(m => m.Identifier.ToString() == methodName);
+                    if(removeMethod != null)
+                    {
+                        node = node.RemoveNode(removeMethod, SyntaxRemoveOptions.KeepNoTrivia).NormalizeWhitespace();
+                    }
+                }
+                
                 return node;
             };
             return AddMethod;
@@ -151,6 +159,32 @@ namespace CTA.Rules.Actions
                 return node;
             };
             return RenameClass;
+        }
+        public Func<SyntaxGenerator, ClassDeclarationSyntax, ClassDeclarationSyntax> GetReplaceMethodModifiersAction(string methodName, string modifiers)
+        {
+            Func<SyntaxGenerator, ClassDeclarationSyntax, ClassDeclarationSyntax> ReplaceMethodModifiers = (SyntaxGenerator syntaxGenerator, ClassDeclarationSyntax node) =>
+            {
+                var allMembers = node.Members.ToList();
+                var allMethods = allMembers.OfType<MethodDeclarationSyntax>();
+                if(allMethods.Any())
+                {
+                    var replaceMethod = allMethods.FirstOrDefault(m => m.Identifier.ToString() == methodName);
+                    if(replaceMethod != null )
+                    {
+                        var allModifiersAreValid = modifiers.Split(new char[] { ' ', ',' }).All(m => Constants.SupportedMethodModifiers.Contains(m));
+                        if(allModifiersAreValid)
+                        {
+                            SyntaxTokenList tokenList = new SyntaxTokenList(SyntaxFactory.ParseTokens(modifiers));
+                            var newMethod = replaceMethod.WithModifiers(tokenList);
+
+                            node = node.WithMembers(node.Members.Replace(replaceMethod, newMethod)).NormalizeWhitespace();
+                        }
+                    }
+                }
+
+                return node;
+            };
+            return ReplaceMethodModifiers;
         }
     }
 }
