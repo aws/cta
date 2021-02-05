@@ -100,17 +100,17 @@ namespace CTA.Rules.Test
             StringAssert.Contains(@"HttpContext ", displayText);
             StringAssert.Contains(@"RequestDelegate ", displayText);
             StringAssert.Contains(@"TryGetValue", displayText);
-            StringAssert.Contains(@"remove the base class here : OwinMiddleware", displayText);
+            StringAssert.DoesNotContain(@": OwinMiddleware", displayText);
             //StringAssert.DoesNotContain(@"base(next)", displayText);
-            //StringAssert.DoesNotContain(@"override", displayText);
+            StringAssert.DoesNotContain(@"override", displayText);
 
             StringAssert.Contains(@"using Microsoft.AspNetCore.Http", addText);
             StringAssert.Contains(@"HttpContext ", addText);
             StringAssert.Contains(@"RequestDelegate ", addText);
             StringAssert.Contains(@"_next", addText);
-            StringAssert.Contains(@"remove the base class here : OwinMiddleware", addText);
+            StringAssert.DoesNotContain(@": OwinMiddleware", addText);
             //StringAssert.DoesNotContain(@"base(next)", addText);
-            //StringAssert.DoesNotContain(@"override", addText);
+            StringAssert.DoesNotContain(@"override", addText);
 
             StringAssert.Contains(@"using Microsoft.AspNetCore.Http", startupText);
             StringAssert.Contains(@"HttpContext ", startupText);
