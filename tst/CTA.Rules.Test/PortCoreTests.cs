@@ -276,9 +276,13 @@ namespace CTA.Rules.Test
         }
 
         [Test]
-        public void TestAntlrSampleSolution()
+        public void TestAntlrSample3()
         {
-            var version = "netcoreapp3.1";
+            TestAntlrSampleSolution("netcoreapp3.1");
+        }
+
+        private void TestAntlrSampleSolution(string version)
+        {
             TestSolutionAnalysis results = AnalyzeSolution("AntlrSample.sln", tempDir, downloadLocation, version);
 
             // Verify new .csproj file exists
