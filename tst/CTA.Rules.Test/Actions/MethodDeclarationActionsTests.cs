@@ -38,6 +38,20 @@ namespace CTA.Rules.Test.Actions
         }
 
         [Test]
+        public void MethodDeclarationAddExpression()
+        {
+            BlockSyntax nodeBody = _node.Body;
+            nodeBody = nodeBody.AddStatements(SyntaxFactory.ParseStatement("string testing = \"Testing\";"));
+            _node = _node.WithBody(nodeBody);
+
+            const string expression = "int i = 5;";
+            var addExpressionFunction = _methodDeclarationActions.GetAddExpressionAction(expression);
+            var newNode = addExpressionFunction(_syntaxGenerator, _node);
+
+            StringAssert.Contains(expression, newNode.ToFullString());
+        }
+
+        [Test]
         public void MethodDeclarationActionComparison()
         {
             var methodDeclarationAction = new MethodDeclarationAction()

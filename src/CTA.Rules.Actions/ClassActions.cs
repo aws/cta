@@ -29,7 +29,7 @@ namespace CTA.Rules.Actions
                     }
                 }
 
-                if (newBaseTypes.Count == 0)
+                if (!newBaseTypes.Any())
                 {
                     node = node.WithBaseList(null);
                 }
@@ -128,7 +128,6 @@ namespace CTA.Rules.Actions
             };
             return AddMethod;
         }
-
         public Func<SyntaxGenerator, ClassDeclarationSyntax, ClassDeclarationSyntax> GetRemoveMethodAction(string methodName)
         {
             //TODO  what if there is operator overloading 
@@ -148,6 +147,75 @@ namespace CTA.Rules.Actions
             Func<SyntaxGenerator, ClassDeclarationSyntax, ClassDeclarationSyntax> RenameClass = (SyntaxGenerator syntaxGenerator, ClassDeclarationSyntax node) =>
             {                
                 node = node.WithIdentifier(SyntaxFactory.Identifier(newClassName)).NormalizeWhitespace();
+                return node;
+            };
+            return RenameClass;
+        }
+        public Func<SyntaxGenerator, ClassDeclarationSyntax, ClassDeclarationSyntax> GetAddGlobalExpressionAction(string expression)
+        {
+            Func<SyntaxGenerator, ClassDeclarationSyntax, ClassDeclarationSyntax> RenameClass = (SyntaxGenerator syntaxGenerator, ClassDeclarationSyntax node) =>
+            {
+                MemberDeclarationSyntax parsedExpression = SyntaxFactory.ParseMemberDeclaration(expression);
+                if (!parsedExpression.FullSpan.IsEmpty)
+                {
+                    var nodeDeclarations = node.Members;
+                    nodeDeclarations = nodeDeclarations.Insert(0,parsedExpression);
+                    node = node.WithMembers(nodeDeclarations).NormalizeWhitespace();
+                }
+                return node;
+            };
+            return RenameClass;
+        }
+        public Func<SyntaxGenerator, ClassDeclarationSyntax, ClassDeclarationSyntax> GetRemoveConstructorInitializerAction(string baseClass)
+        {
+            Func<SyntaxGenerator, ClassDeclarationSyntax, ClassDeclarationSyntax> RemoveConstructorInitializer = (SyntaxGenerator syntaxGenerator, ClassDeclarationSyntax node) =>
+            {
+                var constructor = node.ChildNodes().Where(c => Microsoft.CodeAnalysis.CSharp.CSharpExtensions.Kind(c) == SyntaxKind.ConstructorDeclaration).FirstOrDefault();
+                if (constructor != null)
+                {
+                    ConstructorDeclarationSyntax constructorNode = (ConstructorDeclarationSyntax)constructor;
+
+                    SeparatedSyntaxList<ArgumentSyntax> initializerArguments = constructorNode.Initializer.ArgumentList.Arguments;
+                    SeparatedSyntaxList<ArgumentSyntax> newArguments = new SeparatedSyntaxList<ArgumentSyntax>();
+
+                    foreach(var argument in initializerArguments)
+                    {
+                        if (!argument.GetText().ToString().Trim().Equals(baseClass))
+                        {
+                            newArguments = newArguments.Add(argument);
+                        }
+                    }
+
+                    if (!newArguments.Any())
+                    {
+                        constructorNode = constructorNode.WithInitializer(null);
+                    }
+                    else
+                    {
+                        constructorNode = constructorNode.WithInitializer(SyntaxFactory.ConstructorInitializer(SyntaxKind.BaseConstructorInitializer).AddArgumentListArguments(newArguments.ToArray()));
+                    }
+                    node = node.ReplaceNode(constructor, constructorNode).NormalizeWhitespace();
+                };
+                return node;
+            };
+
+            return RemoveConstructorInitializer;
+        }
+        public Func<SyntaxGenerator, ClassDeclarationSyntax, ClassDeclarationSyntax> GetAddConstructorExpressionAction(string expression)
+        {
+            Func<SyntaxGenerator, ClassDeclarationSyntax, ClassDeclarationSyntax> RenameClass = (SyntaxGenerator syntaxGenerator, ClassDeclarationSyntax node) =>
+            {
+                var constructor = node.Members.Where(c => Microsoft.CodeAnalysis.CSharp.CSharpExtensions.Kind(c) == SyntaxKind.ConstructorDeclaration).FirstOrDefault();
+                if (constructor != null)
+                {
+                    ConstructorDeclarationSyntax constructorNode = (ConstructorDeclarationSyntax)constructor;
+                    StatementSyntax statementExpression = SyntaxFactory.ParseStatement(expression);
+                    if (!statementExpression.FullSpan.IsEmpty)
+                    {
+                        constructorNode = constructorNode.AddBodyStatements(statementExpression);
+                        node = node.ReplaceNode(constructor, constructorNode).NormalizeWhitespace();
+                    }
+                }
                 return node;
             };
             return RenameClass;

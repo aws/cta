@@ -23,5 +23,22 @@ namespace CTA.Rules.Actions
             };
             return AddComment;
         }
+
+        public Func<SyntaxGenerator, MethodDeclarationSyntax, MethodDeclarationSyntax> GetAddExpressionAction(string expression)
+        {
+            // TODO: This will add an expression at the bottom of a method body, in the future we should add granularity for where to add the expression within a method body
+            Func<SyntaxGenerator, MethodDeclarationSyntax, MethodDeclarationSyntax> AddExpression = (SyntaxGenerator syntaxGenerator, MethodDeclarationSyntax node) =>
+            {
+                StatementSyntax statementExpression = SyntaxFactory.ParseStatement(expression);
+                if(!statementExpression.FullSpan.IsEmpty)
+                {
+                    BlockSyntax nodeBody = node.Body;
+                    nodeBody = nodeBody.AddStatements(statementExpression);
+                    node = node.WithBody(nodeBody).NormalizeWhitespace();
+                }
+                return node;
+            };
+            return AddExpression;
+        }
     }
 }

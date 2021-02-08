@@ -97,7 +97,7 @@ namespace CTA.Rules.Test
             TestSolutionAnalysis results = AnalyzeSolution("BranchingPipelines.sln", tempDir, downloadLocation, version);
 
             string projectDir = results.ProjectResults.FirstOrDefault().ProjectDirectory;
-
+            var csProjContent = results.ProjectResults.FirstOrDefault().CsProjectContent;
             var startupText = File.ReadAllText(Path.Combine(projectDir, "Startup.cs"));
             //var programText = File.ReadAllText(Path.Combine(projectDir, "Program.cs"));
             var displayText = File.ReadAllText(Path.Combine(projectDir, "DisplayBreadCrumbs.cs"));
@@ -107,21 +107,27 @@ namespace CTA.Rules.Test
             StringAssert.Contains(@"HttpContext ", displayText);
             StringAssert.Contains(@"RequestDelegate ", displayText);
             StringAssert.Contains(@"TryGetValue", displayText);
-            StringAssert.Contains(@"remove the base class here : OwinMiddleware", displayText);
-            //StringAssert.DoesNotContain(@"base(next)", displayText);
+            StringAssert.Contains(@"RequestDelegate _next", displayText);
+            StringAssert.Contains(@"_next = next;", displayText);
+            StringAssert.DoesNotContain(@"base(next)", displayText);
             //StringAssert.DoesNotContain(@"override", displayText);
 
             StringAssert.Contains(@"using Microsoft.AspNetCore.Http", addText);
             StringAssert.Contains(@"HttpContext ", addText);
             StringAssert.Contains(@"RequestDelegate ", addText);
             StringAssert.Contains(@"_next", addText);
-            StringAssert.Contains(@"remove the base class here : OwinMiddleware", addText);
-            //StringAssert.DoesNotContain(@"base(next)", addText);
+            StringAssert.Contains(@"RequestDelegate _next", addText);
+            StringAssert.Contains(@"_next = next;", addText);
+            StringAssert.Contains(@"_next.Invoke", addText);
+            StringAssert.DoesNotContain(@"base(next)", addText);
             //StringAssert.DoesNotContain(@"override", addText);
 
             StringAssert.Contains(@"using Microsoft.AspNetCore.Http", startupText);
             StringAssert.Contains(@"HttpContext ", startupText);
             StringAssert.Contains(@"UseMiddleware", startupText);
+
+            //Check that correct version is used
+            Assert.True(csProjContent.IndexOf(string.Concat(">", version, "<")) > 0);
 
             //FileAssert.Exists(Path.Combine(projectDir, "Program.cs")); // This should be added but class library does not do this
         }
