@@ -77,7 +77,11 @@ namespace CTA.Rules.Test
             //FileAssert.Exists(Path.Combine(projectDir, "Program.cs")); // This should be added but class library does not do this
 
             //Check that package has been added:
-            //Assert.True(csProjContent.IndexOf(@"Microsoft.AspNetCore.Owin") > 0);
+            StringAssert.Contains(@"Microsoft.AspNetCore.Owin", csProjContent);
+            StringAssert.Contains(@"Microsoft.AspNetCore.Diagnostics", csProjContent);
+
+            //Check that correct version is used
+            Assert.True(csProjContent.IndexOf(string.Concat(">", version, "<")) > 0);
         }
 
         [Test]
@@ -110,7 +114,8 @@ namespace CTA.Rules.Test
             StringAssert.Contains(@"RequestDelegate _next", displayText);
             StringAssert.Contains(@"_next = next;", displayText);
             StringAssert.DoesNotContain(@"base(next)", displayText);
-            //StringAssert.DoesNotContain(@"override", displayText);
+            StringAssert.DoesNotContain(@": OwinMiddleware", displayText);
+            StringAssert.DoesNotContain(@"override", displayText);
 
             StringAssert.Contains(@"using Microsoft.AspNetCore.Http", addText);
             StringAssert.Contains(@"HttpContext ", addText);
@@ -120,11 +125,16 @@ namespace CTA.Rules.Test
             StringAssert.Contains(@"_next = next;", addText);
             StringAssert.Contains(@"_next.Invoke", addText);
             StringAssert.DoesNotContain(@"base(next)", addText);
-            //StringAssert.DoesNotContain(@"override", addText);
+            StringAssert.DoesNotContain(@": OwinMiddleware", addText);
+            StringAssert.DoesNotContain(@"override", addText);
 
             StringAssert.Contains(@"using Microsoft.AspNetCore.Http", startupText);
             StringAssert.Contains(@"HttpContext ", startupText);
             StringAssert.Contains(@"UseMiddleware", startupText);
+
+            //Check that package has been added:
+            StringAssert.Contains(@"Microsoft.AspNetCore.Owin", csProjContent);
+            StringAssert.Contains(@"Microsoft.AspNetCore.Diagnostics", csProjContent);
 
             //Check that correct version is used
             Assert.True(csProjContent.IndexOf(string.Concat(">", version, "<")) > 0);
@@ -151,6 +161,7 @@ namespace CTA.Rules.Test
             var analysisResult = results.SolutionAnalysisResult;
 
             string projectDir = results.ProjectResults.FirstOrDefault().ProjectDirectory;
+            var csProjContent = results.ProjectResults.FirstOrDefault().CsProjectContent;
 
             StringAssert.Contains("Microsoft.AspNetCore.Owin", analysisResult);
             StringAssert.Contains("Microsoft.AspNetCore.Hosting", analysisResult);
@@ -167,6 +178,14 @@ namespace CTA.Rules.Test
             StringAssert.Contains("Microsoft.AspNetCore.Hosting", programText);
             StringAssert.Contains("Microsoft.AspNetCore.Server.Kestrel", programText);
             StringAssert.Contains("WebHostBuilder", programText);
+
+            //Check that package has been added:
+            StringAssert.Contains(@"Microsoft.AspNetCore.Owin", csProjContent);
+            StringAssert.Contains(@"Microsoft.AspNetCore.Diagnostics", csProjContent);
+            StringAssert.Contains(@"Microsoft.AspNetCore.Server.Kestrel", csProjContent);
+
+            //Check that correct version is used
+            Assert.True(csProjContent.IndexOf(string.Concat(">", version, "<")) > 0);
         }
 
         [Test]
@@ -195,6 +214,7 @@ namespace CTA.Rules.Test
             StringAssert.Contains("Microsoft.AspNetCore.Server.Kestrel", results.SolutionAnalysisResult);
 
             //MyApp
+            var myappProjContent = myApp.CsProjectContent;
             var startupText = File.ReadAllText(Path.Combine(myApp.ProjectDirectory, "Startup.cs"));
             var programText = File.ReadAllText(Path.Combine(myApp.ProjectDirectory, "Program.cs"));
 
@@ -205,13 +225,26 @@ namespace CTA.Rules.Test
 
             //Check for comment on how to implement a custom server here in program
 
+            //Check that package has been added:
+            StringAssert.Contains(@"Microsoft.AspNetCore.Owin", myappProjContent);
+            StringAssert.Contains(@"Microsoft.AspNetCore.Diagnostics", myappProjContent);
+            StringAssert.Contains(@"Microsoft.AspNetCore.Server.Kestrel", myappProjContent);
+            StringAssert.Contains(@"Microsoft.AspNetCore.Hosting", myappProjContent);
+
+            //Check that correct version is used
+            Assert.True(myappProjContent.IndexOf(string.Concat(">", version, "<")) > 0);
+
             //CustomServer
+            var customProjContent = customServer.CsProjectContent;
             var customerServerText = File.ReadAllText(Path.Combine(customServer.ProjectDirectory, "CustomServer.cs"));
             var serverFactoryText = File.ReadAllText(Path.Combine(customServer.ProjectDirectory, "ServerFactory.cs"));
 
             //MyCustomerServer very difficult
             //Keep their server intact but must implement IServer instead of just IDisposable
             //Change their Start class to implement StartAsync instead and change reference to it to startAsync also
+
+            //Check that correct version is used
+            Assert.True(customProjContent.IndexOf(string.Concat(">", version, "<")) > 0);
         }
 
         [Test]
@@ -232,6 +265,7 @@ namespace CTA.Rules.Test
 
             var analysisResult = results.SolutionAnalysisResult;
             string projectDir = results.ProjectResults.FirstOrDefault().ProjectDirectory;
+            var csProjContent = results.ProjectResults.FirstOrDefault().CsProjectContent;
 
             StringAssert.Contains("Microsoft.AspNetCore.Owin", analysisResult);
             StringAssert.Contains("Replace IOwinContext with HttpContext", analysisResult);
@@ -243,6 +277,13 @@ namespace CTA.Rules.Test
 
             //Check that httpcontext is added (with a space) to make sure it's not httpcontextbase
             StringAssert.Contains(@"HttpContext ", startupText);
+
+            //Check that package has been added:
+            StringAssert.Contains(@"Microsoft.AspNetCore.Owin", csProjContent);
+            StringAssert.Contains(@"Microsoft.AspNetCore.Diagnostics", csProjContent);
+
+            //Check that correct version is used
+            Assert.True(csProjContent.IndexOf(string.Concat(">", version, "<")) > 0);
         }
 
         [Test]
@@ -262,11 +303,18 @@ namespace CTA.Rules.Test
             TestSolutionAnalysis results = AnalyzeSolution("HelloWorldRawOwin.sln", tempDir, downloadLocation, version);
 
             string projectDir = results.ProjectResults.FirstOrDefault().ProjectDirectory;
+            var csProjContent = results.ProjectResults.FirstOrDefault().CsProjectContent;
             var startupText = File.ReadAllText(Path.Combine(projectDir, "Startup.cs"));
 
             StringAssert.Contains(@"Microsoft.AspNetCore.Builder", startupText);
             StringAssert.Contains(@"IApplicationBuilder", startupText);
             StringAssert.Contains(@"UseOwin", startupText);
+
+            //Check that package has been added:
+            StringAssert.Contains(@"Microsoft.AspNetCore.Diagnostics", csProjContent);
+
+            //Check that correct version is used
+            Assert.True(csProjContent.IndexOf(string.Concat(">", version, "<")) > 0);
         }
 
         [Test]
@@ -286,6 +334,7 @@ namespace CTA.Rules.Test
             TestSolutionAnalysis results = AnalyzeSolution("OwinSelfhostSample.sln", tempDir, downloadLocation, version);
 
             string projectDir = results.ProjectResults.FirstOrDefault().ProjectDirectory;
+            var csProjContent = results.ProjectResults.FirstOrDefault().CsProjectContent;
             var startupText = File.ReadAllText(Path.Combine(projectDir, "Startup.cs"));
             var programText = File.ReadAllText(Path.Combine(projectDir, "Program.cs"));
 
@@ -297,6 +346,14 @@ namespace CTA.Rules.Test
             StringAssert.DoesNotContain(@"System.Web.Http", startupText);
 
             StringAssert.Contains("WebHostBuilder", programText);
+
+            //Check that package has been added:
+            StringAssert.Contains(@"Microsoft.AspNetCore.Diagnostics", csProjContent);
+            StringAssert.Contains(@"Microsoft.AspNetCore.Server.Kestrel", csProjContent);
+            StringAssert.Contains(@"Microsoft.AspNetCore.Hosting", csProjContent);
+
+            //Check that correct version is used
+            Assert.True(csProjContent.IndexOf(string.Concat(">", version, "<")) > 0);
         }
 
         [Test]
@@ -316,6 +373,7 @@ namespace CTA.Rules.Test
             TestSolutionAnalysis results = AnalyzeSolution("SignalR.sln", tempDir, downloadLocation, version);
 
             string projectDir = results.ProjectResults.FirstOrDefault().ProjectDirectory;
+            var csProjContent = results.ProjectResults.FirstOrDefault().CsProjectContent;
             var startupText = File.ReadAllText(Path.Combine(projectDir, "Startup.cs"));
             var programText = File.ReadAllText(Path.Combine(projectDir, "Program.cs"));
 
@@ -327,6 +385,15 @@ namespace CTA.Rules.Test
             StringAssert.Contains(@"Microsoft.Extensions.DependencyInjection", startupText);
 
             StringAssert.Contains("WebHostBuilder", programText);
+
+            //Check that package has been added:
+            StringAssert.Contains(@"Microsoft.AspNetCore.Diagnostics", csProjContent);
+            StringAssert.Contains(@"Microsoft.AspNetCore.Server.Kestrel", csProjContent);
+            StringAssert.Contains(@"Microsoft.AspNetCore.Hosting", csProjContent);
+            StringAssert.Contains(@"Microsoft.AspNetCore.SignalR", csProjContent);
+
+            //Check that correct version is used
+            Assert.True(csProjContent.IndexOf(string.Concat(">", version, "<")) > 0);
         }
 
         [Test]
@@ -346,6 +413,7 @@ namespace CTA.Rules.Test
             TestSolutionAnalysis results = AnalyzeSolution("StaticFilesSample.sln", tempDir, downloadLocation, version);
 
             string projectDir = results.ProjectResults.FirstOrDefault().ProjectDirectory;
+            var csProjContent = results.ProjectResults.FirstOrDefault().CsProjectContent;
             var startupText = File.ReadAllText(Path.Combine(projectDir, "Startup.cs"));
             var programText = File.ReadAllText(Path.Combine(projectDir, "Program.cs"));
 
@@ -360,6 +428,17 @@ namespace CTA.Rules.Test
             StringAssert.DoesNotContain(@"Microsoft.Owin.FileSystems", startupText);
 
             StringAssert.Contains("WebHostBuilder", programText);
+
+            //Check that package has been added:
+            StringAssert.Contains(@"Microsoft.AspNetCore.Diagnostics", csProjContent);
+            StringAssert.Contains(@"Microsoft.AspNetCore.Server.Kestrel", csProjContent);
+            StringAssert.Contains(@"Microsoft.AspNetCore.Hosting", csProjContent);
+            StringAssert.Contains(@"Microsoft.AspNetCore.Owin", csProjContent);
+            StringAssert.Contains(@"Microsoft.AspNetCore.StaticFiles", csProjContent);
+            StringAssert.Contains(@"Microsoft.Extensions.FileProviders.Physical", csProjContent);
+
+            //Check that correct version is used
+            Assert.True(csProjContent.IndexOf(string.Concat(">", version, "<")) > 0);
         }
 
         [Test]
@@ -379,6 +458,7 @@ namespace CTA.Rules.Test
             TestSolutionAnalysis results = AnalyzeSolution("OwinWebApi.sln", tempDir, downloadLocation, version);
 
             string projectDir = results.ProjectResults.FirstOrDefault().ProjectDirectory;
+            var csProjContent = results.ProjectResults.FirstOrDefault().CsProjectContent;
             var startupText = File.ReadAllText(Path.Combine(projectDir, "Startup.cs"));
 
             StringAssert.Contains(@"UseEndpoints", startupText);
@@ -386,6 +466,12 @@ namespace CTA.Rules.Test
             StringAssert.Contains(@"MapControllers", startupText);
             StringAssert.Contains(@"Microsoft.AspNetCore.Builder", startupText);
             StringAssert.Contains(@"Microsoft.Extensions.DependencyInjection", startupText);
+
+            //Check that package has been added:
+            StringAssert.Contains(@"Microsoft.AspNetCore.Diagnostics", csProjContent);
+
+            //Check that correct version is used
+            Assert.True(csProjContent.IndexOf(string.Concat(">", version, "<")) > 0);
         }
 
         [Test]
@@ -409,8 +495,10 @@ namespace CTA.Rules.Test
             var webSocketServer = results.ProjectResults.Where(p => p.CsProjectPath.EndsWith("WebSocketServer.csproj")).FirstOrDefault();
             FileAssert.Exists(webSocketServer.CsProjectPath);
 
+            var clientProjContent = sampleClient.CsProjectContent;
             var clientProgramText = File.ReadAllText(Path.Combine(sampleClient.ProjectDirectory, "Program.cs"));
 
+            var serverProjContent = webSocketServer.CsProjectContent;
             var serverStartupText = File.ReadAllText(Path.Combine(webSocketServer.ProjectDirectory, "Startup.cs"));
             var serverProgramText = File.ReadAllText(Path.Combine(webSocketServer.ProjectDirectory, "Program.cs"));
 
@@ -419,6 +507,17 @@ namespace CTA.Rules.Test
             StringAssert.Contains(@"UseOwin", serverStartupText);
 
             StringAssert.Contains("WebHostBuilder", serverProgramText);
+
+            //Check that correct version is used
+            Assert.True(clientProjContent.IndexOf(string.Concat(">", version, "<")) > 0);
+
+            //Check that package has been added:
+            StringAssert.Contains(@"Microsoft.AspNetCore.Diagnostics", serverProjContent);
+            StringAssert.Contains(@"Microsoft.AspNetCore.Server.Kestrel", serverProjContent);
+            StringAssert.Contains(@"Microsoft.AspNetCore.Hosting", serverProjContent);
+            StringAssert.Contains(@"Microsoft.AspNetCore.Owin", serverProjContent);
+
+            Assert.True(serverProjContent.IndexOf(string.Concat(">", version, "<")) > 0);
         }
 
         [TearDown]

@@ -151,6 +151,32 @@ namespace CTA.Rules.Actions
             };
             return RenameClass;
         }
+        public Func<SyntaxGenerator, ClassDeclarationSyntax, ClassDeclarationSyntax> GetReplaceMethodModifiersAction(string methodName, string modifiers)
+        {
+            Func<SyntaxGenerator, ClassDeclarationSyntax, ClassDeclarationSyntax> ReplaceMethodModifiers = (SyntaxGenerator syntaxGenerator, ClassDeclarationSyntax node) =>
+            {
+                var allMembers = node.Members.ToList();
+                var allMethods = allMembers.OfType<MethodDeclarationSyntax>();
+                if (allMethods.Any())
+                {
+                    var replaceMethod = allMethods.FirstOrDefault(m => m.Identifier.ToString() == methodName);
+                    if (replaceMethod != null)
+                    {
+                        var allModifiersAreValid = modifiers.Split(new char[] { ' ', ',' }).All(m => Constants.SupportedMethodModifiers.Contains(m));
+                        if (allModifiersAreValid)
+                        {
+                            SyntaxTokenList tokenList = new SyntaxTokenList(SyntaxFactory.ParseTokens(modifiers));
+                            var newMethod = replaceMethod.WithModifiers(tokenList);
+
+                            node = node.WithMembers(node.Members.Replace(replaceMethod, newMethod)).NormalizeWhitespace();
+                        }
+                    }
+                }
+
+                return node;
+            };
+            return ReplaceMethodModifiers;
+        }
         public Func<SyntaxGenerator, ClassDeclarationSyntax, ClassDeclarationSyntax> GetAddGlobalExpressionAction(string expression)
         {
             Func<SyntaxGenerator, ClassDeclarationSyntax, ClassDeclarationSyntax> RenameClass = (SyntaxGenerator syntaxGenerator, ClassDeclarationSyntax node) =>

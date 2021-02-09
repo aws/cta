@@ -114,6 +114,21 @@ class MyClass
         }
 
         [Test]
+        public void ReplaceMethodModifiers()
+        {
+            const string methodName = "MyMethod";
+            var methodNode = SyntaxFactory.MethodDeclaration(SyntaxFactory.ParseTypeName("void"), methodName);
+            var nodeWithMethod = _node.AddMembers(methodNode);
+
+            var modifier = "private async extern";
+            var replaceModifier = _classActions.GetReplaceMethodModifiersAction(methodName, modifier);
+
+            var node = replaceModifier(_syntaxGenerator, nodeWithMethod);
+
+            StringAssert.Contains(modifier, node.ToFullString());
+        }
+
+        [Test]
         public void AddGlobalExpression()
         {
             string expression = "RequestDelegate _next = null;";

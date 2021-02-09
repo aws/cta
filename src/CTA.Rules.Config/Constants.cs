@@ -89,5 +89,7 @@ namespace CTA.Rules.Config
         public const string key = "key";
         public const string value = "value";
         public const string ConnectionStrings = "ConnectionStrings";
+
+        public static readonly List<string> SupportedMethodModifiers = new List<string>() { "public", "internal", "protected", "private", "abstract", "extern", "override", "static", "unsafe", "virtual", "async" };
     }
 }
