@@ -207,6 +207,76 @@ namespace CTA.Rules.Update.Rewriters
             }
             return newNode;
         }
+
+        public override SyntaxNode VisitElementAccessExpression(ElementAccessExpressionSyntax node)
+        {
+            var symbols = _semanticModel.GetSymbolInfo(node);
+            var newNode = (ElementAccessExpressionSyntax)base.VisitElementAccessExpression(node);
+
+            var symbol = symbols.Symbol;
+
+            if (symbol != null)
+            {
+                var nodeKey = $"{symbol.ContainingType}.{node.Expression}";
+
+                foreach (var action in _fileActions.ElementAccessActions)
+                {
+                    if (nodeKey == action.Key)
+                    {
+                        var actionExecution = new GenericActionExecution(action, _fileActions.FilePath);
+                        actionExecution.TimesRun = 1;
+                        try
+                        {
+                            newNode = action.ElementAccessExpressionActionFunc(_syntaxGenerator, newNode);
+                            LogHelper.LogInformation(string.Format("{0}: {1}", node.SpanStart, action.Description));
+                        }
+                        catch (Exception ex)
+                        {
+                            var actionExecutionException = new ActionExecutionException(action.Name, action.Key, ex);
+                            actionExecution.InvalidExecutions = 1;
+                            LogHelper.LogError(actionExecutionException);
+                        }
+                        allActions.Add(actionExecution);
+                    }
+                }
+            }
+            return newNode;
+        }
+
+        public override SyntaxNode VisitMemberAccessExpression(MemberAccessExpressionSyntax node)
+        {
+            var symbols = _semanticModel.GetSymbolInfo(node);
+            var newNode = base.VisitMemberAccessExpression(node);
+            var symbol = symbols.Symbol;
+
+            if (symbol != null)
+            {
+                var nodeKey = $"{symbol.ContainingType}.{node.Name}";
+
+                foreach (var action in _fileActions.MemberAccessActions)
+                {
+                    if (nodeKey == action.Key)
+                    {
+                        var actionExecution = new GenericActionExecution(action, _fileActions.FilePath);
+                        actionExecution.TimesRun = 1;
+                        try
+                        {
+                            newNode = action.MemberAccessActionFunc(_syntaxGenerator, (MemberAccessExpressionSyntax)newNode);
+                            LogHelper.LogInformation(string.Format("{0}: {1}", node.SpanStart, action.Description));
+                        }
+                        catch (Exception ex)
+                        {
+                            var actionExecutionException = new ActionExecutionException(action.Name, action.Key, ex);
+                            actionExecution.InvalidExecutions = 1;
+                            LogHelper.LogError(actionExecutionException);
+                        }
+                        allActions.Add(actionExecution);
+                    }
+                }
+            }
+            return newNode;
+        }
+
         public override SyntaxNode VisitCompilationUnit(CompilationUnitSyntax node)
         {
             CompilationUnitSyntax newNode = (CompilationUnitSyntax)base.VisitCompilationUnit(node);

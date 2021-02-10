@@ -34,7 +34,9 @@ namespace CTA.Rules.Update
                 MethodInvocations = true,
                 ReferenceData = true,
                 LoadBuildData = true,
-                InterfaceDeclarations = true
+                InterfaceDeclarations = true,
+                MemberAccess = true,
+                ElementAccess = true
             };
 
             _rulesRewriters = new List<ProjectRewriter>();

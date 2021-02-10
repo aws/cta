@@ -49,7 +49,6 @@ namespace CTA.Rules.Test
         {
             TestWebApi("net5.0");
         }
-
         [Test]
         public void TestSampleWebApi3Solution()
         {
@@ -57,7 +56,6 @@ namespace CTA.Rules.Test
             SolutionPort.ResetCache(false, false);
             TestWebApi("net5.0", Path.Combine(tempDir, "netcoreapp3.1"));
         }
-
         private void TestWebApi(string version, string solutionDir = "")
         {
             TestSolutionAnalysis results;
@@ -131,7 +129,6 @@ namespace CTA.Rules.Test
         {
             TestWebApiWithReferences("netcoreapp3.1");
         }
-
         private void TestWebApiWithReferences(string version)
         {
             TestSolutionAnalysis results = AnalyzeSolution("WebApiWithReferences.sln", tempDir, downloadLocation, version);
@@ -205,13 +202,11 @@ namespace CTA.Rules.Test
         {
             TestMvcMusicStore("net5.0");
         }
-
         [Test]
         public void TestMvcMusicStore3()
         {
             TestMvcMusicStore("netcoreapp3.1");
         }
-
         private void TestMvcMusicStore(string version)
         {
             TestSolutionAnalysis results = AnalyzeSolution("MvcMusicStore.sln", tempDir, downloadLocation, version);
@@ -281,7 +276,6 @@ namespace CTA.Rules.Test
         {
             TestAntlrSampleSolution("netcoreapp3.1");
         }
-
         private void TestAntlrSampleSolution(string version)
         {
             TestSolutionAnalysis results = AnalyzeSolution("AntlrSample.sln", tempDir, downloadLocation, version);
@@ -299,6 +293,70 @@ namespace CTA.Rules.Test
         }
 
         [Test]
+        public void TestMvcConfigSample3()
+        {
+            TestMvcConfigSampleSolution("netcoreapp3.1");
+        }
+        [Test]
+        public void TestMvcConfigSample5()
+        {
+            TestMvcConfigSampleSolution("net5.0");
+        }
+        private void TestMvcConfigSampleSolution(string version)
+        {
+            TestSolutionAnalysis results = AnalyzeSolution("MvcConfigMigrationTest.sln", tempDir, downloadLocation, version);
+
+            string projectDir = results.ProjectResults.FirstOrDefault().ProjectDirectory;
+
+            var homeControllerText = File.ReadAllText(Path.Combine(projectDir, "Controllers", "HomeController.cs"));
+            ValidateConfig(homeControllerText);
+        }
+
+        [Test]
+        public void TestWebApiConfig3()
+        {
+            TestWebApiConfigSampleSolution("netcoreapp3.1");
+        }
+        [Test]
+        public void TestWebApiConfig5()
+        {
+            TestWebApiConfigSampleSolution("net5.0");
+        }
+        private void TestWebApiConfigSampleSolution(string version)
+        {
+            TestSolutionAnalysis results = AnalyzeSolution("WebApiConfigTest.sln", tempDir, downloadLocation, version);
+
+            string projectDir = results.ProjectResults.FirstOrDefault().ProjectDirectory;
+
+            var valuesControllerText = File.ReadAllText(Path.Combine(projectDir, "Controllers", "ValuesController.cs"));
+            ValidateConfig(valuesControllerText);
+
+        }
+
+        private void ValidateConfig(string controllerText)
+        {
+            StringAssert.Contains(@"var conn = ConfigurationManager.Configuration.GetSection(""ConnectionStrings"")[""FirstConnectionString""]", controllerText);
+            StringAssert.Contains(@"var conn2 = ConfigurationManager.Configuration.GetSection(""ConnectionStrings"")[""SecondConnectionString""]", controllerText);
+            StringAssert.Contains(@"var conn3 = ConfigurationManager.Configuration.GetSection(""ConnectionStrings"")[constConnectionString]", controllerText);
+
+            StringAssert.Contains(@"var webConn1 = ConfigurationManager.Configuration.GetSection(""ConnectionStrings"")[""FirstConnectionString""]", controllerText);
+            StringAssert.Contains(@"var webConn2 = ConfigurationManager.Configuration.GetSection(""ConnectionStrings"")[""SecondConnectionString""]", controllerText);
+            StringAssert.Contains(@"var webConn3 = ConfigurationManager.Configuration.GetSection(""ConnectionStrings"")[constConnectionString]", controllerText);
+
+            StringAssert.Contains(@"var appSetting = ConfigurationManager.Configuration.GetSection(""appSettings"")[""ClientValidationEnabled""]", controllerText);
+            StringAssert.Contains(@"var appSetting3 = ConfigurationManager.Configuration.GetSection(""appSettings"")[constAppSetting]", controllerText);
+
+            StringAssert.DoesNotContain(@"var conn = ConfigurationManager.ConnectionStrings[""FirstConnectionString""];", controllerText);
+            StringAssert.DoesNotContain(@"var conn2 = ConfigurationManager.ConnectionStrings[""SecondConnectionString""].ConnectionString;", controllerText);
+            StringAssert.DoesNotContain(@"var conn3 = ConfigurationManager.ConnectionStrings[constConnectionString].ConnectionString;", controllerText);
+
+            StringAssert.DoesNotContain(@"var webConn1 = WebConfigurationManager.ConnectionStrings[""FirstConnectionString""];", controllerText);
+            StringAssert.DoesNotContain(@"var webConn2 = WebConfigurationManager.ConnectionStrings[""SecondConnectionString""].ConnectionString;", controllerText);
+            StringAssert.DoesNotContain(@"var webConn3 = WebConfigurationManager.ConnectionStrings[constConnectionString].ConnectionString;", controllerText);
+
+            StringAssert.DoesNotContain(@"var appSetting = ConfigurationManager.AppSettings[""ClientValidationEnabled""];", controllerText);
+            StringAssert.DoesNotContain(@"var appSetting3 = WebConfigurationManager.AppSettings[constAppSetting];", controllerText);
+        }
         public void TestIonicZipSample3()
         {
             TestIonicZipSampleSolution("netcoreapp3.1");

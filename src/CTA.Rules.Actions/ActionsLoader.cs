@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Runtime.Loader;
 using CTA.Rules.Config;
 using CTA.Rules.Models;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Editing;
 using Newtonsoft.Json;
@@ -221,8 +222,8 @@ namespace CTA.Rules.Actions
         public Func<SyntaxGenerator, ElementAccessExpressionSyntax, ElementAccessExpressionSyntax> GetElementAccessExpressionActions(string name, dynamic value) =>
             GetAction<Func<SyntaxGenerator, ElementAccessExpressionSyntax, ElementAccessExpressionSyntax>>
                 (elementAccessActions, elementAccessObject, name, value);
-        public Func<SyntaxGenerator, MemberAccessExpressionSyntax, MemberAccessExpressionSyntax> GetMemberAccessExpressionActions(string name, dynamic value) =>
-            GetAction<Func<SyntaxGenerator, MemberAccessExpressionSyntax, MemberAccessExpressionSyntax>>
+        public Func<SyntaxGenerator, MemberAccessExpressionSyntax, SyntaxNode> GetMemberAccessExpressionActions(string name, dynamic value) =>
+            GetAction<Func<SyntaxGenerator, MemberAccessExpressionSyntax, SyntaxNode>>
                 (memberAccessActions, memberAccessObject, name, value);
 
         /// <summary>

@@ -4,6 +4,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Editing;
+using System.Linq;
 
 namespace CTA.Rules.Update
 {
@@ -12,7 +13,7 @@ namespace CTA.Rules.Update
     /// </summary>
     public class MemberAccessActions
     {
-        public Func<SyntaxGenerator, MemberAccessExpressionSyntax, MemberAccessExpressionSyntax> GetAddCommentAction(string comment)
+        public Func<SyntaxGenerator, MemberAccessExpressionSyntax, SyntaxNode> GetAddCommentAction(string comment)
         {
             MemberAccessExpressionSyntax AddComment(SyntaxGenerator syntaxGenerator, MemberAccessExpressionSyntax node)
             {
@@ -22,6 +23,15 @@ namespace CTA.Rules.Update
                 return node;
             }
             return AddComment;
+        }
+
+        public Func<SyntaxGenerator, MemberAccessExpressionSyntax, SyntaxNode> GetRemoveMemberAccessAction(string empty)
+        {
+            SyntaxNode RemoveMemberAccess(SyntaxGenerator syntaxGenerator, MemberAccessExpressionSyntax node)
+            {
+                return node.Expression;
+            }
+            return RemoveMemberAccess;
         }
     }
 }
