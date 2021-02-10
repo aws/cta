@@ -129,11 +129,11 @@ class MyClass
         }
 
         [Test]
-        public void AddGlobalExpression()
+        public void AddExpression()
         {
             string expression = "RequestDelegate _next = null;";
 
-            var addBaseClass = _classActions.GetAddGlobalExpressionAction(expression);
+            var addBaseClass = _classActions.GetAddExpressionAction(expression);
 
             var nodeWithExpression = addBaseClass(_syntaxGenerator, _node);
 
@@ -141,13 +141,13 @@ class MyClass
         }
 
         [Test]
-        public void AddConstructorExpression()
+        public void AppendConstructorExpression()
         {
             var methodNode = SyntaxFactory.ConstructorDeclaration(new SyntaxList<AttributeListSyntax>(), new SyntaxTokenList(SyntaxFactory.ParseToken("void")), SyntaxFactory.Identifier("MyClass"), SyntaxFactory.ParameterList(), null, SyntaxFactory.Block(SyntaxFactory.ParseStatement("int i = 5;")), SyntaxFactory.Token(SyntaxKind.SemicolonToken));
             var nodeWithMethod = _node.AddMembers(methodNode);
             string expression = "_next = next;";
 
-            var addBaseClass = _classActions.GetAddConstructorExpressionAction(expression);
+            var addBaseClass = _classActions.GetAppendConstructorExpressionAction(expression);
 
             var nodeWithExpression = addBaseClass(_syntaxGenerator, nodeWithMethod);
 

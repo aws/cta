@@ -45,7 +45,7 @@ namespace CTA.Rules.Test.Actions
             _node = _node.WithBody(nodeBody);
 
             const string expression = "int i = 5;";
-            var addExpressionFunction = _methodDeclarationActions.GetAddExpressionAction(expression);
+            var addExpressionFunction = _methodDeclarationActions.GetAppendExpressionAction(expression);
             var newNode = addExpressionFunction(_syntaxGenerator, _node);
 
             StringAssert.Contains(expression, newNode.ToFullString());
