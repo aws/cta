@@ -27,7 +27,7 @@ namespace CTA.Rules.Actions
         public Func<SyntaxGenerator, MethodDeclarationSyntax, MethodDeclarationSyntax> GetAppendExpressionAction(string expression)
         {
             // TODO: This will add an expression at the bottom of a method body, in the future we should add granularity for where to add the expression within a method body
-            Func<SyntaxGenerator, MethodDeclarationSyntax, MethodDeclarationSyntax> AddExpression = (SyntaxGenerator syntaxGenerator, MethodDeclarationSyntax node) =>
+            Func<SyntaxGenerator, MethodDeclarationSyntax, MethodDeclarationSyntax> AppendExpression = (SyntaxGenerator syntaxGenerator, MethodDeclarationSyntax node) =>
             {
                 StatementSyntax statementExpression = SyntaxFactory.ParseStatement(expression);
                 if(!statementExpression.FullSpan.IsEmpty)
@@ -38,7 +38,7 @@ namespace CTA.Rules.Actions
                 }
                 return node;
             };
-            return AddExpression;
+            return AppendExpression;
         }
     }
 }

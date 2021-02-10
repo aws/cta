@@ -131,7 +131,7 @@ namespace CTA.Rules.Actions
         public Func<SyntaxGenerator, ClassDeclarationSyntax, ClassDeclarationSyntax> GetRemoveMethodAction(string methodName)
         {
             //TODO  what if there is operator overloading 
-            Func<SyntaxGenerator, ClassDeclarationSyntax, ClassDeclarationSyntax> AddMethod = (SyntaxGenerator syntaxGenerator, ClassDeclarationSyntax node) =>
+            Func<SyntaxGenerator, ClassDeclarationSyntax, ClassDeclarationSyntax> RemoveMethod = (SyntaxGenerator syntaxGenerator, ClassDeclarationSyntax node) =>
             {
                 var allMembers = node.Members.ToList();
                 var allMethods = allMembers.OfType<MethodDeclarationSyntax>();
@@ -140,7 +140,7 @@ namespace CTA.Rules.Actions
                 node = node.RemoveNode(removeMethod, SyntaxRemoveOptions.KeepNoTrivia).NormalizeWhitespace();
                 return node;
             };
-            return AddMethod;
+            return RemoveMethod;
         }
         public Func<SyntaxGenerator, ClassDeclarationSyntax, ClassDeclarationSyntax> GetRenameClassAction(string newClassName)
         {
@@ -179,7 +179,7 @@ namespace CTA.Rules.Actions
         }
         public Func<SyntaxGenerator, ClassDeclarationSyntax, ClassDeclarationSyntax> GetAddExpressionAction(string expression)
         {
-            Func<SyntaxGenerator, ClassDeclarationSyntax, ClassDeclarationSyntax> RenameClass = (SyntaxGenerator syntaxGenerator, ClassDeclarationSyntax node) =>
+            Func<SyntaxGenerator, ClassDeclarationSyntax, ClassDeclarationSyntax> AddExpression = (SyntaxGenerator syntaxGenerator, ClassDeclarationSyntax node) =>
             {
                 MemberDeclarationSyntax parsedExpression = SyntaxFactory.ParseMemberDeclaration(expression);
                 if (!parsedExpression.FullSpan.IsEmpty)
@@ -190,7 +190,7 @@ namespace CTA.Rules.Actions
                 }
                 return node;
             };
-            return RenameClass;
+            return AddExpression;
         }
         public Func<SyntaxGenerator, ClassDeclarationSyntax, ClassDeclarationSyntax> GetRemoveConstructorInitializerAction(string baseClass)
         {
@@ -229,7 +229,7 @@ namespace CTA.Rules.Actions
         }
         public Func<SyntaxGenerator, ClassDeclarationSyntax, ClassDeclarationSyntax> GetAppendConstructorExpressionAction(string expression)
         {
-            Func<SyntaxGenerator, ClassDeclarationSyntax, ClassDeclarationSyntax> RenameClass = (SyntaxGenerator syntaxGenerator, ClassDeclarationSyntax node) =>
+            Func<SyntaxGenerator, ClassDeclarationSyntax, ClassDeclarationSyntax> AppendConstructorExpression = (SyntaxGenerator syntaxGenerator, ClassDeclarationSyntax node) =>
             {
                 var constructor = node.Members.Where(c => Microsoft.CodeAnalysis.CSharp.CSharpExtensions.Kind(c) == SyntaxKind.ConstructorDeclaration).FirstOrDefault();
                 if (constructor != null)
@@ -244,7 +244,7 @@ namespace CTA.Rules.Actions
                 }
                 return node;
             };
-            return RenameClass;
+            return AppendConstructorExpression;
         }
     }
 }
