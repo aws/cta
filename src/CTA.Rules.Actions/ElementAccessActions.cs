@@ -23,5 +23,15 @@ namespace CTA.Rules.Update
             }
             return AddComment;
         }
+        public Func<SyntaxGenerator, ElementAccessExpressionSyntax, ElementAccessExpressionSyntax> GetReplaceElementAccessAction(string newExpression)
+        {
+            ElementAccessExpressionSyntax ReplaceElement(SyntaxGenerator syntaxGenerator, ElementAccessExpressionSyntax node)
+            {
+                var newNode = SyntaxFactory.ElementAccessExpression(SyntaxFactory.ParseExpression(newExpression).NormalizeWhitespace(), node.ArgumentList);
+                newNode = newNode.NormalizeWhitespace();
+                return newNode;
+            }
+            return ReplaceElement;
+        }
     }
 }

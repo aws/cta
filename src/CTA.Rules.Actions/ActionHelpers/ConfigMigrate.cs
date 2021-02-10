@@ -153,10 +153,10 @@ namespace CTA.Rules.Actions
         {
             jObject.AddFirst(
                 new JProperty(name,
-                new JArray(
+                new JObject(
                     arrayContent.Select(c =>
-                    new JObject(new JProperty(c.Key, c.Value))))
-                ));
+                    (new JProperty(c.Key, c.Value)))
+                )));
         }
 
         /// <summary>

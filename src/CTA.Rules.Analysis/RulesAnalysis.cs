@@ -194,6 +194,45 @@ namespace CTA.Rules.Analyzer
                                 if (AnalyzeChildren(fileAction, child.Children, ++level, parentNamespace, parentClass)) { containsActions = true; }
                                 break;
                             }
+                        case IdConstants.ElementAccessIdName:
+                            {
+                                ElementAccess elementAccess = (ElementAccess)child;
+                                var compareToken = new ElementAccessToken()
+                                {
+                                    Key = elementAccess.Expression,
+                                    FullKey = GetFullKey(elementAccess.Reference?.Namespace, elementAccess.SemanticClassType, elementAccess.Expression),
+                                    Type = elementAccess.SemanticClassType,
+                                    Namespace = elementAccess.Reference?.Namespace
+                                };
+                                _rootNodes.ElementAccesstokens.TryGetValue(compareToken, out var token);
+                                if (token != null)
+                                {
+                                    AddActions(fileAction, token, child.TextSpan);
+                                    containsActions = true;
+                                }
+                                if (AnalyzeChildren(fileAction, child.Children, ++level, parentNamespace, parentClass)) { containsActions = true; }
+                                break;
+                            }
+
+                        case IdConstants.MemberAccessIdName:
+                            {
+                                MemberAccess memberAccess = (MemberAccess)child;
+                                var compareToken = new MemberAccessToken()
+                                {
+                                    Key = memberAccess.Name,
+                                    FullKey = GetFullKey(memberAccess.Reference?.Namespace, memberAccess.SemanticClassType, memberAccess.Name),
+                                    Type = memberAccess.SemanticClassType,
+                                    Namespace = memberAccess.Reference?.Namespace
+                                };
+                                _rootNodes.MemberAccesstokens.TryGetValue(compareToken, out var token);
+                                if (token != null)
+                                {
+                                    AddActions(fileAction, token, child.TextSpan);
+                                    containsActions = true;
+                                }
+                                if (AnalyzeChildren(fileAction, child.Children, ++level, parentNamespace, parentClass)) { containsActions = true; }
+                                break;
+                            }
                         case IdConstants.DeclarationNodeIdName:
                             {
                                 var declarationNode = (DeclarationNode)child;
@@ -244,6 +283,22 @@ namespace CTA.Rules.Analyzer
                 }
             }
             return containsActions;
+        }
+
+        private string GetFullKey(string containingNamespace, string containingClass, string key)
+        {
+            if (string.IsNullOrEmpty(containingNamespace))
+            {
+                return key;
+            }
+            else
+            {
+                if (!string.IsNullOrEmpty(containingClass))
+                {
+                    return $"{containingNamespace}.{containingClass}.{key}";
+                }
+                return $"{containingNamespace}.{key}";
+            }
         }
 
         /// <summary>
@@ -303,6 +358,30 @@ namespace CTA.Rules.Analyzer
                 InvocationExpressionActionFunc = a.InvocationExpressionActionFunc
             }).ToList());
 
+            fileAction.ElementAccessActions.UnionWith(token.ElementAccessActions.Select(a => new ElementAccessAction()
+            {
+                Key = (token is ElementAccessToken) ? token.FullKey : a.Key,
+                Description = a.Description,
+                Value = a.Value,
+                Name = a.Name,
+                Type = a.Type,
+                TextSpan = textSpan,
+                ActionValidation = a.ActionValidation,
+                ElementAccessExpressionActionFunc = a.ElementAccessExpressionActionFunc
+            }).ToList());
+
+            fileAction.MemberAccessActions.UnionWith(token.MemberAccessActions.Select(a => new MemberAccessAction()
+            {
+                Key = (token is MemberAccessToken) ? token.FullKey : a.Key,
+                Description = a.Description,
+                Value = a.Value,
+                Name = a.Name,
+                Type = a.Type,
+                TextSpan = textSpan,
+                ActionValidation = a.ActionValidation,
+                MemberAccessActionFunc = a.MemberAccessActionFunc
+            }).ToList());
+
             fileAction.Usingactions.UnionWith(token.UsingActions.Select(a => new UsingAction()
             {
                 Key = a.Key,
@@ -344,6 +423,8 @@ namespace CTA.Rules.Analyzer
             if (fileAction.AttributeActions.Any()
                 || fileAction.IdentifierNameActions.Any()
                 || fileAction.InvocationExpressionActions.Any()
+                || fileAction.ElementAccessActions.Any()
+                || fileAction.MemberAccessActions.Any()
                 || fileAction.Usingactions.Any()
                 || fileAction.NamespaceActions.Any()
                 || fileAction.ObjectCreationExpressionActions.Any())

@@ -561,7 +561,7 @@ namespace CTA.Rules.RuleFiles
                                 var actionFunc = actionsLoader.GetElementAccessExpressionActions(action.Name, action.Value);
                                 if (actionFunc != null)
                                 {
-                                    nodeToken.MemberAccessActions.Add(new MemberAccessAction()
+                                    nodeToken.ElementAccessActions.Add(new ElementAccessAction()
                                     {
                                         Key = nodeToken.Key,
                                         Value = GetActionValue(action.Value),
@@ -569,7 +569,7 @@ namespace CTA.Rules.RuleFiles
                                         ActionValidation = action.ActionValidation,
                                         Name = action.Name,
                                         Type = action.Type,
-                                        MemberAccessActionFunc = actionFunc
+                                        ElementAccessExpressionActionFunc = actionFunc
                                     });
                                 }
                                 break;

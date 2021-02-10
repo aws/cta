@@ -52,7 +52,9 @@ namespace CTA.Rules.PortCore
                 MethodInvocations = true,
                 ReferenceData = true,
                 LoadBuildData = true,
-                InterfaceDeclarations = true
+                InterfaceDeclarations = true,
+                MemberAccess = true,
+                ElementAccess = true
             };
 
             CodeAnalyzer analyzer = CodeAnalyzerFactory.GetAnalyzer(analyzerConfiguration, LogHelper.Logger);

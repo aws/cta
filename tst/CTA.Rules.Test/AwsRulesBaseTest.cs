@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 
 namespace CTA.Rules.Test
@@ -101,6 +102,7 @@ namespace CTA.Rules.Test
                     }
 
                     SolutionPort solutionPort = new SolutionPort(solutionPath, solutionPortConfiguration);
+                    CopyTestRules();
                     var analysisRunResult = solutionPort.AnalysisRun();
 
                     foreach (var projectResult in analysisRunResult.ProjectResults)
@@ -131,6 +133,21 @@ namespace CTA.Rules.Test
                 }
             }
             return result;
+        }
+
+        private void CopyTestRules()
+        {
+            var tempRulesDir = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "TempRules");
+            var files = Directory.EnumerateFiles(tempRulesDir, "*.json");
+
+            foreach(var file in files)
+            {
+                string targetFile = Path.Combine(Constants.RulesDefaultPath, Path.GetFileName(file));
+                if (!File.Exists(targetFile))
+                {
+                    File.Copy(file, targetFile);
+                }
+            }
         }
 
         public string DownloadTestProjects(string tempDir)
