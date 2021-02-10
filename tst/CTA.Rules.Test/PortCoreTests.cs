@@ -357,6 +357,26 @@ namespace CTA.Rules.Test
             StringAssert.DoesNotContain(@"var appSetting = ConfigurationManager.AppSettings[""ClientValidationEnabled""];", controllerText);
             StringAssert.DoesNotContain(@"var appSetting3 = WebConfigurationManager.AppSettings[constAppSetting];", controllerText);
         }
+        public void TestIonicZipSample3()
+        {
+            TestIonicZipSampleSolution("netcoreapp3.1");
+        }
+
+        private void TestIonicZipSampleSolution(string version)
+        {
+            TestSolutionAnalysis results = AnalyzeSolution("IonicZipSample.sln", tempDir, downloadLocation, version);
+
+            // Verify new .csproj file exists
+            var ionicZipProjectFile = results.ProjectResults.Where(p => p.CsProjectPath.EndsWith("IonicZipSample.csproj")).FirstOrDefault();
+            FileAssert.Exists(ionicZipProjectFile.CsProjectPath);
+
+            // No build errors expected in the ported project
+            Assert.False(results.SolutionRunResult.BuildErrors[ionicZipProjectFile.CsProjectPath].Any());
+
+            // Verify the new package has been added
+            var csProjectContent = ionicZipProjectFile.CsProjectContent;
+            StringAssert.Contains("Include=\"DotNetZip\"", csProjectContent);
+        }
 
         [TearDown]
         public void Cleanup()
