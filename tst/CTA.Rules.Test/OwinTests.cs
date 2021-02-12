@@ -22,20 +22,11 @@ namespace CTA.Rules.Test
             downloadLocation = DownloadTestProjects(tempDir);
         }
 
-        [Test]
-        public void TestAspNetRoutes5Solution()
+        [TestCase(TargetFramework.Dotnet5)]
+        [TestCase(TargetFramework.DotnetCoreApp31)]
+        public void TestAspNetRoutes(string version)
         {
-            TestAspNetRoutes("net5.0");
-        }
-
-        [Test]
-        public void TestAspNetRoutes3Solution()
-        {
-            TestAspNetRoutes("netcoreapp3.1");
-        }
-
-        private void TestAspNetRoutes(string version)
-        {
+            _ = TargetFramework.DotnetCoreApp31;
             TestSolutionAnalysis results = AnalyzeSolution("AspNetRoutes.sln", tempDir, downloadLocation, version);
 
             var analysisResult = results.SolutionAnalysisResult;
@@ -73,19 +64,9 @@ namespace CTA.Rules.Test
             //Assert.True(csProjContent.IndexOf(@"Microsoft.AspNetCore.Owin") > 0);
         }
 
-        [Test]
-        public void TestBranchingPipelines5Solution()
-        {
-            TestBranchingPipelines("net5.0");
-        }
-
-        [Test]
-        public void TestBranchingPipelines3Solution()
-        {
-            TestBranchingPipelines("netcoreapp3.1");
-        }
-
-        private void TestBranchingPipelines(string version)
+        [TestCase(TargetFramework.Dotnet5)]
+        [TestCase(TargetFramework.DotnetCoreApp31)]
+        public void TestBranchingPipelines(string version)
         {
             TestSolutionAnalysis results = AnalyzeSolution("BranchingPipelines.sln", tempDir, downloadLocation, version);
 
@@ -119,19 +100,9 @@ namespace CTA.Rules.Test
             //FileAssert.Exists(Path.Combine(projectDir, "Program.cs")); // This should be added but class library does not do this
         }
 
-        [Test]
-        public void TestEmbedded5Solution()
-        {
-            TestEmbedded("net5.0");
-        }
-
-        [Test]
-        public void TestEmbedded3Solution()
-        {
-            TestEmbedded("netcoreapp3.1");
-        }
-
-        private void TestEmbedded(string version)
+        [TestCase(TargetFramework.Dotnet5)]
+        [TestCase(TargetFramework.DotnetCoreApp31)]
+        public void TestEmbedded(string version)
         {
             TestSolutionAnalysis results = AnalyzeSolution("Embedded.sln", tempDir, downloadLocation, version);
 
@@ -156,19 +127,9 @@ namespace CTA.Rules.Test
             StringAssert.Contains("WebHostBuilder", programText);
         }
 
-        [Test]
-        public void TestCustomServer5Solution()
-        {
-            TestCustomServer("net5.0");
-        }
-
-        [Test]
-        public void TestCustomServer3Solution()
-        {
-            TestCustomServer("netcoreapp3.1");
-        }
-
-        private void TestCustomServer(string version)
+        [TestCase(TargetFramework.Dotnet5)]
+        [TestCase(TargetFramework.DotnetCoreApp31)]
+        public void TestCustomServer(string version)
         {
             TestSolutionAnalysis results = AnalyzeSolution("CustomServer.sln", tempDir, downloadLocation, version);
 
@@ -201,19 +162,10 @@ namespace CTA.Rules.Test
             //Change their Start class to implement StartAsync instead and change reference to it to startAsync also
         }
 
-        [Test]
-        public void TestHelloWorld5Solution()
-        {
-            TestHelloWorld("net5.0");
-        }
 
-        [Test]
-        public void TestHelloWorld3Solution()
-        {
-            TestHelloWorld("netcoreapp3.1");
-        }
-
-        private void TestHelloWorld(string version)
+        [TestCase(TargetFramework.Dotnet5)]
+        [TestCase(TargetFramework.DotnetCoreApp31)]
+        public void TestHelloWorld(string version)
         {
             TestSolutionAnalysis results = AnalyzeSolution("HelloWorld.sln", tempDir, downloadLocation, version);
 
@@ -232,19 +184,9 @@ namespace CTA.Rules.Test
             StringAssert.Contains(@"HttpContext ", startupText);
         }
 
-        [Test]
-        public void TestHelloWorldRawOwin5Solution()
-        {
-            TestHelloWorldRawOwin("net5.0");
-        }
-
-        [Test]
-        public void TestHelloWorldRawOwin3Solution()
-        {
-            TestHelloWorldRawOwin("netcoreapp3.1");
-        }
-
-        private void TestHelloWorldRawOwin(string version)
+        [TestCase(TargetFramework.Dotnet5)]
+        [TestCase(TargetFramework.DotnetCoreApp31)]
+        public void TestHelloWorldRawOwin(string version)
         {
             TestSolutionAnalysis results = AnalyzeSolution("HelloWorldRawOwin.sln", tempDir, downloadLocation, version);
 
@@ -256,19 +198,9 @@ namespace CTA.Rules.Test
             StringAssert.Contains(@"UseOwin", startupText);
         }
 
-        [Test]
-        public void TestOwinSelfHostSample5Solution()
-        {
-            TestOwinSelfHostSample("net5.0");
-        }
-
-        [Test]
-        public void TestOwinSelfHostSample3Solution()
-        {
-            TestOwinSelfHostSample("netcoreapp3.1");
-        }
-
-        private void TestOwinSelfHostSample(string version)
+        [TestCase(TargetFramework.Dotnet5)]
+        [TestCase(TargetFramework.DotnetCoreApp31)]
+        public void TestOwinSelfHostSample(string version)
         {
             TestSolutionAnalysis results = AnalyzeSolution("OwinSelfhostSample.sln", tempDir, downloadLocation, version);
 
@@ -286,19 +218,9 @@ namespace CTA.Rules.Test
             StringAssert.Contains("WebHostBuilder", programText);
         }
 
-        [Test]
-        public void TestSignalR5Solution()
-        {
-            TestSignalR("net5.0");
-        }
-
-        [Test]
-        public void TestSignalR3Solution()
-        {
-            TestSignalR("netcoreapp3.1");
-        }
-
-        private void TestSignalR(string version)
+        [TestCase(TargetFramework.Dotnet5)]
+        [TestCase(TargetFramework.DotnetCoreApp31)]
+        public void TestSignalR(string version)
         {
             TestSolutionAnalysis results = AnalyzeSolution("SignalR.sln", tempDir, downloadLocation, version);
 
@@ -316,19 +238,9 @@ namespace CTA.Rules.Test
             StringAssert.Contains("WebHostBuilder", programText);
         }
 
-        [Test]
-        public void TestStaticFilesSample5Solution()
-        {
-            TestStaticFilesSample("net5.0");
-        }
-
-        [Test]
-        public void TestStaticFilesSample3Solution()
-        {
-            TestStaticFilesSample("netcoreapp3.1");
-        }
-
-        private void TestStaticFilesSample(string version)
+        [TestCase(TargetFramework.Dotnet5)]
+        [TestCase(TargetFramework.DotnetCoreApp31)]
+        public void TestStaticFilesSample(string version)
         {
             TestSolutionAnalysis results = AnalyzeSolution("StaticFilesSample.sln", tempDir, downloadLocation, version);
 
@@ -349,19 +261,9 @@ namespace CTA.Rules.Test
             StringAssert.Contains("WebHostBuilder", programText);
         }
 
-        [Test]
-        public void TestWebApi5Solution()
-        {
-            TestWebApi("net5.0");
-        }
-
-        [Test]
-        public void TestWebApi3Solution()
-        {
-            TestWebApi("netcoreapp3.1");
-        }
-
-        private void TestWebApi(string version)
+        [TestCase(TargetFramework.Dotnet5)]
+        [TestCase(TargetFramework.DotnetCoreApp31)]
+        public void TestWebApi(string version)
         {
             TestSolutionAnalysis results = AnalyzeSolution("OwinWebApi.sln", tempDir, downloadLocation, version);
 
@@ -375,19 +277,9 @@ namespace CTA.Rules.Test
             StringAssert.Contains(@"Microsoft.Extensions.DependencyInjection", startupText);
         }
 
-        [Test]
-        public void TestWebSocketSample5Solution()
-        {
-            TestWebSocketSample("net5.0");
-        }
-
-        [Test]
-        public void TestWebSocketSample3Solution()
-        {
-            TestWebSocketSample("netcoreapp3.1");
-        }
-
-        private void TestWebSocketSample(string version)
+        [TestCase(TargetFramework.Dotnet5)]
+        [TestCase(TargetFramework.DotnetCoreApp31)]
+        public void TestWebSocketSample(string version)
         {
             TestSolutionAnalysis results = AnalyzeSolution("WebSocketSample.sln", tempDir, downloadLocation, version);
 
