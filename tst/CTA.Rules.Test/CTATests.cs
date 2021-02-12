@@ -75,7 +75,7 @@ namespace CTA.Rules.Test
             {
                 ProjectPath = projectFile,
                 TargetVersions = new List<string> { version },
-                RulesPath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "CTAFiles"))
+                RulesDir = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "CTAFiles"))
             };
 
             List<ProjectConfiguration> solutionConfiguration = new List<ProjectConfiguration>();
@@ -147,7 +147,7 @@ namespace CTA.Rules.Test
             {
                 ProjectPath = projectFile,
                 TargetVersions = new List<string> { version },
-                RulesPath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "CTAFiles"))
+                RulesDir = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "CTAFiles"))
             };
 
             List<ProjectConfiguration> solutionConfiguration = new List<ProjectConfiguration>();
