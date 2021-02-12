@@ -275,7 +275,7 @@ namespace CTA.Rules.Test
 
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.DotnetCoreApp31)]
-        private void TestMvcConfigSampleSolution(string version)
+        public void TestMvcConfigSampleSolution(string version)
         {
             TestSolutionAnalysis results = AnalyzeSolution("MvcConfigMigrationTest.sln", tempDir, downloadLocation, version);
 
