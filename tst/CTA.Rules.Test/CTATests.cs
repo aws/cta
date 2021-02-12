@@ -78,8 +78,10 @@ namespace CTA.Rules.Test
                 RulesPath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "CTAFiles"))
             };
 
-            List<ProjectConfiguration> solutionConfiguration = new List<ProjectConfiguration>();
-            solutionConfiguration.Add(projectConfiguration);
+            List<ProjectConfiguration> solutionConfiguration = new List<ProjectConfiguration>
+            {
+                projectConfiguration
+            };
 
             SolutionRewriter solutionRewriter = new SolutionRewriter(solutionPath, solutionConfiguration);
             var analysisRunResult = solutionRewriter.AnalysisRun();
@@ -150,8 +152,10 @@ namespace CTA.Rules.Test
                 RulesPath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "CTAFiles"))
             };
 
-            List<ProjectConfiguration> solutionConfiguration = new List<ProjectConfiguration>();
-            solutionConfiguration.Add(projectConfiguration);
+            List<ProjectConfiguration> solutionConfiguration = new List<ProjectConfiguration>
+            {
+                projectConfiguration
+            };
 
             SolutionRewriter solutionRewriter = new SolutionRewriter(solutionPath, solutionConfiguration);
             var analysisRunResult = solutionRewriter.AnalysisRun();

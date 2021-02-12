@@ -34,8 +34,10 @@ namespace CTA.Rules.PortCore
                 string solutionDir = Directory.GetParent(cli.FilePath).FullName;
                 var projectFiles = Directory.EnumerateFiles(solutionDir, "*.csproj", SearchOption.AllDirectories);
 
-                var packageReferences = new Dictionary<string, Tuple<string, string>>();
-                packageReferences.Add("Microsoft.EntityFrameworkCore", new Tuple<string, string>("0.0.0", "*"));
+                var packageReferences = new Dictionary<string, Tuple<string, string>>
+                {
+                    { "Microsoft.EntityFrameworkCore", new Tuple<string, string>("0.0.0", "*") }
+                };
 
                 List<PortCoreConfiguration> configs = new List<PortCoreConfiguration>();
                 foreach (var proj in projectFiles)

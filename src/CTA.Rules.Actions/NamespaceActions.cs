@@ -9,11 +9,11 @@ namespace CTA.Rules.Actions
     {
         public Func<SyntaxGenerator, NamespaceDeclarationSyntax, NamespaceDeclarationSyntax> GetRenameNamespaceAction(string newName)
         {
-            Func<SyntaxGenerator, NamespaceDeclarationSyntax, NamespaceDeclarationSyntax> RenameNamespace = (SyntaxGenerator syntaxGenerator, NamespaceDeclarationSyntax node) =>
+            NamespaceDeclarationSyntax RenameNamespace(SyntaxGenerator syntaxGenerator, NamespaceDeclarationSyntax node)
             {
                 node = node.WithName(SyntaxFactory.ParseName(newName));
                 return node;
-            };
+            }
             return RenameNamespace;
         }
     }

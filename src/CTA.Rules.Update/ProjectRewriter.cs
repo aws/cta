@@ -18,10 +18,10 @@ namespace CTA.Rules.Update
     public class ProjectRewriter
     {
         public ProjectConfiguration RulesEngineConfiguration;
-        private List<RootUstNode> _sourceFileResults;
-        private List<SourceFileBuildResult> _sourceFileBuildResults;
-        private List<string> _projectReferences;
-        private ProjectResult _projectResult;
+        private readonly List<RootUstNode> _sourceFileResults;
+        private readonly List<SourceFileBuildResult> _sourceFileBuildResults;
+        private readonly List<string> _projectReferences;
+        private readonly ProjectResult _projectResult;
 
         /// <summary>
         /// Initializes a new instance of ProjectRewriter using an existing analysis

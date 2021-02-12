@@ -14,8 +14,8 @@ namespace CTA.Rules.Update
 {
     public class CodeReplacer
     {
-        private ProjectConfiguration _projectConfiguration;
-        private IEnumerable<SourceFileBuildResult> _sourceFileBuildResults;
+        private readonly ProjectConfiguration _projectConfiguration;
+        private readonly IEnumerable<SourceFileBuildResult> _sourceFileBuildResults;
 
         public CodeReplacer(List<SourceFileBuildResult> sourceFileBuildResults, ProjectConfiguration projectConfiguration)
         {
@@ -75,8 +75,10 @@ namespace CTA.Rules.Update
             //Project Level Actions
             foreach (var projectLevelAction in projectActions.ProjectLevelActions)
             {
-                var projectActionExecution = new GenericActionExecution(projectLevelAction, _projectConfiguration.ProjectPath);
-                projectActionExecution.TimesRun = 1;
+                var projectActionExecution = new GenericActionExecution(projectLevelAction, _projectConfiguration.ProjectPath)
+                {
+                    TimesRun = 1
+                };
                 var runResult = string.Empty;
                 if (!_projectConfiguration.IsMockRun)
                 {
@@ -133,8 +135,10 @@ namespace CTA.Rules.Update
 
             foreach (var action in actionsWithNoMatch)
             {
-                var genericActionExecution = new GenericActionExecution(action, filePath);
-                genericActionExecution.TimesRun = 0;
+                var genericActionExecution = new GenericActionExecution(action, filePath)
+                {
+                    TimesRun = 0
+                };
                 allActions.Add(genericActionExecution);
             }
 

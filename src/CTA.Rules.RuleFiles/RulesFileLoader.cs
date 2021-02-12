@@ -15,11 +15,11 @@ namespace CTA.Rules.RuleFiles
     /// </summary>
     public class RulesFileLoader
     {
-        private string _rulesFile;
-        private string _targetFramework;
-        private string _overrideFile;
-        private string _assembliesDir;
-        private IEnumerable<Reference> _projectReferences;
+        private readonly string _rulesFile;
+        private readonly string _targetFramework;
+        private readonly string _overrideFile;
+        private readonly string _assembliesDir;
+        private readonly IEnumerable<Reference> _projectReferences;
 
         /// <summary>
         /// Initializes a new RulesFileLoader

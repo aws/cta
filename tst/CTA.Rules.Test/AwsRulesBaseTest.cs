@@ -14,13 +14,11 @@ namespace CTA.Rules.Test
 {
     public class AwsRulesBaseTest
     {
-        private System.Type systemType;
         private string tstPath;
         private string srcPath;
 
         protected void Setup(System.Type type)
         {
-            this.systemType = type;
             this.tstPath = GetTstPath(type);
             this.srcPath = GetSrcPath(type);
         }
@@ -82,8 +80,10 @@ namespace CTA.Rules.Test
                     {
                         ProjectResult project = new ProjectResult();
 
-                        Dictionary<string, Tuple<string, string>> packages = new Dictionary<string, Tuple<string, string>>();
-                        packages.Add("Newtonsoft.Json", new Tuple<string, string>("9.0.0", "*"));
+                        Dictionary<string, Tuple<string, string>> packages = new Dictionary<string, Tuple<string, string>>
+                        {
+                            { "Newtonsoft.Json", new Tuple<string, string>("9.0.0", "*") }
+                        };
                         PortCoreConfiguration projectConfiguration = new PortCoreConfiguration()
                         {
                             ProjectPath = projectFile,

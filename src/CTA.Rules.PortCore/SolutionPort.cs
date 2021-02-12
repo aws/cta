@@ -25,9 +25,9 @@ namespace CTA.Rules.PortCore
     public class SolutionPort
     {
         private SolutionRewriter _solutionRewriter;
-        private string _solutionPath;
-        private PortSolutionResult _portSolutionResult;
-        private MetricsContext _context;
+        private readonly string _solutionPath;
+        private readonly PortSolutionResult _portSolutionResult;
+        private readonly MetricsContext _context;
 
         /// <summary>
         /// Initializes a new instance of Solution Port, analyzing the solution path using the provided config.
@@ -44,17 +44,19 @@ namespace CTA.Rules.PortCore
             }
             _portSolutionResult = new PortSolutionResult(solutionFilePath);
             _solutionPath = solutionFilePath;
-            AnalyzerConfiguration analyzerConfiguration = new AnalyzerConfiguration(LanguageOptions.CSharp);
-            analyzerConfiguration.MetaDataSettings = new MetaDataSettings()
+            AnalyzerConfiguration analyzerConfiguration = new AnalyzerConfiguration(LanguageOptions.CSharp)
             {
-                Annotations = true,
-                DeclarationNodes = true,
-                MethodInvocations = true,
-                ReferenceData = true,
-                LoadBuildData = true,
-                InterfaceDeclarations = true,
-                MemberAccess = true,
-                ElementAccess = true
+                MetaDataSettings = new MetaDataSettings()
+                {
+                    Annotations = true,
+                    DeclarationNodes = true,
+                    MethodInvocations = true,
+                    ReferenceData = true,
+                    LoadBuildData = true,
+                    InterfaceDeclarations = true,
+                    MemberAccess = true,
+                    ElementAccess = true
+                }
             };
 
             CodeAnalyzer analyzer = CodeAnalyzerFactory.GetAnalyzer(analyzerConfiguration, LogHelper.Logger);
@@ -94,37 +96,35 @@ namespace CTA.Rules.PortCore
 
             _portSolutionResult.References = allReferences.ToHashSet<string>();
 
-            using (var httpClient = new HttpClient())
-            {
-                ConcurrentBag<string> matchedFiles = new ConcurrentBag<string>();
+            using var httpClient = new HttpClient();
+            ConcurrentBag<string> matchedFiles = new ConcurrentBag<string>();
 
-                var parallelOptions = new ParallelOptions() { MaxDegreeOfParallelism = Constants.ThreadCount };
-                Parallel.ForEach(allReferences, parallelOptions, recommendationNamespace =>
+            var parallelOptions = new ParallelOptions() { MaxDegreeOfParallelism = Constants.ThreadCount };
+            Parallel.ForEach(allReferences, parallelOptions, recommendationNamespace =>
+            {
+                if (!string.IsNullOrEmpty(recommendationNamespace))
                 {
-                    if (!string.IsNullOrEmpty(recommendationNamespace))
+                    try
                     {
-                        try
-                        {
-                            var fileName = string.Concat(recommendationNamespace.ToLower(), ".json");
-                            var fullFileName = Path.Combine(Constants.RulesDefaultPath, fileName);
+                        var fileName = string.Concat(recommendationNamespace.ToLower(), ".json");
+                        var fullFileName = Path.Combine(Constants.RulesDefaultPath, fileName);
                             //Download only if it's not available
                             if (!File.Exists(fullFileName))
-                            {
-                                var fileContents = httpClient.GetStringAsync(string.Concat(Constants.S3RecommendationsBucketUrl, "/", fileName)).Result;
-                                File.WriteAllText(fullFileName, fileContents);
-                            }
-                            matchedFiles.Add(fileName);
-                        }
-                        catch (Exception)
                         {
+                            var fileContents = httpClient.GetStringAsync(string.Concat(Constants.S3RecommendationsBucketUrl, "/", fileName)).Result;
+                            File.WriteAllText(fullFileName, fileContents);
+                        }
+                        matchedFiles.Add(fileName);
+                    }
+                    catch (Exception)
+                    {
                             //We are checking which files have a recommendation, some of them won't
                         }
-                    }
-                });
+                }
+            });
 
-                _portSolutionResult.DownloadedFiles = matchedFiles.ToHashSet<string>();
-                LogHelper.LogInformation("Found recommendations for the below:{0}{1}", Environment.NewLine, string.Join(Environment.NewLine, matchedFiles.Distinct()));
-            }
+            _portSolutionResult.DownloadedFiles = matchedFiles.ToHashSet<string>();
+            LogHelper.LogInformation("Found recommendations for the below:{0}{1}", Environment.NewLine, string.Join(Environment.NewLine, matchedFiles.Distinct()));
         }
 
         private void InitRules(List<PortCoreConfiguration> solutionConfiguration, List<AnalyzerResult> analyzerResults)
@@ -181,17 +181,15 @@ namespace CTA.Rules.PortCore
         private void DownloadResources()
         {
             var executingPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            using (var httpClient = new HttpClient())
+            using var httpClient = new HttpClient();
+            try
             {
-                try
-                {
-                    var zipFile = Utils.DownloadFile(Constants.S3CTAFiles, Constants.ResourcesFile);
-                    ZipFile.ExtractToDirectory(zipFile, executingPath, true);
-                }
-                catch (Exception ex)
-                {
-                    LogHelper.LogError(ex, string.Format("Unable to download resources from {0}", Constants.S3CTAFiles));
-                }
+                var zipFile = Utils.DownloadFile(Constants.S3CTAFiles, Constants.ResourcesFile);
+                ZipFile.ExtractToDirectory(zipFile, executingPath, true);
+            }
+            catch (Exception ex)
+            {
+                LogHelper.LogError(ex, string.Format("Unable to download resources from {0}", Constants.S3CTAFiles));
             }
         }
 

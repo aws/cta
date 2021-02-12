@@ -67,23 +67,23 @@ namespace CTA.FeatureDetection.Common.Models.Features
         public void Add(Feature feature)
         {
             var featureType = feature.GetType();
-            if (feature is CompiledFeature)
+            if (feature is CompiledFeature feature1)
             {
                 if (ConfiguredFeatures.Any(f => f.Name == feature.Name))
                 {
                     throw new ArgumentException(string.Format(FeatureNameConflictTemplate, feature.Name, nameof(ConfiguredFeature)));
                 }
 
-                CompiledFeatures.Add((CompiledFeature)feature);
+                CompiledFeatures.Add(feature1);
             }
-            else if (feature is ConfiguredFeature)
+            else if (feature is ConfiguredFeature feature2)
             {
                 if (CompiledFeatures.Any(f => f.Name == feature.Name))
                 {
                     throw new ArgumentException(string.Format(FeatureNameConflictTemplate, feature.Name, nameof(CompiledFeature)));
                 }
 
-                ConfiguredFeatures.Add((ConfiguredFeature)feature);
+                ConfiguredFeatures.Add(feature2);
             }
             else
             {
