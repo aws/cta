@@ -26,7 +26,6 @@ namespace CTA.Rules.Test
         [TestCase(TargetFramework.DotnetCoreApp31)]
         public void TestAspNetRoutes(string version)
         {
-            _ = TargetFramework.DotnetCoreApp31;
             TestSolutionAnalysis results = AnalyzeSolution("AspNetRoutes.sln", tempDir, downloadLocation, version);
 
             var analysisResult = results.SolutionAnalysisResult;
