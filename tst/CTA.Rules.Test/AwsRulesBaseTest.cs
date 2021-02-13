@@ -18,6 +18,12 @@ namespace CTA.Rules.Test
         private string tstPath;
         private string srcPath;
 
+        protected static class TargetFramework
+        {
+            public const string Dotnet5 = "net5.0";
+            public const string DotnetCoreApp31 = "netcoreapp3.1";
+        }
+
         protected void Setup(System.Type type)
         {
             this.systemType = type;

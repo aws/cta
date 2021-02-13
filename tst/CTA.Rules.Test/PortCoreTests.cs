@@ -45,18 +45,15 @@ namespace CTA.Rules.Test
         }
 
         [Test]
-        public void TestSampleWebApi5Solution()
-        {
-            TestWebApi("net5.0");
-        }
-        [Test]
         public void TestSampleWebApi3Solution()
         {
-            TestWebApi("netcoreapp3.1");
+            TestWebApi(TargetFramework.DotnetCoreApp31);
             SolutionPort.ResetCache(false, false);
-            TestWebApi("net5.0", Path.Combine(tempDir, "netcoreapp3.1"));
+            TestWebApi(TargetFramework.Dotnet5, Path.Combine(tempDir, TargetFramework.DotnetCoreApp31));
         }
-        private void TestWebApi(string version, string solutionDir = "")
+
+        [TestCase(TargetFramework.Dotnet5)]
+        public void TestWebApi(string version, string solutionDir = "")
         {
             TestSolutionAnalysis results;
 
@@ -124,12 +121,8 @@ namespace CTA.Rules.Test
             }
         }
 
-        [Test]
-        public void TestSampleWebApiWithReferences3Solution()
-        {
-            TestWebApiWithReferences("netcoreapp3.1");
-        }
-        private void TestWebApiWithReferences(string version)
+        [TestCase(TargetFramework.DotnetCoreApp31)]
+        public void TestWebApiWithReferences(string version)
         {
             TestSolutionAnalysis results = AnalyzeSolution("WebApiWithReferences.sln", tempDir, downloadLocation, version);
 
@@ -196,18 +189,10 @@ namespace CTA.Rules.Test
             Assert.AreEqual(classlibrary2Actions.Count, 2);
             Assert.AreEqual(webApiProjectActions.Count, 4);
         }
-
-        [Test]
-        public void TestMvcMusicStore5()
-        {
-            TestMvcMusicStore("net5.0");
-        }
-        [Test]
-        public void TestMvcMusicStore3()
-        {
-            TestMvcMusicStore("netcoreapp3.1");
-        }
-        private void TestMvcMusicStore(string version)
+        
+        [TestCase(TargetFramework.Dotnet5)]
+        [TestCase(TargetFramework.DotnetCoreApp31)]
+        public void TestMvcMusicStore(string version)
         {
             TestSolutionAnalysis results = AnalyzeSolution("MvcMusicStore.sln", tempDir, downloadLocation, version);
 
@@ -270,13 +255,9 @@ namespace CTA.Rules.Test
 
             Assert.AreEqual(mvcProjectActions.Count, 4);
         }
-
-        [Test]
-        public void TestAntlrSample3()
-        {
-            TestAntlrSampleSolution("netcoreapp3.1");
-        }
-        private void TestAntlrSampleSolution(string version)
+        
+        [TestCase(TargetFramework.DotnetCoreApp31)]
+        public void TestAntlrSampleSolution(string version)
         {
             TestSolutionAnalysis results = AnalyzeSolution("AntlrSample.sln", tempDir, downloadLocation, version);
 
@@ -292,17 +273,9 @@ namespace CTA.Rules.Test
             StringAssert.Contains("Include=\"Antlr3.Runtime\"", csProjectContent);
         }
 
-        [Test]
-        public void TestMvcConfigSample3()
-        {
-            TestMvcConfigSampleSolution("netcoreapp3.1");
-        }
-        [Test]
-        public void TestMvcConfigSample5()
-        {
-            TestMvcConfigSampleSolution("net5.0");
-        }
-        private void TestMvcConfigSampleSolution(string version)
+        [TestCase(TargetFramework.Dotnet5)]
+        [TestCase(TargetFramework.DotnetCoreApp31)]
+        public void TestMvcConfigSampleSolution(string version)
         {
             TestSolutionAnalysis results = AnalyzeSolution("MvcConfigMigrationTest.sln", tempDir, downloadLocation, version);
 
@@ -312,17 +285,9 @@ namespace CTA.Rules.Test
             ValidateConfig(homeControllerText);
         }
 
-        [Test]
-        public void TestWebApiConfig3()
-        {
-            TestWebApiConfigSampleSolution("netcoreapp3.1");
-        }
-        [Test]
-        public void TestWebApiConfig5()
-        {
-            TestWebApiConfigSampleSolution("net5.0");
-        }
-        private void TestWebApiConfigSampleSolution(string version)
+        [TestCase(TargetFramework.Dotnet5)]
+        [TestCase(TargetFramework.DotnetCoreApp31)]
+        public void TestWebApiConfigSampleSolution(string version)
         {
             TestSolutionAnalysis results = AnalyzeSolution("WebApiConfigTest.sln", tempDir, downloadLocation, version);
 
@@ -357,12 +322,9 @@ namespace CTA.Rules.Test
             StringAssert.DoesNotContain(@"var appSetting = ConfigurationManager.AppSettings[""ClientValidationEnabled""];", controllerText);
             StringAssert.DoesNotContain(@"var appSetting3 = WebConfigurationManager.AppSettings[constAppSetting];", controllerText);
         }
-        public void TestIonicZipSample3()
-        {
-            TestIonicZipSampleSolution("netcoreapp3.1");
-        }
 
-        private void TestIonicZipSampleSolution(string version)
+        [TestCase(TargetFramework.DotnetCoreApp31)]
+        public void TestIonicZipSampleSolution(string version)
         {
             TestSolutionAnalysis results = AnalyzeSolution("IonicZipSample.sln", tempDir, downloadLocation, version);
 
