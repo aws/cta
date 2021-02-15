@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace CTA.Rules.Config
+﻿namespace CTA.Rules.Config
 {
     public class GithubInfo
     {

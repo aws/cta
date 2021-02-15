@@ -1,11 +1,10 @@
-﻿using CTA.Rules.Config;
+﻿using System;
+using System.Linq;
+using CTA.Rules.Config;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.Classification;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Editing;
-using System;
-using System.Linq;
 
 namespace CTA.Rules.Actions
 {
@@ -135,9 +134,15 @@ namespace CTA.Rules.Actions
             {
                 var allMembers = node.Members.ToList();
                 var allMethods = allMembers.OfType<MethodDeclarationSyntax>();
-                var removeMethod = allMethods.Where(m => m.Identifier.ToString() == methodName).FirstOrDefault();
-                allMembers.Remove(removeMethod);
-                node = node.RemoveNode(removeMethod, SyntaxRemoveOptions.KeepNoTrivia).NormalizeWhitespace();
+                if (allMethods.Any())
+                {
+                    var removeMethod = allMethods.FirstOrDefault(m => m.Identifier.ToString() == methodName);
+                    if (removeMethod != null)
+                    {
+                        node = node.RemoveNode(removeMethod, SyntaxRemoveOptions.KeepNoTrivia).NormalizeWhitespace();
+                    }
+                }
+
                 return node;
             };
             return RemoveMethod;
@@ -145,7 +150,7 @@ namespace CTA.Rules.Actions
         public Func<SyntaxGenerator, ClassDeclarationSyntax, ClassDeclarationSyntax> GetRenameClassAction(string newClassName)
         {
             Func<SyntaxGenerator, ClassDeclarationSyntax, ClassDeclarationSyntax> RenameClass = (SyntaxGenerator syntaxGenerator, ClassDeclarationSyntax node) =>
-            {                
+            {
                 node = node.WithIdentifier(SyntaxFactory.Identifier(newClassName)).NormalizeWhitespace();
                 return node;
             };

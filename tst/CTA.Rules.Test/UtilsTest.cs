@@ -1,8 +1,8 @@
-﻿using System.IO;
+﻿using CTA.FeatureDetection.Common.Models.Configuration;
 using CTA.Rules.Config;
-using CTA.FeatureDetection.Common.Models.Configuration;
 using NUnit.Framework;
- 
+using System.IO;
+
 namespace CTA.Rules.Test
 {
     public class UtilsTests : AwsRulesBaseTest
@@ -16,7 +16,7 @@ namespace CTA.Rules.Test
         [Test]
         public void Parse_Throws_Validation_Exception_When_Enum_Value_Is_Invalid()
         {
-            var jsonFilePath = GetTstPath(Path.Combine("CTA.FeatureDetection.Tests", "Examples", "Input", "test_file_with_nonexistent_feature_scope.json"));
+            var jsonFilePath = GetTstPath(Path.Combine("CTA.FeatureDetection.Tests", "Examples", "Templates", "test_file_with_nonexistent_feature_scope.json"));
             var jsonContent = File.ReadAllText(jsonFilePath);
 
             Assert.Throws<Newtonsoft.Json.JsonException>(() => Utils.ValidateJsonObject(jsonContent, typeof(FeatureConfig)));
@@ -25,7 +25,7 @@ namespace CTA.Rules.Test
         [Test]
         public void Parse_Throws_Validation_Exception_When_Required_Field_Is_Missing()
         {
-            var jsonFilePath = GetTstPath(Path.Combine("CTA.FeatureDetection.Tests", "Examples", "Input", "test_file_with_missing_feature_scope.json"));
+            var jsonFilePath = GetTstPath(Path.Combine("CTA.FeatureDetection.Tests", "Examples", "Templates", "test_file_with_missing_feature_scope.json"));
             var jsonContent = File.ReadAllText(jsonFilePath);
 
             Assert.Throws<Newtonsoft.Json.JsonException>(() => Utils.ValidateJsonObject(jsonContent, typeof(FeatureConfig)));

@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using CTA.FeatureDetection.Load.Loaders;
+﻿using CTA.FeatureDetection.Load.Loaders;
 using CTA.FeatureDetection.Tests.TestBase;
 using NUnit.Framework;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 
 namespace CTA.FeatureDetection.Tests.FeatureDetection
 {
@@ -35,10 +35,10 @@ namespace CTA.FeatureDetection.Tests.FeatureDetection
         [Test]
         public void FeatureDetector_Loads_Features_In_Specified_Config()
         {
-            var featureConfig = Path.Combine(TestProjectDirectory, "Examples", "Input", "EntityFramework_config_features.json");
+            var featureConfig = Path.Combine(TestProjectDirectory, "Examples", "Templates", "EntityFramework_config_features.json");
             var featureDetector = new FeatureDetector(featureConfig);
             var loadedFeatureSet = featureDetector.LoadedFeatureSet;
-            
+
             Assert.IsEmpty(loadedFeatureSet.CompiledFeatures);
             Assert.True(loadedFeatureSet.ConfiguredFeatures.Count == 9);
         }
@@ -46,8 +46,8 @@ namespace CTA.FeatureDetection.Tests.FeatureDetection
         [Test]
         public void FeatureDetector_Loads_Features_In_Specified_Configs()
         {
-            var featureConfig1 = Path.Combine(TestProjectDirectory, "Examples", "Input", "EntityFramework_config_features.json");
-            var featureConfig2 = Path.Combine(TestProjectDirectory, "Examples", "Input", "ProjectType_code_features.json");
+            var featureConfig1 = Path.Combine(TestProjectDirectory, "Examples", "Templates", "EntityFramework_config_features.json");
+            var featureConfig2 = Path.Combine(TestProjectDirectory, "Examples", "Templates", "ProjectType_code_features.json");
             var featureConfigs = new List<string>
             {
                 featureConfig1,
@@ -55,7 +55,7 @@ namespace CTA.FeatureDetection.Tests.FeatureDetection
             };
             var featureDetector = new FeatureDetector(featureConfigs);
             var loadedFeatureSet = featureDetector.LoadedFeatureSet;
-            
+
             CollectionAssert.IsNotEmpty(loadedFeatureSet.ConfiguredFeatures);
             CollectionAssert.IsNotEmpty(loadedFeatureSet.CompiledFeatures);
             Assert.True(loadedFeatureSet.ConfiguredFeatures.Count == 9);

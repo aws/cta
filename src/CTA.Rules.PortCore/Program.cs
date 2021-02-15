@@ -1,12 +1,10 @@
-﻿using CTA.Rules.Config;
-using CTA.Rules.Models;
-using Codelyzer.Analysis;
-using Microsoft.Extensions.Logging;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Text.RegularExpressions;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
+using CTA.Rules.Config;
+using CTA.Rules.Models;
+using Microsoft.Extensions.Logging;
 
 namespace CTA.Rules.PortCore
 {
@@ -27,14 +25,17 @@ namespace CTA.Rules.PortCore
                 LogHelper.Logger = loggerFactory.CreateLogger("Translator");
 
 
-                if (string.IsNullOrEmpty(cli.RulesPath))
+                if (string.IsNullOrEmpty(cli.RulesDir))
                 {
                     //TODO : Change the hard coded path to a constant
-                    cli.RulesPath = Config.Constants.RulesDefaultPath;
+                    cli.RulesDir = Config.Constants.RulesDefaultPath;
                 }
 
                 string solutionDir = Directory.GetParent(cli.FilePath).FullName;
                 var projectFiles = Directory.EnumerateFiles(solutionDir, "*.csproj", SearchOption.AllDirectories);
+
+                var packageReferences = new Dictionary<string, Tuple<string, string>>();
+                packageReferences.Add("Microsoft.EntityFrameworkCore", new Tuple<string, string>("0.0.0", "*"));
 
                 List<PortCoreConfiguration> configs = new List<PortCoreConfiguration>();
                 foreach (var proj in projectFiles)
@@ -42,10 +43,11 @@ namespace CTA.Rules.PortCore
                     PortCoreConfiguration projectConfiguration = new PortCoreConfiguration()
                     {
                         ProjectPath = proj,
-                        RulesPath = cli.RulesPath,
+                        RulesDir = cli.RulesDir,
                         IsMockRun = cli.IsMockRun,
                         UseDefaultRules = cli.DefaultRules,
-                        TargetVersions = new List<string> { cli.Version }       
+                        PackageReferences = packageReferences,
+                        TargetVersions = new List<string> { cli.Version }
                     };
 
                     configs.Add(projectConfiguration);
@@ -54,10 +56,10 @@ namespace CTA.Rules.PortCore
                 //Solution Rewriter:
                 SolutionPort solutionPort = new SolutionPort(cli.FilePath, configs);
                 var s = solutionPort.AnalysisRun();
-                foreach (var k in s.Keys)
+                foreach (var k in s.ProjectResults)
                 {
-                    Console.WriteLine(k);
-                    Console.WriteLine(s[k].ToString());
+                    Console.WriteLine(k.ProjectFile);
+                    Console.WriteLine(k.ProjectActions.ToString());
                 }
                 var portSolutionResult = solutionPort.Run();
             }

@@ -1,10 +1,10 @@
-﻿using System.Linq;
-using CTA.FeatureDetection.Common.Models.Enums;
+﻿using CTA.FeatureDetection.Common.Models.Enums;
 using CTA.FeatureDetection.Common.Models.Features.Base;
 using CTA.FeatureDetection.Common.Models.Features.Conditions;
 using CTA.FeatureDetection.Load.Factories;
 using CTA.FeatureDetection.Tests.TestBase;
 using NUnit.Framework;
+using System.Linq;
 
 namespace CTA.FeatureDetection.Tests.FeatureDetection.Load.Factories
 {

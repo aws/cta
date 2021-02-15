@@ -1,21 +1,21 @@
-﻿using CTA.Rules.Config;
-using CTA.Rules.Models;
-using CTA.Rules.Update;
-using Codelyzer.Analysis;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
+using System.IO.Compression;
 using System.Linq;
+using System.Net.Http;
+using System.Reflection;
+using System.Threading.Tasks;
+using Codelyzer.Analysis;
 using CTA.FeatureDetection;
 using CTA.FeatureDetection.Common.Models;
 using CTA.FeatureDetection.ProjectType.Extensions;
-using System.IO;
+using CTA.Rules.Config;
 using CTA.Rules.Metrics;
-using System.Net.Http;
-using System.Threading.Tasks;
-using System;
+using CTA.Rules.Models;
+using CTA.Rules.Update;
 using Microsoft.Extensions.Logging;
-using System.IO.Compression;
-using System.Reflection;
 
 namespace CTA.Rules.PortCore
 {
@@ -52,7 +52,9 @@ namespace CTA.Rules.PortCore
                 MethodInvocations = true,
                 ReferenceData = true,
                 LoadBuildData = true,
-                InterfaceDeclarations = true
+                InterfaceDeclarations = true,
+                MemberAccess = true,
+                ElementAccess = true
             };
 
             CodeAnalyzer analyzer = CodeAnalyzerFactory.GetAnalyzer(analyzerConfiguration, LogHelper.Logger);
@@ -62,7 +64,7 @@ namespace CTA.Rules.PortCore
             InitSolutionRewriter(analyzerResults, solutionConfiguration);
         }
 
-        public SolutionPort(string solutionFilePath,  List<AnalyzerResult> analyzerResults, List<PortCoreConfiguration> solutionConfiguration, ILogger logger = null)
+        public SolutionPort(string solutionFilePath, List<AnalyzerResult> analyzerResults, List<PortCoreConfiguration> solutionConfiguration, ILogger logger = null)
         {
             if (logger != null)
             {
@@ -77,7 +79,6 @@ namespace CTA.Rules.PortCore
         private void InitSolutionRewriter(List<AnalyzerResult> analyzerResults, List<PortCoreConfiguration> solutionConfiguration)
         {
             CheckCache();
-            CheckResources();
             InitRules(solutionConfiguration, analyzerResults);
             _solutionRewriter = new SolutionRewriter(analyzerResults, solutionConfiguration.ToList<ProjectConfiguration>());
         }
@@ -92,7 +93,7 @@ namespace CTA.Rules.PortCore
             allReferences.Add(Constants.ProjectRecommendationFile);
 
             _portSolutionResult.References = allReferences.ToHashSet<string>();
-            
+
             using (var httpClient = new HttpClient())
             {
                 ConcurrentBag<string> matchedFiles = new ConcurrentBag<string>();
@@ -114,7 +115,7 @@ namespace CTA.Rules.PortCore
                             }
                             matchedFiles.Add(fileName);
                         }
-                        catch (Exception) 
+                        catch (Exception)
                         {
                             //We are checking which files have a recommendation, some of them won't
                         }
@@ -138,16 +139,26 @@ namespace CTA.Rules.PortCore
                 if (projectConfiguration.UseDefaultRules)
                 {
                     DownloadRecommendationFiles(analyzerResults);
-                    projectConfiguration.RulesPath = Constants.RulesDefaultPath;
+                    projectConfiguration.RulesDir = Constants.RulesDefaultPath;
                 }
             }
         }
         /// <summary>
         /// Initializes the Solution Port
         /// </summary>
-        public ConcurrentDictionary<string, ProjectActions> AnalysisRun()
+        public SolutionResult AnalysisRun()
         {
-            return _solutionRewriter.AnalysisRun();
+            var solutionResult = _solutionRewriter.AnalysisRun();
+            _portSolutionResult.AddSolutionResult(solutionResult);
+            if (!string.IsNullOrEmpty(_solutionPath))
+            {
+                PortSolutionResultReportGenerator reportGenerator = new PortSolutionResultReportGenerator(_context, _portSolutionResult);
+                reportGenerator.GenerateAnalysisReport();
+
+                LogHelper.LogInformation("Generating Post-Analysis Report");
+                LogHelper.LogError($"{Constants.MetricsTag}: {reportGenerator.AnalyzeSolutionResultJsonReport}");
+            }
+            return solutionResult;
         }
 
         /// <summary>
@@ -167,7 +178,7 @@ namespace CTA.Rules.PortCore
             return _portSolutionResult;
         }
 
-        private void CheckResources()
+        private void DownloadResources()
         {
             var executingPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             using (var httpClient = new HttpClient())
@@ -186,24 +197,54 @@ namespace CTA.Rules.PortCore
 
         private void CheckCache()
         {
-            var createdTime = Directory.GetCreationTime(Constants.RulesDefaultPath);
-            if(createdTime.AddHours(Constants.CacheExpiryHours) < DateTime.Now)
+            var recommendationsTime = Directory.GetCreationTime(Constants.RulesDefaultPath);
+            var resourceExtractedTime = Directory.GetCreationTime(Constants.ResourcesExtractedPath);
+
+            bool cleanRecommendations = false;
+            bool cleanResources = false;
+
+            if (recommendationsTime.AddHours(Constants.CacheExpiryHours) < DateTime.Now)
             {
-                ResetCache();
+                cleanRecommendations = true;
+            }
+            if (resourceExtractedTime.AddDays(Constants.CacheExpiryDays) < DateTime.Now)
+            {
+                cleanResources = true;
+            }
+
+            ResetCache(cleanRecommendations, cleanResources);
+            if (cleanResources)
+            {
+                DownloadResources();
             }
         }
 
-        public static void ResetCache()
+        public static void ResetCache(bool recommendations, bool resources)
         {
             try
             {
-                if(Directory.Exists(Constants.RulesDefaultPath))
+                if (recommendations)
                 {
-                    Directory.Delete(Constants.RulesDefaultPath, true);
+                    if (Directory.Exists(Constants.RulesDefaultPath))
+                    {
+                        Directory.Delete(Constants.RulesDefaultPath, true);
+                    }
+                    Directory.CreateDirectory(Constants.RulesDefaultPath);
                 }
-                if (File.Exists(Constants.ResourcesFile))
+                if (resources)
                 {
-                    File.Delete(Constants.ResourcesFile);
+                    if (File.Exists(Constants.ResourcesFile))
+                    {
+                        File.Delete(Constants.ResourcesFile);
+                    }
+                    if (File.Exists(Constants.DefaultFeaturesFilePath))
+                    {
+                        File.Delete(Constants.DefaultFeaturesFilePath);
+                    }
+                    if (Directory.Exists(Constants.ResourcesExtractedPath))
+                    {
+                        Directory.Delete(Constants.ResourcesExtractedPath, true);
+                    }
                 }
             }
             catch (Exception ex)

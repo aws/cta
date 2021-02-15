@@ -1,13 +1,14 @@
 ﻿
+using System;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Editing;
-using System;
 
 namespace CTA.Rules.Models
 {
     public class MemberAccessAction : GenericAction
     {
-        public Func<SyntaxGenerator, MemberAccessExpressionSyntax, MemberAccessExpressionSyntax> MemberAccessActionFunc { get; set; }
+        public Func<SyntaxGenerator, MemberAccessExpressionSyntax, SyntaxNode> MemberAccessActionFunc { get; set; }
         public override bool Equals(object obj)
         {
             var action = (MemberAccessAction)obj;

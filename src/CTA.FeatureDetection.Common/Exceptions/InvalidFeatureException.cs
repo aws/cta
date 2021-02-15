@@ -5,12 +5,12 @@ namespace CTA.FeatureDetection.Common.Exceptions
 {
     public class InvalidFeatureException : Exception
     {
-        public InvalidFeatureException(Assembly assembly, string className) 
+        public InvalidFeatureException(Assembly assembly, string className)
             : base(DefaultMessage(assembly, className))
         {
         }
 
-        public InvalidFeatureException(Type type) 
+        public InvalidFeatureException(Type type)
             : base(DefaultMessage(type))
         {
         }

@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
-using Codelyzer.Analysis;
+﻿using Codelyzer.Analysis;
 using CTA.FeatureDetection.Common.Models.Configuration;
 using CTA.FeatureDetection.Common.Models.Enums;
 using CTA.FeatureDetection.Common.Models.Features.Conditions.Base;
 using Moq;
 using NUnit.Framework;
+using System.Collections.Generic;
 
 namespace CTA.FeatureDetection.Tests.TestBase
 {

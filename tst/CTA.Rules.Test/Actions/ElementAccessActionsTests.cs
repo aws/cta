@@ -1,5 +1,4 @@
-﻿using CTA.Rules.Actions;
-using CTA.Rules.Models;
+﻿using CTA.Rules.Models;
 using CTA.Rules.Update;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -43,7 +42,7 @@ namespace CTA.Rules.Test.Actions
                 Key = "Test",
                 Value = "Test2",
                 ElementAccessExpressionActionFunc = _elementAccessActions.GetAddCommentAction("Test")
-                 
+
             };
 
             var cloned = elementAccessAction.Clone();

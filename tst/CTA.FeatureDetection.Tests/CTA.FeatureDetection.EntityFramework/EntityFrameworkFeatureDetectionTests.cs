@@ -1,8 +1,8 @@
-﻿using System.IO;
-using System.Linq;
-using CTA.FeatureDetection.Common.Models;
+﻿using CTA.FeatureDetection.Common.Models;
 using CTA.FeatureDetection.Tests.Utils;
 using NUnit.Framework;
+using System.IO;
+using System.Linq;
 
 namespace CTA.FeatureDetection.Tests.FeatureDetection.EntityFramework
 {
@@ -10,7 +10,7 @@ namespace CTA.FeatureDetection.Tests.FeatureDetection.EntityFramework
     {
         private const string ProjectName = "EF6_Test.csproj";
         private static readonly string TestProjectDirectory = TestUtils.GetTestAssemblySourceDirectory(typeof(TestUtils));
-        private static string ConfigFile => Path.Combine(TestProjectDirectory, "Examples", "Input", "EntityFramework_config_features.json");
+        private static string ConfigFile => Path.Combine(TestProjectDirectory, "Examples", "Templates", "EntityFramework_config_features.json");
         private FeatureDetectionResult _featureDetectionResult;
 
         [SetUp]

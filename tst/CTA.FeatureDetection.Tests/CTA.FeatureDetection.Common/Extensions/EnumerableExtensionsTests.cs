@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
-using CTA.FeatureDetection.Common.Extensions;
+﻿using CTA.FeatureDetection.Common.Extensions;
 using NUnit.Framework;
+using System.Collections.Generic;
 
 namespace CTA.FeatureDetection.Tests.FeatureDetection.Common.Extensions
 {
@@ -25,7 +25,7 @@ namespace CTA.FeatureDetection.Tests.FeatureDetection.Common.Extensions
         [Test]
         public void IsNullOrEmpty_Returns_False_If_Enumerable_Has_Contents()
         {
-            IEnumerable<int> nullEnumerable = new [] { 1 };
+            IEnumerable<int> nullEnumerable = new[] { 1 };
 
             Assert.False(nullEnumerable.IsNullOrEmpty());
         }

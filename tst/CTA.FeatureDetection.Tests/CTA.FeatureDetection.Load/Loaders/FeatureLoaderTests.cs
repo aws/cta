@@ -1,11 +1,11 @@
-﻿using System;
+﻿using CTA.FeatureDetection.Load.Loaders;
+using CTA.FeatureDetection.ProjectType.CompiledFeatures;
+using NUnit.Framework;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using CTA.FeatureDetection.Load.Loaders;
-using CTA.FeatureDetection.ProjectType.CompiledFeatures;
-using NUnit.Framework;
 
 namespace CTA.FeatureDetection.Tests.FeatureDetection.Load.Loaders
 {
@@ -21,10 +21,10 @@ namespace CTA.FeatureDetection.Tests.FeatureDetection.Load.Loaders
 
             var expectedFeatureNames = new[]
             {
-                nameof(AspNetMvcFeature), 
-                nameof(AspNetWebApiFeature), 
-                nameof(AspNetCoreMvcFeature), 
-                nameof(AspNetCoreWebApiFeature), 
+                nameof(AspNetMvcFeature),
+                nameof(AspNetWebApiFeature),
+                nameof(AspNetCoreMvcFeature),
+                nameof(AspNetCoreWebApiFeature),
                 nameof(WebClassLibraryFeature)
             };
 
@@ -70,7 +70,7 @@ namespace CTA.FeatureDetection.Tests.FeatureDetection.Load.Loaders
         [Test]
         public void LoadFeaturesByTypes_Returns_Instances_Of_Specified_Types()
         {
-            var featureTypes = new[] {typeof(AspNetMvcFeature), typeof(AspNetWebApiFeature)};
+            var featureTypes = new[] { typeof(AspNetMvcFeature), typeof(AspNetWebApiFeature) };
             var features = FeatureLoader.LoadFeaturesByTypes(featureTypes);
             var returnedFeatureTypes = features.Select(f => f.GetType());
 

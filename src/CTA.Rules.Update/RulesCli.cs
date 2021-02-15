@@ -1,8 +1,6 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using Codelyzer.Analysis;
-using Codelyzer.Analysis.Common;
 using CommandLine;
 
 namespace CTA.Rules.Update
@@ -11,12 +9,12 @@ namespace CTA.Rules.Update
     {
         [Option('p', "project-path", Required = true, HelpText = "Project file path.")]
         public string ProjectPath { get; set; }
-        
+
         [Option('s', "solution-path", Required = false, HelpText = "Solution file path.")]
         public string SolutionPath { get; set; }
 
-        [Option('r', "rules-input-infile", Required = false, HelpText = "Rules json input file")]
-        public string RulesInputFile { get; set; }
+        [Option('r', "rules-dir", Required = false, HelpText = "Directory containing rules json input file(s)")]
+        public string RulesDir { get; set; }
 
         [Option('a', "assemblies-dir", Required = false, HelpText = "Action Assemblies Dir")]
         public string AssembliesDir { get; set; }
@@ -24,12 +22,12 @@ namespace CTA.Rules.Update
         [Option('m', "mock-run", Required = false, HelpText = "Mock run to generate output only (no changes will be made)")]
         public string IsMockRun { get; set; }
     }
-    
+
     public class RulesCli
     {
         public bool Project;
         public string FilePath;
-        public string RulesPath;
+        public string RulesDir;
         public string AssembliesDir;
         public bool IsMockRun;
         public AnalyzerConfiguration Configuration;
@@ -44,9 +42,9 @@ namespace CTA.Rules.Update
                     {
                         Project = true;
                         FilePath = o.ProjectPath;
-                    }                 
+                    }
 
-                    RulesPath = o.RulesInputFile;
+                    RulesDir = o.RulesDir;
                     AssembliesDir = o.AssembliesDir;
 
                     if (!string.IsNullOrEmpty(o.IsMockRun) && o.IsMockRun.ToLower() == "true")
@@ -55,12 +53,12 @@ namespace CTA.Rules.Update
                     }
                 });
         }
-        
+
         static void HandleParseError(IEnumerable<Error> errs)
         {
-            Environment.Exit( -1 );
+            Environment.Exit(-1);
         }
     }
-    
-    
+
+
 }

@@ -1,11 +1,11 @@
-﻿using CTA.Rules.Config;
-using CTA.Rules.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Xml.Linq;
+using CTA.Rules.Config;
+using CTA.Rules.Models;
 
 namespace CTA.Rules.ProjectFile
 {
@@ -26,7 +26,7 @@ namespace CTA.Rules.ProjectFile
                     </PropertyGroup>
                     {2}
                 </Project>";
-        
+
         public const string csCoreProjSyntaxWebClassLibrary = @"
                 <Project Sdk=""{0}"">
                     <PropertyGroup>
@@ -145,7 +145,7 @@ namespace CTA.Rules.ProjectFile
                 {
                     references.Add(string.Format(projectReferenceTemplate, projectReference));
                 }
-            }            
+            }
 
             return string.Join(Environment.NewLine, references);
         }
@@ -184,7 +184,7 @@ namespace CTA.Rules.ProjectFile
 
                 _packages = packages.Union(_packages).ToDictionary(d => d.Key, d => d.Value);
             }
-            catch(Exception)
+            catch (Exception)
             {
                 //If we're using a framework csproj, we will get an error. No need to catch since we're overwriting the csproj file
             }
@@ -198,7 +198,7 @@ namespace CTA.Rules.ProjectFile
 
                 _projectReferences = projects.Union(_projectReferences).Distinct().ToList();
             }
-            catch(Exception)
+            catch (Exception)
             {
                 //If we're using a framework csproj, we will get an error. No need to catch since we're overwriting the csproj file
             }
@@ -210,7 +210,7 @@ namespace CTA.Rules.ProjectFile
                     _projectType = ProjectType.WebClassLibrary;
                 }
             }
-            catch(Exception)
+            catch (Exception)
             {
                 //If we're using a framework csproj, we will get an error. No need to catch since we're overwriting the csproj file
             }

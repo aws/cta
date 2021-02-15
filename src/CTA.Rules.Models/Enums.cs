@@ -1,6 +1,4 @@
-﻿using System.ComponentModel;
-
-namespace CTA.Rules.Models
+﻿namespace CTA.Rules.Models
 {
     public enum ActionTypes
     {

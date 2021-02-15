@@ -12,12 +12,12 @@ using Microsoft.Extensions.Logging;
 
 namespace CTA.FeatureDetection.Common.Models.Features.Conditions
 {
-    public class XmlFileQueryCondition: Condition
+    public class XmlFileQueryCondition : Condition
     {
         private ILogger Logger => Log.Logger;
 
         public string FileNamePattern { get; set; }
-        public string[] FileNamePatterns { get; set; } = {};
+        public string[] FileNamePatterns { get; set; } = { };
         public string XmlElementPath { get; set; }
         public string SearchPath { get; set; }
         public SearchOption SearchOption { get; set; } = SearchOption.AllDirectories;
@@ -50,7 +50,7 @@ namespace CTA.FeatureDetection.Common.Models.Features.Conditions
                 filePatternsToLookFor.Add(FileNamePattern);
             }
 
-            var filesFound = filePatternsToLookFor.SelectMany(filePattern => 
+            var filesFound = filePatternsToLookFor.SelectMany(filePattern =>
                 Directory.EnumerateFiles(directory, "*", SearchOption)
                     .Where(name => Regex.IsMatch(name, filePattern, IgnoreCase)));
 
@@ -72,7 +72,6 @@ namespace CTA.FeatureDetection.Common.Models.Features.Conditions
 
         private IEnumerable<XElement> GetElementsInPath(string xmlElementPath, XDocument xml)
         {
-            var x = xml.XPathSelectElements(xmlElementPath);
             return xml.XPathSelectElements(xmlElementPath);
         }
 
@@ -87,7 +86,7 @@ namespace CTA.FeatureDetection.Common.Models.Features.Conditions
                     return false;
                 }
 
-                return attributeInElement.Value == (string) attribute.Value;
+                return attributeInElement.Value == (string)attribute.Value;
             });
         }
     }

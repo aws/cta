@@ -1,12 +1,12 @@
-﻿using CTA.Rules.Config;
-using CTA.Rules.Models;
-using Codelyzer.Analysis.Model;
-using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Codelyzer.Analysis.Model;
+using CTA.Rules.Config;
+using CTA.Rules.Models;
+using Newtonsoft.Json;
 
 namespace CTA.Rules.RuleFiles
 {
@@ -15,25 +15,27 @@ namespace CTA.Rules.RuleFiles
     /// </summary>
     public class RulesFileLoader
     {
-        private string _rulesFile;
-        private string _targetFramework;
-        private string _overrideFile;
-        private string _assembliesDir;
-        private IEnumerable<Reference> _projectReferences;
+        private readonly string _rulesFilesDir;
+        private readonly string _targetFramework;
+        private readonly string _overrideFile;
+        private readonly string _assembliesDir;
+        private readonly IEnumerable<Reference> _projectReferences;
 
         /// <summary>
         /// Initializes a new RulesFileLoader
         /// </summary>
         /// <param name="projectReferences">References in the project to filter the rules by</param>
+        /// <param name="rulesFilesDir">Directory containing rules file(s) to use</param>
+        /// <param name="targetFramework">Target framework to port to</param>
         /// <param name="overrideFile">Path to rules file containing override rules. The override rules will be added to the built in rules, overriding any matching existing rules</param>
         /// <param name="assembliesDir">Directory containing assemblies containing additional actions</param>
-        public RulesFileLoader(IEnumerable<Reference> projectReferences, string rulesFile, List<string> targetFramework, string overrideFile = "", string assembliesDir = "")
+        public RulesFileLoader(IEnumerable<Reference> projectReferences, string rulesFilesDir, List<string> targetFramework, string overrideFile = "", string assembliesDir = "")
         {
-            _rulesFile = rulesFile;
+            _rulesFilesDir = rulesFilesDir;
             try
             {
                 _targetFramework = targetFramework.First();
-                if(targetFramework.Count > 1)
+                if (targetFramework.Count > 1)
                 {
                     LogHelper.LogDebug("Please specify one target version. Multiple target versions is not supported");
                 }
@@ -42,7 +44,7 @@ namespace CTA.Rules.RuleFiles
             {
                 LogHelper.LogError(ex, "Please specify one target version. Multiple target versions is not supported");
             }
-            
+
             _overrideFile = overrideFile;
             _assembliesDir = assembliesDir;
             _projectReferences = projectReferences;
@@ -57,9 +59,9 @@ namespace CTA.Rules.RuleFiles
             var mainNamespaceFileTasks = new Task<NamespaceRecommendations>(() =>
             {
                 NamespaceRecommendations rulesFile = new NamespaceRecommendations();
-                if (!string.IsNullOrEmpty(_rulesFile) && Directory.Exists(_rulesFile))
+                if (!string.IsNullOrEmpty(_rulesFilesDir) && Directory.Exists(_rulesFilesDir))
                 {
-                    rulesFile = LoadNamespaceFile(_rulesFile);
+                    rulesFile = LoadNamespaceFile(_rulesFilesDir);
                 }
                 return rulesFile;
             });
@@ -67,16 +69,16 @@ namespace CTA.Rules.RuleFiles
 
             var mainFileTask = new Task<Rootobject>(() =>
             {
-                Rootobject rulesFile = new Rootobject();
-                if (!string.IsNullOrEmpty(_rulesFile) && Directory.Exists(_rulesFile))
+                Rootobject rules = new Rootobject();
+                if (!string.IsNullOrEmpty(_rulesFilesDir) && Directory.Exists(_rulesFilesDir))
                 {
-                    rulesFile = LoadFile(_rulesFile);
-                    if (rulesFile.NameSpaces != null)
+                    rules = LoadRulesFiles(_rulesFilesDir);
+                    if (rules.NameSpaces != null)
                     {
-                        rulesFile.NameSpaces = rulesFile.NameSpaces.Where(n => _projectReferences.Contains(new Reference() { Assembly = n.Assembly, Namespace = n.@namespace }) || (n.Assembly == Constants.Project && n.@namespace == Constants.Project)).ToList();
+                        rules.NameSpaces = rules.NameSpaces.Where(n => _projectReferences.Contains(new Reference() { Assembly = n.Assembly, Namespace = n.@namespace }) || (n.Assembly == Constants.Project && n.@namespace == Constants.Project)).ToList();
                     }
                 }
-                return rulesFile;
+                return rules;
             });
             mainFileTask.Start();
 
@@ -93,25 +95,25 @@ namespace CTA.Rules.RuleFiles
 
             var overrideTask = new Task<Rootobject>(() =>
             {
-                Rootobject rulesFile = new Rootobject();
+                Rootobject rules = new Rootobject();
                 if (!string.IsNullOrEmpty(_overrideFile) && Directory.Exists(_overrideFile))
                 {
-                    rulesFile = LoadFile(_overrideFile);
-                    if (rulesFile.NameSpaces != null)
+                    rules = LoadRulesFiles(_overrideFile);
+                    if (rules.NameSpaces != null)
                     {
-                        rulesFile.NameSpaces = rulesFile.NameSpaces.Where(n => _projectReferences.Contains(new Reference() { Assembly = n.Assembly, Namespace = n.@namespace }) || (n.Assembly == Constants.Project && n.@namespace == Constants.Project)).ToList();
+                        rules.NameSpaces = rules.NameSpaces.Where(n => _projectReferences.Contains(new Reference() { Assembly = n.Assembly, Namespace = n.@namespace }) || (n.Assembly == Constants.Project && n.@namespace == Constants.Project)).ToList();
                     }
                 }
-                return rulesFile;
+                return rules;
             });
             overrideTask.Start();
 
             Task.WaitAll(mainNamespaceFileTasks, overrideNamespaceFileTasks, mainFileTask, overrideTask);
-            
-            RulesFileParser rulesFileParser = new RulesFileParser(mainNamespaceFileTasks.Result, 
-                overrideNamespaceFileTasks.Result, 
-                mainFileTask.Result, 
-                overrideTask.Result, 
+
+            RulesFileParser rulesFileParser = new RulesFileParser(mainNamespaceFileTasks.Result,
+                overrideNamespaceFileTasks.Result,
+                mainFileTask.Result,
+                overrideTask.Result,
                 _assembliesDir,
                 _targetFramework
                 );
@@ -148,22 +150,22 @@ namespace CTA.Rules.RuleFiles
             return nr;
         }
 
-        private Rootobject LoadFile(string pathToLoad)
+        private Rootobject LoadRulesFiles(string ruleFilesDir)
         {
             Rootobject r = new Rootobject();
-            var ruleFiles = Directory.EnumerateFiles(pathToLoad, "*.json", SearchOption.AllDirectories);
-            foreach (var ruleFile in ruleFiles)
+            var rulesFiles = Directory.EnumerateFiles(ruleFilesDir, "*.json", SearchOption.AllDirectories);
+            foreach (var rulesFile in rulesFiles)
             {
                 try
                 {
-                    var content = File.ReadAllText(ruleFile);
-                   
-                    var currentNode = JsonConvert.DeserializeObject<Rootobject>(content);                    
+                    var content = File.ReadAllText(rulesFile);
+
+                    var currentNode = JsonConvert.DeserializeObject<Rootobject>(content);
                     r.NameSpaces.AddRange(currentNode.NameSpaces);
                 }
                 catch (Exception ex)
                 {
-                    LogHelper.LogError("Error parsing file: {0}{1} Exception:{2}", ruleFile, Environment.NewLine, ex.Message);
+                    LogHelper.LogError("Error parsing file: {0}{1} Exception:{2}", rulesFile, Environment.NewLine, ex.Message);
                 }
             }
             return r;

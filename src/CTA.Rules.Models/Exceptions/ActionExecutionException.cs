@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace CTA.Rules.Models
 {
     public class ActionExecutionException : Exception
     {
-        public ActionExecutionException(string actionType, string actionName, Exception exception) 
+        public ActionExecutionException(string actionType, string actionName, Exception exception)
             : base(GetActionExecutionException(actionType, actionName), exception)
         {
 

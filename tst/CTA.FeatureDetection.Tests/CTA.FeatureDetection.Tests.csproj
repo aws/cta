@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup> 
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.5.0" /> 
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.8.3" /> 
     <PackageReference Include="NUnit3TestAdapter" Version="3.15.1" />
     <PackageReference Include="Moq" Version="4.14.7" /> 
     <PackageReference Include="NUnit" Version="3.12.0" />
@@ -25,6 +25,39 @@
     <ProjectReference Include="..\..\src\CTA.FeatureDetection.ProjectType\CTA.FeatureDetection.ProjectType.csproj" />
     <ProjectReference Include="..\..\src\CTA.FeatureDetection\CTA.FeatureDetection.csproj" />
     <ProjectReference Include="..\..\src\CTA.Rules.Config\CTA.Rules.Config.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Templates\mvc\Program.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Compile>
+    <Compile Update="Templates\mvc\Startup.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Compile>
+    <Compile Update="Templates\webapi\Program.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Compile>
+    <Compile Update="Templates\webapi\Startup.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Templates\classlibrary\appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Templates\default.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Templates\mvc\appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Templates\webapi\appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Templates\webclasslibrary\appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

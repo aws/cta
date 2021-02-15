@@ -12,7 +12,7 @@ namespace CTA.FeatureDetection.Tests.FeatureDetection.ProjectType.Extensions
         {
             var mockResult = new FeatureDetectionResult
             {
-                FeatureStatus = {{Constants.AspNetCoreMvcFeatureName, true}}
+                FeatureStatus = { { Constants.AspNetCoreMvcFeatureName, true } }
             };
 
             Assert.True(mockResult.IsCoreMvcProject());
@@ -34,7 +34,7 @@ namespace CTA.FeatureDetection.Tests.FeatureDetection.ProjectType.Extensions
         {
             var mockResult = new FeatureDetectionResult
             {
-                FeatureStatus = {{Constants.AspNetMvcFeatureName, true}}
+                FeatureStatus = { { Constants.AspNetMvcFeatureName, true } }
             };
 
             Assert.True(mockResult.IsMvcProject());

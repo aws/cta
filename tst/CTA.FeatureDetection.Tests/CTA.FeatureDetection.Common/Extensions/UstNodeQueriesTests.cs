@@ -1,8 +1,8 @@
-﻿using System.Linq;
-using Codelyzer.Analysis.Model;
+﻿using Codelyzer.Analysis.Model;
 using CTA.FeatureDetection.Common.Extensions;
 using CTA.FeatureDetection.Tests.TestBase;
 using NUnit.Framework;
+using System.Linq;
 
 namespace CTA.FeatureDetection.Tests.FeatureDetection.Common.Extensions
 {
@@ -87,7 +87,7 @@ namespace CTA.FeatureDetection.Tests.FeatureDetection.Common.Extensions
         public void ContainsInvocationExpressionsWithSemanticDefinition_Returns_False_If_InvocationExpression_Is_Found()
         {
             var semanticOriginalDefinition = "Nonexistent InvocationExpression";
-            var projectName = MvcProjectName; 
+            var projectName = MvcProjectName;
             var sourceFileName = "HomeController.cs";
             var projectWorkspace = MvcAnalyzerResults
                 .First(r => r.ProjectResult.ProjectName == projectName)
@@ -103,7 +103,7 @@ namespace CTA.FeatureDetection.Tests.FeatureDetection.Common.Extensions
         public void GetInvocationExpressionsBySemanticReturnType_Returns_InvocationExpressions_With_SemanticReturnType()
         {
             var semanticReturnType = "ViewResult";
-            var projectName = MvcProjectName; 
+            var projectName = MvcProjectName;
             var sourceFileName = "HomeController.cs";
             var projectWorkspace = MvcAnalyzerResults
                 .First(r => r.ProjectResult.ProjectName == projectName)
@@ -117,8 +117,8 @@ namespace CTA.FeatureDetection.Tests.FeatureDetection.Common.Extensions
         [Test]
         public void GetInvocationExpressionsBySemanticReturnType_Returns_InvocationExpressions_With_SemanticReturnTypes()
         {
-            var semanticReturnTypes = new[] {"ViewResult"};
-            var projectName = MvcProjectName; 
+            var semanticReturnTypes = new[] { "ViewResult" };
+            var projectName = MvcProjectName;
             var sourceFileName = "HomeController.cs";
             var projectWorkspace = MvcAnalyzerResults
                 .First(r => r.ProjectResult.ProjectName == projectName)

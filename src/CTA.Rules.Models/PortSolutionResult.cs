@@ -61,7 +61,7 @@ namespace CTA.Rules.Models
             try
             {
                 analyzerResults = codeAnalyzer.AnalyzeSolution(SolutionPath).Result;
-                
+
                 // Process build errors by project
                 foreach (var analyzerResult in analyzerResults)
                 {
@@ -106,10 +106,10 @@ namespace CTA.Rules.Models
         public override string ToString()
         {
             StringBuilder str = new StringBuilder();
-            
+
             // Print References
             str.AppendLine("==========");
-            str.AppendLine(nameof(References)); 
+            str.AppendLine(nameof(References));
             str.AppendLine("==========");
             str.AppendLine(string.Join(Environment.NewLine, References));
             str.AppendLine();
