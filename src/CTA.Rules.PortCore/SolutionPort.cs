@@ -139,7 +139,7 @@ namespace CTA.Rules.PortCore
                 if (projectConfiguration.UseDefaultRules)
                 {
                     DownloadRecommendationFiles(analyzerResults);
-                    projectConfiguration.RulesPath = Constants.RulesDefaultPath;
+                    projectConfiguration.RulesDir = Constants.RulesDefaultPath;
                 }
             }
         }

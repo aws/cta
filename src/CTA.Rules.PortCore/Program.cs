@@ -25,10 +25,10 @@ namespace CTA.Rules.PortCore
                 LogHelper.Logger = loggerFactory.CreateLogger("Translator");
 
 
-                if (string.IsNullOrEmpty(cli.RulesPath))
+                if (string.IsNullOrEmpty(cli.RulesDir))
                 {
                     //TODO : Change the hard coded path to a constant
-                    cli.RulesPath = Config.Constants.RulesDefaultPath;
+                    cli.RulesDir = Config.Constants.RulesDefaultPath;
                 }
 
                 string solutionDir = Directory.GetParent(cli.FilePath).FullName;
@@ -43,7 +43,7 @@ namespace CTA.Rules.PortCore
                     PortCoreConfiguration projectConfiguration = new PortCoreConfiguration()
                     {
                         ProjectPath = proj,
-                        RulesPath = cli.RulesPath,
+                        RulesDir = cli.RulesDir,
                         IsMockRun = cli.IsMockRun,
                         UseDefaultRules = cli.DefaultRules,
                         PackageReferences = packageReferences,

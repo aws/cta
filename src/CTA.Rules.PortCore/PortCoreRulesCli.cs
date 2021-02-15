@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using CommandLine;
 
@@ -12,8 +12,8 @@ namespace CTA.Rules.PortCore
         [Option('s', "solution-path", Required = false, HelpText = "Solution file path.")]
         public string SolutionPath { get; set; }
 
-        [Option('r', "rules-input-infile", Required = false, HelpText = "Rules json input file")]
-        public string RulesInputFile { get; set; }
+        [Option('r', "rules-dir", Required = false, HelpText = "Directory containing rules json input file(s)")]
+        public string RulesDir { get; set; }
 
         [Option('d', "use-builtin-rules", Required = false, HelpText = "Use default rule files")]
         public string DefaultRules { get; set; }
@@ -31,7 +31,7 @@ namespace CTA.Rules.PortCore
     public class PortCoreRulesCli
     {
         public string FilePath;
-        public string RulesPath;
+        public string RulesDir;
         public string AssembliesDir;
         public bool IsMockRun;
         public bool DefaultRules;
@@ -52,7 +52,7 @@ namespace CTA.Rules.PortCore
                         FilePath = o.SolutionPath;
                     }
 
-                    RulesPath = o.RulesInputFile;
+                    RulesDir = o.RulesDir;
                     AssembliesDir = o.AssembliesDir;
 
                     if (!string.IsNullOrEmpty(o.DefaultRules) && o.DefaultRules.ToLower() == "true")
