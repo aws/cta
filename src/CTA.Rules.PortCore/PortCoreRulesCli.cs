@@ -12,8 +12,8 @@ namespace CTA.Rules.PortCore
         [Option('s', "solution-path", Required = false, HelpText = "Solution file path.")]
         public string SolutionPath { get; set; }
 
-        [Option('r', "rules-input-infile-directory", Required = false, HelpText = "Directory containing rules json input file(s)")]
-        public string RulesInputFilesDirectory { get; set; }
+        [Option('r', "rules-dir", Required = false, HelpText = "Directory containing rules json input file(s)")]
+        public string RulesDir { get; set; }
 
         [Option('d', "use-builtin-rules", Required = false, HelpText = "Use default rule files")]
         public string DefaultRules { get; set; }
@@ -52,7 +52,7 @@ namespace CTA.Rules.PortCore
                         FilePath = o.SolutionPath;
                     }
 
-                    RulesDir = o.RulesInputFilesDirectory;
+                    RulesDir = o.RulesDir;
                     AssembliesDir = o.AssembliesDir;
 
                     if (!string.IsNullOrEmpty(o.DefaultRules) && o.DefaultRules.ToLower() == "true")

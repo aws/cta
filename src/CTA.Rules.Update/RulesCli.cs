@@ -13,8 +13,8 @@ namespace CTA.Rules.Update
         [Option('s', "solution-path", Required = false, HelpText = "Solution file path.")]
         public string SolutionPath { get; set; }
 
-        [Option('r', "rules-input-infile-directory", Required = false, HelpText = "Directory containing rules json input file(s)")]
-        public string RulesInputFilesDirectory { get; set; }
+        [Option('r', "rules-dir", Required = false, HelpText = "Directory containing rules json input file(s)")]
+        public string RulesDir { get; set; }
 
         [Option('a', "assemblies-dir", Required = false, HelpText = "Action Assemblies Dir")]
         public string AssembliesDir { get; set; }
@@ -44,7 +44,7 @@ namespace CTA.Rules.Update
                         FilePath = o.ProjectPath;
                     }
 
-                    RulesDir = o.RulesInputFilesDirectory;
+                    RulesDir = o.RulesDir;
                     AssembliesDir = o.AssembliesDir;
 
                     if (!string.IsNullOrEmpty(o.IsMockRun) && o.IsMockRun.ToLower() == "true")
