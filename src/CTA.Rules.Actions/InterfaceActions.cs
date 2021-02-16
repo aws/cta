@@ -15,16 +15,16 @@ namespace CTA.Rules.Actions
     {
         public Func<SyntaxGenerator, InterfaceDeclarationSyntax, InterfaceDeclarationSyntax> GetChangeNameAction(string newName)
         {
-            Func<SyntaxGenerator, InterfaceDeclarationSyntax, InterfaceDeclarationSyntax> ChangeName = (SyntaxGenerator syntaxGenerator, InterfaceDeclarationSyntax node) =>
+            InterfaceDeclarationSyntax ChangeName(SyntaxGenerator syntaxGenerator, InterfaceDeclarationSyntax node)
             {
                 node = node.WithIdentifier(SyntaxFactory.Identifier(newName));
                 return node;
-            };
+            }
             return ChangeName;
         }
         public Func<SyntaxGenerator, InterfaceDeclarationSyntax, InterfaceDeclarationSyntax> GetRemoveAttributeAction(string attributeName)
         {
-            Func<SyntaxGenerator, InterfaceDeclarationSyntax, InterfaceDeclarationSyntax> RemoveAttribute = (SyntaxGenerator syntaxGenerator, InterfaceDeclarationSyntax node) =>
+            InterfaceDeclarationSyntax RemoveAttribute(SyntaxGenerator syntaxGenerator, InterfaceDeclarationSyntax node)
             {
                 var attributeLists = node.AttributeLists;
                 AttributeListSyntax attributeToRemove = null;
@@ -48,13 +48,13 @@ namespace CTA.Rules.Actions
 
                 node = node.WithAttributeLists(attributeLists);
                 return node;
-            };
+            }
 
             return RemoveAttribute;
         }
         public Func<SyntaxGenerator, InterfaceDeclarationSyntax, InterfaceDeclarationSyntax> GetAddAttributeAction(string attribute)
         {
-            Func<SyntaxGenerator, InterfaceDeclarationSyntax, InterfaceDeclarationSyntax> AddAttribute = (SyntaxGenerator syntaxGenerator, InterfaceDeclarationSyntax node) =>
+            InterfaceDeclarationSyntax AddAttribute(SyntaxGenerator syntaxGenerator, InterfaceDeclarationSyntax node)
             {
                 var attributeLists = node.AttributeLists;
                 attributeLists = attributeLists.Add(
@@ -64,36 +64,36 @@ namespace CTA.Rules.Actions
 
                 node = node.WithAttributeLists(attributeLists).NormalizeWhitespace();
                 return node;
-            };
+            }
             return AddAttribute;
         }
         public Func<SyntaxGenerator, InterfaceDeclarationSyntax, InterfaceDeclarationSyntax> GetAddCommentAction(string comment)
         {
-            Func<SyntaxGenerator, InterfaceDeclarationSyntax, InterfaceDeclarationSyntax> AddComment = (SyntaxGenerator syntaxGenerator, InterfaceDeclarationSyntax node) =>
+            InterfaceDeclarationSyntax AddComment(SyntaxGenerator syntaxGenerator, InterfaceDeclarationSyntax node)
             {
                 SyntaxTriviaList currentTrivia = node.GetLeadingTrivia();
                 //TODO see if this will lead NPE    
                 currentTrivia = currentTrivia.Add(SyntaxFactory.SyntaxTrivia(SyntaxKind.MultiLineCommentTrivia, string.Format(Constants.CommentFormat, comment)));
                 node = node.WithLeadingTrivia(currentTrivia).NormalizeWhitespace();
                 return node;
-            };
+            }
             return AddComment;
         }
         public Func<SyntaxGenerator, InterfaceDeclarationSyntax, InterfaceDeclarationSyntax> GetAddMethodAction(string expression)
         {
-            Func<SyntaxGenerator, InterfaceDeclarationSyntax, InterfaceDeclarationSyntax> AddMethod = (SyntaxGenerator syntaxGenerator, InterfaceDeclarationSyntax node) =>
+            InterfaceDeclarationSyntax AddMethod(SyntaxGenerator syntaxGenerator, InterfaceDeclarationSyntax node)
             {
                 var allMembers = node.Members;
                 allMembers = allMembers.Add(SyntaxFactory.ParseMemberDeclaration(expression));
                 node = node.WithMembers(allMembers).NormalizeWhitespace();
                 return node;
-            };
+            }
             return AddMethod;
         }
         public Func<SyntaxGenerator, InterfaceDeclarationSyntax, InterfaceDeclarationSyntax> GetRemoveMethodAction(string methodName)
         {
             //TODO  what if there is operator overloading 
-            Func<SyntaxGenerator, InterfaceDeclarationSyntax, InterfaceDeclarationSyntax> AddMethod = (SyntaxGenerator syntaxGenerator, InterfaceDeclarationSyntax node) =>
+            InterfaceDeclarationSyntax AddMethod(SyntaxGenerator syntaxGenerator, InterfaceDeclarationSyntax node)
             {
                 var allMembers = node.Members.ToList();
                 var allMethods = allMembers.OfType<MethodDeclarationSyntax>();
@@ -101,7 +101,7 @@ namespace CTA.Rules.Actions
                 allMembers.Remove(removeMethod);
                 node = node.RemoveNode(removeMethod, SyntaxRemoveOptions.KeepNoTrivia);
                 return node;
-            };
+            }
             return AddMethod;
         }
     }

@@ -82,19 +82,19 @@ namespace CTA.Rules.Config
         public const string MetricsTag = "CTA_METRICS_TAG";
 
         //Folder migration
-        public const string wwwroot = "wwwroot";
+        public const string Wwwroot = "wwwroot";
         public const string Content = "Content";
         public const string Scripts = "Scripts";
 
         //Config migration
-        public const string appSettingsJson = "appsettings.json";
-        public const string appSettings = "appsettings";
-        public const string webConfig = "web.config";
-        public const string name = "name";
-        public const string connectionstrings = "connectionstrings";
-        public const string connectionstring = "connectionstring";
-        public const string key = "key";
-        public const string value = "value";
+        public const string AppSettingsJson = "appsettings.json";
+        public const string AppSettings = "appsettings";
+        public const string WebConfig = "web.config";
+        public const string Name = "name";
+        public const string ConnectionstringsLower = "connectionstrings";
+        public const string Connectionstring = "connectionstring";
+        public const string Key = "key";
+        public const string Value = "value";
         public const string ConnectionStrings = "ConnectionStrings";
 
         public static readonly List<string> SupportedMethodModifiers = new List<string>() { "public", "internal", "protected", "private", "abstract", "extern", "override", "static", "unsafe", "virtual", "async" };

@@ -14,7 +14,7 @@ namespace CTA.Rules.Actions
     {
         public Func<SyntaxGenerator, IdentifierNameSyntax, IdentifierNameSyntax> GetReplaceIdentifierAction(string identifierName)
         {
-            Func<SyntaxGenerator, IdentifierNameSyntax, IdentifierNameSyntax> ReplaceIdentifier = (SyntaxGenerator syntaxGenerator, IdentifierNameSyntax node) =>
+            IdentifierNameSyntax ReplaceIdentifier(SyntaxGenerator syntaxGenerator, IdentifierNameSyntax node)
             {
                 var leadingTrivia = node.GetLeadingTrivia();
                 var trailingTrivia = node.GetTrailingTrivia();
@@ -22,13 +22,13 @@ namespace CTA.Rules.Actions
                 node = node.WithLeadingTrivia(leadingTrivia);
                 node = node.WithTrailingTrivia(trailingTrivia);
                 return node;
-            };
+            }
             return ReplaceIdentifier;
         }
 
         public Func<SyntaxGenerator, IdentifierNameSyntax, IdentifierNameSyntax> GetReplaceIdentifierInsideClassAction(string Identifier, string ClassFullKey)
         {
-            Func<SyntaxGenerator, IdentifierNameSyntax, IdentifierNameSyntax> ReplaceIdentifier2 = (SyntaxGenerator syntaxGenerator, IdentifierNameSyntax node) =>
+            IdentifierNameSyntax ReplaceIdentifier2(SyntaxGenerator syntaxGenerator, IdentifierNameSyntax node)
             {
                 var currentNode = node.Parent;
                 while (currentNode != null && currentNode.GetType() != typeof(ClassDeclarationSyntax))
@@ -42,10 +42,7 @@ namespace CTA.Rules.Actions
                     currentNode = currentNode.Parent;
                 }
 
-                var namespaceNode = currentNode as NamespaceDeclarationSyntax;
-
-                if (classNode == null || namespaceNode == null) { return node; }
-
+                if (classNode == null || !(currentNode is NamespaceDeclarationSyntax namespaceNode)) { return node; }
 
                 var fullName = string.Concat(namespaceNode.Name, ".", classNode.Identifier.Text);
 
@@ -63,7 +60,7 @@ namespace CTA.Rules.Actions
                     return node;
                 }
 
-            };
+            }
             return ReplaceIdentifier2;
         }
     }

@@ -10,13 +10,13 @@ namespace CTA.Rules.ProjectFile
 {
     public class ProjectFileCreator
     {
-        private string _projectFile;
-        private List<string> _targetVersions;
+        private readonly string _projectFile;
+        private readonly List<string> _targetVersions;
         private Dictionary<string, string> _packages;
         private IEnumerable<string> _projectReferences;
         private ProjectType _projectType;
 
-        private const string CsCoreProjSyntaxWeb = 
+        private readonly string _csCoreProjSyntaxWeb = 
 @"<Project Sdk=""{0}"">
   <PropertyGroup>
     <TargetFramework>{1}</TargetFramework>
@@ -25,7 +25,7 @@ namespace CTA.Rules.ProjectFile
 {3}
 </Project>";
 
-        private const string CsCoreProjSyntaxWebClassLibrary =
+        private readonly string _csCoreProjSyntaxWebClassLibrary =
 @"<Project Sdk=""{0}"">
   <PropertyGroup>
     <TargetFramework>{1}</TargetFramework>
@@ -37,7 +37,7 @@ namespace CTA.Rules.ProjectFile
 {3}
 </Project>";
 
-        private const string CsCoreProjSyntaxClassLibrary =
+        private readonly string _csCoreProjSyntaxClassLibrary =
 @"<Project Sdk=""{0}"">
   <PropertyGroup>
     <TargetFramework>{1}</TargetFramework>
@@ -46,7 +46,7 @@ namespace CTA.Rules.ProjectFile
 {3}
 </Project>";
 
-        private const string ItemGroupTemplate =
+        private readonly string _itemGroupTemplate =
 @"<ItemGroup>
 {0}
 </ItemGroup>";
@@ -89,16 +89,16 @@ namespace CTA.Rules.ProjectFile
             try
             {
                 string sdkName = Constants.ClassLibrarySdkName;
-                string csProj = CsCoreProjSyntaxClassLibrary;
+                string csProj = _csCoreProjSyntaxClassLibrary;
 
                 if (_projectType == ProjectType.Mvc || _projectType == ProjectType.WebApi)
                 {
-                    csProj = CsCoreProjSyntaxWeb;
+                    csProj = _csCoreProjSyntaxWeb;
                     sdkName = Constants.WebSdkName;
                 }
                 else if (_projectType == ProjectType.WebClassLibrary)
                 {
-                    csProj = CsCoreProjSyntaxWebClassLibrary;
+                    csProj = _csCoreProjSyntaxWebClassLibrary;
                 }
 
                 string packages = GetPackagesSection();
@@ -122,7 +122,7 @@ namespace CTA.Rules.ProjectFile
                 return string.Empty;
             }
             
-            var itemGroupContent = string.Format(ItemGroupTemplate, content);
+            var itemGroupContent = string.Format(_itemGroupTemplate, content);
             itemGroupContent = IndentAllLines(itemGroupContent);
 
             return itemGroupContent;

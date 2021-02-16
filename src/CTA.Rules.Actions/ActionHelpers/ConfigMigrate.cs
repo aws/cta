@@ -12,8 +12,8 @@ namespace CTA.Rules.Actions
 {
     public class ConfigMigrate
     {
-        private string _projectDir;
-        private ProjectType _projectType;
+        private readonly string _projectDir;
+        private readonly ProjectType _projectType;
         private bool _hasData;
 
         public ConfigMigrate(string projectDir, ProjectType projectType)
@@ -38,7 +38,7 @@ namespace CTA.Rules.Actions
             var configXml = LoadWebConfig(_projectDir);
             if (configXml == null) { return isConfigFound; }
 
-            var config = ProcessWebConfig(configXml, TemplateHelper.GetTemplateFileContent("", _projectType, Constants.appSettingsJson));
+            var config = ProcessWebConfig(configXml, TemplateHelper.GetTemplateFileContent("", _projectType, Constants.AppSettingsJson));
             if (_hasData)
             {
                 isConfigFound = "Found and migrated settings from web.config";
@@ -49,7 +49,7 @@ namespace CTA.Rules.Actions
         }
         private Configuration LoadWebConfig(string projectDir)
         {
-            string webConfigFile = Path.Combine(projectDir, Constants.webConfig);
+            string webConfigFile = Path.Combine(projectDir, Constants.WebConfig);
 
             if (File.Exists(webConfigFile))
             {
@@ -89,7 +89,7 @@ namespace CTA.Rules.Actions
                 }
                 if (appSettingsObjects.Count > 0)
                 {
-                    AddToJsonObject(defaultContent, Constants.appSettings, appSettingsObjects);
+                    AddToJsonObject(defaultContent, Constants.AppSettings, appSettingsObjects);
                 }
                 return defaultContent;
             }
@@ -166,7 +166,7 @@ namespace CTA.Rules.Actions
         /// <param name="projectDir">The project directory where this file will be created</param>
         private void AddAppSettingsJsonFile(JObject content, string projectDir)
         {
-            File.WriteAllText(Path.Combine(projectDir, Constants.appSettingsJson), content.ToString());
+            File.WriteAllText(Path.Combine(projectDir, Constants.AppSettingsJson), content.ToString());
             LogChange(string.Format("Create appsettings.json file using web.config settings"));
         }
         private void LogChange(string message)

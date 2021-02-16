@@ -14,13 +14,13 @@ namespace CTA.Rules.Actions
     {
         public Func<SyntaxGenerator, MethodDeclarationSyntax, MethodDeclarationSyntax> GetAddCommentAction(string comment)
         {
-            Func<SyntaxGenerator, MethodDeclarationSyntax, MethodDeclarationSyntax> AddComment = (SyntaxGenerator syntaxGenerator, MethodDeclarationSyntax node) =>
+            MethodDeclarationSyntax AddComment(SyntaxGenerator syntaxGenerator, MethodDeclarationSyntax node)
             {
                 SyntaxTriviaList currentTrivia = node.GetLeadingTrivia();
                 currentTrivia = currentTrivia.Insert(0, SyntaxFactory.SyntaxTrivia(SyntaxKind.MultiLineCommentTrivia, string.Format(Constants.CommentFormat, comment)));
                 node = node.WithLeadingTrivia(currentTrivia).NormalizeWhitespace();
                 return node;
-            };
+            }
             return AddComment;
         }
     }

@@ -11,17 +11,17 @@ namespace CTA.Rules.Actions
     /// </summary>
     public class ProjectFileActions
     {
-        public Func<string, ProjectType, List<string>, Dictionary<string, string>, List<string>, string> GetMigrateProjectFileAction(string empty)
+        public Func<string, ProjectType, List<string>, Dictionary<string, string>, List<string>, string> GetMigrateProjectFileAction(string _)
         {
-            Func<string, ProjectType, List<string>, Dictionary<string, string>, List<string>, string> func
-                = (string projectDir, ProjectType projectType, List<string> targetVersion, Dictionary<string, string> packageReferences, List<string> projectReferences) =>
+            static string func
+(string projectDir, ProjectType projectType, List<string> targetVersion, Dictionary<string, string> packageReferences, List<string> projectReferences)
             {
                 ProjectFileCreator projectFileCreator = new ProjectFileCreator(projectDir, targetVersion,
                     packageReferences, projectReferences.ToList(), projectType);
 
                 var result = projectFileCreator.Create();
                 return result ? "Project file created" : string.Empty;
-            };
+            }
 
             return func;
         }

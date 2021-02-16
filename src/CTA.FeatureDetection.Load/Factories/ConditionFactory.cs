@@ -28,8 +28,7 @@ namespace CTA.FeatureDetection.Load.Factories
                 throw new ClassNotFoundException(assembly, className);
             }
 
-            var conditionInstance = Activator.CreateInstance(conditionType, conditionMetadata) as Condition;
-            if (conditionInstance == null)
+            if (!(Activator.CreateInstance(conditionType, conditionMetadata) is Condition conditionInstance))
             {
                 throw new InvalidCastException($"Type {className} cannot be cast to {typeof(Condition)}");
             }
