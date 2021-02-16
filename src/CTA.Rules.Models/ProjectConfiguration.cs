@@ -14,7 +14,7 @@ namespace CTA.Rules.Models
         public string ProjectPath;
         public List<string> TargetVersions;
         public string AssemblyDir;
-        public string RulesPath;
+        public string RulesDir;
         public Dictionary<string, Tuple<string, string>> PackageReferences;
         public bool IsMockRun = false;
         public ProjectType ProjectType = ProjectType.ClassLibrary;

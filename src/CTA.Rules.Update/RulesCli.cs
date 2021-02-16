@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Codelyzer.Analysis;
 using CommandLine;
@@ -13,8 +13,8 @@ namespace CTA.Rules.Update
         [Option('s', "solution-path", Required = false, HelpText = "Solution file path.")]
         public string SolutionPath { get; set; }
 
-        [Option('r', "rules-input-infile", Required = false, HelpText = "Rules json input file")]
-        public string RulesInputFile { get; set; }
+        [Option('r', "rules-dir", Required = false, HelpText = "Directory containing rules json input file(s)")]
+        public string RulesDir { get; set; }
 
         [Option('a', "assemblies-dir", Required = false, HelpText = "Action Assemblies Dir")]
         public string AssembliesDir { get; set; }
@@ -27,7 +27,7 @@ namespace CTA.Rules.Update
     {
         public bool Project;
         public string FilePath;
-        public string RulesPath;
+        public string RulesDir;
         public string AssembliesDir;
         public bool IsMockRun;
         public AnalyzerConfiguration Configuration;
@@ -44,7 +44,7 @@ namespace CTA.Rules.Update
                         FilePath = o.ProjectPath;
                     }
 
-                    RulesPath = o.RulesInputFile;
+                    RulesDir = o.RulesDir;
                     AssembliesDir = o.AssembliesDir;
 
                     if (!string.IsNullOrEmpty(o.IsMockRun) && o.IsMockRun.ToLower() == "true")

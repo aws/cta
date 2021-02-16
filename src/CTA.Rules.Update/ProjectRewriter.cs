@@ -59,7 +59,7 @@ namespace CTA.Rules.Update
             try
             {
                 var allReferences = _sourceFileResults?.SelectMany(s => s.References).Distinct();
-                RulesFileLoader rulesFileLoader = new RulesFileLoader(allReferences, RulesEngineConfiguration.RulesPath, RulesEngineConfiguration.TargetVersions, string.Empty, RulesEngineConfiguration.AssemblyDir);
+                RulesFileLoader rulesFileLoader = new RulesFileLoader(allReferences, RulesEngineConfiguration.RulesDir, RulesEngineConfiguration.TargetVersions, string.Empty, RulesEngineConfiguration.AssemblyDir);
                 var result = rulesFileLoader.Load();
 
                 RulesAnalysis walker = new RulesAnalysis(_sourceFileResults, result);
