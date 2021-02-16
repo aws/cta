@@ -15,16 +15,16 @@ namespace CTA.Rules.RuleFiles
     /// </summary>
     public class RulesFileParser
     {
-        private RootNodes _rootNodes;
-        private string _assembliesDir;
-        private string _targetFramework;
+        private readonly RootNodes _rootNodes;
+        private readonly string _assembliesDir;
+        private readonly string _targetFramework;
 
         private ActionsLoader actionsLoader;
-        private Rootobject _rulesObject;
-        private Rootobject _overrideObject;
+        private readonly Rootobject _rulesObject;
+        private readonly Rootobject _overrideObject;
 
-        private NamespaceRecommendations _namespaceRecommendations;
-        private NamespaceRecommendations _overrideNamespaceRecommendations;
+        private readonly NamespaceRecommendations _namespaceRecommendations;
+        private readonly NamespaceRecommendations _overrideNamespaceRecommendations;
 
         /// <summary>
         /// Runs the rules parser

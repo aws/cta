@@ -14,14 +14,14 @@ namespace CTA.Rules.Actions
     {
         public Func<SyntaxGenerator, AttributeListSyntax, AttributeListSyntax> GetAddCommentAction(string comment)
         {
-            Func<SyntaxGenerator, AttributeListSyntax, AttributeListSyntax> AddComment = (SyntaxGenerator syntaxGenerator, AttributeListSyntax node) =>
+            AttributeListSyntax AddComment(SyntaxGenerator syntaxGenerator, AttributeListSyntax node)
             {
                 //TODO IS there possibility of NPE , if there are no Trivia or it always returns a node...
                 SyntaxTriviaList currentTrivia = node.GetLeadingTrivia();
                 currentTrivia = currentTrivia.Insert(0, SyntaxFactory.SyntaxTrivia(SyntaxKind.MultiLineCommentTrivia, string.Format(Constants.CommentFormat, comment)));
                 node = node.WithLeadingTrivia(currentTrivia).NormalizeWhitespace();
                 return node;
-            };
+            }
             return AddComment;
         }
     }

@@ -6,9 +6,9 @@ namespace CTA.Rules.Actions
 {
     public class FolderUpdate
     {
-        private string _projectDir;
-        private string _projectFile;
-        private ProjectType _projectType;
+        private readonly string _projectDir;
+        private readonly string _projectFile;
+        private readonly ProjectType _projectType;
 
         public FolderUpdate(string projectFile, ProjectType projectType)
         {
@@ -84,7 +84,7 @@ namespace CTA.Rules.Actions
         /// <param name="projectDir">Directory of the project</param>
         private void CreateMvcDirs(string projectDir)
         {
-            string wwwrootdir = Path.Combine(projectDir, Constants.wwwroot);
+            string wwwrootdir = Path.Combine(projectDir, Constants.Wwwroot);
             string contentdir = string.Concat(projectDir, Constants.Content);
             string scriptsdir = string.Concat(projectDir, Constants.Scripts);
 
@@ -93,7 +93,7 @@ namespace CTA.Rules.Actions
 
             Directory.CreateDirectory(wwwrootdir);
 
-            LogChange(string.Format("Create {0} dir at {1}", Constants.wwwroot, projectDir));
+            LogChange(string.Format("Create {0} dir at {1}", Constants.Wwwroot, projectDir));
             if (Directory.Exists(contentdir) && !Directory.Exists(targetContentDir))
             {
                 Directory.Move(contentdir, targetContentDir);

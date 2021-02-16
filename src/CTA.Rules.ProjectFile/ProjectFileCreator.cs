@@ -11,15 +11,15 @@ namespace CTA.Rules.ProjectFile
 {
     public class ProjectFileCreator
     {
-        private string _projectFile;
+        private readonly string _projectFile;
 
-        private List<string> _targetVersions;
+        private readonly List<string> _targetVersions;
         private Dictionary<string, string> _packages;
         private IEnumerable<string> _projectReferences;
         private ProjectType _projectType;
 
 
-        public const string csCoreProjSyntaxWeb = @"
+        private readonly string csCoreProjSyntaxWeb = @"
                 <Project Sdk=""{0}"">
                     <PropertyGroup>
                         <TargetFramework>{1}</TargetFramework>
@@ -27,7 +27,7 @@ namespace CTA.Rules.ProjectFile
                     {2}
                 </Project>";
 
-        public const string csCoreProjSyntaxWebClassLibrary = @"
+        private readonly string csCoreProjSyntaxWebClassLibrary = @"
                 <Project Sdk=""{0}"">
                     <PropertyGroup>
                         <TargetFramework>{1}</TargetFramework>
@@ -38,7 +38,7 @@ namespace CTA.Rules.ProjectFile
                     {2}
                 </Project>";
 
-        public const string csCoreProjSyntaxClassLibrary = @"
+        private readonly string csCoreProjSyntaxClassLibrary = @"
                 <Project Sdk=""{0}"">
                     <PropertyGroup>
                         <TargetFramework>{1}</TargetFramework>

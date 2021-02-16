@@ -10,6 +10,11 @@ namespace CTA.FeatureDetection
     {
         static void Main(string[] args)
         {
+            if (args != null)
+            {
+                Console.WriteLine(args);
+            }
+
             /* Select a test project */
             var solutionPath = Path.Combine("path", "to", "solution.sln");
 

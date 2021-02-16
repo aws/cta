@@ -13,7 +13,7 @@ namespace CTA.FeatureDetection.Tests.Utils
             return codeAnalyzer.AnalyzeProject(projectPath).Result;
         }
 
-        public static IEnumerable<AnalyzerResult> GetAnalyzerResults(string solutionPath, int maxAttempts = 2)
+        public static IEnumerable<AnalyzerResult> GetAnalyzerResults(string solutionPath)
         {
             var codeAnalyzer = GetDefaultCodeAnalyzer(solutionPath);
             return codeAnalyzer.AnalyzeSolution(solutionPath).Result;

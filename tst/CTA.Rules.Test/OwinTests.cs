@@ -29,7 +29,6 @@ namespace CTA.Rules.Test
             TestSolutionAnalysis results = AnalyzeSolution("AspNetRoutes.sln", tempDir, downloadLocation, version);
 
             var analysisResult = results.SolutionAnalysisResult;
-            var csProjContent = results.ProjectResults.FirstOrDefault().CsProjectContent;
             string projectDir = results.ProjectResults.FirstOrDefault().ProjectDirectory;
 
             StringAssert.Contains("Microsoft.AspNetCore.Owin", analysisResult);
