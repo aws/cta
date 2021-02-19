@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using CTA.FeatureDetection.Common.Models.Enums;
 using CTA.FeatureDetection.Common.Models.Configuration;
+using CTA.FeatureDetection.Common.Models.Enums;
 using CTA.FeatureDetection.Common.Models.Features.Base;
 using CTA.FeatureDetection.Common.Models.Features.Conditions.Base;
 

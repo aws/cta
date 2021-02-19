@@ -1,12 +1,12 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using System.IO.Compression;
-using System.Linq;
-using Codelyzer.Analysis;
+﻿using Codelyzer.Analysis;
 using CTA.FeatureDetection.Common.Models;
 using CTA.FeatureDetection.Tests.Utils;
 using CTA.Rules.Config;
 using NUnit.Framework;
+using System.Collections.Generic;
+using System.IO;
+using System.IO.Compression;
+using System.Linq;
 
 namespace CTA.FeatureDetection.Tests
 {
@@ -23,7 +23,7 @@ namespace CTA.FeatureDetection.Tests
         private static readonly string _webApiDir = "WebApi";
         private static readonly string _webClassLibraryDir = "WebClassLibrary";
         private static readonly string TestProjectDirectory = TestUtils.GetTestAssemblySourceDirectory(typeof(TestUtils));
-        public static string ConfigFile => Path.Combine(TestProjectDirectory, "Examples", "Input", "feature_config.json");
+        public static string ConfigFile => Path.Combine(TestProjectDirectory, "Examples", "Templates", "feature_config.json");
 
         public static string CoreMvcSolutionName => "CoreMVC.sln";
         public static string CoreWebApiSolutionName => "CoreWebApi.sln";
@@ -74,7 +74,7 @@ namespace CTA.FeatureDetection.Tests
             var tempMvcSolutionDir = GetSolutionDir(tempDownloadDir, MvcSolutionName);
             var tempWebApiSolutionDir = GetSolutionDir(tempDownloadDir, WebApiSolutionName);
             var tempWebClassLibrarySolutionDir = GetSolutionDir(tempDownloadDir, WebClassLibrarySolutionName);
-            
+
             // Copy solutions to a directory with a shorter path
             var destDir = "dest";
             _targetDir = Path.Combine(_tempBaseDir, destDir);

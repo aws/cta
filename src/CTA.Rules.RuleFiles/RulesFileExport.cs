@@ -1,8 +1,8 @@
-﻿using Newtonsoft.Json;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Newtonsoft.Json;
 
 namespace CTA.Rules.RuleFiles
 {
@@ -11,9 +11,9 @@ namespace CTA.Rules.RuleFiles
     /// </summary>
     public class RulesFileExport
     {
-        private Rootobject _rootObject;
-        private string _rulesPath;
-        private List<TargetFramework> targetFrameworks;
+        private readonly Rootobject _rootObject;
+        private readonly string _rulesPath;
+        private readonly List<TargetFramework> targetFrameworks;
 
         /// <summary>
         /// Initialize a new instance of RulesFileExport
@@ -26,9 +26,11 @@ namespace CTA.Rules.RuleFiles
 
             _rootObject = JsonConvert.DeserializeObject<Rootobject>(rulesFileContent);
 
-            targetFrameworks = new List<TargetFramework>();
-            targetFrameworks.Add(new TargetFramework() { Name = "netcoreapp3.1", TargetCPU = { "x86", "x64", "ARM64" } });
-            targetFrameworks.Add(new TargetFramework() { Name = "net5.0", TargetCPU = { "x86", "x64", "ARM64" } });
+            targetFrameworks = new List<TargetFramework>
+            {
+                new TargetFramework() { Name = "netcoreapp3.1", TargetCPU = { "x86", "x64", "ARM64" } },
+                new TargetFramework() { Name = "net5.0", TargetCPU = { "x86", "x64", "ARM64" } }
+            };
         }
 
         /// <summary>
@@ -37,8 +39,6 @@ namespace CTA.Rules.RuleFiles
         public void Run()
         {
             NamespaceRecommendations recommendations = new NamespaceRecommendations();
-
-            var namespaces = _rootObject.NameSpaces;
 
             foreach (var @namespace in _rootObject.NameSpaces)
             {
@@ -82,11 +82,11 @@ namespace CTA.Rules.RuleFiles
                 var result = JsonConvert.SerializeObject(n, Formatting.Indented);
                 File.WriteAllText(fileName, result);
             }
-        }        
+        }
         private void AddToFlatFile(Namespace @namespace, NamespaceRecommendations recommendations)
         {
             var currentNamespace = EnsureNamespace(@namespace, recommendations);
-            if(@namespace.Actions != null && @namespace.Actions.Count > 0)
+            if (@namespace.Actions != null && @namespace.Actions.Count > 0)
             {
 
                 RecommendedActions recommendation = new RecommendedActions()
@@ -108,7 +108,7 @@ namespace CTA.Rules.RuleFiles
 
                     RecommendedActions = new List<RecommendedActions>() { recommendation }
                 };
-               
+
                 currentNamespace.Recommendations.Add(r);
             }
         }
@@ -128,7 +128,7 @@ namespace CTA.Rules.RuleFiles
             {
                 Type = "Class",
                 KeyType = @class.KeyType,
-                Name =  @class.Key,
+                Name = @class.Key,
                 Value = @class.FullKey,
                 ContainingType = "",
                 RecommendedActions = new List<RecommendedActions>() { recommendation }
@@ -181,7 +181,7 @@ namespace CTA.Rules.RuleFiles
                 KeyType = "Name",
                 Value = attribute.FullKey,
                 ContainingType = @class.Key,
-                RecommendedActions = new List<RecommendedActions>() { recommendation}                
+                RecommendedActions = new List<RecommendedActions>() { recommendation }
             };
             currentNamespace.Recommendations.Add(r);
         }
@@ -206,7 +206,7 @@ namespace CTA.Rules.RuleFiles
         }
         private string GetDescription(List<Action> actions)
         {
-            if(actions.Count == 0)
+            if (actions.Count == 0)
             {
                 return string.Empty;
             }

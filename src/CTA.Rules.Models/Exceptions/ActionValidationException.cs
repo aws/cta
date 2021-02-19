@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace CTA.Rules.Models
 {
     public class ActionValidationException : Exception
     {
-        public ActionValidationException(string actionType, string actionName) 
+        public ActionValidationException(string actionType, string actionName)
             : base(GetActionValidationException(actionType, actionName))
         {
 

@@ -1,7 +1,7 @@
-﻿using CTA.Rules.Config;
+﻿using System.Collections.Generic;
+using CTA.Rules.Config;
 using CTA.Rules.Models;
 using Newtonsoft.Json;
-using System.Collections.Generic;
 
 namespace CTA.Rules.Metrics
 {

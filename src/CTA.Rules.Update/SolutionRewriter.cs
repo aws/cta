@@ -1,10 +1,9 @@
-﻿using CTA.Rules.Config;
-using CTA.Rules.Models;
-using Codelyzer.Analysis;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Codelyzer.Analysis;
+using CTA.Rules.Config;
+using CTA.Rules.Models;
 
 namespace CTA.Rules.Update
 {
@@ -13,8 +12,8 @@ namespace CTA.Rules.Update
     /// </summary>
     public class SolutionRewriter
     {
-        private List<ProjectRewriter> _rulesRewriters;
-        private SolutionResult _solutionResult;
+        private readonly List<ProjectRewriter> _rulesRewriters;
+        private readonly SolutionResult _solutionResult;
 
         /// <summary>
         /// Initializes a new instance of SolutionRewriter, analyzing the solution path using the provided config.
@@ -27,15 +26,19 @@ namespace CTA.Rules.Update
         public SolutionRewriter(string solutionFilePath, List<ProjectConfiguration> solutionConfiguration)
         {
             _solutionResult = new SolutionResult();
-            AnalyzerConfiguration analyzerConfiguration = new AnalyzerConfiguration(LanguageOptions.CSharp);
-            analyzerConfiguration.MetaDataSettings = new MetaDataSettings()
+            AnalyzerConfiguration analyzerConfiguration = new AnalyzerConfiguration(LanguageOptions.CSharp)
             {
-                Annotations = true,
-                DeclarationNodes = true,
-                MethodInvocations = true,
-                ReferenceData = true,
-                LoadBuildData = true,
-                InterfaceDeclarations = true
+                MetaDataSettings = new MetaDataSettings()
+                {
+                    Annotations = true,
+                    DeclarationNodes = true,
+                    MethodInvocations = true,
+                    ReferenceData = true,
+                    LoadBuildData = true,
+                    InterfaceDeclarations = true,
+                    MemberAccess = true,
+                    ElementAccess = true
+                }
             };
 
             _rulesRewriters = new List<ProjectRewriter>();
@@ -59,21 +62,20 @@ namespace CTA.Rules.Update
         /// <summary>
         /// Initializes the SolutionRewriter
         /// </summary>
-        public ConcurrentDictionary<string, ProjectActions> AnalysisRun()
+        public SolutionResult AnalysisRun()
         {
-            ConcurrentDictionary<string, ProjectActions> projectActions = new ConcurrentDictionary<string, ProjectActions>();
             var options = new ParallelOptions() { MaxDegreeOfParallelism = Constants.ThreadCount };
             Parallel.ForEach(_rulesRewriters, options, rulesRewriter =>
             {
-                projectActions.GetOrAdd(rulesRewriter.RulesEngineConfiguration.ProjectPath, rulesRewriter.Initialize());
+                _solutionResult.ProjectResults.Add(rulesRewriter.Initialize());
             });
-            return projectActions;
+            return _solutionResult;
         }
 
         /// <summary>
         /// Run the SolutionRewriter using a previously created analysis
         /// </summary>
-        public SolutionResult Run(ConcurrentDictionary<string, ProjectActions> projectActions)
+        public SolutionResult Run(Dictionary<string, ProjectActions> projectActions)
         {
             var options = new ParallelOptions() { MaxDegreeOfParallelism = Constants.ThreadCount };
             Parallel.ForEach(_rulesRewriters, options, rulesRewriter =>

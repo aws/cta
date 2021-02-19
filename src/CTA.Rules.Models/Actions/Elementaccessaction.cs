@@ -1,9 +1,7 @@
 ﻿
+using System;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Editing;
-using System;
-using System.Collections.Generic;
-using Codelyzer.Analysis.Model;
 
 namespace CTA.Rules.Models
 {

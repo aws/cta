@@ -86,7 +86,7 @@ class MyClass
         [Test]
         public void GetRemoveMethodAction_Removes_Specified_Method()
         {
-            const string methodName= "MyMethod";
+            const string methodName = "MyMethod";
             var methodNode = SyntaxFactory.MethodDeclaration(SyntaxFactory.ParseTypeName("void"), methodName);
             var nodeWithMethod = _node.AddMembers(methodNode);
 

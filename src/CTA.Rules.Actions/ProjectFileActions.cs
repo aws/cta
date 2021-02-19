@@ -1,14 +1,8 @@
-﻿using CTA.Rules.Models;
-using CTA.Rules.ProjectFile;
-using Microsoft.Build.Tasks;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.Editing;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
+using CTA.Rules.Models;
+using CTA.Rules.ProjectFile;
 
 namespace CTA.Rules.Actions
 {
@@ -17,17 +11,17 @@ namespace CTA.Rules.Actions
     /// </summary>
     public class ProjectFileActions
     {
-        public Func<string, ProjectType, List<string>, Dictionary<string, string>, List<string>, string> GetMigrateProjectFileAction(string empty)
+        public Func<string, ProjectType, List<string>, Dictionary<string, string>, List<string>, string> GetMigrateProjectFileAction(string _)
         {
-            Func<string, ProjectType, List<string>, Dictionary<string, string>, List<string>, string> func
-                = (string projectDir, ProjectType projectType, List<string> targetVersion, Dictionary<string, string> packageReferences, List<string> projectReferences) =>
+            static string func
+(string projectDir, ProjectType projectType, List<string> targetVersion, Dictionary<string, string> packageReferences, List<string> projectReferences)
             {
                 ProjectFileCreator projectFileCreator = new ProjectFileCreator(projectDir, targetVersion,
                     packageReferences, projectReferences.ToList(), projectType);
 
                 var result = projectFileCreator.Create();
                 return result ? "Project file created" : string.Empty;
-            };
+            }
 
             return func;
         }

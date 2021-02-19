@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace CTA.Rules.Models
 {
     public class FilePortingException : Exception
     {
-        public FilePortingException(string filename, Exception exception) 
+        public FilePortingException(string filename, Exception exception)
             : base(GetActionExecutionException(filename), exception)
         {
 

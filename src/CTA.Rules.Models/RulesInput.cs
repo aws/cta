@@ -1,6 +1,6 @@
 ﻿
-using CTA.Rules.Models;
 using System.Collections.Generic;
+using CTA.Rules.Models;
 
 public class Rootobject
 {

@@ -1,9 +1,9 @@
-﻿using CTA.Rules.Config;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using CTA.Rules.Config;
 
 namespace CTA.Rules.Models
 {
@@ -14,6 +14,7 @@ namespace CTA.Rules.Models
             FileActions = new BlockingCollection<FileActions>();
             PackageActions = new BlockingCollection<PackageAction>();
             ProjectReferenceActions = new BlockingCollection<string>();
+            ProjectLevelActions = new List<ProjectLevelAction>();
         }
         public BlockingCollection<FileActions> FileActions { get; set; }
         public BlockingCollection<PackageAction> PackageActions { get; set; }

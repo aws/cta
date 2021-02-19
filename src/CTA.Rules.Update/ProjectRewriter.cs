@@ -1,16 +1,14 @@
-﻿using CTA.Rules.Analyzer;
-using CTA.Rules.Config;
-using CTA.Rules.Metrics;
-using CTA.Rules.Models;
-using CTA.Rules.RuleFiles;
+﻿using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
 using Codelyzer.Analysis;
 using Codelyzer.Analysis.Build;
 using Codelyzer.Analysis.Model;
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+using CTA.Rules.Analyzer;
+using CTA.Rules.Config;
+using CTA.Rules.Models;
+using CTA.Rules.RuleFiles;
 
 namespace CTA.Rules.Update
 {
@@ -20,10 +18,10 @@ namespace CTA.Rules.Update
     public class ProjectRewriter
     {
         public ProjectConfiguration RulesEngineConfiguration;
-        private List<RootUstNode> _sourceFileResults;
-        private List<SourceFileBuildResult> _sourceFileBuildResults;
-        private List<string> _projectReferences;
-        private ProjectResult _projectResult;
+        private readonly List<RootUstNode> _sourceFileResults;
+        private readonly List<SourceFileBuildResult> _sourceFileBuildResults;
+        private readonly List<string> _projectReferences;
+        private readonly ProjectResult _projectResult;
 
         /// <summary>
         /// Initializes a new instance of ProjectRewriter using an existing analysis
@@ -36,12 +34,17 @@ namespace CTA.Rules.Update
             {
                 ProjectFile = rulesEngineConfiguration.ProjectPath,
                 TargetVersions = rulesEngineConfiguration.TargetVersions,
-                UpgradePackages = rulesEngineConfiguration.PackageReferences.Select(p => new PackageAction() { Name = p.Key, Version = p.Value }).ToList()
+                UpgradePackages = rulesEngineConfiguration.PackageReferences.Select(p => new PackageAction()
+                {
+                    Name = p.Key,
+                    OriginalVersion = p.Value.Item1,
+                    Version = p.Value.Item2
+                }).ToList()
             };
 
             _sourceFileBuildResults = analyzerResult?.ProjectBuildResult?.SourceFileBuildResults;
             _sourceFileResults = analyzerResult?.ProjectResult?.SourceFileResults;
-            _projectReferences = analyzerResult?.ProjectBuildResult?.ExternalReferences?.ProjectReferences.Select(p => p.AssemblyLocation).ToList();            
+            _projectReferences = analyzerResult?.ProjectBuildResult?.ExternalReferences?.ProjectReferences.Select(p => p.AssemblyLocation).ToList();
             RulesEngineConfiguration = rulesEngineConfiguration;
 
         }
@@ -50,13 +53,13 @@ namespace CTA.Rules.Update
         /// Initializes the project rewriter by getting a list of actions that will be run
         /// </summary>
         /// <returns>A list of project actions to be run</returns>
-        public ProjectActions Initialize()
+        public ProjectResult Initialize()
         {
             ProjectActions projectActions = new ProjectActions();
             try
             {
                 var allReferences = _sourceFileResults?.SelectMany(s => s.References).Distinct();
-                RulesFileLoader rulesFileLoader = new RulesFileLoader(allReferences, RulesEngineConfiguration.RulesPath, RulesEngineConfiguration.TargetVersions, string.Empty, RulesEngineConfiguration.AssemblyDir);
+                RulesFileLoader rulesFileLoader = new RulesFileLoader(allReferences, RulesEngineConfiguration.RulesDir, RulesEngineConfiguration.TargetVersions, string.Empty, RulesEngineConfiguration.AssemblyDir);
                 var result = rulesFileLoader.Load();
 
                 RulesAnalysis walker = new RulesAnalysis(_sourceFileResults, result);
@@ -65,11 +68,12 @@ namespace CTA.Rules.Update
                 {
                     projectActions.ProjectReferenceActions.Add(Config.Utils.GetRelativePath(RulesEngineConfiguration.ProjectPath, p));
                 });
+
                 _projectResult.ActionPackages = projectActions.PackageActions.Distinct().ToList();
 
                 foreach (var p in RulesEngineConfiguration.PackageReferences)
                 {
-                    projectActions.PackageActions.Add(new PackageAction() { Name = p.Key, Version = p.Value });
+                    projectActions.PackageActions.Add(new PackageAction() { Name = p.Key, OriginalVersion = p.Value.Item1, Version = p.Value.Item2 });
                 }
                 MergePackages(projectActions.PackageActions);
                 projectActions.ProjectLevelActions = result.ProjectTokens.SelectMany(p => p.ProjectLevelActions).Distinct().ToList();
@@ -82,7 +86,7 @@ namespace CTA.Rules.Update
                 LogHelper.LogError(ex, "Error while initializing project {0}", RulesEngineConfiguration.ProjectPath);
             }
 
-            return projectActions;
+            return _projectResult;
         }
 
         /// <summary>
@@ -90,8 +94,8 @@ namespace CTA.Rules.Update
         /// </summary>
         public ProjectResult Run()
         {
-            ProjectActions projectActions = Initialize();
-            return Run(projectActions);
+            var projectResult = Initialize();
+            return Run(projectResult.ProjectActions);
         }
 
         /// <summary>
@@ -113,11 +117,13 @@ namespace CTA.Rules.Update
         /// <param name="packageActions">A list of packages and their versions to add to the project</param>
         private void MergePackages(BlockingCollection<PackageAction> packageActions)
         {
-            if(RulesEngineConfiguration.PackageReferences != null)
+            if (RulesEngineConfiguration.PackageReferences != null)
             {
-                foreach(var package in RulesEngineConfiguration.PackageReferences.Keys)
+                foreach (var package in RulesEngineConfiguration.PackageReferences.Keys)
                 {
-                    packageActions.Add(new FilePackageAction() { Name = package, Version = RulesEngineConfiguration.PackageReferences[package] });
+                    var versionTuple = RulesEngineConfiguration.PackageReferences[package];
+                    var version = versionTuple != null ? versionTuple.Item2 ?? "*" : "*";
+                    packageActions.Add(new FilePackageAction() { Name = package, Version = version });
                 }
             }
         }

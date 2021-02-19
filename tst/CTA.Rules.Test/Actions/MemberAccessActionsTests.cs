@@ -1,5 +1,4 @@
-﻿using CTA.Rules.Actions;
-using CTA.Rules.Models;
+﻿using CTA.Rules.Models;
 using CTA.Rules.Update;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;

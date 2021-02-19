@@ -61,7 +61,7 @@ namespace CTA.Rules.Models
             try
             {
                 analyzerResults = codeAnalyzer.AnalyzeSolution(SolutionPath).Result;
-                
+
                 // Process build errors by project
                 foreach (var analyzerResult in analyzerResults)
                 {
@@ -74,7 +74,7 @@ namespace CTA.Rules.Models
                         {
                             string errorSeparator = ": error ";
                             var index = e.IndexOf(errorSeparator, StringComparison.InvariantCulture);
-                            var s = e.Substring(index + errorSeparator.Length);
+                            var s = e[(index + errorSeparator.Length)..];
 
                             if (buildErrorCounts.ContainsKey(s))
                             {
@@ -106,10 +106,10 @@ namespace CTA.Rules.Models
         public override string ToString()
         {
             StringBuilder str = new StringBuilder();
-            
+
             // Print References
             str.AppendLine("==========");
-            str.AppendLine(nameof(References)); 
+            str.AppendLine(nameof(References));
             str.AppendLine("==========");
             str.AppendLine(string.Join(Environment.NewLine, References));
             str.AppendLine();

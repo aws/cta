@@ -1,29 +1,30 @@
-﻿using Codelyzer.Analysis;
-using CTA.Rules.Config;
+﻿using CTA.Rules.Config;
 using CTA.Rules.Models;
 using CTA.Rules.PortCore;
-using CTA.Rules.Update;
 using NUnit.Framework;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Net.Http;
+using System.Reflection;
 using System.Text;
 
 namespace CTA.Rules.Test
 {
     public class AwsRulesBaseTest
     {
-        private System.Type systemType;
         private string tstPath;
         private string srcPath;
 
+        protected static class TargetFramework
+        {
+            public const string Dotnet5 = "net5.0";
+            public const string DotnetCoreApp31 = "netcoreapp3.1";
+        }
+
         protected void Setup(System.Type type)
         {
-            this.systemType = type;
             this.tstPath = GetTstPath(type);
             this.srcPath = GetSrcPath(type);
         }
@@ -85,8 +86,10 @@ namespace CTA.Rules.Test
                     {
                         ProjectResult project = new ProjectResult();
 
-                        Dictionary<string, string> packages = new Dictionary<string, string>();
-                        packages.Add("Newtonsoft.Json", "*");
+                        Dictionary<string, Tuple<string, string>> packages = new Dictionary<string, Tuple<string, string>>
+                        {
+                            { "Newtonsoft.Json", new Tuple<string, string>("9.0.0", "*") }
+                        };
                         PortCoreConfiguration projectConfiguration = new PortCoreConfiguration()
                         {
                             ProjectPath = projectFile,
@@ -105,20 +108,21 @@ namespace CTA.Rules.Test
                     }
 
                     SolutionPort solutionPort = new SolutionPort(solutionPath, solutionPortConfiguration);
+                    CopyTestRules();
                     var analysisRunResult = solutionPort.AnalysisRun();
 
-                    foreach(var projectAction in analysisRunResult.Values)
+                    foreach (var projectResult in analysisRunResult.ProjectResults)
                     {
-                        Assert.IsTrue(projectAction.ToSummaryString()?.Length > 0);
+                        Assert.IsTrue(projectResult.ProjectActions.ToSummaryString()?.Length > 0);
                     }
 
                     StringBuilder str = new StringBuilder();
-                    foreach (var k in analysisRunResult.Keys)
+                    foreach (var projectResult in analysisRunResult.ProjectResults)
                     {
                         StringBuilder projectResults = new StringBuilder();
-                        projectResults.AppendLine(k);
-                        projectResults.AppendLine(analysisRunResult[k].ToString());
-                        result.ProjectResults.Where(p => p.CsProjectPath == k).FirstOrDefault().ProjectAnalysisResult = projectResults.ToString();
+                        projectResults.AppendLine(projectResult.ProjectFile);
+                        projectResults.AppendLine(projectResult.ProjectActions.ToString());
+                        result.ProjectResults.Where(p => p.CsProjectPath == projectResult.ProjectFile).FirstOrDefault().ProjectAnalysisResult = projectResults.ToString();
 
                         str.Append(projectResults);
                     }
@@ -135,6 +139,18 @@ namespace CTA.Rules.Test
                 }
             }
             return result;
+        }
+
+        private void CopyTestRules()
+        {
+            var tempRulesDir = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "TempRules");
+            var files = Directory.EnumerateFiles(tempRulesDir, "*.json");
+
+            foreach(var file in files)
+            {
+                string targetFile = Path.Combine(Constants.RulesDefaultPath, Path.GetFileName(file));
+                    File.Copy(file, targetFile);
+            }
         }
 
         public string DownloadTestProjects(string tempDir)
@@ -156,13 +172,13 @@ namespace CTA.Rules.Test
             }
 
             var files = source.GetFiles();
-            foreach(var file in files)
+            foreach (var file in files)
             {
                 file.CopyTo(Path.Combine(target.FullName, file.Name));
             }
 
             var dirs = source.GetDirectories();
-            foreach(var dir in dirs)
+            foreach (var dir in dirs)
             {
                 DirectoryInfo destinationSub = new DirectoryInfo(Path.Combine(target.FullName, dir.Name));
                 CopyDirectory(dir, destinationSub);

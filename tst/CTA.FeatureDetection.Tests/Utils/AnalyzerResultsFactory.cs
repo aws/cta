@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using Codelyzer.Analysis;
+﻿using Codelyzer.Analysis;
 using CTA.FeatureDetection.Common;
+using System.Collections.Generic;
+using System.IO;
 
 namespace CTA.FeatureDetection.Tests.Utils
 {
@@ -13,7 +13,7 @@ namespace CTA.FeatureDetection.Tests.Utils
             return codeAnalyzer.AnalyzeProject(projectPath).Result;
         }
 
-        public static IEnumerable<AnalyzerResult> GetAnalyzerResults(string solutionPath, int maxAttempts = 2)
+        public static IEnumerable<AnalyzerResult> GetAnalyzerResults(string solutionPath)
         {
             var codeAnalyzer = GetDefaultCodeAnalyzer(solutionPath);
             return codeAnalyzer.AnalyzeSolution(solutionPath).Result;
@@ -28,7 +28,7 @@ namespace CTA.FeatureDetection.Tests.Utils
             var logger = Log.Logger;
 
             /* 2. Get Analyzer instance based on language */
-            var args = new []
+            var args = new[]
             {
                 "-p", solutionOrProjectPath
             };

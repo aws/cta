@@ -1,9 +1,9 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using System;
+using System.Linq;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Editing;
-using System;
-using System.Linq;
 
 namespace CTA.Rules.Actions
 {
@@ -14,7 +14,7 @@ namespace CTA.Rules.Actions
     {
         public Func<SyntaxGenerator, CompilationUnitSyntax, CompilationUnitSyntax> GetAddDirectiveAction(string @namespace)
         {
-            Func<SyntaxGenerator, CompilationUnitSyntax, CompilationUnitSyntax> AddDirective = (SyntaxGenerator syntaxGenerator, CompilationUnitSyntax node) =>
+            CompilationUnitSyntax AddDirective(SyntaxGenerator syntaxGenerator, CompilationUnitSyntax node)
             {
                 var allUsings = node.Usings;
 
@@ -23,13 +23,13 @@ namespace CTA.Rules.Actions
 
                 node = node.WithUsings(allUsings).NormalizeWhitespace();
                 return node;
-            };
+            }
             return AddDirective;
         }
 
         public Func<SyntaxGenerator, CompilationUnitSyntax, CompilationUnitSyntax> GetRemoveDirectiveAction(string @namespace)
         {
-            Func<SyntaxGenerator, CompilationUnitSyntax, CompilationUnitSyntax> RemoveDirective = (SyntaxGenerator syntaxGenerator, CompilationUnitSyntax node) =>
+            CompilationUnitSyntax RemoveDirective(SyntaxGenerator syntaxGenerator, CompilationUnitSyntax node)
             {
                 var allUsings = node.Usings;
                 var removeList = allUsings.Where(u => @namespace == u.Name.ToString());
@@ -40,7 +40,7 @@ namespace CTA.Rules.Actions
                 }
                 node = node.WithUsings(allUsings).NormalizeWhitespace();
                 return node;
-            };
+            }
             return RemoveDirective;
         }
     }

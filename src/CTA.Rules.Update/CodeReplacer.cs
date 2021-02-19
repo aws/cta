@@ -1,22 +1,21 @@
-﻿using CTA.Rules.Config;
-using CTA.Rules.Models;
-using CTA.Rules.Update.Rewriters;
-using Codelyzer.Analysis.Build;
+﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Microsoft.CodeAnalysis;
-using System.Text.RegularExpressions;
-using System;
 using System.Threading.Tasks;
-using System.Collections.Concurrent;
+using Codelyzer.Analysis.Build;
+using CTA.Rules.Config;
+using CTA.Rules.Models;
+using CTA.Rules.Update.Rewriters;
+using Microsoft.CodeAnalysis;
 
 namespace CTA.Rules.Update
 {
     public class CodeReplacer
     {
-        private ProjectConfiguration _projectConfiguration;
-        private IEnumerable<SourceFileBuildResult> _sourceFileBuildResults;
+        private readonly ProjectConfiguration _projectConfiguration;
+        private readonly IEnumerable<SourceFileBuildResult> _sourceFileBuildResults;
 
         public CodeReplacer(List<SourceFileBuildResult> sourceFileBuildResults, ProjectConfiguration projectConfiguration)
         {
@@ -32,7 +31,8 @@ namespace CTA.Rules.Update
 
             var parallelOptions = new ParallelOptions() { MaxDegreeOfParallelism = Constants.ThreadCount };
 
-            Parallel.ForEach(_sourceFileBuildResults, parallelOptions, sourceFileBuildResult => {
+            Parallel.ForEach(_sourceFileBuildResults, parallelOptions, sourceFileBuildResult =>
+            {
                 try
                 {
                     var currentFileActions = fileActions.Where(f => f.FilePath == sourceFileBuildResult.SourceFileFullPath).FirstOrDefault();
@@ -75,8 +75,10 @@ namespace CTA.Rules.Update
             //Project Level Actions
             foreach (var projectLevelAction in projectActions.ProjectLevelActions)
             {
-                var projectActionExecution = new GenericActionExecution(projectLevelAction, _projectConfiguration.ProjectPath);
-                projectActionExecution.TimesRun = 1;
+                var projectActionExecution = new GenericActionExecution(projectLevelAction, _projectConfiguration.ProjectPath)
+                {
+                    TimesRun = 1
+                };
                 var runResult = string.Empty;
                 if (!_projectConfiguration.IsMockRun)
                 {
@@ -115,7 +117,7 @@ namespace CTA.Rules.Update
                 }
             }
 
-            if(!actionsPerProject.TryAdd(Constants.Project, projectRunActions))
+            if (!actionsPerProject.TryAdd(Constants.Project, projectRunActions))
             {
                 LogHelper.LogError(new FilePortingException(Constants.Project, new Exception("Error adding project to actions collection")));
             }
@@ -133,8 +135,10 @@ namespace CTA.Rules.Update
 
             foreach (var action in actionsWithNoMatch)
             {
-                var genericActionExecution = new GenericActionExecution(action, filePath);
-                genericActionExecution.TimesRun = 0;
+                var genericActionExecution = new GenericActionExecution(action, filePath)
+                {
+                    TimesRun = 0
+                };
                 allActions.Add(genericActionExecution);
             }
 

@@ -1,14 +1,9 @@
-﻿using CTA.Rules.Models;
-using CTA.Rules.ProjectFile;
-using Microsoft.Build.Tasks;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.Editing;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
+using CTA.Rules.Models;
+using Microsoft.CodeAnalysis;
 
 namespace CTA.Rules.Actions
 {
@@ -19,7 +14,7 @@ namespace CTA.Rules.Actions
     {
         public Func<string, ProjectType, string> GetArchiveFilesAction(string archiveFiles)
         {
-            Func<string, ProjectType, string> func = (string projectDir, ProjectType projectType) =>
+            string func(string projectDir, ProjectType projectType)
             {
                 List<string> archived = new List<string>();
                 List<string> deleted = new List<string>();
@@ -56,40 +51,40 @@ namespace CTA.Rules.Actions
                 return string.Concat(
                     deleted.Count > 0 ? string.Concat("Deleted: ", string.Join(",", deleted)) : string.Empty,
                     archived.Count > 0 ? string.Concat("Archived: ", string.Join(",", archived)) : string.Empty);
-            };
+            }
 
             return func;
         }
 
-        public Func<string, ProjectType, string> GetCreateNet3FolderHierarchyAction(string empty)
+        public Func<string, ProjectType, string> GetCreateNet3FolderHierarchyAction(string _)
         {
-            Func<string, ProjectType, string> func = (string projectDir, ProjectType projectType) =>
+            static string func(string projectDir, ProjectType projectType)
             {
                 FolderUpdate folderUpdate = new FolderUpdate(projectDir, projectType);
                 return folderUpdate.Run();
-            };
+            }
 
             return func;
         }
 
-        public Func<string, ProjectType, string> GetCreateNet5FolderHierarchyAction(string empty)
+        public Func<string, ProjectType, string> GetCreateNet5FolderHierarchyAction(string _)
         {
-            Func<string, ProjectType, string> func = (string projectDir, ProjectType projectType) =>
+            static string func(string projectDir, ProjectType projectType)
             {
                 FolderUpdate folderUpdate = new FolderUpdate(projectDir, projectType);
                 return folderUpdate.Run();
-            };
+            }
 
             return func;
         }
 
-        public Func<string, ProjectType, string> GetMigrateConfigAction(string empty)
+        public Func<string, ProjectType, string> GetMigrateConfigAction(string _)
         {
-            Func<string, ProjectType, string> func = (string projectDir, ProjectType projectType) =>
+            static string func(string projectDir, ProjectType projectType)
             {
                 ConfigMigrate configMigrate = new ConfigMigrate(projectDir, projectType);
-                return configMigrate.Run();                 
-            };
+                return configMigrate.Run();
+            }
 
             return func;
         }

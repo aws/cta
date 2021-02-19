@@ -1,12 +1,12 @@
-﻿using CTA.Rules.Actions;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using CTA.Rules.Actions;
 using CTA.Rules.Config;
 using CTA.Rules.Models;
 using CTA.Rules.Models.Tokens;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 
 namespace CTA.Rules.RuleFiles
 {
@@ -15,16 +15,16 @@ namespace CTA.Rules.RuleFiles
     /// </summary>
     public class RulesFileParser
     {
-        private RootNodes _rootNodes;
-        private string _assembliesDir;
-        private string _targetFramework;
+        private readonly RootNodes _rootNodes;
+        private readonly string _assembliesDir;
+        private readonly string _targetFramework;
 
         private ActionsLoader actionsLoader;
-        private Rootobject _rulesObject;
-        private Rootobject _overrideObject;
+        private readonly Rootobject _rulesObject;
+        private readonly Rootobject _overrideObject;
 
-        private NamespaceRecommendations _namespaceRecommendations;
-        private NamespaceRecommendations _overrideNamespaceRecommendations;
+        private readonly NamespaceRecommendations _namespaceRecommendations;
+        private readonly NamespaceRecommendations _overrideNamespaceRecommendations;
 
         /// <summary>
         /// Runs the rules parser
@@ -32,7 +32,7 @@ namespace CTA.Rules.RuleFiles
         /// <param name="rulesObject">Object containing built in rules</param>
         /// <param name="overrideObject">Object containing override rules</param>
         /// <param name="assembliesDir">Directory containing additional actions assemblies</param>
-        public RulesFileParser(NamespaceRecommendations namespaceRecommendations, NamespaceRecommendations overrideNamespaceRecommendations, 
+        public RulesFileParser(NamespaceRecommendations namespaceRecommendations, NamespaceRecommendations overrideNamespaceRecommendations,
             Rootobject rulesObject, Rootobject overrideObject, string assembliesDir, string targetFramework)
         {
             _rootNodes = new RootNodes();
@@ -87,7 +87,8 @@ namespace CTA.Rules.RuleFiles
         private void LoadActions()
         {
             List<string> assemblies = new List<string>();
-            if (!string.IsNullOrEmpty(_assembliesDir)){
+            if (!string.IsNullOrEmpty(_assembliesDir))
+            {
                 assemblies = Directory.EnumerateFiles(_assembliesDir, "*.dll").ToList();
             }
             actionsLoader = new ActionsLoader(assemblies);
@@ -110,7 +111,7 @@ namespace CTA.Rules.RuleFiles
                     {
                         var projectToken = _rootNodes.ProjectTokens.FirstOrDefault();
                         ParseActions(projectToken, @namespace.Actions);
-                    } 
+                    }
                     //Namespace specific actions:
                     else
                     {
@@ -155,7 +156,7 @@ namespace CTA.Rules.RuleFiles
                     {
                         if (method.Actions != null && method.Actions.Count > 0)
                         {
-                            var token = new InvocationExpressionToken() { Key = method.Key, Namespace = @namespace.@namespace, FullKey = method.FullKey, Type = @class.Key };                            
+                            var token = new InvocationExpressionToken() { Key = method.Key, Namespace = @namespace.@namespace, FullKey = method.FullKey, Type = @class.Key };
                             if (!_rootNodes.Invocationexpressiontokens.Contains(token)) { _rootNodes.Invocationexpressiontokens.Add(token); }
                             ParseActions(token, method.Actions);
                         }
@@ -223,10 +224,10 @@ namespace CTA.Rules.RuleFiles
 
             foreach (var @namespace in namespaces)
             {
-                foreach(var recommendation in @namespace.Recommendations)
+                foreach (var recommendation in @namespace.Recommendations)
                 {
                     RecommendedActions recommendedActions = recommendation.RecommendedActions
-                        .Where(ra => ra.Preferred == "Yes" && ra.TargetFrameworks.Any(t=> t.Name.Equals(_targetFramework))).FirstOrDefault();
+                        .Where(ra => ra.Preferred == "Yes" && ra.TargetFrameworks.Any(t => t.Name.Equals(_targetFramework))).FirstOrDefault();
 
                     //There are recommendations, but none of them are preferred
                     if (recommendedActions == null && recommendation.RecommendedActions.Count > 0)
@@ -358,7 +359,7 @@ namespace CTA.Rules.RuleFiles
                     }
                 }
             }
-        }        
+        }
 
         /// <summary>
         /// Add actions to each node type
@@ -560,7 +561,7 @@ namespace CTA.Rules.RuleFiles
                                 var actionFunc = actionsLoader.GetElementAccessExpressionActions(action.Name, action.Value);
                                 if (actionFunc != null)
                                 {
-                                    nodeToken.MemberAccessActions.Add(new MemberAccessAction()
+                                    nodeToken.ElementAccessActions.Add(new ElementAccessAction()
                                     {
                                         Key = nodeToken.Key,
                                         Value = GetActionValue(action.Value),
@@ -568,7 +569,7 @@ namespace CTA.Rules.RuleFiles
                                         ActionValidation = action.ActionValidation,
                                         Name = action.Name,
                                         Type = action.Type,
-                                        MemberAccessActionFunc = actionFunc
+                                        ElementAccessExpressionActionFunc = actionFunc
                                     });
                                 }
                                 break;
@@ -672,7 +673,8 @@ namespace CTA.Rules.RuleFiles
             if (value is string)
             {
                 return value;
-            } else
+            }
+            else
             {
                 return value + "";
             }

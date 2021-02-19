@@ -1,8 +1,5 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using Codelyzer.Analysis;
-using Codelyzer.Analysis.Common;
 using CommandLine;
 
 namespace CTA.Rules.PortCore
@@ -11,12 +8,12 @@ namespace CTA.Rules.PortCore
     {
         [Option('p', "project-path", Required = false, HelpText = "Project file path.")]
         public string ProjectPath { get; set; }
-        
+
         [Option('s', "solution-path", Required = false, HelpText = "Solution file path.")]
         public string SolutionPath { get; set; }
 
-        [Option('r', "rules-input-infile", Required = false, HelpText = "Rules json input file")]
-        public string RulesInputFile { get; set; }
+        [Option('r', "rules-dir", Required = false, HelpText = "Directory containing rules json input file(s)")]
+        public string RulesDir { get; set; }
 
         [Option('d', "use-builtin-rules", Required = false, HelpText = "Use default rule files")]
         public string DefaultRules { get; set; }
@@ -30,11 +27,11 @@ namespace CTA.Rules.PortCore
         [Option('m', "mock-run", Required = false, HelpText = "Mock run to generate output only (no changes will be made)")]
         public string IsMockRun { get; set; }
     }
-    
+
     public class PortCoreRulesCli
     {
         public string FilePath;
-        public string RulesPath;
+        public string RulesDir;
         public string AssembliesDir;
         public bool IsMockRun;
         public bool DefaultRules;
@@ -53,9 +50,9 @@ namespace CTA.Rules.PortCore
                     else
                     {
                         FilePath = o.SolutionPath;
-                    }                  
+                    }
 
-                    RulesPath = o.RulesInputFile;
+                    RulesDir = o.RulesDir;
                     AssembliesDir = o.AssembliesDir;
 
                     if (!string.IsNullOrEmpty(o.DefaultRules) && o.DefaultRules.ToLower() == "true")
@@ -76,12 +73,12 @@ namespace CTA.Rules.PortCore
                     }
                 });
         }
-        
+
         static void HandleParseError(IEnumerable<Error> errs)
         {
-            Environment.Exit( -1 );
+            Environment.Exit(-1);
         }
     }
-    
-    
+
+
 }

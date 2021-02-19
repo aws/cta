@@ -1,12 +1,11 @@
-﻿using CTA.Rules.Config;
-using CTA.Rules.Models;
-using CTA.Rules.RuleFiles;
-using Codelyzer.Analysis;
-using Microsoft.Extensions.Logging;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
+using System.Linq;
+using CTA.Rules.Config;
+using CTA.Rules.Models;
+using Microsoft.Extensions.Logging;
 
 namespace CTA.Rules.Update
 {
@@ -36,7 +35,7 @@ namespace CTA.Rules.Update
                     ProjectConfiguration projectConfiguration = new ProjectConfiguration()
                     {
                         ProjectPath = proj,
-                        RulesPath = cli.RulesPath,
+                        RulesDir = cli.RulesDir,
                         IsMockRun = cli.IsMockRun,
                         TargetVersions = new List<string> { "net5.0" }
                     };
@@ -47,12 +46,13 @@ namespace CTA.Rules.Update
                 //Solution Rewriter:
                 SolutionRewriter solutionRewriter = new SolutionRewriter(cli.FilePath, configs);
                 var s = solutionRewriter.AnalysisRun();
-                foreach(var k in s.Keys)
+                foreach (var k in s.ProjectResults)
                 {
-                    Console.WriteLine(k);
-                    Console.WriteLine(s[k].ToString());
+                    Console.WriteLine(k.ProjectFile);
+                    Console.WriteLine(k.ProjectActions.ToString());
                 }
-                solutionRewriter.Run(s);
+
+                solutionRewriter.Run(s.ProjectResults.ToDictionary(p => p.ProjectFile, p => p.ProjectActions));
             }
             catch (Exception ex)
             {

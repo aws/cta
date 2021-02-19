@@ -1,11 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using CTA.FeatureDetection.Common.Exceptions;
-using CTA.FeatureDetection.Common.Models.Enums;
-using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using CTA.FeatureDetection.Common.Exceptions;
 using CTA.FeatureDetection.Common.Models.Configuration;
+using CTA.FeatureDetection.Common.Models.Enums;
 using CTA.FeatureDetection.Common.Models.Features.Conditions.Base;
 
 [assembly: InternalsVisibleTo("CTA.FeatureDetection.Tests")]
@@ -28,8 +28,7 @@ namespace CTA.FeatureDetection.Load.Factories
                 throw new ClassNotFoundException(assembly, className);
             }
 
-            var conditionInstance = Activator.CreateInstance(conditionType, conditionMetadata) as Condition;
-            if (conditionInstance == null)
+            if (!(Activator.CreateInstance(conditionType, conditionMetadata) is Condition conditionInstance))
             {
                 throw new InvalidCastException($"Type {className} cannot be cast to {typeof(Condition)}");
             }

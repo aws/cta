@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 
 namespace CTA.Rules.Config
 {
@@ -24,7 +23,9 @@ namespace CTA.Rules.Config
         public static HashSet<string> CoreVersions = new HashSet<string>() { "netcoreapp3.1" };
 
         public static string RulesDefaultPath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Input"));
+        public static string DefaultFeaturesFilePath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Templates", "default.json"));
         public static string ResourcesFile = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "resources.zip"));
+        public static string ResourcesExtractedPath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Templates"));
         public static string DefaultCoreVersion = "netcoreapp3.1";
 
         public static string JsonFileSchema = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), Path.Combine(new string[] { "..", "..", "..", "..", ".." })
@@ -38,6 +39,7 @@ namespace CTA.Rules.Config
         public const int MaxRecursionDepth = 100000;
         public const int DefaultThreadSleepTime = 2000;
         public const int CacheExpiryHours = 1;
+        public const int CacheExpiryDays = 1;
 
 
         public const int DownloadRetryCount = 3;
@@ -79,15 +81,20 @@ namespace CTA.Rules.Config
 
         public const string MetricsTag = "CTA_METRICS_TAG";
 
+        //Folder migration
+        public const string Wwwroot = "wwwroot";
+        public const string Content = "Content";
+        public const string Scripts = "Scripts";
+
         //Config migration
-        public const string appSettingsJson = "appsettings.json";
-        public const string appSettings = "appsettings";
-        public const string webConfig = "web.config";
-        public const string name = "name";
-        public const string connectionstrings = "connectionstrings";
-        public const string connectionstring = "connectionstring";
-        public const string key = "key";
-        public const string value = "value";
+        public const string AppSettingsJson = "appsettings.json";
+        public const string AppSettings = "appsettings";
+        public const string WebConfig = "web.config";
+        public const string Name = "name";
+        public const string ConnectionstringsLower = "connectionstrings";
+        public const string Connectionstring = "connectionstring";
+        public const string Key = "key";
+        public const string Value = "value";
         public const string ConnectionStrings = "ConnectionStrings";
 
         public static readonly List<string> SupportedMethodModifiers = new List<string>() { "public", "internal", "protected", "private", "abstract", "extern", "override", "static", "unsafe", "virtual", "async" };

@@ -2,7 +2,6 @@ using CTA.Rules.PortCore;
 using NUnit.Framework;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace CTA.Rules.Test
 {
@@ -46,27 +45,23 @@ namespace CTA.Rules.Test
         }
 
         [Test]
-        public void TestSampleWebApi5Solution()
-        {
-            TestWebApi("net5.0");
-        }
-
-        [Test]
         public void TestSampleWebApi3Solution()
         {
-            TestWebApi("netcoreapp3.1");
-            SolutionPort.ResetCache();
-            TestWebApi("net5.0", Path.Combine(tempDir, "netcoreapp3.1"));
+            TestWebApi(TargetFramework.DotnetCoreApp31);
+            SolutionPort.ResetCache(false, false);
+            TestWebApi(TargetFramework.Dotnet5, Path.Combine(tempDir, TargetFramework.DotnetCoreApp31));
         }
 
-        private void TestWebApi(string version, string solutionDir = "")
+        [TestCase(TargetFramework.Dotnet5)]
+        public void TestWebApi(string version, string solutionDir = "")
         {
             TestSolutionAnalysis results;
 
             if (string.IsNullOrEmpty(solutionDir))
             {
                 results = AnalyzeSolution("SampleWebApi.sln", tempDir, downloadLocation, version);
-            }else
+            }
+            else
             {
                 results = AnalyzeSolution("SampleWebApi.sln", solutionDir, downloadLocation, version, true);
             }
@@ -116,29 +111,24 @@ namespace CTA.Rules.Test
             //When running it the first time
             if (string.IsNullOrEmpty(solutionDir))
             {
-                Assert.AreEqual(webApiProjectActions.Count, 3);
+                Assert.AreEqual(webApiProjectActions.Count, 4);
             }
 
             //When running the second time
             else
             {
-                Assert.AreEqual(webApiProjectActions.Count, 1);
+                Assert.AreEqual(webApiProjectActions.Count, 2);
             }
         }
 
-        [Test]
-        public void TestSampleWebApiWithReferences3Solution()
-        {
-            TestWebApiWithReferences("netcoreapp3.1");
-        }
-
-        private void TestWebApiWithReferences(string version)
+        [TestCase(TargetFramework.DotnetCoreApp31)]
+        public void TestWebApiWithReferences(string version)
         {
             TestSolutionAnalysis results = AnalyzeSolution("WebApiWithReferences.sln", tempDir, downloadLocation, version);
 
             StringAssert.Contains("IActionResult", results.SolutionAnalysisResult);
             StringAssert.Contains("Startup", results.SolutionAnalysisResult);
-                       
+
 
             var webProjectFile = results.ProjectResults.Where(p => p.CsProjectPath.EndsWith("WebApiWithReferences.csproj")).FirstOrDefault();
             FileAssert.Exists(webProjectFile.CsProjectPath);
@@ -197,22 +187,12 @@ namespace CTA.Rules.Test
 
             Assert.AreEqual(classlibrary1Actions.Count, 2);
             Assert.AreEqual(classlibrary2Actions.Count, 2);
-            Assert.AreEqual(webApiProjectActions.Count, 3);
+            Assert.AreEqual(webApiProjectActions.Count, 4);
         }
-
-        [Test]
-        public void TestMvcMusicStore5()
-        {
-            TestMvcMusicStore("net5.0");
-        }
-
-        [Test]
-        public void TestMvcMusicStore3()
-        { 
-            TestMvcMusicStore("netcoreapp3.1");
-        }
-
-        private void TestMvcMusicStore(string version)
+        
+        [TestCase(TargetFramework.Dotnet5)]
+        [TestCase(TargetFramework.DotnetCoreApp31)]
+        public void TestMvcMusicStore(string version)
         {
             TestSolutionAnalysis results = AnalyzeSolution("MvcMusicStore.sln", tempDir, downloadLocation, version);
 
@@ -274,6 +254,90 @@ namespace CTA.Rules.Test
                 .ExecutedActions.First(a => a.Key == "Project").Value;
 
             Assert.AreEqual(mvcProjectActions.Count, 4);
+        }
+        
+        [TestCase(TargetFramework.DotnetCoreApp31)]
+        public void TestAntlrSampleSolution(string version)
+        {
+            TestSolutionAnalysis results = AnalyzeSolution("AntlrSample.sln", tempDir, downloadLocation, version);
+
+            // Verify new .csproj file exists
+            var addsAntlr3RuntimeProjectFile = results.ProjectResults.Where(p => p.CsProjectPath.EndsWith("Adds.Antlr3.Runtime.csproj")).FirstOrDefault();
+            FileAssert.Exists(addsAntlr3RuntimeProjectFile.CsProjectPath);
+
+            // No build errors expected in the ported project
+            Assert.False(results.SolutionRunResult.BuildErrors[addsAntlr3RuntimeProjectFile.CsProjectPath].Any());
+
+            // Verify the new package has been added
+            var csProjectContent = addsAntlr3RuntimeProjectFile.CsProjectContent;
+            StringAssert.Contains("Include=\"Antlr3.Runtime\"", csProjectContent);
+        }
+
+        [TestCase(TargetFramework.Dotnet5)]
+        [TestCase(TargetFramework.DotnetCoreApp31)]
+        public void TestMvcConfigSampleSolution(string version)
+        {
+            TestSolutionAnalysis results = AnalyzeSolution("MvcConfigMigrationTest.sln", tempDir, downloadLocation, version);
+
+            string projectDir = results.ProjectResults.FirstOrDefault().ProjectDirectory;
+
+            var homeControllerText = File.ReadAllText(Path.Combine(projectDir, "Controllers", "HomeController.cs"));
+            ValidateConfig(homeControllerText);
+        }
+
+        [TestCase(TargetFramework.Dotnet5)]
+        [TestCase(TargetFramework.DotnetCoreApp31)]
+        public void TestWebApiConfigSampleSolution(string version)
+        {
+            TestSolutionAnalysis results = AnalyzeSolution("WebApiConfigTest.sln", tempDir, downloadLocation, version);
+
+            string projectDir = results.ProjectResults.FirstOrDefault().ProjectDirectory;
+
+            var valuesControllerText = File.ReadAllText(Path.Combine(projectDir, "Controllers", "ValuesController.cs"));
+            ValidateConfig(valuesControllerText);
+
+        }
+
+        private void ValidateConfig(string controllerText)
+        {
+            StringAssert.Contains(@"var conn = ConfigurationManager.Configuration.GetSection(""ConnectionStrings"")[""FirstConnectionString""]", controllerText);
+            StringAssert.Contains(@"var conn2 = ConfigurationManager.Configuration.GetSection(""ConnectionStrings"")[""SecondConnectionString""]", controllerText);
+            StringAssert.Contains(@"var conn3 = ConfigurationManager.Configuration.GetSection(""ConnectionStrings"")[constConnectionString]", controllerText);
+
+            StringAssert.Contains(@"var webConn1 = ConfigurationManager.Configuration.GetSection(""ConnectionStrings"")[""FirstConnectionString""]", controllerText);
+            StringAssert.Contains(@"var webConn2 = ConfigurationManager.Configuration.GetSection(""ConnectionStrings"")[""SecondConnectionString""]", controllerText);
+            StringAssert.Contains(@"var webConn3 = ConfigurationManager.Configuration.GetSection(""ConnectionStrings"")[constConnectionString]", controllerText);
+
+            StringAssert.Contains(@"var appSetting = ConfigurationManager.Configuration.GetSection(""appSettings"")[""ClientValidationEnabled""]", controllerText);
+            StringAssert.Contains(@"var appSetting3 = ConfigurationManager.Configuration.GetSection(""appSettings"")[constAppSetting]", controllerText);
+
+            StringAssert.DoesNotContain(@"var conn = ConfigurationManager.ConnectionStrings[""FirstConnectionString""];", controllerText);
+            StringAssert.DoesNotContain(@"var conn2 = ConfigurationManager.ConnectionStrings[""SecondConnectionString""].ConnectionString;", controllerText);
+            StringAssert.DoesNotContain(@"var conn3 = ConfigurationManager.ConnectionStrings[constConnectionString].ConnectionString;", controllerText);
+
+            StringAssert.DoesNotContain(@"var webConn1 = WebConfigurationManager.ConnectionStrings[""FirstConnectionString""];", controllerText);
+            StringAssert.DoesNotContain(@"var webConn2 = WebConfigurationManager.ConnectionStrings[""SecondConnectionString""].ConnectionString;", controllerText);
+            StringAssert.DoesNotContain(@"var webConn3 = WebConfigurationManager.ConnectionStrings[constConnectionString].ConnectionString;", controllerText);
+
+            StringAssert.DoesNotContain(@"var appSetting = ConfigurationManager.AppSettings[""ClientValidationEnabled""];", controllerText);
+            StringAssert.DoesNotContain(@"var appSetting3 = WebConfigurationManager.AppSettings[constAppSetting];", controllerText);
+        }
+
+        [TestCase(TargetFramework.DotnetCoreApp31)]
+        public void TestIonicZipSampleSolution(string version)
+        {
+            TestSolutionAnalysis results = AnalyzeSolution("IonicZipSample.sln", tempDir, downloadLocation, version);
+
+            // Verify new .csproj file exists
+            var ionicZipProjectFile = results.ProjectResults.Where(p => p.CsProjectPath.EndsWith("IonicZipSample.csproj")).FirstOrDefault();
+            FileAssert.Exists(ionicZipProjectFile.CsProjectPath);
+
+            // No build errors expected in the ported project
+            Assert.False(results.SolutionRunResult.BuildErrors[ionicZipProjectFile.CsProjectPath].Any());
+
+            // Verify the new package has been added
+            var csProjectContent = ionicZipProjectFile.CsProjectContent;
+            StringAssert.Contains("Include=\"DotNetZip\"", csProjectContent);
         }
 
         [TearDown]

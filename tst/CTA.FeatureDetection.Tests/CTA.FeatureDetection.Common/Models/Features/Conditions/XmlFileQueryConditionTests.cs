@@ -1,11 +1,11 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using System.Text.RegularExpressions;
-using CTA.FeatureDetection.Common.Models.Configuration;
+﻿using CTA.FeatureDetection.Common.Models.Configuration;
 using CTA.FeatureDetection.Common.Models.Enums;
 using CTA.FeatureDetection.Common.Models.Features.Conditions;
 using CTA.FeatureDetection.Tests.Utils;
 using NUnit.Framework;
+using System.Collections.Generic;
+using System.IO;
+using System.Text.RegularExpressions;
 
 namespace CTA.FeatureDetection.Tests.FeatureDetection.Common.Models.Features.Conditions
 {
@@ -28,7 +28,7 @@ namespace CTA.FeatureDetection.Tests.FeatureDetection.Common.Models.Features.Con
                     { "SearchOption", SearchOption.AllDirectories },
                     { "IgnoreCase", RegexOptions.IgnoreCase },
                     { "XmlElementPath", "configuration/connectionStrings/add" },
-                    { "XmlElementAttributes", new Dictionary<string, object> 
+                    { "XmlElementAttributes", new Dictionary<string, object>
                         {
                             { "providerName", "System.Data.SqlClient" }
                         }

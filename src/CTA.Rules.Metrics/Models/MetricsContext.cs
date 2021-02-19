@@ -1,6 +1,6 @@
-﻿using Codelyzer.Analysis;
+﻿using System.Collections.Generic;
+using Codelyzer.Analysis;
 using CTA.Rules.Config;
-using System.Collections.Generic;
 
 namespace CTA.Rules.Metrics
 {

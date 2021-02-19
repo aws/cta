@@ -11,7 +11,6 @@ using System.IO.Compression;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace CTA.Rules.Test
 {
@@ -50,7 +49,7 @@ namespace CTA.Rules.Test
             Assert.NotNull(cli.Project);
             Assert.NotNull(cli.FilePath);
             Assert.NotNull(cli.AssembliesDir);
-            Assert.NotNull(cli.IsMockRun);            
+            Assert.NotNull(cli.IsMockRun);
 
         }
 
@@ -76,19 +75,21 @@ namespace CTA.Rules.Test
             {
                 ProjectPath = projectFile,
                 TargetVersions = new List<string> { version },
-                RulesPath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "CTAFiles"))
+                RulesDir = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "CTAFiles"))
             };
 
-            List<ProjectConfiguration> solutionConfiguration = new List<ProjectConfiguration>();
-            solutionConfiguration.Add(projectConfiguration);
+            List<ProjectConfiguration> solutionConfiguration = new List<ProjectConfiguration>
+            {
+                projectConfiguration
+            };
 
             SolutionRewriter solutionRewriter = new SolutionRewriter(solutionPath, solutionConfiguration);
             var analysisRunResult = solutionRewriter.AnalysisRun();
             StringBuilder str = new StringBuilder();
-            foreach (var k in analysisRunResult.Keys)
+            foreach (var projectResult in analysisRunResult.ProjectResults)
             {
-                str.AppendLine(k);
-                str.AppendLine(analysisRunResult[k].ToString());
+                str.AppendLine(projectResult.ProjectFile);
+                str.AppendLine(projectResult.ProjectActions.ToString());
             }
 
 
@@ -96,7 +97,7 @@ namespace CTA.Rules.Test
             StringAssert.Contains("IActionResult", analysisResult);
 
 
-            solutionRewriter.Run(analysisRunResult);
+            solutionRewriter.Run(analysisRunResult.ProjectResults.ToDictionary(p => p.ProjectFile, p => p.ProjectActions));
 
             string projectDir = Directory.GetParent(projectFile).FullName;
 
@@ -148,25 +149,27 @@ namespace CTA.Rules.Test
             {
                 ProjectPath = projectFile,
                 TargetVersions = new List<string> { version },
-                RulesPath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "CTAFiles"))
+                RulesDir = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "CTAFiles"))
             };
 
-            List<ProjectConfiguration> solutionConfiguration = new List<ProjectConfiguration>();
-            solutionConfiguration.Add(projectConfiguration);
+            List<ProjectConfiguration> solutionConfiguration = new List<ProjectConfiguration>
+            {
+                projectConfiguration
+            };
 
             SolutionRewriter solutionRewriter = new SolutionRewriter(solutionPath, solutionConfiguration);
             var analysisRunResult = solutionRewriter.AnalysisRun();
             StringBuilder str = new StringBuilder();
-            foreach (var k in analysisRunResult.Keys)
+            foreach (var k in analysisRunResult.ProjectResults)
             {
-                str.AppendLine(k);
-                str.AppendLine(analysisRunResult[k].ToString());
+                str.AppendLine(k.ProjectFile);
+                str.AppendLine(k.ProjectActions.ToString());
             }
 
             var analysisResult = str.ToString();
             StringAssert.Contains("HtmlEncoder", analysisResult);
 
-            solutionRewriter.Run(analysisRunResult);
+            solutionRewriter.Run(analysisRunResult.ProjectResults.ToDictionary(p => p.ProjectFile, p => p.ProjectActions));
 
             string projectDir = Directory.GetParent(projectFile).FullName;
 

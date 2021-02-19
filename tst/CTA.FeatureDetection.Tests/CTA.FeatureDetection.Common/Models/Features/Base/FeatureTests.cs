@@ -1,7 +1,7 @@
-﻿using System.Linq;
-using CTA.FeatureDetection.Common.Models.Features.Base;
+﻿using CTA.FeatureDetection.Common.Models.Features.Base;
 using CTA.FeatureDetection.ProjectType.CompiledFeatures;
 using NUnit.Framework;
+using System.Linq;
 
 namespace CTA.FeatureDetection.Tests.FeatureDetection.Common.Models.Features.Base
 {

@@ -21,7 +21,7 @@ namespace CTA.FeatureDetection.ProjectType.Extensions
         /// <param name="featureDetectionResult">Result from feature detection</param>
         /// <returns>Whether or not the project is a .NET Core MVC project</returns>
         public static bool IsCoreMvcProject(this FeatureDetectionResult featureDetectionResult)
-        { 
+        {
             return featureDetectionResult.FeatureStatus.GetValueOrDefault(Constants.AspNetCoreMvcFeatureName, false);
         }
 
@@ -41,7 +41,7 @@ namespace CTA.FeatureDetection.ProjectType.Extensions
         /// <param name="featureDetectionResult">Result from feature detection</param>
         /// <returns>Whether or not the project is a .NET Framework MVC project</returns>
         public static bool IsMvcProject(this FeatureDetectionResult featureDetectionResult)
-        { 
+        {
             return featureDetectionResult.FeatureStatus.GetValueOrDefault(Constants.AspNetMvcFeatureName, false);
         }
 

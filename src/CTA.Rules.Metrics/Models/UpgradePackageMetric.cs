@@ -1,6 +1,6 @@
-﻿using CTA.Rules.Models;
+﻿using System.Collections.Generic;
+using CTA.Rules.Models;
 using Newtonsoft.Json;
-using System.Collections.Generic;
 
 namespace CTA.Rules.Metrics
 {
@@ -12,8 +12,11 @@ namespace CTA.Rules.Metrics
         [JsonProperty("packageName", Order = 11)]
         public string PackageName { get; set; }
 
-        [JsonProperty("packageVersion", Order = 11)]
+        [JsonProperty("packageVersion", Order = 12)]
         public string PackageVersion { get; set; }
+
+        [JsonProperty("packageOriginalVersion", Order = 13)]
+        public string PackageOriginalVersion { get; set; }
 
         [JsonProperty("solutionPath", Order = 30)]
         public string SolutionPathHash { get; set; }
@@ -25,6 +28,7 @@ namespace CTA.Rules.Metrics
         {
             PackageName = packageAction.Name;
             PackageVersion = packageAction.Version;
+            PackageOriginalVersion = packageAction.OriginalVersion;
             SolutionPathHash = context.SolutionPathHash;
             ProjectGuid = context.ProjectGuidMap.GetValueOrDefault(projectPath, "N/A");
         }

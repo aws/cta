@@ -1,7 +1,5 @@
-﻿using CTA.Rules.Models.Tokens;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
+using CTA.Rules.Models.Tokens;
 
 namespace CTA.Rules.Models
 {

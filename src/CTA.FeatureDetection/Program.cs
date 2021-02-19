@@ -10,11 +10,16 @@ namespace CTA.FeatureDetection
     {
         static void Main(string[] args)
         {
+            if (args != null)
+            {
+                Console.WriteLine(args);
+            }
+
             /* Select a test project */
             var solutionPath = Path.Combine("path", "to", "solution.sln");
 
             /* Select a feature config file*/
-            var featureConfigFilePath = Path.Combine("..", "..", "..", "..", "..", "tst", "CTA.FeatureDetection.Tests", "Examples", "Input", "feature_config.json");
+            var featureConfigFilePath = Path.Combine("..", "..", "..", "..", "..", "tst", "CTA.FeatureDetection.Tests", "Examples", "Templates", "feature_config.json");
 
             // Identify all features in a given project
             var featureDetector = new FeatureDetector(featureConfigFilePath);

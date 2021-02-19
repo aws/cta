@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
-using Codelyzer.Analysis;
+﻿using Codelyzer.Analysis;
 using CTA.FeatureDetection.Common.Models;
 using CTA.FeatureDetection.Tests.Utils;
 using NUnit.Framework;
+using System.Collections.Generic;
 
 namespace CTA.FeatureDetection.Tests.TestBase
 {
