@@ -149,10 +149,7 @@ namespace CTA.Rules.Test
             foreach(var file in files)
             {
                 string targetFile = Path.Combine(Constants.RulesDefaultPath, Path.GetFileName(file));
-                if (!File.Exists(targetFile))
-                {
                     File.Copy(file, targetFile);
-                }
             }
         }
 
