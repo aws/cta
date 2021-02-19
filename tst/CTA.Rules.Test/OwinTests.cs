@@ -30,6 +30,7 @@ namespace CTA.Rules.Test
 
             var analysisResult = results.SolutionAnalysisResult;
             string projectDir = results.ProjectResults.FirstOrDefault().ProjectDirectory;
+            var csProjContent = results.ProjectResults.FirstOrDefault().CsProjectContent;
 
             StringAssert.Contains("Microsoft.AspNetCore.Owin", analysisResult);
             StringAssert.Contains("Replace IOwinContext with HttpContext", analysisResult);
