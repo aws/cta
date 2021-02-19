@@ -149,7 +149,7 @@ namespace CTA.Rules.Test
             foreach(var file in files)
             {
                 string targetFile = Path.Combine(Constants.RulesDefaultPath, Path.GetFileName(file));
-                    File.Copy(file, targetFile);
+                File.Copy(file, targetFile);
             }
         }
 
