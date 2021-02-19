@@ -303,11 +303,12 @@ namespace CTA.Rules.Update.Rewriters
         }
         public override SyntaxNode VisitObjectCreationExpression(ObjectCreationExpressionSyntax node)
         {
+            var symbols = _semanticModel.GetSymbolInfo(node);
             ObjectCreationExpressionSyntax newNode = node;// (ObjectCreationExpressionSyntax)base.VisitObjectCreationExpression(node);
             bool skipChildren = false;
             foreach (var action in _fileActions.ObjectCreationExpressionActions)
             {
-                if (newNode.ToString() == action.Key)
+                if (newNode.ToString() == action.Key || symbols.Symbol.OriginalDefinition.ToString() == action.Key)
                 {
                     var actionExecution = new GenericActionExecution(action, _fileActions.FilePath);
                     actionExecution.TimesRun = 1;
