@@ -12,12 +12,12 @@ namespace CTA.Rules.Update.Rewriters
 {
     public class ActionsRewriter : CSharpSyntaxRewriter
     {
-        FileActions _fileActions;
-        private SemanticModel _semanticModel;
-        private SyntaxGenerator _syntaxGenerator;
+        private readonly FileActions _fileActions;
+        private readonly SemanticModel _semanticModel;
+        private readonly SyntaxGenerator _syntaxGenerator;
         public List<GenericActionExecution> allActions { get; private set; }
 
-        private static Type[] identifierNameTypes = new Type[] {
+        private static readonly Type[] identifierNameTypes = new Type[] {
             typeof(MethodDeclarationSyntax),
             typeof(ClassDeclarationSyntax),
             typeof(VariableDeclarationSyntax),
@@ -44,8 +44,10 @@ namespace CTA.Rules.Update.Rewriters
                     {
                         if (action.AttributeListActionFunc != null)
                         {
-                            var actionExecution = new GenericActionExecution(action, _fileActions.FilePath);
-                            actionExecution.TimesRun = 1;
+                            var actionExecution = new GenericActionExecution(action, _fileActions.FilePath)
+                            {
+                                TimesRun = 1
+                            };
                             try
                             {
                                 attributeListSyntax = action.AttributeListActionFunc(_syntaxGenerator, attributeListSyntax);
@@ -76,8 +78,10 @@ namespace CTA.Rules.Update.Rewriters
                 {
                     if (action.AttributeActionFunc != null)
                     {
-                        var actionExecution = new GenericActionExecution(action, _fileActions.FilePath);
-                        actionExecution.TimesRun = 1;
+                        var actionExecution = new GenericActionExecution(action, _fileActions.FilePath)
+                        {
+                            TimesRun = 1
+                        };
                         try
                         {
                             attributeSyntax = action.AttributeActionFunc(_syntaxGenerator, attributeSyntax);
@@ -105,8 +109,10 @@ namespace CTA.Rules.Update.Rewriters
             {
                 if (action.Key == node.Identifier.Text.Trim())
                 {
-                    var actionExecution = new GenericActionExecution(action, _fileActions.FilePath);
-                    actionExecution.TimesRun = 1;
+                    var actionExecution = new GenericActionExecution(action, _fileActions.FilePath)
+                    {
+                        TimesRun = 1
+                    };
                     try
                     {
                         newNode = action.ClassDeclarationActionFunc(_syntaxGenerator, newNode);
@@ -132,8 +138,10 @@ namespace CTA.Rules.Update.Rewriters
             {
                 if (action.Key == node.Identifier.Text.Trim())
                 {
-                    var actionExecution = new GenericActionExecution(action, _fileActions.FilePath);
-                    actionExecution.TimesRun = 1;
+                    var actionExecution = new GenericActionExecution(action, _fileActions.FilePath)
+                    {
+                        TimesRun = 1
+                    };
                     try
                     {
                         newNode = action.InterfaceDeclarationActionFunc(_syntaxGenerator, newNode);
@@ -161,8 +169,10 @@ namespace CTA.Rules.Update.Rewriters
                 {
                     if (symbolInfo.Symbol.ToString() == action.Key && identifierNameTypes.Contains(identifierNameSyntax.Parent?.GetType()))
                     {
-                        var actionExecution = new GenericActionExecution(action, _fileActions.FilePath);
-                        actionExecution.TimesRun = 1;
+                        var actionExecution = new GenericActionExecution(action, _fileActions.FilePath)
+                        {
+                            TimesRun = 1
+                        };
                         try
                         {
                             identifierNameSyntax = action.IdentifierNameActionFunc(_syntaxGenerator, identifierNameSyntax);
@@ -189,8 +199,10 @@ namespace CTA.Rules.Update.Rewriters
             {
                 if (symbols.Symbol.Name == action.Key)
                 {
-                    var actionExecution = new GenericActionExecution(action, _fileActions.FilePath);
-                    actionExecution.TimesRun = 1;
+                    var actionExecution = new GenericActionExecution(action, _fileActions.FilePath)
+                    {
+                        TimesRun = 1
+                    };
                     try
                     {
                         newNode = action.InvocationExpressionActionFunc(_syntaxGenerator, newNode);
@@ -223,8 +235,10 @@ namespace CTA.Rules.Update.Rewriters
                 {
                     if (nodeKey == action.Key)
                     {
-                        var actionExecution = new GenericActionExecution(action, _fileActions.FilePath);
-                        actionExecution.TimesRun = 1;
+                        var actionExecution = new GenericActionExecution(action, _fileActions.FilePath)
+                        {
+                            TimesRun = 1
+                        };
                         try
                         {
                             newNode = action.ElementAccessExpressionActionFunc(_syntaxGenerator, newNode);
@@ -257,8 +271,10 @@ namespace CTA.Rules.Update.Rewriters
                 {
                     if (nodeKey == action.Key)
                     {
-                        var actionExecution = new GenericActionExecution(action, _fileActions.FilePath);
-                        actionExecution.TimesRun = 1;
+                        var actionExecution = new GenericActionExecution(action, _fileActions.FilePath)
+                        {
+                            TimesRun = 1
+                        };
                         try
                         {
                             newNode = action.MemberAccessActionFunc(_syntaxGenerator, (MemberAccessExpressionSyntax)newNode);
@@ -283,8 +299,10 @@ namespace CTA.Rules.Update.Rewriters
             //Applying using actions
             foreach (var action in _fileActions.Usingactions)
             {
-                var actionExecution = new GenericActionExecution(action, _fileActions.FilePath);
-                actionExecution.TimesRun = 1;
+                var actionExecution = new GenericActionExecution(action, _fileActions.FilePath)
+                {
+                    TimesRun = 1
+                };
                 try
                 {
                     newNode = action.UsingActionFunc(_syntaxGenerator, newNode);
@@ -310,8 +328,10 @@ namespace CTA.Rules.Update.Rewriters
             {
                 if (newNode.ToString() == action.Key || symbols.Symbol.OriginalDefinition.ToString() == action.Key)
                 {
-                    var actionExecution = new GenericActionExecution(action, _fileActions.FilePath);
-                    actionExecution.TimesRun = 1;
+                    var actionExecution = new GenericActionExecution(action, _fileActions.FilePath)
+                    {
+                        TimesRun = 1
+                    };
                     try
                     {
                         skipChildren = true;
@@ -342,8 +362,10 @@ namespace CTA.Rules.Update.Rewriters
             {
                 if (action.Key == newNode.Name.ToString())
                 {
-                    var actionExecution = new GenericActionExecution(action, _fileActions.FilePath);
-                    actionExecution.TimesRun = 1;
+                    var actionExecution = new GenericActionExecution(action, _fileActions.FilePath)
+                    {
+                        TimesRun = 1
+                    };
                     try
                     {
                         newNode = action.NamespaceActionFunc(_syntaxGenerator, newNode);

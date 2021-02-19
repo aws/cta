@@ -11,9 +11,9 @@ namespace CTA.Rules.RuleFiles
     /// </summary>
     public class RulesFileExport
     {
-        private Rootobject _rootObject;
-        private string _rulesPath;
-        private List<TargetFramework> targetFrameworks;
+        private readonly Rootobject _rootObject;
+        private readonly string _rulesPath;
+        private readonly List<TargetFramework> targetFrameworks;
 
         /// <summary>
         /// Initialize a new instance of RulesFileExport
@@ -26,9 +26,11 @@ namespace CTA.Rules.RuleFiles
 
             _rootObject = JsonConvert.DeserializeObject<Rootobject>(rulesFileContent);
 
-            targetFrameworks = new List<TargetFramework>();
-            targetFrameworks.Add(new TargetFramework() { Name = "netcoreapp3.1", TargetCPU = { "x86", "x64", "ARM64" } });
-            targetFrameworks.Add(new TargetFramework() { Name = "net5.0", TargetCPU = { "x86", "x64", "ARM64" } });
+            targetFrameworks = new List<TargetFramework>
+            {
+                new TargetFramework() { Name = "netcoreapp3.1", TargetCPU = { "x86", "x64", "ARM64" } },
+                new TargetFramework() { Name = "net5.0", TargetCPU = { "x86", "x64", "ARM64" } }
+            };
         }
 
         /// <summary>
@@ -37,8 +39,6 @@ namespace CTA.Rules.RuleFiles
         public void Run()
         {
             NamespaceRecommendations recommendations = new NamespaceRecommendations();
-
-            var namespaces = _rootObject.NameSpaces;
 
             foreach (var @namespace in _rootObject.NameSpaces)
             {

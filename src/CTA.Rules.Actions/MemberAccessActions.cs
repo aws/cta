@@ -25,9 +25,9 @@ namespace CTA.Rules.Update
             return AddComment;
         }
 
-        public Func<SyntaxGenerator, MemberAccessExpressionSyntax, SyntaxNode> GetRemoveMemberAccessAction(string empty)
+        public Func<SyntaxGenerator, MemberAccessExpressionSyntax, SyntaxNode> GetRemoveMemberAccessAction(string _)
         {
-            SyntaxNode RemoveMemberAccess(SyntaxGenerator syntaxGenerator, MemberAccessExpressionSyntax node)
+            static SyntaxNode RemoveMemberAccess(SyntaxGenerator syntaxGenerator, MemberAccessExpressionSyntax node)
             {
                 return node.Expression;
             }

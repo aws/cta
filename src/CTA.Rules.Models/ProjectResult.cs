@@ -56,8 +56,6 @@ namespace CTA.Rules.Models
                 stringBuilder.AppendLine("---------------------------");
                 foreach (var genericAction in ExecutedActions[fileName])
                 {
-                    var actionKey = string.IsNullOrEmpty(genericAction.Key) ? "N/A" : genericAction.Key;
-
                     stringBuilder.AppendLine();
                     stringBuilder.AppendLine($"Action Type: {genericAction.Type}");
                     stringBuilder.AppendLine($"Action Name: {genericAction.Name}");

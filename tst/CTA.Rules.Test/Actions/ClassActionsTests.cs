@@ -5,6 +5,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Editing;
 using NUnit.Framework;
+using System.Collections.Generic;
 
 namespace CTA.Rules.Test.Actions
 {
@@ -125,6 +126,53 @@ class MyClass
             var node = replaceModifier(_syntaxGenerator, nodeWithMethod);
 
             StringAssert.Contains(modifier, node.ToFullString());
+        }
+
+        [Test]
+        public void AddExpression()
+        {
+            string expression = "RequestDelegate _next = null;";
+
+            var addBaseClass = _classActions.GetAddExpressionAction(expression);
+
+            var nodeWithExpression = addBaseClass(_syntaxGenerator, _node);
+
+            StringAssert.Contains(expression, nodeWithExpression.ToFullString());
+        }
+
+        [Test]
+        public void AppendConstructorExpression()
+        {
+            var methodNode = SyntaxFactory.ConstructorDeclaration(new SyntaxList<AttributeListSyntax>(), new SyntaxTokenList(SyntaxFactory.ParseToken("void")), SyntaxFactory.Identifier("MyClass"), SyntaxFactory.ParameterList(), null, SyntaxFactory.Block(SyntaxFactory.ParseStatement("int i = 5;")), SyntaxFactory.Token(SyntaxKind.SemicolonToken));
+            var nodeWithMethod = _node.AddMembers(methodNode);
+            string expression = "_next = next;";
+
+            var addBaseClass = _classActions.GetAppendConstructorExpressionAction(expression);
+
+            var nodeWithExpression = addBaseClass(_syntaxGenerator, nodeWithMethod);
+
+            StringAssert.Contains(expression, nodeWithExpression.ToFullString());
+        }
+
+        [Test]
+        public void RemoveConstructorBaseClass()
+        {
+            List<ParameterSyntax> parameters = new List<ParameterSyntax>
+            {
+                SyntaxFactory.Parameter(SyntaxFactory.Identifier("breadcrumb")).WithType(SyntaxFactory.ParseTypeName("string"))
+            };
+            var parameterList = SyntaxFactory.ParameterList(SyntaxFactory.SeparatedList(parameters));
+
+            var methodNode = SyntaxFactory.ConstructorDeclaration(new SyntaxList<AttributeListSyntax>(), new SyntaxTokenList(SyntaxFactory.ParseToken("void")), SyntaxFactory.Identifier("MyClass"), parameterList, null, SyntaxFactory.Block(SyntaxFactory.ParseStatement("_breadcrumb = breadcrumb;")), SyntaxFactory.Token(SyntaxKind.SemicolonToken))
+                .WithInitializer(SyntaxFactory.ConstructorInitializer(SyntaxKind.BaseConstructorInitializer).AddArgumentListArguments(SyntaxFactory.Argument(SyntaxFactory.IdentifierName("next")), SyntaxFactory.Argument(SyntaxFactory.IdentifierName("testing"))));
+            var nodeWithMethod = _node.AddMembers(methodNode);
+            string expression = "next";
+
+            var addBaseClass = _classActions.GetRemoveConstructorInitializerAction(expression);
+
+            var nodeWithExpression = addBaseClass(_syntaxGenerator, nodeWithMethod);
+
+            StringAssert.DoesNotContain(expression, nodeWithExpression.ToFullString());
         }
 
         [Test]

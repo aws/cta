@@ -74,7 +74,7 @@ namespace CTA.Rules.Models
                         {
                             string errorSeparator = ": error ";
                             var index = e.IndexOf(errorSeparator, StringComparison.InvariantCulture);
-                            var s = e.Substring(index + errorSeparator.Length);
+                            var s = e[(index + errorSeparator.Length)..];
 
                             if (buildErrorCounts.ContainsKey(s))
                             {
