@@ -323,7 +323,7 @@ namespace CTA.Rules.Update.Rewriters
         {
             var symbols = _semanticModel.GetSymbolInfo(node);
             ObjectCreationExpressionSyntax newNode = node;// (ObjectCreationExpressionSyntax)base.VisitObjectCreationExpression(node);
-            bool skipChildren = false;
+            bool skipChildren = false; // This is here to skip actions on children node when the main dientifier was changed. Just use new expression for the subsequent children actions.
             foreach (var action in _fileActions.ObjectCreationExpressionActions)
             {
                 if (newNode.ToString() == action.Key || symbols.Symbol.OriginalDefinition.ToString() == action.Key)
@@ -335,10 +335,9 @@ namespace CTA.Rules.Update.Rewriters
                     try
                     {
                         skipChildren = true;
-                        var createdNode = action.ObjectCreationExpressionGenericActionFunc(_syntaxGenerator, newNode);
+                        newNode = (ObjectCreationExpressionSyntax)action.ObjectCreationExpressionGenericActionFunc(_syntaxGenerator, newNode);
                         allActions.Add(actionExecution);
                         LogHelper.LogInformation(string.Format("{0}", action.Description));
-                        return createdNode;
                     }
                     catch (Exception ex)
                     {

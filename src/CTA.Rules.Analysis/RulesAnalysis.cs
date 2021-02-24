@@ -268,12 +268,15 @@ namespace CTA.Rules.Analyzer
                                 }
 
                                 token = null;
-                                var nameToken = new ObjectCreationExpressionToken() { Key = objectCreationNode.SemanticMethodSignature, Namespace = objectCreationNode.SemanticNamespace, Type = objectCreationNode.SemanticClassType };
-                                _rootNodes.ObjectCreationExpressionTokens.TryGetValue(nameToken, out token);
-                                if (token != null)
+                                if(!string.IsNullOrEmpty(objectCreationNode.SemanticMethodSignature))
                                 {
-                                    AddActions(fileAction, token, child.TextSpan);
-                                    containsActions = true;
+                                    var nameToken = new ObjectCreationExpressionToken() { Key = objectCreationNode.SemanticMethodSignature, Namespace = objectCreationNode.SemanticNamespace, Type = objectCreationNode.SemanticClassType };
+                                    _rootNodes.ObjectCreationExpressionTokens.TryGetValue(nameToken, out token);
+                                    if (token != null)
+                                    {
+                                        AddActions(fileAction, token, child.TextSpan);
+                                        containsActions = true;
+                                    }
                                 }
 
                                 if (AnalyzeChildren(fileAction, child.Children, ++level, parentNamespace, parentClass)) { containsActions = true; }

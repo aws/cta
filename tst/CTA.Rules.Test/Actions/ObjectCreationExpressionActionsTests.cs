@@ -83,7 +83,6 @@ namespace CTA.Rules.Test.Actions
             var newNode = replaceObjectWithInvocationFunc(_syntaxGenerator, _node);
 
             StringAssert.Contains(newIdentifier, newNode.ToFullString());
-            StringAssert.DoesNotContain(oldIdentifier, newNode.ToFullString());
         }
 
         [Test]
@@ -112,27 +111,30 @@ namespace CTA.Rules.Test.Actions
 
             StringAssert.Contains(newIdentifier, newNode.ToFullString());
             StringAssert.Contains(newValue, newNode.ToFullString());
-            StringAssert.DoesNotContain(oldIdentifier, newNode.ToFullString());
         }
 
         [Test]
         public void GetReplaceObjectIdentifier()
         {
             string oldIdentifier = "PhysicalFileSystem", newIdentifier = "PhysicalFileProvider";
-            _node = SyntaxFactory.ObjectCreationExpression(
-                SyntaxFactory.IdentifierName("PhysicalFileSystem"))
-            .WithArgumentList(
-                SyntaxFactory.ArgumentList(
-                    SyntaxFactory.SingletonSeparatedList<ArgumentSyntax>(
-                        SyntaxFactory.Argument(
-                            SyntaxFactory.LiteralExpression(
-                                SyntaxKind.StringLiteralExpression,
-                                SyntaxFactory.Literal(
-                                    "@\".\\defaults\"",
-                                    ".\\defaults"))))))
+            _node = _syntaxGenerator.ObjectCreationExpression(SyntaxFactory.ParseTypeName("FileServerOptions")).NormalizeWhitespace() as ObjectCreationExpressionSyntax;
+
+            _node = _node.WithArgumentList(SyntaxFactory.ArgumentList()).WithInitializer(SyntaxFactory.InitializerExpression(SyntaxKind.ObjectInitializerExpression,
+                SyntaxFactory.SeparatedList<ExpressionSyntax>(
+                    new SyntaxNodeOrToken[]{
+                        SyntaxFactory.AssignmentExpression(
+                            SyntaxKind.SimpleAssignmentExpression,
+                            SyntaxFactory.IdentifierName("RequestPath"),
+                            SyntaxFactory.ParseExpression("PathString.Empty")),
+                        SyntaxFactory.Token(SyntaxKind.CommaToken),
+                        SyntaxFactory.AssignmentExpression(
+                            SyntaxKind.SimpleAssignmentExpression,
+                            SyntaxFactory.IdentifierName("FileSystem"),
+                            SyntaxFactory.ParseExpression("new PhysicalFileSystem(@\".\\defaults\")")),
+                        SyntaxFactory.Token(SyntaxKind.CommaToken)})))
             .NormalizeWhitespace();
 
-            var replaceObjectWithInvocationFunc = _objectCreationExpressionActions.GetReplaceObjectIdentifierAction(newIdentifier);
+            var replaceObjectWithInvocationFunc = _objectCreationExpressionActions.GetReplaceObjectPropertyValueAction(oldIdentifier,newIdentifier);
             var newNode = replaceObjectWithInvocationFunc(_syntaxGenerator, _node);
 
             StringAssert.Contains(newIdentifier, newNode.ToFullString());

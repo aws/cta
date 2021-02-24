@@ -40,29 +40,51 @@ namespace CTA.Rules.Actions
         {
             Func<SyntaxGenerator, ObjectCreationExpressionSyntax, ExpressionSyntax> action = (SyntaxGenerator syntaxGenerator, ObjectCreationExpressionSyntax node) =>
             {
-                var member = node.Initializer.Expressions.FirstOrDefault(n => n.ToFullString().Contains(oldMember));
-                if(member != null)
+                if(node.Initializer != null && node.Initializer.Expressions.Count > 0)
                 {
-                    var newExpression = SyntaxFactory.ParseExpression(member.ToFullString().Replace(oldMember,newMember));
-                    var newNode = node.Initializer.Expressions.Replace(member, newExpression);
-                    node = node.WithInitializer(node.Initializer.WithExpressions(newNode)).NormalizeWhitespace();
-                }
-                else
-                {
-                    var newExpression = SyntaxFactory.ParseExpression(newMember + "=" + newValueIfAdding);
-                    var newNode = node.Initializer.Expressions.Add(newExpression);
-                    node = node.WithInitializer(node.Initializer.WithExpressions(newNode)).NormalizeWhitespace();
+                    var memberList = node.Initializer.Expressions.Where(n => n.Kind() == SyntaxKind.SimpleAssignmentExpression);
+                    if(memberList.Count() > 0)
+                    {
+                        var assignMemberList = memberList.Select(n => (AssignmentExpressionSyntax)n);
+                        var member = assignMemberList.Where(n => n.Left.ToFullString().Contains(oldMember)).FirstOrDefault();
+                        if (member != null)
+                        {
+                            var newExpression = SyntaxFactory.ParseExpression(newMember + "=" + member.Right);
+                            var newNode = node.Initializer.Expressions.Replace(member, newExpression);
+                            node = node.WithInitializer(node.Initializer.WithExpressions(newNode)).NormalizeWhitespace();
+                        }
+                        else
+                        {
+                            var newExpression = SyntaxFactory.ParseExpression(newMember + "=" + newValueIfAdding);
+                            var newNode = node.Initializer.Expressions.Add(newExpression);
+                            node = node.WithInitializer(node.Initializer.WithExpressions(newNode)).NormalizeWhitespace();
+                        }
+                    }
                 }
                 return node;
             };
             return action;
         }
 
-        public Func<SyntaxGenerator, ObjectCreationExpressionSyntax, ExpressionSyntax> GetReplaceObjectIdentifierAction(string identifier)
+        public Func<SyntaxGenerator, ObjectCreationExpressionSyntax, ExpressionSyntax> GetReplaceObjectPropertyValueAction(string oldMember, string newMember)
         {
             Func<SyntaxGenerator, ObjectCreationExpressionSyntax, ExpressionSyntax> action = (SyntaxGenerator syntaxGenerator, ObjectCreationExpressionSyntax node) =>
             {
-                node = node.WithType(SyntaxFactory.ParseTypeName(identifier)).NormalizeWhitespace();
+                if (node.Initializer != null && node.Initializer.Expressions.Count > 0)
+                {
+                    var memberList = node.Initializer.Expressions.Where(n => n.Kind() == SyntaxKind.SimpleAssignmentExpression);
+                    if (memberList.Count() > 0)
+                    {
+                        var assignMemberList = memberList.Select(n => (AssignmentExpressionSyntax)n);
+                        var member = assignMemberList.Where(n => n.Right.ToFullString().Contains(oldMember)).FirstOrDefault();
+                        if (member != null)
+                        {
+                            var newExpression = SyntaxFactory.ParseExpression(member.Left + "=" + member.Right.ToString().Replace(oldMember,newMember));
+                            var newNode = node.Initializer.Expressions.Replace(member, newExpression);
+                            node = node.WithInitializer(node.Initializer.WithExpressions(newNode)).NormalizeWhitespace();
+                        }
+                    }
+                }
                 return node;
             };
             return action;
