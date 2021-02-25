@@ -114,7 +114,7 @@ namespace CTA.Rules.Test.Actions
         }
 
         [Test]
-        public void GetReplaceObjectIdentifier()
+        public void GetReplaceObjectPropertyValue()
         {
             string oldIdentifier = "PhysicalFileSystem", newIdentifier = "PhysicalFileProvider";
             _node = _syntaxGenerator.ObjectCreationExpression(SyntaxFactory.ParseTypeName("FileServerOptions")).NormalizeWhitespace() as ObjectCreationExpressionSyntax;
