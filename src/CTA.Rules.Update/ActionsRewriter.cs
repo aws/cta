@@ -322,7 +322,7 @@ namespace CTA.Rules.Update.Rewriters
         public override SyntaxNode VisitObjectCreationExpression(ObjectCreationExpressionSyntax node)
         {
             var symbols = _semanticModel.GetSymbolInfo(node);
-            ObjectCreationExpressionSyntax newNode = node;// (ObjectCreationExpressionSyntax)base.VisitObjectCreationExpression(node);
+            ExpressionSyntax newNode = node;// (ObjectCreationExpressionSyntax)base.VisitObjectCreationExpression(node);
             bool skipChildren = false; // This is here to skip actions on children node when the main dientifier was changed. Just use new expression for the subsequent children actions.
             foreach (var action in _fileActions.ObjectCreationExpressionActions)
             {
@@ -335,7 +335,7 @@ namespace CTA.Rules.Update.Rewriters
                     try
                     {
                         skipChildren = true;
-                        newNode = (ObjectCreationExpressionSyntax)action.ObjectCreationExpressionGenericActionFunc(_syntaxGenerator, newNode);
+                        newNode = action.ObjectCreationExpressionGenericActionFunc(_syntaxGenerator, (ObjectCreationExpressionSyntax)newNode);
                         allActions.Add(actionExecution);
                         LogHelper.LogInformation(string.Format("{0}", action.Description));
                     }

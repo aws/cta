@@ -515,19 +515,6 @@ namespace CTA.Rules.Analyzer
                     MethodDeclarationActionFunc = c.MethodDeclarationActionFunc
                 }));
 
-            fileAction.ObjectCreationExpressionActions.UnionWith(token.ObjectCreationExpressionActions
-                .Select(c => new ObjectCreationExpressionAction()
-                {
-                    Key = identifier,
-                    Value = c.Value,
-                    Description = c.Description,
-                    Name = c.Name,
-                    Type = c.Type,
-                    TextSpan = textSpan,
-                    ActionValidation = c.ActionValidation,
-                    ObjectCreationExpressionGenericActionFunc = c.ObjectCreationExpressionGenericActionFunc
-                }));
-
             if (fileAction.ClassDeclarationActions.Any() || fileAction.InterfaceDeclarationActions.Any() || fileAction.MethodDeclarationActions.Any() || fileAction.ObjectCreationExpressionActions.Any())
             {
                 var nodeToken = token.Clone();
