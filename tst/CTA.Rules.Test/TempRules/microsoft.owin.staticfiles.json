@@ -88,7 +88,7 @@
     },
     {
       "Type": "ObjectCreation",
-      "Name": "Microsoft.Owin.StaticFiles.FileServerOptions.FileServerOptions()",
+      "Name": "FileServerOptions",
       "Value": "Microsoft.Owin.StaticFiles.FileServerOptions.FileServerOptions()",
       "KeyType": "Name",
       "ContainingType": "FileServerOptions",
@@ -114,7 +114,7 @@
               "Value": {
                 "oldMember": "FileSystem",
                 "newMember": "FileProvider",
-                "newValueIfAdding": "new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), @\"\"))"
+                "newValueIfAdding": "new PhysicalFileProvider(@\"\")"
               },
               "Description": "Replace FileServerOptions' FileSystem with FileProvider",
               "ActionValidation": {
@@ -138,10 +138,10 @@
             {
               "Name": "AddComment",
               "Type": "ObjectCreation",
-              "Value": "If FileSystem was not present before FileProvider was added, please copy the value from RequestPath into it. You may need to use Directory.GetCurrentDirectory().",
+              "Value": "If FileSystem was not present before FileProvider was added, please initialize this new value. Using the value from RequestPath with System.IO.Directory.GetCurrentDirectory() as a prefix may be  agood starting point.",
               "Description": "Add a comment to explain how to initialize FileProvider correctly.",
               "ActionValidation": {
-                "Contains": "IfFileSystemwasnotpresentbeforeFileProviderwasadded,pleasecopythevaluefromRequestPathintoit.YoumayneedtouseDirectory.GetCurrentDirectory().",
+                "Contains": "IfFileSystemwasnotpresentbeforeFileProviderwasadded,pleaseinitializethisnewvalue.",
                 "NotContains": ""
               }
             }
@@ -151,7 +151,7 @@
     },
     {
       "Type": "ObjectCreation",
-      "Name": "Microsoft.Owin.StaticFiles.DirectoryBrowserOptions.DirectoryBrowserOptions()",
+      "Name": "DirectoryBrowserOptions",
       "Value": "Microsoft.Owin.StaticFiles.DirectoryBrowserOptions.DirectoryBrowserOptions()",
       "KeyType": "Name",
       "ContainingType": "DirectoryBrowserOptions",
@@ -177,7 +177,7 @@
               "Value": {
                 "oldMember": "FileSystem",
                 "newMember": "FileProvider",
-                "newValueIfAdding": "new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), @\"\"))"
+                "newValueIfAdding": "new PhysicalFileProvider(@\"\")"
               },
               "Description": "Replace DirectoryBrowserOptions' FileSystem with FileProvider",
               "ActionValidation": {
@@ -201,10 +201,10 @@
             {
               "Name": "AddComment",
               "Type": "ObjectCreation",
-              "Value": "If FileSystem was not present before FileProvider was added, please copy the value from RequestPath into it. You may need to use Directory.GetCurrentDirectory().",
+              "Value": "If FileSystem was not present before FileProvider was added, please initialize this new value. Using the value from RequestPath with System.IO.Directory.GetCurrentDirectory() as a prefix may be  agood starting point.",
               "Description": "Add a comment to explain how to initialize FileProvider correctly.",
               "ActionValidation": {
-                "Contains": "IfFileSystemwasnotpresentbeforeFileProviderwasadded,pleasecopythevaluefromRequestPathintoit.YoumayneedtouseDirectory.GetCurrentDirectory().",
+                "Contains": "IfFileSystemwasnotpresentbeforeFileProviderwasadded,pleaseinitializethisnewvalue.",
                 "NotContains": ""
               }
             }

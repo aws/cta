@@ -326,7 +326,7 @@ namespace CTA.Rules.Update.Rewriters
             bool skipChildren = false; // This is here to skip actions on children node when the main dientifier was changed. Just use new expression for the subsequent children actions.
             foreach (var action in _fileActions.ObjectCreationExpressionActions)
             {
-                if (newNode.ToString() == action.Key || symbols.Symbol.OriginalDefinition.ToString() == action.Key)
+                if (newNode.ToString() == action.Key || symbols.Symbol.ContainingType.Name == action.Key)
                 {
                     var actionExecution = new GenericActionExecution(action, _fileActions.FilePath)
                     {
