@@ -118,8 +118,8 @@ namespace CTA.Rules.PortCore
                     }
                     catch (Exception)
                     {
-                            //We are checking which files have a recommendation, some of them won't
-                        }
+                        //We are checking which files have a recommendation, some of them won't
+                    }
                 }
             });
 
@@ -132,6 +132,15 @@ namespace CTA.Rules.PortCore
             var projectTypeFeatureDetector = new FeatureDetector();
             var projectTypeFeatureResults = projectTypeFeatureDetector.DetectFeaturesInProjects(analyzerResults);
 
+            if (projectTypeFeatureResults.Values.Any(f => f.PresentFeatures.Any()))
+            {
+                var reportGenerator = new FeatureDetectionResultReportGenerator(_context, projectTypeFeatureResults);
+                reportGenerator.GenerateFeatureDetectionReport();
+
+                LogHelper.LogInformation("Generating FeatureDetection Report");
+                LogHelper.LogError($"{Constants.MetricsTag}: {reportGenerator.FeatureDetectionResultJsonReport}");
+            }
+            
             foreach (var projectConfiguration in solutionConfiguration)
             {
                 var projectTypeFeatureResult = projectTypeFeatureResults[projectConfiguration.ProjectPath];
