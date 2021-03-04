@@ -38,7 +38,7 @@ namespace CTA.Rules.Actions
 
         public Func<SyntaxGenerator, ObjectCreationExpressionSyntax, ExpressionSyntax> GetReplaceOrAddObjectPropertyIdentifierAction(string oldMember, string newMember, string newValueIfAdding)
         {
-            Func<SyntaxGenerator, ObjectCreationExpressionSyntax, ExpressionSyntax> action = (SyntaxGenerator syntaxGenerator, ObjectCreationExpressionSyntax node) =>
+            ExpressionSyntax action(SyntaxGenerator syntaxGenerator, ObjectCreationExpressionSyntax node)
             {
                 if(node.Initializer != null && node.Initializer.Expressions.Count > 0)
                 {
@@ -62,13 +62,13 @@ namespace CTA.Rules.Actions
                     }
                 }
                 return node;
-            };
+            }
             return action;
         }
 
         public Func<SyntaxGenerator, ObjectCreationExpressionSyntax, ExpressionSyntax> GetReplaceObjectPropertyValueAction(string oldMember, string newMember)
         {
-            Func<SyntaxGenerator, ObjectCreationExpressionSyntax, ExpressionSyntax> action = (SyntaxGenerator syntaxGenerator, ObjectCreationExpressionSyntax node) =>
+            ExpressionSyntax action(SyntaxGenerator syntaxGenerator, ObjectCreationExpressionSyntax node)
             {
                 if (node.Initializer != null && node.Initializer.Expressions.Count > 0)
                 {
@@ -86,7 +86,7 @@ namespace CTA.Rules.Actions
                     }
                 }
                 return node;
-            };
+            }
             return action;
         }
 

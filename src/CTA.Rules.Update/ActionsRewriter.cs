@@ -322,11 +322,11 @@ namespace CTA.Rules.Update.Rewriters
         public override SyntaxNode VisitObjectCreationExpression(ObjectCreationExpressionSyntax node)
         {
             var symbols = _semanticModel.GetSymbolInfo(node);
-            ExpressionSyntax newNode = node;// (ObjectCreationExpressionSyntax)base.VisitObjectCreationExpression(node);
-            bool skipChildren = false; // This is here to skip actions on children node when the main dientifier was changed. Just use new expression for the subsequent children actions.
+            ExpressionSyntax newNode = node;
+            bool skipChildren = false; // This is here to skip actions on children node when the main identifier was changed. Just use new expression for the subsequent children actions.
             foreach (var action in _fileActions.ObjectCreationExpressionActions)
             {
-                if (newNode.ToString() == action.Key || symbols.Symbol.ContainingType.Name == action.Key)
+                if (newNode.ToString() == action.Key || symbols.Symbol?.ContainingType?.Name == action.Key)
                 {
                     var actionExecution = new GenericActionExecution(action, _fileActions.FilePath)
                     {
