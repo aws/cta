@@ -199,7 +199,7 @@ namespace CTA.Rules.Update.Rewriters
 
             if (symbol != null)
             {
-                var nodeKey = $"{symbol.ContainingType}.{symbol.Name}";
+                var nodeKey = symbol.OriginalDefinition.ToString();
 
                 foreach (var action in _fileActions.InvocationExpressionActions)
                 {

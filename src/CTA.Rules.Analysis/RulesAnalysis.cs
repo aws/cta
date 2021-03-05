@@ -184,7 +184,7 @@ namespace CTA.Rules.Analyzer
                         case IdConstants.InvocationIdName:
                             {
                                 InvocationExpression invocationExpression = (InvocationExpression)child;
-                                var compareToken = new InvocationExpressionToken() { Key = invocationExpression.MethodName, Namespace = invocationExpression.Reference.Namespace, Type = invocationExpression.SemanticClassType };
+                                var compareToken = new InvocationExpressionToken() { Key = invocationExpression.SemanticOriginalDefinition, Namespace = invocationExpression.Reference.Namespace, Type = invocationExpression.SemanticClassType };
                                 _rootNodes.Invocationexpressiontokens.TryGetValue(compareToken, out var token);
                                 if (token != null)
                                 {
