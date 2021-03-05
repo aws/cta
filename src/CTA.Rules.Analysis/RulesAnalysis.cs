@@ -267,6 +267,18 @@ namespace CTA.Rules.Analyzer
                                     containsActions = true;
                                 }
 
+                                token = null;
+                                if(!string.IsNullOrEmpty(objectCreationNode.SemanticMethodSignature))
+                                {
+                                    var nameToken = new ObjectCreationExpressionToken() { Key = objectCreationNode.SemanticClassType, Namespace = objectCreationNode.SemanticNamespace, Type = objectCreationNode.SemanticClassType };
+                                    _rootNodes.ObjectCreationExpressionTokens.TryGetValue(nameToken, out token);
+                                    if (token != null)
+                                    {
+                                        AddActions(fileAction, token, child.TextSpan);
+                                        containsActions = true;
+                                    }
+                                }
+
                                 if (AnalyzeChildren(fileAction, child.Children, ++level, parentNamespace, parentClass)) { containsActions = true; }
                                 break;
                             }
@@ -503,7 +515,7 @@ namespace CTA.Rules.Analyzer
                     MethodDeclarationActionFunc = c.MethodDeclarationActionFunc
                 }));
 
-            if (fileAction.ClassDeclarationActions.Any() || fileAction.InterfaceDeclarationActions.Any() || fileAction.MethodDeclarationActions.Any())
+            if (fileAction.ClassDeclarationActions.Any() || fileAction.InterfaceDeclarationActions.Any() || fileAction.MethodDeclarationActions.Any() || fileAction.ObjectCreationExpressionActions.Any())
             {
                 var nodeToken = token.Clone();
                 nodeToken.TextSpan = textSpan;

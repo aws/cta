@@ -329,11 +329,12 @@ namespace CTA.Rules.Update.Rewriters
         }
         public override SyntaxNode VisitObjectCreationExpression(ObjectCreationExpressionSyntax node)
         {
-            ObjectCreationExpressionSyntax newNode = node;// (ObjectCreationExpressionSyntax)base.VisitObjectCreationExpression(node);
-            bool skipChildren = false;
+            var symbols = _semanticModel.GetSymbolInfo(node);
+            ExpressionSyntax newNode = node;
+            bool skipChildren = false; // This is here to skip actions on children node when the main identifier was changed. Just use new expression for the subsequent children actions.
             foreach (var action in _fileActions.ObjectCreationExpressionActions)
             {
-                if (newNode.ToString() == action.Key)
+                if (newNode.ToString() == action.Key || symbols.Symbol?.ContainingType?.Name == action.Key)
                 {
                     var actionExecution = new GenericActionExecution(action, _fileActions.FilePath)
                     {
@@ -342,10 +343,9 @@ namespace CTA.Rules.Update.Rewriters
                     try
                     {
                         skipChildren = true;
-                        var createdNode = action.ObjectCreationExpressionGenericActionFunc(_syntaxGenerator, newNode);
+                        newNode = action.ObjectCreationExpressionGenericActionFunc(_syntaxGenerator, (ObjectCreationExpressionSyntax)newNode);
                         allActions.Add(actionExecution);
                         LogHelper.LogInformation(string.Format("{0}", action.Description));
-                        return createdNode;
                     }
                     catch (Exception ex)
                     {

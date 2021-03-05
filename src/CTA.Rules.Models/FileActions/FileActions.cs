@@ -32,8 +32,8 @@ namespace CTA.Rules.Models
         public HashSet<IdentifierNameAction> IdentifierNameActions { get; set; }
         public HashSet<InvocationExpressionAction> InvocationExpressionActions { get; set; }
         public HashSet<MemberAccessAction> MemberAccessActions { get; set; }
-        public HashSet<UsingAction> Usingactions { get; set; }
         public HashSet<ObjectCreationExpressionAction> ObjectCreationExpressionActions { get; set; }
+        public HashSet<UsingAction> Usingactions { get; set; }
         public HashSet<NamespaceAction> NamespaceActions { get; set; }
         public HashSet<PackageAction> PackageActions { get; set; }
 
