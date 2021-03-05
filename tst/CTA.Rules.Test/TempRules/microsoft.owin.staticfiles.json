@@ -106,7 +106,7 @@
               "TargetCPU": [ "x86", "x64", "ARM32", "ARM64" ]
             }
           ],
-          "Description": "Replace FileServerOptions' FileSystem with FileProvider.",
+          "Description": "Replace FileServerOptions' FileSystem with FileProvider and PhysicalFileSystem with PhysicalFileProvider.",
           "Actions": [
             {
               "Name": "ReplaceOrAddObjectPropertyIdentifier",
@@ -114,7 +114,8 @@
               "Value": {
                 "oldMember": "FileSystem",
                 "newMember": "FileProvider",
-                "newValueIfAdding": "new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), @\"\"))"
+
+                "newValueIfAdding": "new PhysicalFileProvider(@\"\")"
               },
               "Description": "Replace FileServerOptions' FileSystem with FileProvider",
               "ActionValidation": {
@@ -123,12 +124,25 @@
               }
             },
             {
+              "Name": "ReplaceObjectPropertyValue",
+              "Type": "ObjectCreation",
+              "Value": {
+                "oldMember": "PhysicalFileSystem",
+                "newMember": "PhysicalFileProvider"
+              },
+              "Description": "Replace PhysicalFileSystem with PhysicalFileProvider",
+              "ActionValidation": {
+                "Contains": "PhysicalFileProvider",
+                "NotContains": "PhysicalFileSystem"
+              }
+            },
+            {
               "Name": "AddComment",
               "Type": "ObjectCreation",
-              "Value": "If FileSystem was not present before FileProvider was initialized for you, please copy the value from RequestPath into it. You may need to use Directory.GetCurrentDirectory().",
+              "Value": "If FileSystem was not present before FileProvider was added, please initialize this new value. Using the value from RequestPath with System.IO.Directory.GetCurrentDirectory() as a prefix may be  agood starting point.",
               "Description": "Add a comment to explain how to initialize FileProvider correctly.",
               "ActionValidation": {
-                "Contains": "IfFileSystemwasnotpresentbeforeFileProviderwasinitializedforyou,pleasecopythevaluefromRequestPathintoit.YoumayneedtouseDirectory.GetCurrentDirectory().",
+                "Contains": "IfFileSystemwasnotpresentbeforeFileProviderwasadded,pleaseinitializethisnewvalue.",
                 "NotContains": ""
               }
             }
@@ -156,7 +170,7 @@
               "TargetCPU": [ "x86", "x64", "ARM32", "ARM64" ]
             }
           ],
-          "Description": "Replace DirectoryBrowserOptions' FileSystem with FileProvider.",
+          "Description": "Replace DirectoryBrowserOptions' FileSystem with FileProvider and PhysicalFileSystem with PhysicalFileProvider.",
           "Actions": [
             {
               "Name": "ReplaceOrAddObjectPropertyIdentifier",
@@ -164,7 +178,7 @@
               "Value": {
                 "oldMember": "FileSystem",
                 "newMember": "FileProvider",
-                "newValueIfAdding": "new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), @\"\"))"
+                "newValueIfAdding": "new PhysicalFileProvider(@\"\")"
               },
               "Description": "Replace DirectoryBrowserOptions' FileSystem with FileProvider",
               "ActionValidation": {
@@ -173,12 +187,25 @@
               }
             },
             {
+              "Name": "ReplaceObjectPropertyValue",
+              "Type": "ObjectCreation",
+              "Value": {
+                "oldMember": "PhysicalFileSystem",
+                "newMember": "PhysicalFileProvider"
+              },
+              "Description": "Replace PhysicalFileSystem with PhysicalFileProvider",
+              "ActionValidation": {
+                "Contains": "PhysicalFileProvider",
+                "NotContains": "PhysicalFileSystem"
+              }
+            },
+            {
               "Name": "AddComment",
               "Type": "ObjectCreation",
-              "Value": "If FileSystem was not present before FileProvider was initialized for you, please copy the value from RequestPath into it. You may need to use Directory.GetCurrentDirectory().",
+              "Value": "If FileSystem was not present before FileProvider was added, please initialize this new value. Using the value from RequestPath with System.IO.Directory.GetCurrentDirectory() as a prefix may be  agood starting point.",
               "Description": "Add a comment to explain how to initialize FileProvider correctly.",
               "ActionValidation": {
-                "Contains": "IfFileSystemwasnotpresentbeforeFileProviderwasinitializedforyou,pleasecopythevaluefromRequestPathintoit.YoumayneedtouseDirectory.GetCurrentDirectory().",
+                "Contains": "IfFileSystemwasnotpresentbeforeFileProviderwasadded,pleaseinitializethisnewvalue.",
                 "NotContains": ""
               }
             }
