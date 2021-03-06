@@ -38,6 +38,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CTA.FeatureDetection.AuthType", "CTA.FeatureDetection.AuthType\CTA.FeatureDetection.AuthType.csproj", "{7F508C93-ACD1-4322-BF40-454E386EE53C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -104,6 +106,10 @@ Global
 		{75B5A557-88EF-4039-BF5E-BA001247BD3A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{75B5A557-88EF-4039-BF5E-BA001247BD3A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{75B5A557-88EF-4039-BF5E-BA001247BD3A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7F508C93-ACD1-4322-BF40-454E386EE53C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7F508C93-ACD1-4322-BF40-454E386EE53C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7F508C93-ACD1-4322-BF40-454E386EE53C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7F508C93-ACD1-4322-BF40-454E386EE53C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
