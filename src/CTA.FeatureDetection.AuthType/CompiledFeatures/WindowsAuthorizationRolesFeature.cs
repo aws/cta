@@ -15,9 +15,9 @@ namespace CTA.FeatureDetection.AuthType.CompiledFeatures
         {
             var configs = LoadWebConfigs(analyzerResult);
             return configs.Any(c =>
-                c.RootSectionGroup?.SectionGroups[Constants.AuthenticationElement]?.Sections[Constants.AllowElement]?.ElementInformation.Properties[Constants.RolesAttribute] != null
-                || c.RootSectionGroup?.SectionGroups[Constants.SystemWebElement]?.SectionGroups[Constants.AuthenticationElement]?.Sections[Constants.AllowElement]?.ElementInformation.Properties[Constants.RolesAttribute] != null
-                || c.RootSectionGroup?.SectionGroups[Constants.ConfigurationElement]?.SectionGroups[Constants.SystemWebElement]?.SectionGroups[Constants.AuthenticationElement]?.Sections[Constants.AllowElement]?.ElementInformation.Properties[Constants.RolesAttribute] != null);
+                c.RootSectionGroup?.SectionGroups[Constants.AuthorizationElement]?.Sections[Constants.AllowElement]?.ElementInformation.Properties[Constants.RolesAttribute] != null
+                || c.RootSectionGroup?.SectionGroups[Constants.SystemWebElement]?.SectionGroups[Constants.AuthorizationElement]?.Sections[Constants.AllowElement]?.ElementInformation.Properties[Constants.RolesAttribute] != null
+                || c.RootSectionGroup?.SectionGroups[Constants.ConfigurationElement]?.SectionGroups[Constants.SystemWebElement]?.SectionGroups[Constants.AuthorizationElement]?.Sections[Constants.AllowElement]?.ElementInformation.Properties[Constants.RolesAttribute] != null);
         }
         
         private bool IsPresentInCode(AnalyzerResult analyzerResult)
