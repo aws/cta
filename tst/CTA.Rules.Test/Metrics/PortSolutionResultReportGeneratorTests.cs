@@ -9,6 +9,7 @@ using NUnit.Framework;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
+using CTA.FeatureDetection.Common.Models;
 
 namespace CTA.Rules.Test.Metrics
 {
@@ -16,30 +17,41 @@ namespace CTA.Rules.Test.Metrics
     {
         private const string _tempDir = "temp";
         public PortSolutionResultReportGenerator ReportGenerator;
+        public PortSolutionResultReportGenerator ReportGeneratorWithFeatureDetection;
 
         [SetUp]
         public void Setup()
         {
             Directory.CreateDirectory(_tempDir);
             var solutionPath = $"{_tempDir}/solution.sln";
-            var projectPath = $"{_tempDir}/project.csproj";
-            var projectResult = new ProjectWorkspace(projectPath)
+            var projectPath1 = $"{_tempDir}/project1.csproj";
+            var projectPath2 = $"{_tempDir}/project2.csproj";
+            var projectResult1 = new ProjectWorkspace(projectPath1)
             {
                 ProjectGuid = "1234-5678"
             };
-            var analyzerResult = new AnalyzerResult
+            var projectResult2 = new ProjectWorkspace(projectPath2)
             {
-                ProjectResult = projectResult
+                ProjectGuid = "ABCD-EFGH"
+            };
+            var analyzerResult1 = new AnalyzerResult
+            {
+                ProjectResult = projectResult1
+            };
+            var analyzerResult2 = new AnalyzerResult
+            {
+                ProjectResult = projectResult2
             };
             var analyzerResults = new List<AnalyzerResult>
             {
-                analyzerResult
+                analyzerResult1,
+                analyzerResult2
             };
             var context = new MetricsContext(solutionPath, analyzerResults);
 
             var buildErrors = new Dictionary<string, Dictionary<string, int>>
             {
-                { projectPath, new Dictionary<string, int>
+                { projectPath1, new Dictionary<string, int>
                     {
                         { "CS0000: BuildError1", 100 },
                         { "BuildError2", 200 }
@@ -65,7 +77,7 @@ namespace CTA.Rules.Test.Metrics
             {
                 new Models.ProjectResult
                 {
-                    ProjectFile = projectPath,
+                    ProjectFile = projectPath1,
                     TargetVersions = new List<string>() {Constants.DefaultCoreVersion},
                     UpgradePackages = new List<PackageAction>() {new PackageAction() { Name = "Newtonsoft.Json", OriginalVersion="9.0.0", Version="12.0.0" } },
                     ProjectActions = new ProjectActions() {
@@ -127,9 +139,38 @@ namespace CTA.Rules.Test.Metrics
                 ProjectResults = projectResults
             };
 
+            var featureDetectionResults = new Dictionary<string, FeatureDetectionResult>
+            {
+                { projectPath1, new FeatureDetectionResult
+                    {
+                        FeatureStatus =
+                        {
+                            { "Feature 1", true },
+                            { "Feature 1a", true },
+                            { "Feature 1b", false },
+                        },
+                        ProjectPath = projectPath1
+                    }
+                },
+                { projectPath2, new FeatureDetectionResult
+                    {
+                        FeatureStatus =
+                        {
+                            { "Feature 2", false },
+                            { "Feature 2a", false },
+                            { "Feature 2b", false },
+                        },
+                        ProjectPath = projectPath2
+                    }
+                },
+            };
+
             ReportGenerator = new PortSolutionResultReportGenerator(context, portSolutionResult);
             ReportGenerator.GenerateAnalysisReport();
             ReportGenerator.GenerateAndExportReports();
+
+            ReportGeneratorWithFeatureDetection = new PortSolutionResultReportGenerator(context, portSolutionResult, featureDetectionResults);
+            ReportGeneratorWithFeatureDetection.GenerateAnalysisReport();
         }
 
         [TearDown]
@@ -177,6 +218,58 @@ namespace CTA.Rules.Test.Metrics
         }
 
         [Test]
+        public void GenerateAnalysisReportWithFeatureDetection()
+        {
+            var expectedAnalysisReport = @"[
+  {
+    ""metricsType"": ""CTA"",
+    ""metricName"": ""UpgradePackage"",
+    ""packageName"": ""Newtonsoft.Json"",
+    ""packageVersion"": ""12.0.0"",
+    ""packageOriginalVersion"": ""9.0.0"",
+    ""solutionPath"": ""5fa9de0cb5af2d468dfb1702b1e342f47de2df9a195dabb3be2d04f9c2767482"",
+    ""projectGuid"": ""1234-5678""
+  },
+  {
+    ""metricsType"": ""CTA"",
+    ""metricName"": ""GenericAction"",
+    ""actionName"": ""GA1 Name"",
+    ""actionType"": ""GA1 Type"",
+    ""actionValue"": ""GA1 Value"",
+    ""solutionPath"": ""5fa9de0cb5af2d468dfb1702b1e342f47de2df9a195dabb3be2d04f9c2767482"",
+    ""projectGuid"": ""1234-5678"",
+    ""filePath"": ""eb98c1d648bc61064bdeaca9523a49e51bb3312f28f59376fb385e1569c77822""
+  },
+  {
+    ""metricsType"": ""CTA"",
+    ""metricName"": ""GenericAction"",
+    ""actionName"": ""GA2 Name"",
+    ""actionType"": ""GA2 Type"",
+    ""actionValue"": ""GA2 Value"",
+    ""solutionPath"": ""5fa9de0cb5af2d468dfb1702b1e342f47de2df9a195dabb3be2d04f9c2767482"",
+    ""projectGuid"": ""1234-5678"",
+    ""filePath"": ""eb98c1d648bc61064bdeaca9523a49e51bb3312f28f59376fb385e1569c77822""
+  },
+  {
+    ""metricsType"": ""CTA"",
+    ""metricName"": ""DetectedFeature"",
+    ""featureName"": ""Feature 1"",
+    ""solutionPath"": ""5fa9de0cb5af2d468dfb1702b1e342f47de2df9a195dabb3be2d04f9c2767482"",
+    ""projectGuid"": ""1234-5678""
+  },
+  {
+    ""metricsType"": ""CTA"",
+    ""metricName"": ""DetectedFeature"",
+    ""featureName"": ""Feature 1a"",
+    ""solutionPath"": ""5fa9de0cb5af2d468dfb1702b1e342f47de2df9a195dabb3be2d04f9c2767482"",
+    ""projectGuid"": ""1234-5678""
+  }
+]";
+            var formattedReport = JValue.Parse(ReportGeneratorWithFeatureDetection.AnalyzeSolutionResultJsonReport.Trim()).ToString(Formatting.Indented);
+            Assert.AreEqual(expectedAnalysisReport, formattedReport);
+        }
+
+        [Test]
         public void GenerateAndExportReports_Creates_Expected_Text_Report()
         {
             var expectedTextReport = @"==========
@@ -194,7 +287,7 @@ project.all.json
 ProjectResults
 ==============
 ----------------------
-Showing results for: temp/project.csproj
+Showing results for: temp/project1.csproj
 ----------------------
 ---------------------------
 Target Versions:
@@ -229,7 +322,7 @@ Invalid Executions: 0
 BuildErrors
 ===========
 ------------------
-BUILD ERRORS FOR: temp/project.csproj
+BUILD ERRORS FOR: temp/project1.csproj
 ------------------
 
 BuildError: CS0000: BuildError1

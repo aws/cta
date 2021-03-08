@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using CTA.FeatureDetection.Common.Models;
 using CTA.Rules.Config;
 using CTA.Rules.Models;
 using Newtonsoft.Json;
@@ -12,22 +13,32 @@ namespace CTA.Rules.Metrics
     {
         public MetricsContext Context { get; set; }
         public PortSolutionResult PortSolutionResult { get; set; }
+        public Dictionary<string, FeatureDetectionResult> FeatureDetectionResults { get; set; }
         public IEnumerable<ReferencesMetric> ReferencesMetrics { get; set; }
         public IEnumerable<DownloadedFilesMetric> DownloadedFilesMetrics { get; set; }
         public IEnumerable<TargetVersionMetric> TargetVersionMetrics { get; set; }
         public IEnumerable<UpgradePackageMetric> UpgradePackageMetrics { get; set; }
         public IEnumerable<ActionPackageMetric> ActionPackageMetrics { get; set; }
         public IEnumerable<GenericActionMetric> GenericActionMetrics { get; set; }
+        public IEnumerable<FeatureDetectionMetric> FeatureDetectionMetrics { get; set; }
         public IEnumerable<GenericActionExecutionMetric> GenericActionExecutionMetrics { get; set; }
         public IEnumerable<BuildErrorMetric> BuildErrorMetrics { get; set; }
         public string AnalyzeSolutionResultJsonReport { get; set; }
         public string PortSolutionResultJsonReport { get; set; }
         public string PortSolutionResultTextReport { get; set; }
 
-        public PortSolutionResultReportGenerator(MetricsContext context, PortSolutionResult portSolutionResult)
+        public PortSolutionResultReportGenerator(MetricsContext context, PortSolutionResult portSolutionResult, Dictionary<string, FeatureDetectionResult> featureDetectionResults)
         {
             Context = context;
             PortSolutionResult = portSolutionResult;
+            FeatureDetectionResults = featureDetectionResults;
+        }
+
+        public PortSolutionResultReportGenerator(MetricsContext context,PortSolutionResult portSolutionResult)
+        {
+            Context = context;
+            PortSolutionResult = portSolutionResult;
+            FeatureDetectionResults = new Dictionary<string, FeatureDetectionResult>();
         }
 
         public void GenerateAndExportReports()
@@ -51,6 +62,7 @@ namespace CTA.Rules.Metrics
             var upgradePackageMetrics = new List<UpgradePackageMetric>();
             var actionPackageMetrics = new List<ActionPackageMetric>();
             var actionMetrics = new List<GenericActionMetric>();
+            var featureDetectionMetrics = new List<FeatureDetectionMetric>();
 
             foreach (var projectResult in PortSolutionResult.ProjectResults)
             {
@@ -58,10 +70,12 @@ namespace CTA.Rules.Metrics
                 actionPackageMetrics.AddRange(MetricsTransformer.TransformActionPackages(Context, projectResult));
                 actionMetrics.AddRange(MetricsTransformer.TransformProjectActions(Context, projectResult));
             }
+            featureDetectionMetrics.AddRange(MetricsTransformer.TransformFeatureDetectionResults(Context, FeatureDetectionResults));
 
             UpgradePackageMetrics = upgradePackageMetrics;
             ActionPackageMetrics = actionPackageMetrics;
             GenericActionMetrics = actionMetrics;
+            FeatureDetectionMetrics = featureDetectionMetrics;
         }
 
         private void GenerateMetrics()
@@ -98,6 +112,7 @@ namespace CTA.Rules.Metrics
                 .Concat(UpgradePackageMetrics)
                 .Concat(ActionPackageMetrics)
                 .Concat(GenericActionMetrics)
+                .Concat(FeatureDetectionMetrics)
                 .ToList();
 
             AnalyzeSolutionResultJsonReport = JsonConvert.SerializeObject(allMetrics);

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using CTA.FeatureDetection.Common.Models;
 using CTA.Rules.Models;
 
 namespace CTA.Rules.Metrics
@@ -9,7 +10,7 @@ namespace CTA.Rules.Metrics
     /// </summary>
     public class MetricsTransformer
     {
-        internal static IEnumerable<GenericActionExecutionMetric> TransformGenericActionExecutions(MetricsContext context, ProjectResult projectResult)// Dictionary<string, List<GenericActionExecution>> executedActionsByProject)
+        internal static IEnumerable<GenericActionExecutionMetric> TransformGenericActionExecutions(MetricsContext context, ProjectResult projectResult)
         {
             var projectFile = projectResult.ProjectFile;
             var executedActionsByFile = projectResult.ExecutedActions;
@@ -122,6 +123,22 @@ namespace CTA.Rules.Metrics
             }
 
             return buildErrorMetrics;
+        }
+
+        internal static IEnumerable<FeatureDetectionMetric> TransformFeatureDetectionResults(MetricsContext context,
+            Dictionary<string, FeatureDetectionResult> featureDetectionResults)
+        {
+            var featureDetectionMetrics = new List<FeatureDetectionMetric>();
+            foreach (var kvp in featureDetectionResults)
+            {
+                var featureDetectionResult = kvp.Value;
+                var metrics = featureDetectionResult.PresentFeatures.Select(featureName =>
+                    new FeatureDetectionMetric(context, featureName, featureDetectionResult.ProjectPath));
+
+                featureDetectionMetrics.AddRange(metrics);
+            }
+
+            return featureDetectionMetrics;
         }
     }
 }

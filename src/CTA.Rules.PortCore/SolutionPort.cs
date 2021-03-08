@@ -28,6 +28,7 @@ namespace CTA.Rules.PortCore
         private readonly string _solutionPath;
         private readonly PortSolutionResult _portSolutionResult;
         private readonly MetricsContext _context;
+        private Dictionary<string, FeatureDetectionResult> _projectTypeFeatureResults;
 
         /// <summary>
         /// Initializes a new instance of Solution Port, analyzing the solution path using the provided config.
@@ -108,8 +109,8 @@ namespace CTA.Rules.PortCore
                     {
                         var fileName = string.Concat(recommendationNamespace.ToLower(), ".json");
                         var fullFileName = Path.Combine(Constants.RulesDefaultPath, fileName);
-                            //Download only if it's not available
-                            if (!File.Exists(fullFileName))
+                        //Download only if it's not available
+                        if (!File.Exists(fullFileName))
                         {
                             var fileContents = httpClient.GetStringAsync(string.Concat(Constants.S3RecommendationsBucketUrl, "/", fileName)).Result;
                             File.WriteAllText(fullFileName, fileContents);
@@ -118,8 +119,8 @@ namespace CTA.Rules.PortCore
                     }
                     catch (Exception)
                     {
-                            //We are checking which files have a recommendation, some of them won't
-                        }
+                        //We are checking which files have a recommendation, some of them won't
+                    }
                 }
             });
 
@@ -130,11 +131,11 @@ namespace CTA.Rules.PortCore
         private void InitRules(List<PortCoreConfiguration> solutionConfiguration, List<AnalyzerResult> analyzerResults)
         {
             var projectTypeFeatureDetector = new FeatureDetector();
-            var projectTypeFeatureResults = projectTypeFeatureDetector.DetectFeaturesInProjects(analyzerResults);
+            _projectTypeFeatureResults = projectTypeFeatureDetector.DetectFeaturesInProjects(analyzerResults);
 
             foreach (var projectConfiguration in solutionConfiguration)
             {
-                var projectTypeFeatureResult = projectTypeFeatureResults[projectConfiguration.ProjectPath];
+                var projectTypeFeatureResult = _projectTypeFeatureResults[projectConfiguration.ProjectPath];
                 projectConfiguration.ProjectType = GetProjectType(projectTypeFeatureResult);
                 if (projectConfiguration.UseDefaultRules)
                 {
@@ -152,7 +153,7 @@ namespace CTA.Rules.PortCore
             _portSolutionResult.AddSolutionResult(solutionResult);
             if (!string.IsNullOrEmpty(_solutionPath))
             {
-                PortSolutionResultReportGenerator reportGenerator = new PortSolutionResultReportGenerator(_context, _portSolutionResult);
+                PortSolutionResultReportGenerator reportGenerator = new PortSolutionResultReportGenerator(_context, _portSolutionResult, _projectTypeFeatureResults);
                 reportGenerator.GenerateAnalysisReport();
 
                 LogHelper.LogInformation("Generating Post-Analysis Report");
