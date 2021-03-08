@@ -184,7 +184,7 @@ namespace CTA.Rules.Analyzer
                         case IdConstants.InvocationIdName:
                             {
                                 InvocationExpression invocationExpression = (InvocationExpression)child;
-                                var compareToken = new InvocationExpressionToken() { Key = invocationExpression.MethodName, Namespace = invocationExpression.Reference.Namespace, Type = invocationExpression.SemanticClassType };
+                                var compareToken = new InvocationExpressionToken() { Key = invocationExpression.SemanticOriginalDefinition, Namespace = invocationExpression.Reference.Namespace, Type = invocationExpression.SemanticClassType };
                                 _rootNodes.Invocationexpressiontokens.TryGetValue(compareToken, out var token);
                                 if (token != null)
                                 {
@@ -268,9 +268,9 @@ namespace CTA.Rules.Analyzer
                                 }
 
                                 token = null;
-                                if(!string.IsNullOrEmpty(objectCreationNode.SemanticMethodSignature))
+                                if(!string.IsNullOrEmpty(objectCreationNode.SemanticOriginalDefinition))
                                 {
-                                    var nameToken = new ObjectCreationExpressionToken() { Key = objectCreationNode.SemanticClassType, Namespace = objectCreationNode.SemanticNamespace, Type = objectCreationNode.SemanticClassType };
+                                    var nameToken = new ObjectCreationExpressionToken() { Key = objectCreationNode.SemanticOriginalDefinition, Namespace = objectCreationNode.SemanticNamespace, Type = objectCreationNode.SemanticClassType };
                                     _rootNodes.ObjectCreationExpressionTokens.TryGetValue(nameToken, out token);
                                     if (token != null)
                                     {

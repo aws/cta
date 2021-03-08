@@ -31,7 +31,7 @@
           "FullKey": "System.Web.HttpResponse",
           "Methods": [
             {
-              "Key": "AppendHeader",
+              "Key": "System.Web.HttpResponse.AppendHeader(string, string)",
               "FullKey": "System.Web.HttpResponse.AppendHeader(string, string)",
               "Actions": [
                 {
@@ -55,7 +55,7 @@
           "FullKey": "System.Web.HttpServerUtilityBase",
           "Methods": [
             {
-              "Key": "HtmlEncode",
+              "Key": "System.Web.HttpServerUtilityBase.HtmlEncode(string)",
               "FullKey": "System.Web.HttpServerUtilityBase.HtmlEncode(string)",
               "Actions": [
                 {
