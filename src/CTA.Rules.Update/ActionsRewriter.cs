@@ -197,33 +197,34 @@ namespace CTA.Rules.Update.Rewriters
 
             var symbol = symbols.Symbol;
 
-            if (symbol != null)
+            if(symbol == null)
             {
-                var nodeKey = symbol.OriginalDefinition.ToString();
+                return node;
+            }
 
-                foreach (var action in _fileActions.InvocationExpressionActions)
+            var nodeKey = symbol.OriginalDefinition.ToString();
+
+            foreach (var action in _fileActions.InvocationExpressionActions)
+            {
+                if (nodeKey == action.Key)
                 {
-                    if (nodeKey == action.Key)
+                    var actionExecution = new GenericActionExecution(action, _fileActions.FilePath)
                     {
-                        var actionExecution = new GenericActionExecution(action, _fileActions.FilePath)
-                        {
-                            TimesRun = 1
-                        };
-                        try
-                        {
-                            newNode = action.InvocationExpressionActionFunc(_syntaxGenerator, newNode);
-                            LogHelper.LogInformation(string.Format("{0}: {1}", node.SpanStart, action.Description));
-                        }
-                        catch (Exception ex)
-                        {
-                            var actionExecutionException = new ActionExecutionException(action.Name, action.Key, ex);
-                            actionExecution.InvalidExecutions = 1;
-                            LogHelper.LogError(actionExecutionException);
-                        }
-                        allActions.Add(actionExecution);
+                        TimesRun = 1
+                    };
+                    try
+                    {
+                        newNode = action.InvocationExpressionActionFunc(_syntaxGenerator, newNode);
+                        LogHelper.LogInformation(string.Format("{0}: {1}", node.SpanStart, action.Description));
                     }
+                    catch (Exception ex)
+                    {
+                        var actionExecutionException = new ActionExecutionException(action.Name, action.Key, ex);
+                        actionExecution.InvalidExecutions = 1;
+                        LogHelper.LogError(actionExecutionException);
+                    }
+                    allActions.Add(actionExecution);
                 }
-            
             }
             return newNode;
         }
