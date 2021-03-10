@@ -9,6 +9,26 @@ namespace CTA.FeatureDetection.AuthType.CompiledFeatures
     {
         private readonly string _path = $"{Constants.ConfigurationElement}/{Constants.SystemWebElement}/{Constants.AuthorizationElement}";
 
+        /// <summary>
+        /// Determines if Windows Authorization is being used in a given project based on
+        /// Web.config settings and attributes used in code.
+        ///
+        /// Qualifications:
+        /// 1. Web.config uses authorization:
+        ///    <configuration>
+        ///      <system.web>
+        ///        <authorization>
+        ///        </authorization>
+        ///      </system.web>
+        ///    </configuration>
+        /// 
+        /// 2. A method is decorated with the Authorize attribute with or without any arguments:
+        ///    [Authorize]
+        ///    [Authorize(Roles="anyRole")]
+        /// 
+        /// </summary>
+        /// <param name="analyzerResult">Source code analysis results</param>
+        /// <returns>Whether or not Windows Authorization is used</returns>
         public override bool IsPresent(AnalyzerResult analyzerResult)
         {
             return IsPresentInCode(analyzerResult) || IsPresentInConfig(analyzerResult);
