@@ -22,6 +22,7 @@ namespace CTA.FeatureDetection.Tests
         private static readonly string _mvcDir = "Mvc";
         private static readonly string _webApiDir = "WebApi";
         private static readonly string _webClassLibraryDir = "WebClassLibrary";
+        private static readonly string _windowsAuthenticationDir = "WindowsAuthentication";
         private static readonly string TestProjectDirectory = TestUtils.GetTestAssemblySourceDirectory(typeof(TestUtils));
         public static string ConfigFile => Path.Combine(TestProjectDirectory, "Examples", "Templates", "feature_config.json");
 
@@ -31,24 +32,28 @@ namespace CTA.FeatureDetection.Tests
         public static string MvcSolutionName => "ASP.NET-MVC-Framework.sln";
         public static string WebApiSolutionName => "WebApi-Framework.sln";
         public static string WebClassLibrarySolutionName => "WebClassLibrary.sln";
+        public static string WindowsAuthenticationSolutionName => "WindowsAuthentication.sln";
         public static string CoreMvcSolutionPath => Path.Combine(_targetDir, _coreMvcDir, CoreMvcSolutionName);
         public static string CoreWebApiSolutionPath => Path.Combine(_targetDir, _coreWebApiDir, CoreWebApiSolutionName);
         public static string EfSolutionPath => Path.Combine(_targetDir, _efDir, EfSolutionName);
         public static string MvcSolutionPath => Path.Combine(_targetDir, _mvcDir, MvcSolutionName);
         public static string WebApiSolutionPath => Path.Combine(_targetDir, _webApiDir, WebApiSolutionName);
         public static string WebClassLibrarySolutionPath => Path.Combine(_targetDir, _webClassLibraryDir, WebClassLibrarySolutionName);
+        public static string WindowsAuthenticationSolutionPath => Path.Combine(_targetDir, _windowsAuthenticationDir, WindowsAuthenticationSolutionName);
         public static string CoreMvcProjectPath => Path.Combine(_targetDir, _coreMvcDir, "CoreMVC", "CoreMVC.csproj");
         public static string CoreWebApiProjectPath => Path.Combine(_targetDir, _coreWebApiDir, "CoreWebApi", "CoreWebApi.csproj");
         public static string Ef6ProjectPath => Path.Combine(_targetDir, _efDir, "EF6_Test", "EF6_Test.csproj");
         public static string MvcProjectPath => Path.Combine(_targetDir, _mvcDir, "ASP.NET-MVC-Framework", "ASP.NET-MVC-Framework.csproj");
         public static string WebApiProjectPath => Path.Combine(_targetDir, _webApiDir, "WebApi-Framework", "WebApi-Framework.csproj");
         public static string WebClassLibraryProjectPath => Path.Combine(_targetDir, _webClassLibraryDir, "WebClassLibrary", "WebClassLibrary.csproj");
+        public static string WindowsAuthenticationProjectPath => Path.Combine(_targetDir, _windowsAuthenticationDir, "WindowsAuthentication", "WindowsAuthentication.csproj");
         public static IEnumerable<AnalyzerResult> CoreMvcAnalyzerResults { get; private set; }
         public static IEnumerable<AnalyzerResult> CoreWebApiAnalyzerResults { get; private set; }
         public static IEnumerable<AnalyzerResult> EfAnalyzerResults { get; private set; }
         public static IEnumerable<AnalyzerResult> MvcAnalyzerResults { get; private set; }
         public static IEnumerable<AnalyzerResult> WebApiAnalyzerResults { get; private set; }
         public static IEnumerable<AnalyzerResult> WebClassLibraryAnalyzerResults { get; private set; }
+        public static IEnumerable<AnalyzerResult> WindowsAuthenticationAnalyzerResults { get; private set; }
         public static FeatureDetector FeatureDetector { get; private set; }
         public static FeatureDetectionResult CoreMvcFeatureDetectionResult { get; private set; }
         public static FeatureDetectionResult CoreWebApiFeatureDetectionResult { get; private set; }
@@ -56,6 +61,7 @@ namespace CTA.FeatureDetection.Tests
         public static FeatureDetectionResult MvcFeatureDetectionResult { get; private set; }
         public static FeatureDetectionResult WebApiFeatureDetectionResult { get; private set; }
         public static FeatureDetectionResult WebClassLibraryFeatureDetectionResult { get; private set; }
+        public static FeatureDetectionResult WindowsAuthenticationFeatureDetectionResult { get; private set; }
 
         [OneTimeSetUp]
         public void DownloadTestProjects()
@@ -74,6 +80,7 @@ namespace CTA.FeatureDetection.Tests
             var tempMvcSolutionDir = GetSolutionDir(tempDownloadDir, MvcSolutionName);
             var tempWebApiSolutionDir = GetSolutionDir(tempDownloadDir, WebApiSolutionName);
             var tempWebClassLibrarySolutionDir = GetSolutionDir(tempDownloadDir, WebClassLibrarySolutionName);
+            var tempWindowsAuthenticationSolutionDir = GetSolutionDir(tempDownloadDir, WindowsAuthenticationSolutionName);
 
             // Copy solutions to a directory with a shorter path
             var destDir = "dest";
@@ -84,6 +91,7 @@ namespace CTA.FeatureDetection.Tests
             TestUtils.CopyDirectory(tempMvcSolutionDir, new DirectoryInfo(Path.Combine(_targetDir, _mvcDir)));
             TestUtils.CopyDirectory(tempWebApiSolutionDir, new DirectoryInfo(Path.Combine(_targetDir, _webApiDir)));
             TestUtils.CopyDirectory(tempWebClassLibrarySolutionDir, new DirectoryInfo(Path.Combine(_targetDir, _webClassLibraryDir)));
+            TestUtils.CopyDirectory(tempWindowsAuthenticationSolutionDir, new DirectoryInfo(Path.Combine(_targetDir, _windowsAuthenticationDir)));
 
             // Run source code analysis
             CoreMvcAnalyzerResults = AnalyzerResultsFactory.GetAnalyzerResults(CoreMvcSolutionPath);
@@ -92,6 +100,7 @@ namespace CTA.FeatureDetection.Tests
             MvcAnalyzerResults = AnalyzerResultsFactory.GetAnalyzerResults(MvcSolutionPath);
             WebApiAnalyzerResults = AnalyzerResultsFactory.GetAnalyzerResults(WebApiSolutionPath);
             WebClassLibraryAnalyzerResults = AnalyzerResultsFactory.GetAnalyzerResults(WebClassLibrarySolutionPath);
+            WindowsAuthenticationAnalyzerResults = AnalyzerResultsFactory.GetAnalyzerResults(WindowsAuthenticationSolutionPath);
 
             // Detect features in each solution
             FeatureDetector = new FeatureDetector(ConfigFile);
@@ -101,6 +110,7 @@ namespace CTA.FeatureDetection.Tests
             MvcFeatureDetectionResult = FeatureDetector.DetectFeaturesInProjects(MvcAnalyzerResults)[MvcProjectPath];
             WebApiFeatureDetectionResult = FeatureDetector.DetectFeaturesInProjects(WebApiAnalyzerResults)[WebApiProjectPath];
             WebClassLibraryFeatureDetectionResult = FeatureDetector.DetectFeaturesInProjects(WebClassLibraryAnalyzerResults)[WebClassLibraryProjectPath];
+            WindowsAuthenticationFeatureDetectionResult = FeatureDetector.DetectFeaturesInProjects(WindowsAuthenticationAnalyzerResults)[WindowsAuthenticationProjectPath];
         }
 
         [OneTimeTearDown]

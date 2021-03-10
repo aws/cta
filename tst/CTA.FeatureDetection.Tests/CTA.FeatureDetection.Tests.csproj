@@ -20,6 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\CTA.FeatureDetection.AuthType\CTA.FeatureDetection.AuthType.csproj" />
     <ProjectReference Include="..\..\src\CTA.FeatureDetection.Common\CTA.FeatureDetection.Common.csproj" />
     <ProjectReference Include="..\..\src\CTA.FeatureDetection.Load\CTA.FeatureDetection.Load.csproj" />
     <ProjectReference Include="..\..\src\CTA.FeatureDetection.ProjectType\CTA.FeatureDetection.ProjectType.csproj" />
