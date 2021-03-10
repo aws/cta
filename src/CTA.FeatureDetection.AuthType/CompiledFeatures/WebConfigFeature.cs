@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.IO;
 using System.Linq;
-using System.Xml;
+using System.Xml.Linq;
 using Codelyzer.Analysis;
 using CTA.FeatureDetection.Common.Models.Features.Base;
 using CTA.Rules.Config;
@@ -14,29 +13,36 @@ namespace CTA.FeatureDetection.AuthType.CompiledFeatures
     {
         private const string WebConfigFileName = Rules.Config.Constants.WebConfig;
 
-        protected IEnumerable<Configuration> LoadWebConfigs(AnalyzerResult analyzerResult)
+        protected static Dictionary<string, IEnumerable<XDocument>> ConfigCache =
+            new Dictionary<string, IEnumerable<XDocument>>();
+
+        protected IEnumerable<XDocument> LoadWebConfigs(AnalyzerResult analyzerResult)
         {
             var directory = analyzerResult.ProjectResult.ProjectRootPath;
+            if (ConfigCache.TryGetValue(directory, out var cachedConfigs))
+            {
+                return cachedConfigs;
+            }
 
             var webConfigsFound = Directory.EnumerateFiles(directory, "*", SearchOption.AllDirectories)
-                    .Where(name => string.Equals(name, WebConfigFileName, StringComparison.InvariantCultureIgnoreCase));
+                    .Where(name => name.EndsWith(WebConfigFileName, StringComparison.InvariantCultureIgnoreCase));
 
-            var webConfigurations = new List<Configuration>();
+            var webConfigurations = new List<XDocument>();
             foreach (var webConfig in webConfigsFound)
             {
                 try
                 {
-                    var fileMap = new ExeConfigurationFileMap { ExeConfigFilename = webConfig };
-                    var configuration = ConfigurationManager.OpenMappedExeConfiguration(fileMap, ConfigurationUserLevel.None);
+                    var configuration = XDocument.Load(webConfig);
                     webConfigurations.Add(configuration);
                 }
-                catch (XmlException ex)
+                catch (Exception ex)
                 {
                     LogHelper.LogError(ex, $"Error processing web.config file : {webConfig}");
                 }
             }
 
-            return webConfigurations;
+            ConfigCache[directory] = webConfigurations;
+            return ConfigCache[directory];
         }
     }
 }

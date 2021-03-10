@@ -1,44 +1,17 @@
-﻿using System.Collections.Generic;
+﻿using System.Linq;
+using Codelyzer.Analysis;
+using CTA.FeatureDetection.Common.Extensions;
 
 namespace CTA.FeatureDetection.AuthType.CompiledFeatures
 {
     public class WindowsImpersonationFeature : WebConfigFeature
     {
-        private Dictionary<string, object> _attributeValues;
-        private IEnumerable<string> _elementPaths;
+        private readonly string _path = $"{Constants.ConfigurationElement}/{Constants.SystemWebElement}/{Constants.IdentityElement}";
 
-        /// <summary>
-        /// Returns a dictionary of attribute name-value pairs required to confirm this feature
-        /// </summary>
-        protected override Dictionary<string, object> AttributeValues
+        public override bool IsPresent(AnalyzerResult analyzerResult)
         {
-            get
-            {
-                _attributeValues ??= new Dictionary<string, object>
-                {
-                    {Constants.ImpersonateAttribute, true }
-                };
-
-                return _attributeValues;
-            }
-        }
-
-        /// <summary>
-        /// Returns a list of XML element paths to inspect for the attribute name-value pairs defined in <see cref="AttributeValues"/> 
-        /// </summary>
-        protected override IEnumerable<string> ElementPaths
-        {
-            get
-            {
-                _elementPaths ??= new[]
-                {
-                    $"{Constants.IdentityElement}",
-                    $"{Constants.SystemWebElement}/{Constants.IdentityElement}",
-                    $"{Constants.ConfigurationElement}/{Constants.SystemWebElement}/{Constants.IdentityElement}"
-                };
-
-                return _elementPaths;
-            }
+            var configs = LoadWebConfigs(analyzerResult);
+            return configs.Any(c => c.ContainsAttributeValue(_path, Constants.ImpersonateAttribute, true.ToString().ToLower()));
         }
     }
 }
