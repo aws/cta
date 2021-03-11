@@ -1,14 +1,11 @@
 ﻿using System.Linq;
 using Codelyzer.Analysis;
 using Codelyzer.Analysis.Model;
-using CTA.FeatureDetection.Common.Extensions;
 
 namespace CTA.FeatureDetection.AuthType.CompiledFeatures
 {
     public class WindowsAuthorizationFeature : WebConfigFeature
     {
-        private readonly string _path = $"{Constants.ConfigurationElement}/{Constants.SystemWebElement}/{Constants.AuthorizationElement}";
-
         /// <summary>
         /// Determines if Windows Authorization is being used in a given project based on
         /// Web.config settings and attributes used in code.
@@ -36,8 +33,8 @@ namespace CTA.FeatureDetection.AuthType.CompiledFeatures
 
         private bool IsPresentInConfig(AnalyzerResult analyzerResult)
         {
-            var configs = LoadWebConfigs(analyzerResult);
-            return configs.Any(c => c.ContainsElementPath(_path));
+            var config = LoadWebConfig(analyzerResult.ProjectResult.ProjectRootPath);
+            return config.ContainsElement(Constants.AuthorizationElementPath);
         }
 
         private bool IsPresentInCode(AnalyzerResult analyzerResult)

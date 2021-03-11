@@ -1,13 +1,9 @@
-﻿using System.Linq;
-using Codelyzer.Analysis;
-using CTA.FeatureDetection.Common.Extensions;
+﻿using Codelyzer.Analysis;
 
 namespace CTA.FeatureDetection.AuthType.CompiledFeatures
 {
     public class WindowsImpersonationFeature : WebConfigFeature
     {
-        private readonly string _path = $"{Constants.ConfigurationElement}/{Constants.SystemWebElement}/{Constants.IdentityElement}";
-
         /// <summary>
         /// Determines if Windows Impersonation is being used in a given project based on
         /// Web.config settings.
@@ -26,8 +22,8 @@ namespace CTA.FeatureDetection.AuthType.CompiledFeatures
         /// <returns>Whether or not Windows Impersonation is used</returns>
         public override bool IsPresent(AnalyzerResult analyzerResult)
         {
-            var configs = LoadWebConfigs(analyzerResult);
-            return configs.Any(c => c.ContainsAttributeValue(_path, Constants.ImpersonateAttribute, true.ToString().ToLower()));
+            var config = LoadWebConfig(analyzerResult.ProjectResult.ProjectRootPath);
+            return config.ContainsAttributeWithValue(Constants.IdentityElementPath, Constants.ImpersonateAttribute, true.ToString().ToLower());
         }
     }
 }
