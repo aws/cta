@@ -2,7 +2,7 @@
 using System.Xml.Linq;
 using System.Xml.XPath;
 
-namespace CTA.FeatureDetection.Common.Extensions
+namespace CTA.Rules.Common.Extensions
 {
     public static class XDocumentExtensions
     {
