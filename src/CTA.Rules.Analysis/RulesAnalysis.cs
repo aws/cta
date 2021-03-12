@@ -184,7 +184,7 @@ namespace CTA.Rules.Analyzer
                         case IdConstants.InvocationIdName:
                             {
                                 InvocationExpression invocationExpression = (InvocationExpression)child;
-                                var compareToken = new InvocationExpressionToken() { Key = invocationExpression.MethodName, Namespace = invocationExpression.Reference.Namespace, Type = invocationExpression.SemanticClassType };
+                                var compareToken = new InvocationExpressionToken() { Key = invocationExpression.SemanticOriginalDefinition, Namespace = invocationExpression.Reference.Namespace, Type = invocationExpression.SemanticClassType };
                                 _rootNodes.Invocationexpressiontokens.TryGetValue(compareToken, out var token);
                                 if (token != null)
                                 {
@@ -265,6 +265,18 @@ namespace CTA.Rules.Analyzer
                                 {
                                     AddActions(fileAction, tokenLocation, child.TextSpan);
                                     containsActions = true;
+                                }
+
+                                token = null;
+                                if(!string.IsNullOrEmpty(objectCreationNode.SemanticOriginalDefinition))
+                                {
+                                    var nameToken = new ObjectCreationExpressionToken() { Key = objectCreationNode.SemanticOriginalDefinition, Namespace = objectCreationNode.SemanticNamespace, Type = objectCreationNode.SemanticClassType };
+                                    _rootNodes.ObjectCreationExpressionTokens.TryGetValue(nameToken, out token);
+                                    if (token != null)
+                                    {
+                                        AddActions(fileAction, token, child.TextSpan);
+                                        containsActions = true;
+                                    }
                                 }
 
                                 if (AnalyzeChildren(fileAction, child.Children, ++level, parentNamespace, parentClass)) { containsActions = true; }
@@ -503,7 +515,7 @@ namespace CTA.Rules.Analyzer
                     MethodDeclarationActionFunc = c.MethodDeclarationActionFunc
                 }));
 
-            if (fileAction.ClassDeclarationActions.Any() || fileAction.InterfaceDeclarationActions.Any() || fileAction.MethodDeclarationActions.Any())
+            if (fileAction.ClassDeclarationActions.Any() || fileAction.InterfaceDeclarationActions.Any() || fileAction.MethodDeclarationActions.Any() || fileAction.ObjectCreationExpressionActions.Any())
             {
                 var nodeToken = token.Clone();
                 nodeToken.TextSpan = textSpan;

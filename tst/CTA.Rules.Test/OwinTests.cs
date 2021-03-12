@@ -328,6 +328,9 @@ namespace CTA.Rules.Test
             StringAssert.Contains(@"Microsoft.Extensions.DependencyInjection", startupText);
             StringAssert.Contains(@"Microsoft.Extensions.FileProviders", startupText);
             StringAssert.Contains(@"Microsoft.AspNetCore.StaticFiles", startupText);
+            StringAssert.Contains(@"PhysicalFileProvider", startupText);
+            StringAssert.Contains(@"FileProvider", startupText);
+            StringAssert.Contains(@"If FileSystem was not present before FileProvider was added", startupText);
             StringAssert.DoesNotContain(@"Microsoft.Owin.StaticFiles", startupText);
             StringAssert.DoesNotContain(@"Microsoft.Owin.FileSystems", startupText);
 

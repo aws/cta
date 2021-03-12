@@ -19,8 +19,11 @@ namespace CTA.Rules.Update.Rewriters
 
         private static readonly Type[] identifierNameTypes = new Type[] {
             typeof(MethodDeclarationSyntax),
+            typeof(ConstructorDeclarationSyntax),
             typeof(ClassDeclarationSyntax),
             typeof(VariableDeclarationSyntax),
+            typeof(TypeArgumentListSyntax),
+            typeof(TypeParameterListSyntax),
             typeof(ParameterSyntax),
             typeof(ObjectCreationExpressionSyntax)};
 
@@ -195,9 +198,18 @@ namespace CTA.Rules.Update.Rewriters
             var symbols = _semanticModel.GetSymbolInfo(node);
             var newNode = (InvocationExpressionSyntax)base.VisitInvocationExpression(node);
 
+            var symbol = symbols.Symbol;
+
+            if(symbol == null)
+            {
+                return node;
+            }
+
+            var nodeKey = symbol.OriginalDefinition.ToString();
+
             foreach (var action in _fileActions.InvocationExpressionActions)
             {
-                if (symbols.Symbol.Name == action.Key)
+                if (nodeKey == action.Key)
                 {
                     var actionExecution = new GenericActionExecution(action, _fileActions.FilePath)
                     {
@@ -321,11 +333,12 @@ namespace CTA.Rules.Update.Rewriters
         }
         public override SyntaxNode VisitObjectCreationExpression(ObjectCreationExpressionSyntax node)
         {
-            ObjectCreationExpressionSyntax newNode = node;// (ObjectCreationExpressionSyntax)base.VisitObjectCreationExpression(node);
-            bool skipChildren = false;
+            var symbols = _semanticModel.GetSymbolInfo(node);
+            ExpressionSyntax newNode = node;
+            bool skipChildren = false; // This is here to skip actions on children node when the main identifier was changed. Just use new expression for the subsequent children actions.
             foreach (var action in _fileActions.ObjectCreationExpressionActions)
             {
-                if (newNode.ToString() == action.Key)
+                if (newNode.ToString() == action.Key || symbols.Symbol?.OriginalDefinition.ToDisplayString() == action.Key)
                 {
                     var actionExecution = new GenericActionExecution(action, _fileActions.FilePath)
                     {
@@ -334,10 +347,9 @@ namespace CTA.Rules.Update.Rewriters
                     try
                     {
                         skipChildren = true;
-                        var createdNode = action.ObjectCreationExpressionGenericActionFunc(_syntaxGenerator, newNode);
+                        newNode = action.ObjectCreationExpressionGenericActionFunc(_syntaxGenerator, (ObjectCreationExpressionSyntax)newNode);
                         allActions.Add(actionExecution);
                         LogHelper.LogInformation(string.Format("{0}", action.Description));
-                        return createdNode;
                     }
                     catch (Exception ex)
                     {
