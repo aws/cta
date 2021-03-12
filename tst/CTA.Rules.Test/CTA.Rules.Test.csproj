@@ -14,6 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\CTA.Rules.Common\CTA.Rules.Common.csproj" />
     <ProjectReference Include="..\..\src\CTA.Rules.PortCore\CTA.Rules.PortCore.csproj" />
   </ItemGroup>
 
@@ -28,6 +29,12 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="CTAFiles\action.namespace.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="CTAFiles\Configs\Web.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="CTAFiles\Configs\authWeb.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="CTAFiles\consolidated.json">
