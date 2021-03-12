@@ -157,6 +157,8 @@ namespace CTA.Rules.Test
 
             //Check that identifier as replaced:
             StringAssert.Contains(@"IActionResult", homeControllerText);
+            //Check that identifier as replaced:
+            StringAssert.DoesNotContain(@"IHttpActionResult", homeControllerText);
 
             //Check that files have been created
             FileAssert.Exists(Path.Combine(webProjectDir, "Startup.cs"));

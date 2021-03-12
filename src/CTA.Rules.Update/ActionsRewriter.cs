@@ -19,8 +19,11 @@ namespace CTA.Rules.Update.Rewriters
 
         private static readonly Type[] identifierNameTypes = new Type[] {
             typeof(MethodDeclarationSyntax),
+            typeof(ConstructorDeclarationSyntax),
             typeof(ClassDeclarationSyntax),
             typeof(VariableDeclarationSyntax),
+            typeof(TypeArgumentListSyntax),
+            typeof(TypeParameterListSyntax),
             typeof(ParameterSyntax),
             typeof(ObjectCreationExpressionSyntax)};
 
