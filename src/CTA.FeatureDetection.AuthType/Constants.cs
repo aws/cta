@@ -22,7 +22,7 @@
         internal const string WsFederationAuthenticationQualifiedName = "Owin.IAppBuilder.UseWsFederationAuthentication";
 
         // Paths
-        internal static readonly string AuthenticationElementElementPath = $"{Constants.ConfigurationElement}/{Constants.SystemWebElement}/{Constants.AuthenticationElement}";
+        internal static readonly string AuthenticationElementElementPath = $"{ConfigurationElement}/{SystemWebElement}/{AuthenticationElement}";
         internal static readonly string AuthorizationElementPath = $"{ConfigurationElement}/{SystemWebElement}/{AuthorizationElement}";
         internal static readonly string AllowElementPath = $"{ConfigurationElement}/{SystemWebElement}/{AuthorizationElement}/{AllowElement}";
         internal static readonly string IdentityElementPath = $"{ConfigurationElement}/{SystemWebElement}/{IdentityElement}";
