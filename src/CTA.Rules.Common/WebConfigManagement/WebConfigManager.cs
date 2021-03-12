@@ -7,6 +7,12 @@ using CTA.Rules.Config;
 
 namespace CTA.Rules.Common.WebConfigManagement
 {
+    /// <summary>
+    /// Consumers can use this class to load a Web.config into memory specify its representation based on need.
+    /// For accessing more well-defined Web.config properties (e.g. connection strings), it can be loaded as a
+    /// Configuration object. For more flexible navigation, it can be loaded as an XDocument with additional
+    /// helper functions.
+    /// </summary>
     public class WebConfigManager
     {
         private static readonly Dictionary<string, Configuration> ConfigurationCache = new Dictionary<string, Configuration>();
