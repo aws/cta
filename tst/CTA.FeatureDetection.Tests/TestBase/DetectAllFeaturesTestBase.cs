@@ -15,7 +15,6 @@ namespace CTA.FeatureDetection.Tests.TestBase
         protected static IEnumerable<AnalyzerResult> MvcAnalyzerResults => TestProjectsSetupFixture.MvcAnalyzerResults;
         protected static IEnumerable<AnalyzerResult> WebApiAnalyzerResults => TestProjectsSetupFixture.WebApiAnalyzerResults;
         protected static IEnumerable<AnalyzerResult> WebClassLibraryAnalyzerResults => TestProjectsSetupFixture.WebClassLibraryAnalyzerResults;
-        protected static IEnumerable<AnalyzerResult> WindowsAuthenticationAnalyzerResults => TestProjectsSetupFixture.WindowsAuthenticationAnalyzerResults;
         protected static FeatureDetector FeatureDetector { get; private set; }
         protected static string TestProjectDirectory { get; private set; }
 
@@ -26,14 +25,14 @@ namespace CTA.FeatureDetection.Tests.TestBase
         protected FeatureDetectionResult _webApiFeatureDetectionResult;
         protected FeatureDetectionResult _webClassLibraryFeatureDetectionResult;
         protected FeatureDetectionResult _windowsAuthenticationFeatureDetectionResult;
+        protected FeatureDetectionResult _formsAuthenticationFeatureDetectionResult;
+        protected FeatureDetectionResult _federatedAuthenticationFeatureDetectionResult;
 
         protected string CoreMvcProjectName => "CoreMVC";
         protected string CoreWebApiProjectName => "CoreWebApi";
-        protected string Ef6ProjectName => "EF6_Test";
         protected string MvcProjectName => "ASP.NET-MVC-Framework";
         protected string WebApiProjectName => "WebApi-Framework";
         protected string WebClassLibraryProjectName => "WebClassLibrary";
-        protected string WindowsAuthenticationProjectName => "WindowsAuthentication";
 
         [SetUp]
         public void SetUp()
@@ -47,6 +46,8 @@ namespace CTA.FeatureDetection.Tests.TestBase
             _webApiFeatureDetectionResult = TestProjectsSetupFixture.WebApiFeatureDetectionResult;
             _webClassLibraryFeatureDetectionResult = TestProjectsSetupFixture.WebClassLibraryFeatureDetectionResult;
             _windowsAuthenticationFeatureDetectionResult = TestProjectsSetupFixture.WindowsAuthenticationFeatureDetectionResult;
+            _formsAuthenticationFeatureDetectionResult = TestProjectsSetupFixture.FormsAuthenticationFeatureDetectionResult;
+            _federatedAuthenticationFeatureDetectionResult = TestProjectsSetupFixture.FederatedAuthenticationFeatureDetectionResult;
         }
     }
 }

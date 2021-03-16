@@ -54,6 +54,18 @@
                 {
                   "Name": "WindowsImpersonationFeature",
                   "ClassName": "WindowsImpersonationFeature"
+                },
+                {
+                  "Name": "FederatedAuthenticationFeature",
+                  "ClassName": "FederatedAuthenticationFeature"
+                },
+                {
+                  "Name": "FormsAuthenticationFeature",
+                  "ClassName": "FormsAuthenticationFeature"
+                },
+                {
+                  "Name": "FormsAuthenticationWithMembershipFeature",
+                  "ClassName": "FormsAuthenticationWithMembershipFeature"
                 }
               ]
             }

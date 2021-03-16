@@ -10,7 +10,7 @@ namespace CTA.FeatureDetection.Tests.CTA.FeatureDetection.AuthType
         {
             var featureName = "WindowsAuthenticationFeature";
             Assert.True(_windowsAuthenticationFeatureDetectionResult.FeatureStatus[featureName],
-                $"Expected authentication type of {WindowsAuthenticationProjectName} to be present.");
+                $"Expected authentication type of {featureName} to be present.");
         }
 
         [Test]
@@ -18,7 +18,7 @@ namespace CTA.FeatureDetection.Tests.CTA.FeatureDetection.AuthType
         {
             var featureName = "WindowsAuthorizationFeature";
             Assert.True(_windowsAuthenticationFeatureDetectionResult.FeatureStatus[featureName],
-                $"Expected authentication type of {WindowsAuthenticationProjectName} to be present.");
+                $"Expected authentication type of {featureName} to be present.");
         }
 
         [Test]
@@ -26,7 +26,7 @@ namespace CTA.FeatureDetection.Tests.CTA.FeatureDetection.AuthType
         {
             var featureName = "WindowsAuthorizationRolesFeature";
             Assert.True(_windowsAuthenticationFeatureDetectionResult.FeatureStatus[featureName],
-                $"Expected authentication type of {WindowsAuthenticationProjectName} to be present.");
+                $"Expected authentication type of {featureName} to be present.");
         }
 
         [Test]
@@ -34,7 +34,31 @@ namespace CTA.FeatureDetection.Tests.CTA.FeatureDetection.AuthType
         {
             var featureName = "WindowsImpersonationFeature";
             Assert.True(_windowsAuthenticationFeatureDetectionResult.FeatureStatus[featureName],
-                $"Expected authentication type of {WindowsAuthenticationProjectName} to be present.");
+                $"Expected authentication type of {featureName} to be present.");
+        }
+
+        [Test]
+        public void FormsAuthenticationFeature_Is_Present_In_FormsAuthentication_Project()
+        {
+            var featureName = "FormsAuthenticationFeature";
+            Assert.True(_formsAuthenticationFeatureDetectionResult.FeatureStatus[featureName],
+                $"Expected authentication type of {featureName} to be present.");
+        }
+
+        [Test]
+        public void FormsAuthenticationWithMembershipFeature_Is_Present_In_FormsAuthentication_Project()
+        {
+            var featureName = "FormsAuthenticationWithMembershipFeature";
+            Assert.True(_formsAuthenticationFeatureDetectionResult.FeatureStatus[featureName],
+                $"Expected authentication type of {featureName} to be present.");
+        }
+
+        [Test]
+        public void FederatedAuthenticationFeature_Is_Present_In_FormsAuthentication_Project()
+        {
+            var featureName = "FederatedAuthenticationFeature";
+            Assert.True(_federatedAuthenticationFeatureDetectionResult.FeatureStatus[featureName],
+                $"Expected authentication type of {featureName} to be present.");
         }
     }
 }
