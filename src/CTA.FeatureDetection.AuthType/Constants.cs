@@ -11,6 +11,7 @@
         internal const string SecurityElement = "security";
         internal const string WindowsAuthenticationElement = "windowsAuthentication";
         internal const string IdentityElement = "identity";
+        internal const string MembershipElement = "membership";
         internal const string ModeAttribute = "mode";
         internal const string RolesAttribute = "roles";
         internal const string ImpersonateAttribute = "impersonate";
@@ -26,5 +27,6 @@
         internal static readonly string AuthorizationElementPath = $"{ConfigurationElement}/{SystemWebElement}/{AuthorizationElement}";
         internal static readonly string AllowElementPath = $"{ConfigurationElement}/{SystemWebElement}/{AuthorizationElement}/{AllowElement}";
         internal static readonly string IdentityElementPath = $"{ConfigurationElement}/{SystemWebElement}/{IdentityElement}";
+        internal static readonly string MembershipElementPath = $"{ConfigurationElement}/{SystemWebElement}/{MembershipElement}";
     }
 }
