@@ -4,7 +4,7 @@ using Codelyzer.Analysis.Model;
 
 namespace CTA.FeatureDetection.AuthType.CompiledFeatures
 {
-    public class WindowsAuthorizationRolesFeature : WebConfigFeature
+    public class WindowsAuthorizationRolesFeature : WindowsAuthorizationFeature
     {
         /// <summary>
         /// Determines if Windows Authorization Roles are being used in a given project based on
@@ -21,7 +21,14 @@ namespace CTA.FeatureDetection.AuthType.CompiledFeatures
         ///      </system.web>
         ///    </configuration>
         /// 
-        /// 2. A method is decorated with the Authorize attribute and Roles attribute argument:
+        /// 2a. Web.config uses authorization 
+        ///    <configuration>
+        ///      <system.web>
+        ///        <authorization>
+        ///        </authorization>
+        ///      </system.web>
+        ///    </configuration>
+        /// 2b. A method is decorated with the Authorize attribute and Roles attribute argument:
         ///    [Authorize(Roles="anyRole")]
         /// 
         /// </summary>
@@ -29,7 +36,8 @@ namespace CTA.FeatureDetection.AuthType.CompiledFeatures
         /// <returns>Whether or not Windows Authorization Roles are used</returns>
         public override bool IsPresent(AnalyzerResult analyzerResult)
         {
-            return IsPresentInCode(analyzerResult) || IsPresentInConfig(analyzerResult);
+            return IsPresentInConfig(analyzerResult)
+                   || (base.IsPresent(analyzerResult) && IsAuthorizeAttributeInCode(analyzerResult));
         }
 
         private bool IsPresentInConfig(AnalyzerResult analyzerResult)
@@ -38,7 +46,7 @@ namespace CTA.FeatureDetection.AuthType.CompiledFeatures
             return config.ContainsAttribute(Constants.AllowElementPath, Constants.RolesAttribute);
         }
         
-        private bool IsPresentInCode(AnalyzerResult analyzerResult)
+        private bool IsAuthorizeAttributeInCode(AnalyzerResult analyzerResult)
         {
             var allAttributes = analyzerResult.ProjectResult.SourceFileResults.SelectMany(r => r.AllAnnotations());
             var authorizeAttributes = allAttributes.Where(a => a.Identifier == Constants.AuthorizeMethodAttribute);

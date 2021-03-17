@@ -3,7 +3,7 @@ using CTA.Rules.Common.WebConfigManagement;
 
 namespace CTA.FeatureDetection.AuthType.CompiledFeatures
 {
-    public class FormsAuthenticationWithMembershipFeature : WebConfigFeature
+    public class FormsAuthenticationWithMembershipFeature : FormsAuthenticationFeature
     {
         /// <summary>
         /// Determines if Forms Authentication with Membership is being used in a given project based on
@@ -27,9 +27,7 @@ namespace CTA.FeatureDetection.AuthType.CompiledFeatures
         public override bool IsPresent(AnalyzerResult analyzerResult)
         {
             var config = WebConfigManager.LoadWebConfigAsXDocument(analyzerResult.ProjectResult.ProjectRootPath);
-
-            return config.ContainsElement(Constants.MembershipElementPath)
-                   && config.ContainsAttributeWithValue(Constants.AuthenticationElementElementPath, Constants.ModeAttribute, Constants.FormsAuthenticationType);
+            return base.IsPresent(analyzerResult) && config.ContainsElement(Constants.MembershipElementPath);
         }
     }
 }
