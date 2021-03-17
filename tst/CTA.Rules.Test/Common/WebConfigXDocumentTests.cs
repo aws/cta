@@ -16,7 +16,7 @@ namespace CTA.Rules.Test.Common
         [SetUp]
         public void Setup()
         {
-            _configsDir = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "CTAFiles", "Configs");
+            _configsDir = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "TestFiles", "Configs");
             var validXDoc = XDocument.Load(Path.Combine(_configsDir, "authWeb.config"));
 
             _validConfig = new WebConfigXDocument(validXDoc);

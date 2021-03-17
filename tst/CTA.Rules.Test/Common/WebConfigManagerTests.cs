@@ -1,7 +1,6 @@
 ﻿using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Xml.Linq;
 using CTA.Rules.Common.WebConfigManagement;
 using NUnit.Framework;
 
@@ -14,7 +13,7 @@ namespace CTA.Rules.Test.Common
         [SetUp]
         public void Setup()
         {
-            _configsDir = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "CTAFiles", "Configs");
+            _configsDir = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "TestFiles", "Configs");
         }
 
         [Test]
