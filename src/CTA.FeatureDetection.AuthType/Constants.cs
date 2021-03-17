@@ -21,6 +21,8 @@
         internal const string AuthorizeMethodAttribute = "Authorize";
         internal const string RolesAttributeArgument = "Roles";
         internal const string WsFederationAuthenticationQualifiedName = "Owin.IAppBuilder.UseWsFederationAuthentication";
+        internal const string OpenIdConnectAuthenticationQualifiedName = "Owin.IAppBuilder.UseOpenIdConnectAuthentication";
+        internal const string DotNetOpenAuthReferenceIdentifier = "DotNetOpenAuth.Core";
 
         // Paths
         internal static readonly string AuthenticationElementElementPath = $"{ConfigurationElement}/{SystemWebElement}/{AuthenticationElement}";
