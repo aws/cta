@@ -15,24 +15,24 @@ namespace CTA.Rules.Common.WebConfigManagement
     /// </summary>
     public class WebConfigManager
     {
-        private static readonly Dictionary<string, Configuration> ConfigurationCache = new Dictionary<string, Configuration>();
-        private static readonly Dictionary<string, XDocument> XDocumentCache = new Dictionary<string, XDocument>();
+        private static Dictionary<string, Configuration> _configurationCache = new Dictionary<string, Configuration>();
+        private static Dictionary<string, XDocument> _xDocumentCache = new Dictionary<string, XDocument>();
         private delegate object ConfigLoadingDelegate(string configFile);
 
         public static Configuration LoadWebConfigAsConfiguration(string projectDir)
         {
             var config = LoadWebConfig(projectDir, webConfigFile =>
             {
-                if (ConfigurationCache.TryGetValue(webConfigFile, out var cached))
+                if (_configurationCache.TryGetValue(webConfigFile, out var cached))
                 {
                     return cached;
                 }
 
                 var fileMap = new ExeConfigurationFileMap {ExeConfigFilename = webConfigFile};
                 var configuration = ConfigurationManager.OpenMappedExeConfiguration(fileMap, ConfigurationUserLevel.None);
-                ConfigurationCache[webConfigFile] = configuration;
+                _configurationCache[webConfigFile] = configuration;
 
-                return ConfigurationCache[webConfigFile];
+                return _configurationCache[webConfigFile];
             }) as Configuration;
             
             return config;
@@ -42,18 +42,24 @@ namespace CTA.Rules.Common.WebConfigManagement
         {
             var config = LoadWebConfig(projectDir, webConfigFile =>
             {
-                if (XDocumentCache.TryGetValue(webConfigFile, out var cached))
+                if (_xDocumentCache.TryGetValue(webConfigFile, out var cached))
                 {
                     return cached;
                 }
 
                 var xDocument = XDocument.Load(webConfigFile);
-                XDocumentCache[webConfigFile] = xDocument;
+                _xDocumentCache[webConfigFile] = xDocument;
 
-                return XDocumentCache[webConfigFile];
+                return _xDocumentCache[webConfigFile];
             }) as XDocument;
 
             return new WebConfigXDocument(config);
+        }
+
+        public static void ClearCache()
+        {
+            _configurationCache = new Dictionary<string, Configuration>();
+            _xDocumentCache = new Dictionary<string, XDocument>();
         }
 
         private static object LoadWebConfig(string projectDir, ConfigLoadingDelegate configLoadingDelegate)
