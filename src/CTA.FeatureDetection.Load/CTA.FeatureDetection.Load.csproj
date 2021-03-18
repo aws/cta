@@ -9,4 +9,8 @@
     <ProjectReference Include="..\CTA.FeatureDetection.ProjectType\CTA.FeatureDetection.ProjectType.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Update="Nerdbank.GitVersioning" Version="3.3.37" />
+  </ItemGroup>
+
 </Project>

@@ -12,4 +12,8 @@
     <ProjectReference Include="..\CTA.Rules.Common\CTA.Rules.Common.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Update="Nerdbank.GitVersioning" Version="3.3.37" />
+  </ItemGroup>
+
 </Project>
