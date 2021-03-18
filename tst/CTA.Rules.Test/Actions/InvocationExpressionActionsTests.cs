@@ -25,6 +25,30 @@ namespace CTA.Rules.Test.Actions
         }
 
         [Test]
+        public void GetReplaceMethodAction()
+        {
+            const string newMethod = "Math.Floor";
+            var appendMethodFunc =
+                _invocationExpressionActions.GetReplaceMethodAction(newMethod);
+            var newNode = appendMethodFunc(_syntaxGenerator, _node);
+
+            var expectedResult = "Math.Floor(-1)";
+            Assert.AreEqual(expectedResult, newNode.ToFullString());
+        }
+
+        [Test]
+        public void GetReplaceOnlyMethodAction()
+        {
+            const string newMethod = "Floor";
+            var appendMethodFunc =
+                _invocationExpressionActions.GetReplaceOnlyMethodAction("Abs",newMethod);
+            var newNode = appendMethodFunc(_syntaxGenerator, _node);
+
+            var expectedResult = "Math.Floor(-1)";
+            Assert.AreEqual(expectedResult, newNode.ToFullString());
+        }
+
+        [Test]
         public void GetAppendMethodAction_Appends_A_Method_Invocation()
         {
             const string invocationToAppend = "ToString()";

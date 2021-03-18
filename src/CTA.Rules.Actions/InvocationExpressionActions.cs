@@ -23,6 +23,17 @@ namespace CTA.Rules.Actions
             return ReplaceMethod;
         }
 
+        public Func<SyntaxGenerator, InvocationExpressionSyntax, InvocationExpressionSyntax> GetReplaceOnlyMethodAction(string oldMethod, string newMethod)
+        {
+            //TODO what's the outcome if newMethod doesn't have a valid signature.. are there any options we could provide to parseexpression ?
+            InvocationExpressionSyntax ReplaceOnlyMethod(SyntaxGenerator syntaxGenerator, InvocationExpressionSyntax node)
+            {
+                node = node.WithExpression(SyntaxFactory.ParseExpression(node.Expression.ToString().Replace(oldMethod, newMethod))).NormalizeWhitespace();
+                return node;
+            }
+            return ReplaceOnlyMethod;
+        }
+
         public Func<SyntaxGenerator, InvocationExpressionSyntax, InvocationExpressionSyntax> GetAppendMethodAction(string appendMethod)
         {
             InvocationExpressionSyntax ReplaceMethod(SyntaxGenerator syntaxGenerator, InvocationExpressionSyntax node)
