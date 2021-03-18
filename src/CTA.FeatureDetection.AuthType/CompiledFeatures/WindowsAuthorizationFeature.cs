@@ -2,7 +2,7 @@
 
 namespace CTA.FeatureDetection.AuthType.CompiledFeatures
 {
-    public class WindowsAuthorizationFeature : WebConfigFeature
+    public class WindowsAuthorizationFeature : WindowsAuthenticationFeature
     {
         /// <summary>
         /// Determines if Windows Authorization is being used in a given project based on
@@ -12,6 +12,8 @@ namespace CTA.FeatureDetection.AuthType.CompiledFeatures
         /// 1. Web.config uses authorization:
         ///    <configuration>
         ///      <system.web>
+        ///        <authentication mode="Windows">
+        ///        </authentication>
         ///        <authorization>
         ///        </authorization>
         ///      </system.web>
@@ -23,7 +25,7 @@ namespace CTA.FeatureDetection.AuthType.CompiledFeatures
         public override bool IsPresent(AnalyzerResult analyzerResult)
         {
             var config = LoadWebConfig(analyzerResult.ProjectResult.ProjectRootPath);
-            return config.ContainsElement(Constants.AuthorizationElementPath);
+            return base.IsPresent(analyzerResult) && config.ContainsElement(Constants.AuthorizationElementPath);
         }
     }
 }

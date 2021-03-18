@@ -11,19 +11,25 @@ namespace CTA.FeatureDetection.AuthType.CompiledFeatures
         /// Web.config settings and attributes used in code.
         ///
         /// Qualifications:
-        /// 1. Web.config uses authorization and allows specifies roles:
+        /// 1. Web.config uses authorization and allows/denies specifies roles:
         ///    <configuration>
         ///      <system.web>
+        ///        <authentication mode="Windows">
+        ///        </authentication>
         ///        <authorization>
         ///          <allow roles="anyRole">
         ///          </allow>
+        ///          <deny roles="anyOtherRole">
+        ///          </deny>
         ///        </authorization>
         ///      </system.web>
         ///    </configuration>
         /// 
-        /// 2a. Web.config uses authorization 
+        /// 2a. Web.config uses windows authorization 
         ///    <configuration>
         ///      <system.web>
+        ///        <authentication mode="Windows">
+        ///        </authentication>
         ///        <authorization>
         ///        </authorization>
         ///      </system.web>
@@ -36,17 +42,18 @@ namespace CTA.FeatureDetection.AuthType.CompiledFeatures
         /// <returns>Whether or not Windows Authorization Roles are used</returns>
         public override bool IsPresent(AnalyzerResult analyzerResult)
         {
-            return IsPresentInConfig(analyzerResult)
-                   || (base.IsPresent(analyzerResult) && IsAuthorizeAttributeInCode(analyzerResult));
+            return base.IsPresent(analyzerResult) &&
+                (IsAuthorizeRoleInConfig(analyzerResult) || IsAuthorizeRoleAttributeInCode(analyzerResult));
         }
 
-        private bool IsPresentInConfig(AnalyzerResult analyzerResult)
+        private bool IsAuthorizeRoleInConfig(AnalyzerResult analyzerResult)
         {
             var config = LoadWebConfig(analyzerResult.ProjectResult.ProjectRootPath);
-            return config.ContainsAttribute(Constants.AllowElementPath, Constants.RolesAttribute);
+            return config.ContainsAttribute(Constants.AllowElementPath, Constants.RolesAttribute)
+                || config.ContainsAttribute(Constants.DenyElementPath, Constants.RolesAttribute);
         }
         
-        private bool IsAuthorizeAttributeInCode(AnalyzerResult analyzerResult)
+        private bool IsAuthorizeRoleAttributeInCode(AnalyzerResult analyzerResult)
         {
             var allAttributes = analyzerResult.ProjectResult.SourceFileResults.SelectMany(r => r.AllAnnotations());
             var authorizeAttributes = allAttributes.Where(a => a.Identifier == Constants.AuthorizeMethodAttribute);

@@ -8,6 +8,7 @@
         internal const string AuthenticationElement = "authentication";
         internal const string AuthorizationElement = "authorization";
         internal const string AllowElement = "allow";
+        internal const string DenyElement = "deny";
         internal const string SecurityElement = "security";
         internal const string WindowsAuthenticationElement = "windowsAuthentication";
         internal const string IdentityElement = "identity";
@@ -28,6 +29,7 @@
         internal static readonly string AuthenticationElementElementPath = $"{ConfigurationElement}/{SystemWebElement}/{AuthenticationElement}";
         internal static readonly string AuthorizationElementPath = $"{ConfigurationElement}/{SystemWebElement}/{AuthorizationElement}";
         internal static readonly string AllowElementPath = $"{ConfigurationElement}/{SystemWebElement}/{AuthorizationElement}/{AllowElement}";
+        internal static readonly string DenyElementPath = $"{ConfigurationElement}/{SystemWebElement}/{AuthorizationElement}/{DenyElement}";
         internal static readonly string IdentityElementPath = $"{ConfigurationElement}/{SystemWebElement}/{IdentityElement}";
         internal static readonly string MembershipElementPath = $"{ConfigurationElement}/{SystemWebElement}/{MembershipElement}";
     }
