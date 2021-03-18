@@ -130,7 +130,7 @@ namespace CTA.Rules.PortCore
 
         private void InitRules(List<PortCoreConfiguration> solutionConfiguration, List<AnalyzerResult> analyzerResults)
         {
-            var projectTypeFeatureDetector = new FeatureDetector();
+            using var projectTypeFeatureDetector = new FeatureDetector();
             _projectTypeFeatureResults = projectTypeFeatureDetector.DetectFeaturesInProjects(analyzerResults);
 
             foreach (var projectConfiguration in solutionConfiguration)

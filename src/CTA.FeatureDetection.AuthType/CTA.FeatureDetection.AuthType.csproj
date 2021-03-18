@@ -1,15 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="5.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\CTA.FeatureDetection.Common\CTA.FeatureDetection.Common.csproj" />
-    <ProjectReference Include="..\CTA.FeatureDetection.Load\CTA.FeatureDetection.Load.csproj" />
-    <ProjectReference Include="..\CTA.FeatureDetection.ProjectType\CTA.FeatureDetection.ProjectType.csproj" />
     <ProjectReference Include="..\CTA.Rules.Common\CTA.Rules.Common.csproj" />
+    <ProjectReference Include="..\CTA.Rules.Config\CTA.Rules.Config.csproj" />
   </ItemGroup>
 
 </Project>

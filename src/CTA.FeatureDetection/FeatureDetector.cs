@@ -8,12 +8,13 @@ using CTA.FeatureDetection.Common.Models;
 using CTA.FeatureDetection.Common.Models.Configuration;
 using CTA.FeatureDetection.Common.Models.Features;
 using CTA.FeatureDetection.Load.Loaders;
+using CTA.Rules.Common.WebConfigManagement;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
 namespace CTA.FeatureDetection
 {
-    public class FeatureDetector
+    public class FeatureDetector : IDisposable
     {
         public FeatureSet LoadedFeatureSet { get; private set; } = new FeatureSet();
 
@@ -150,6 +151,12 @@ namespace CTA.FeatureDetection
             var result = DetectFeaturesInProjects(analyzerResults);
 
             return result;
+        }
+
+        public void Dispose()
+        {
+            // Clear WebConfigManager cache if any WebConfig.IsPresent() methods are called
+            WebConfigManager.ClearCache();
         }
 
         private CodeAnalyzer GetDefaultCodeAnalyzer()

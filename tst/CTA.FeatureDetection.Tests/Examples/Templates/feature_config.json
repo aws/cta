@@ -32,6 +32,44 @@
               ]
             }
           ]
+        },
+        {
+          "AssemblyPath": "CTA.FeatureDetection.AuthType.dll",
+          "CompiledFeatureNamespaces": [
+            {
+              "Namespace": "CTA.FeatureDetection.AuthType.CompiledFeatures",
+              "CompiledFeatureMetadata": [
+                {
+                  "Name": "WindowsAuthenticationFeature",
+                  "ClassName": "WindowsAuthenticationFeature"
+                },
+                {
+                  "Name": "WindowsAuthorizationFeature",
+                  "ClassName": "WindowsAuthorizationFeature"
+                },
+                {
+                  "Name": "WindowsAuthorizationRolesFeature",
+                  "ClassName": "WindowsAuthorizationRolesFeature"
+                },
+                {
+                  "Name": "WindowsImpersonationFeature",
+                  "ClassName": "WindowsImpersonationFeature"
+                },
+                {
+                  "Name": "FederatedAuthenticationFeature",
+                  "ClassName": "FederatedAuthenticationFeature"
+                },
+                {
+                  "Name": "FormsAuthenticationFeature",
+                  "ClassName": "FormsAuthenticationFeature"
+                },
+                {
+                  "Name": "FormsAuthenticationWithMembershipFeature",
+                  "ClassName": "FormsAuthenticationWithMembershipFeature"
+                }
+              ]
+            }
+          ]
         }
       ],
       "ConfiguredFeatures": []
