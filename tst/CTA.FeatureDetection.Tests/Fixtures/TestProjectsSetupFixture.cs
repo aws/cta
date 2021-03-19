@@ -80,7 +80,7 @@ namespace CTA.FeatureDetection.Tests
         {
             _tempDirName = Path.Combine("Projects", "Temp");
             _tempBaseDir = Path.Combine(TestUtils.GetTstPath(), _tempDirName);
-            var tempDownloadDir = Path.Combine(_tempBaseDir, "d");
+            var tempDownloadDir = Path.Combine(_tempBaseDir, "fd");
 
             // Download test solutions
             DownloadTestProjects(tempDownloadDir);
@@ -147,7 +147,7 @@ namespace CTA.FeatureDetection.Tests
         private void DownloadTestProjects(string tempDir)
         {
             var tempDirectory = Directory.CreateDirectory(tempDir);
-            var downloadLocation = Path.Combine(tempDirectory.FullName, "d");
+            var downloadLocation = Path.Combine(tempDirectory.FullName, "fd_temp");
 
             var fileName = Path.Combine(tempDirectory.Parent.FullName, @"TestProjects.zip");
             Rules.Config.Utils.SaveFileFromGitHub(fileName, GithubInfo.TestGithubOwner, GithubInfo.TestGithubRepo, GithubInfo.TestGithubTag);
