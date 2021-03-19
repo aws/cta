@@ -80,7 +80,7 @@ namespace CTA.FeatureDetection.Tests
         {
             _tempDirName = Path.Combine("Projects", "TempFD");
             _tempBaseDir = Path.Combine(TestUtils.GetTstPath(), _tempDirName);
-            var tempDownloadDir = Path.Combine(_tempBaseDir, "fd");
+            var tempDownloadDir = Path.Combine(_tempBaseDir, "d");
 
             // Download test solutions
             DownloadTestProjects(tempDownloadDir);
