@@ -78,7 +78,7 @@ namespace CTA.FeatureDetection.Tests
         [OneTimeSetUp]
         public void DownloadTestProjects()
         {
-            _tempDirName = Path.Combine("Projects", "Temp");
+            _tempDirName = Path.Combine("Projects", "TempFD");
             _tempBaseDir = Path.Combine(TestUtils.GetTstPath(), _tempDirName);
             var tempDownloadDir = Path.Combine(_tempBaseDir, "d");
 
