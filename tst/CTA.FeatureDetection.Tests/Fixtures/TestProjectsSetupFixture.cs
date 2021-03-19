@@ -147,7 +147,7 @@ namespace CTA.FeatureDetection.Tests
         private void DownloadTestProjects(string tempDir)
         {
             var tempDirectory = Directory.CreateDirectory(tempDir);
-            var downloadLocation = Path.Combine(tempDirectory.FullName, "fd_temp");
+            var downloadLocation = Path.Combine(tempDirectory.FullName, "d");
 
             var fileName = Path.Combine(tempDirectory.Parent.FullName, @"TestProjects.zip");
             Rules.Config.Utils.SaveFileFromGitHub(fileName, GithubInfo.TestGithubOwner, GithubInfo.TestGithubRepo, GithubInfo.TestGithubTag);
