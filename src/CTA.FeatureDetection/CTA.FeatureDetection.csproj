@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\CTA.FeatureDetection.AuthType\CTA.FeatureDetection.AuthType.csproj" />
     <ProjectReference Include="..\CTA.FeatureDetection.Common\CTA.FeatureDetection.Common.csproj" />
     <ProjectReference Include="..\CTA.FeatureDetection.Load\CTA.FeatureDetection.Load.csproj" />
     <ProjectReference Include="..\CTA.FeatureDetection.ProjectType\CTA.FeatureDetection.ProjectType.csproj" />
