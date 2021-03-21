@@ -9,6 +9,7 @@ using CTA.Rules.Analyzer;
 using CTA.Rules.Config;
 using CTA.Rules.Models;
 using CTA.Rules.RuleFiles;
+using Microsoft.CodeAnalysis;
 
 namespace CTA.Rules.Update
 {
@@ -22,6 +23,7 @@ namespace CTA.Rules.Update
         private readonly List<SourceFileBuildResult> _sourceFileBuildResults;
         private readonly List<string> _projectReferences;
         private readonly ProjectResult _projectResult;
+        private readonly List<string> _metaReferences;
 
         /// <summary>
         /// Initializes a new instance of ProjectRewriter using an existing analysis
@@ -45,6 +47,7 @@ namespace CTA.Rules.Update
             _sourceFileBuildResults = analyzerResult?.ProjectBuildResult?.SourceFileBuildResults;
             _sourceFileResults = analyzerResult?.ProjectResult?.SourceFileResults;
             _projectReferences = analyzerResult?.ProjectBuildResult?.ExternalReferences?.ProjectReferences.Select(p => p.AssemblyLocation).ToList();
+            _metaReferences = analyzerResult.ProjectBuildResult.Project.MetadataReferences.Select(m => m.Display).ToList();
             RulesEngineConfiguration = rulesEngineConfiguration;
 
         }
@@ -105,7 +108,7 @@ namespace CTA.Rules.Update
         public ProjectResult Run(ProjectActions projectActions)
         {
             _projectResult.ProjectActions = projectActions;
-            CodeReplacer baseReplacer = new CodeReplacer(_sourceFileBuildResults, RulesEngineConfiguration);
+            CodeReplacer baseReplacer = new CodeReplacer(_sourceFileBuildResults, RulesEngineConfiguration, _metaReferences);
             _projectResult.ExecutedActions = baseReplacer.Run(projectActions, RulesEngineConfiguration.ProjectType);
             return _projectResult;
         }

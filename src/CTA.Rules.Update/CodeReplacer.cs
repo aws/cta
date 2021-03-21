@@ -16,11 +16,13 @@ namespace CTA.Rules.Update
     {
         private readonly ProjectConfiguration _projectConfiguration;
         private readonly IEnumerable<SourceFileBuildResult> _sourceFileBuildResults;
+        private readonly List<string> _metadataReferences;
 
-        public CodeReplacer(List<SourceFileBuildResult> sourceFileBuildResults, ProjectConfiguration projectConfiguration)
+        public CodeReplacer(List<SourceFileBuildResult> sourceFileBuildResults, ProjectConfiguration projectConfiguration, List<string> metadataReferences)
         {
             _sourceFileBuildResults = sourceFileBuildResults;
             _projectConfiguration = projectConfiguration;
+            _metadataReferences = metadataReferences;
         }
 
         public Dictionary<string, List<GenericActionExecution>> Run(ProjectActions projectActions, ProjectType projectType)
@@ -99,7 +101,12 @@ namespace CTA.Rules.Update
                     {
                         try
                         {
-                            runResult = projectLevelAction.ProjectFileActionFunc(_projectConfiguration.ProjectPath, projectType, _projectConfiguration.TargetVersions, projectActions.PackageActions.Distinct().ToDictionary(p => p.Name, p => p.Version), projectActions.ProjectReferenceActions.ToList());
+                            runResult = projectLevelAction.ProjectFileActionFunc(_projectConfiguration.ProjectPath, 
+                                projectType,
+                                _projectConfiguration.TargetVersions, 
+                                projectActions.PackageActions.Distinct().ToDictionary(p => p.Name, p => p.Version), 
+                                projectActions.ProjectReferenceActions.ToList(),
+                                _metadataReferences);
                         }
                         catch (Exception ex)
                         {
