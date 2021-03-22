@@ -12,6 +12,12 @@ namespace CTA.Rules.Actions
     /// </summary>
     public class InvocationExpressionActions
     {
+        /// <summary>
+        /// This Method replaces the entire expression up to the matching invocation expression. For example, Math.Round(5.5) invocation expression matching on Round with a newMethod parameter of Abs would return Abs(5.5) not Math.Abs(5.5).
+        /// Please ensure to include the prefix part of the matching invocation expression since this method will replace it.
+        /// </summary>
+        /// <param name="newMethod">The new invocation expression including the method to replace with.</param>
+        /// <returns></returns>
         public Func<SyntaxGenerator, InvocationExpressionSyntax, InvocationExpressionSyntax> GetReplaceMethodAction(string newMethod)
         {
             //TODO what's the outcome if newMethod doesn't have a valid signature.. are there any options we could provide to parseexpression ?
@@ -23,6 +29,12 @@ namespace CTA.Rules.Actions
             return ReplaceMethod;
         }
 
+        /// <summary>
+        /// This Method replaces only matching method in the invocation expression. For example, Math.Round(5.5) invocation expression matching on Round with a newMethod parameter of Abs and an oldMethod parameter of Round would return Math.Abs(5.5).
+        /// </summary>
+        /// <param name="oldMethod">The matching method in the invocation expression to be replaced.</param>
+        /// <param name="newMethod">The new method to replace the old method with in the invocation expression.</param>
+        /// <returns></returns>
         public Func<SyntaxGenerator, InvocationExpressionSyntax, InvocationExpressionSyntax> GetReplaceOnlyMethodAction(string oldMethod, string newMethod)
         {
             //TODO what's the outcome if newMethod doesn't have a valid signature.. are there any options we could provide to parseexpression ?
