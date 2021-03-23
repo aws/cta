@@ -17,6 +17,8 @@ namespace CTA.Rules.Models
         public string RulesDir;
         public Dictionary<string, Tuple<string, string>> PackageReferences;
         public bool IsMockRun = false;
+        public bool PortProject = true;
+        public bool PortCode = true;
         public ProjectType ProjectType = ProjectType.ClassLibrary;
     }
 }

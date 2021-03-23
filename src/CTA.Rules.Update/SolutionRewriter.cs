@@ -85,6 +85,16 @@ namespace CTA.Rules.Update
             return _solutionResult;
         }
 
+        public SolutionResult RunIncremental(Dictionary<string, ProjectActions> projectActions, List<string> updatedFiles)
+        {
+            var options = new ParallelOptions() { MaxDegreeOfParallelism = Constants.ThreadCount };
+            Parallel.ForEach(_rulesRewriters, options, rulesRewriter =>
+            {
+                _solutionResult.ProjectResults.Add(rulesRewriter.RunIncremental(projectActions[rulesRewriter.RulesEngineConfiguration.ProjectPath], updatedFiles));
+            });
+            return _solutionResult;
+        }
+
         /// <summary>
         /// Runs the solution rewriter after creating an analysis
         /// </summary>

@@ -63,9 +63,9 @@ namespace CTA.Rules.Update
             {
                 var allReferences = _sourceFileResults?.SelectMany(s => s.References).Distinct();
                 RulesFileLoader rulesFileLoader = new RulesFileLoader(allReferences, RulesEngineConfiguration.RulesDir, RulesEngineConfiguration.TargetVersions, string.Empty, RulesEngineConfiguration.AssemblyDir);
-                var result = rulesFileLoader.Load();
+                var projectRules = rulesFileLoader.Load();
 
-                RulesAnalysis walker = new RulesAnalysis(_sourceFileResults, result);
+                RulesAnalysis walker = new RulesAnalysis(_sourceFileResults, projectRules);
                 projectActions = walker.Analyze();
                 _projectReferences.ForEach(p =>
                 {
@@ -79,9 +79,9 @@ namespace CTA.Rules.Update
                     projectActions.PackageActions.Add(new PackageAction() { Name = p.Key, OriginalVersion = p.Value.Item1, Version = p.Value.Item2 });
                 }
                 MergePackages(projectActions.PackageActions);
-                projectActions.ProjectLevelActions = result.ProjectTokens.SelectMany(p => p.ProjectLevelActions).Distinct().ToList();
-                projectActions.ProjectLevelActions.AddRange(result.ProjectTokens.SelectMany(p => p.ProjectFileActions));
-
+                projectActions.ProjectLevelActions = projectRules.ProjectTokens.SelectMany(p => p.ProjectLevelActions).Distinct().ToList();
+                projectActions.ProjectLevelActions.AddRange(projectRules.ProjectTokens.SelectMany(p => p.ProjectFileActions));
+                projectActions.ProjectRules = projectRules;
                 _projectResult.ProjectActions = projectActions;
             }
             catch (Exception ex)
@@ -109,6 +109,18 @@ namespace CTA.Rules.Update
         {
             _projectResult.ProjectActions = projectActions;
             CodeReplacer baseReplacer = new CodeReplacer(_sourceFileBuildResults, RulesEngineConfiguration, _metaReferences);
+            _projectResult.ExecutedActions = baseReplacer.Run(projectActions, RulesEngineConfiguration.ProjectType);
+            return _projectResult;
+        }
+
+        public ProjectResult RunIncremental(ProjectActions projectActions, List<string> updatedFiles)
+        {
+            _projectResult.ProjectActions = projectActions;
+
+            RulesAnalysis walker = new RulesAnalysis(_sourceFileResults, projectActions.ProjectRules);
+            projectActions = walker.Analyze();
+
+            CodeReplacer baseReplacer = new CodeReplacer(_sourceFileBuildResults, RulesEngineConfiguration, _metaReferences, updatedFiles);
             _projectResult.ExecutedActions = baseReplacer.Run(projectActions, RulesEngineConfiguration.ProjectType);
             return _projectResult;
         }

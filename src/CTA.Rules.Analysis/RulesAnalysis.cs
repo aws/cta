@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -42,6 +43,31 @@ namespace CTA.Rules.Analyzer
                 if (AnalyzeChildren(fileAction, result.Children, 0))
                 {
                     _projectActions.FileActions.Add(fileAction);
+                }
+            });
+            return _projectActions;
+        }
+
+        public ProjectActions AnalyzeFiles(ProjectActions projectActions, List<string> updatedFiles)
+        {
+            var options = new ParallelOptions() { MaxDegreeOfParallelism = Constants.ThreadCount };
+            var selectedSourceFileResults = _sourceFileResults.Where(s => updatedFiles.Contains(s.FileFullPath));
+
+            Parallel.ForEach(selectedSourceFileResults, options, result =>
+            {
+                var fileAction = new FileActions() { FilePath = result.FileFullPath };
+
+                if (AnalyzeChildren(fileAction, result.Children, 0))
+                {
+                    var existingFileAction = _projectActions.FileActions.FirstOrDefault(f => f.FilePath == fileAction.FilePath);
+                    if (existingFileAction != null)
+                    {
+                        existingFileAction = fileAction;
+                    }
+                    else
+                    {
+                        _projectActions.FileActions.Add(fileAction);
+                    }
                 }
             });
             return _projectActions;

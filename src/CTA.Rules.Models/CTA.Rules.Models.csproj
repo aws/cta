@@ -11,14 +11,14 @@
 
 
   <ItemGroup>
-    <PackageReference Include="Codelyzer.Analysis" Version="1.3.29" />
-    <PackageReference Include="Codelyzer.Analysis.Model" Version="1.3.29" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
   </ItemGroup>
 
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\codelyzer\src\Analysis\Codelyzer.Analysis.Model\Codelyzer.Analysis.Model.csproj" />
+    <ProjectReference Include="..\..\..\codelyzer\src\Analysis\Codelyzer.Analysis\Codelyzer.Analysis.csproj" />
     <ProjectReference Include="..\CTA.Rules.Config\CTA.Rules.Config.csproj" />
   </ItemGroup>
 

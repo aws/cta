@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using Codelyzer.Analysis.Model;
 using CTA.Rules.Config;
+using Microsoft.CodeAnalysis.Text;
+using TextSpan = Codelyzer.Analysis.Model.TextSpan;
 
 namespace CTA.Rules.Models.Tokens
 {
@@ -32,6 +34,7 @@ namespace CTA.Rules.Models.Tokens
         public string FullKey { get; set; }
         public TextSpan TextSpan { get; set; }
         public string Description { get; set; }
+        public IList<TextChange> TextChanges { get; set; }
         public List<string> TargetCPU { get; set; }
         public List<AttributeAction> AttributeActions { get; set; }
         public List<AttributeAction> AttributeListActions { get; set; }
@@ -50,6 +53,28 @@ namespace CTA.Rules.Models.Tokens
         public List<ProjectLevelAction> ProjectFileActions { get; set; }
 
         public NodeToken Clone() => (NodeToken)this.MemberwiseClone();
+
+        public List<GenericAction> AllActions
+        {
+            get
+            {
+                var allActions = new List<GenericAction>();
+                allActions.AddRange(AttributeActions);
+                allActions.AddRange(AttributeListActions);
+                allActions.AddRange(MethodDeclarationActions);
+                allActions.AddRange(ClassDeclarationActions);
+                allActions.AddRange(InterfaceDeclarationActions);
+                allActions.AddRange(ElementAccessActions);
+                allActions.AddRange(MemberAccessActions);
+                allActions.AddRange(IdentifierNameActions);
+                allActions.AddRange(InvocationExpressionActions);
+                allActions.AddRange(MemberAccessActions);
+                allActions.AddRange(UsingActions);
+                allActions.AddRange(ObjectCreationExpressionActions);
+                allActions.AddRange(NamespaceActions);
+                return allActions;
+            }
+        }
 
     }
 }

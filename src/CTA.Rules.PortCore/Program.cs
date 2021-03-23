@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Linq;
 using CTA.Rules.Config;
 using CTA.Rules.Models;
 using Microsoft.Extensions.Logging;
@@ -49,6 +50,8 @@ namespace CTA.Rules.PortCore
                         IsMockRun = cli.IsMockRun,
                         UseDefaultRules = cli.DefaultRules,
                         PackageReferences = packageReferences,
+                        PortCode = true,
+                        PortProject = true,
                         TargetVersions = new List<string> { cli.Version }
                     };
 
@@ -63,6 +66,7 @@ namespace CTA.Rules.PortCore
                     Console.WriteLine(k.ProjectFile);
                     Console.WriteLine(k.ProjectActions.ToString());
                 }
+
                 var portSolutionResult = solutionPort.Run();
             }
             catch (Exception ex)

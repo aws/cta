@@ -10,11 +10,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Codelyzer.Analysis" Version="1.3.29" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\codelyzer\src\Analysis\Codelyzer.Analysis\Codelyzer.Analysis.csproj" />
     <ProjectReference Include="..\CTA.Rules.Config\CTA.Rules.Config.csproj" />
   </ItemGroup>
 

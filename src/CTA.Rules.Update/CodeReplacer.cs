@@ -18,9 +18,13 @@ namespace CTA.Rules.Update
         private readonly IEnumerable<SourceFileBuildResult> _sourceFileBuildResults;
         private readonly List<string> _metadataReferences;
 
-        public CodeReplacer(List<SourceFileBuildResult> sourceFileBuildResults, ProjectConfiguration projectConfiguration, List<string> metadataReferences)
+        public CodeReplacer(List<SourceFileBuildResult> sourceFileBuildResults, ProjectConfiguration projectConfiguration, List<string> metadataReferences, List<string> updatedFiles = null)
         {
             _sourceFileBuildResults = sourceFileBuildResults;
+            if(updatedFiles != null)
+            {
+                _sourceFileBuildResults = _sourceFileBuildResults.Where(s => updatedFiles.Contains(s.SourceFileFullPath));
+            }
             _projectConfiguration = projectConfiguration;
             _metadataReferences = metadataReferences;
         }
@@ -46,23 +50,47 @@ namespace CTA.Rules.Update
                         LogHelper.LogInformation("---------------------------------------------------------------------------");
                         LogHelper.LogInformation("Processing file " + sourceFileBuildResult.SourceFilePath);
 
-                        ActionsRewriter oneRewriter = new ActionsRewriter(sourceFileBuildResult.SemanticModel, sourceFileBuildResult.SyntaxGenerator, currentFileActions);
-                        root = oneRewriter.Visit(root);
-
-
-                        var result = root.NormalizeWhitespace().ToFullString();
-                        //TODO : Can you send a result
-                        if (!_projectConfiguration.IsMockRun)
+                        if (_projectConfiguration.PortCode)
                         {
-                            File.WriteAllText(sourceFileBuildResult.SourceFileFullPath, result);
-                        }
-                        var processedActions = ValidateActions(oneRewriter.allActions, result);
-                        processedActions = AddActionsWithoutExecutions(currentFileActions, oneRewriter.allActions);
+                            ActionsRewriter oneRewriter = new ActionsRewriter(sourceFileBuildResult.SemanticModel, sourceFileBuildResult.PrePortSemanticModel, sourceFileBuildResult.SyntaxGenerator, currentFileActions.FilePath, currentFileActions.AllActions);
+                            root = oneRewriter.Visit(root);
+                            var result = root.NormalizeWhitespace().ToFullString();
 
-                        if (!actionsPerProject.TryAdd(sourceFileBuildResult.SourceFileFullPath, processedActions))
+                            if (!_projectConfiguration.IsMockRun)
+                            {
+                                File.WriteAllText(sourceFileBuildResult.SourceFileFullPath, result);
+                            }
+
+                            var processedActions = ValidateActions(oneRewriter.allExecutedActions, result);
+                            processedActions = AddActionsWithoutExecutions(currentFileActions, oneRewriter.allExecutedActions);
+
+                            if (!actionsPerProject.TryAdd(sourceFileBuildResult.SourceFileFullPath, processedActions))
+                            {
+                                throw new FilePortingException(sourceFileBuildResult.SourceFilePath, new Exception("File already exists in collection"));
+                            }
+                        }                       
+                        else
                         {
-                            throw new FilePortingException(sourceFileBuildResult.SourceFilePath, new Exception("File already exists in collection"));
+                            if (currentFileActions != null)
+                            {
+                                currentFileActions.NodeTokens.ForEach(nodetoken =>
+                                {
+                                    ActionsRewriter oneRewriter = new ActionsRewriter(sourceFileBuildResult.SemanticModel, sourceFileBuildResult.PrePortSemanticModel, sourceFileBuildResult.SyntaxGenerator, currentFileActions.FilePath, nodetoken.AllActions);
+                                    
+                                    var result = root.NormalizeWhitespace().ToFullString();
+                                    //If true, line endings and spaces need to be normalized:
+                                    if (result != root.ToFullString())
+                                    {
+                                        File.WriteAllText(sourceFileBuildResult.SourceFileFullPath, result);
+                                    }
+
+                                    var newRoot = oneRewriter.Visit(root);
+                                    nodetoken.TextChanges = newRoot.SyntaxTree.GetChanges(root.SyntaxTree);
+                                });
+                            }
                         }
+
+
                     }
                 }
                 catch (Exception ex)
@@ -74,61 +102,63 @@ namespace CTA.Rules.Update
 
             var projectRunActions = new List<GenericActionExecution>();
 
-            //Project Level Actions
-            foreach (var projectLevelAction in projectActions.ProjectLevelActions)
+            if (_projectConfiguration.PortProject)
             {
-                var projectActionExecution = new GenericActionExecution(projectLevelAction, _projectConfiguration.ProjectPath)
+                //Project Level Actions
+                foreach (var projectLevelAction in projectActions.ProjectLevelActions)
                 {
-                    TimesRun = 1
-                };
-                var runResult = string.Empty;
-                if (!_projectConfiguration.IsMockRun)
-                {
-                    if (projectLevelAction.ProjectLevelActionFunc != null)
+                    var projectActionExecution = new GenericActionExecution(projectLevelAction, _projectConfiguration.ProjectPath)
                     {
-                        try
+                        TimesRun = 1
+                    };
+                    var runResult = string.Empty;
+                    if (!_projectConfiguration.IsMockRun)
+                    {
+                        if (projectLevelAction.ProjectLevelActionFunc != null)
                         {
-                            runResult = projectLevelAction.ProjectLevelActionFunc(_projectConfiguration.ProjectPath, projectType);
+                            try
+                            {
+                                runResult = projectLevelAction.ProjectLevelActionFunc(_projectConfiguration.ProjectPath, projectType);
+                            }
+                            catch (Exception ex)
+                            {
+                                var actionExecutionException = new ActionExecutionException(projectLevelAction.Name, projectLevelAction.Key, ex);
+                                projectActionExecution.InvalidExecutions = 1;
+                                LogHelper.LogError(actionExecutionException);
+                            }
                         }
-                        catch (Exception ex)
+                        else if (projectLevelAction.ProjectFileActionFunc != null)
                         {
-                            var actionExecutionException = new ActionExecutionException(projectLevelAction.Name, projectLevelAction.Key, ex);
-                            projectActionExecution.InvalidExecutions = 1;
-                            LogHelper.LogError(actionExecutionException);
+                            try
+                            {
+                                runResult = projectLevelAction.ProjectFileActionFunc(_projectConfiguration.ProjectPath,
+                                    projectType,
+                                    _projectConfiguration.TargetVersions,
+                                    projectActions.PackageActions.Distinct().ToDictionary(p => p.Name, p => p.Version),
+                                    projectActions.ProjectReferenceActions.ToList(),
+                                    _metadataReferences);
+                            }
+                            catch (Exception ex)
+                            {
+                                var actionExecutionException = new ActionExecutionException(projectLevelAction.Name, projectLevelAction.Key, ex);
+                                projectActionExecution.InvalidExecutions = 1;
+                                LogHelper.LogError(actionExecutionException);
+                            }
                         }
                     }
-                    else if (projectLevelAction.ProjectFileActionFunc != null)
+                    if (!string.IsNullOrEmpty(runResult))
                     {
-                        try
-                        {
-                            runResult = projectLevelAction.ProjectFileActionFunc(_projectConfiguration.ProjectPath, 
-                                projectType,
-                                _projectConfiguration.TargetVersions, 
-                                projectActions.PackageActions.Distinct().ToDictionary(p => p.Name, p => p.Version), 
-                                projectActions.ProjectReferenceActions.ToList(),
-                                _metadataReferences);
-                        }
-                        catch (Exception ex)
-                        {
-                            var actionExecutionException = new ActionExecutionException(projectLevelAction.Name, projectLevelAction.Key, ex);
-                            projectActionExecution.InvalidExecutions = 1;
-                            LogHelper.LogError(actionExecutionException);
-                        }
+                        projectActionExecution.Description = string.Concat(projectActionExecution.Description, ": ", runResult);
+                        projectRunActions.Add(projectActionExecution);
+                        LogHelper.LogInformation(projectLevelAction.Description);
                     }
                 }
-                if (!string.IsNullOrEmpty(runResult))
+
+                if (!actionsPerProject.TryAdd(Constants.Project, projectRunActions))
                 {
-                    projectActionExecution.Description = string.Concat(projectActionExecution.Description, ": ", runResult);
-                    projectRunActions.Add(projectActionExecution);
-                    LogHelper.LogInformation(projectLevelAction.Description);
+                    LogHelper.LogError(new FilePortingException(Constants.Project, new Exception("Error adding project to actions collection")));
                 }
             }
-
-            if (!actionsPerProject.TryAdd(Constants.Project, projectRunActions))
-            {
-                LogHelper.LogError(new FilePortingException(Constants.Project, new Exception("Error adding project to actions collection")));
-            }
-
             return actionsPerProject.ToDictionary(a => a.Key, a => a.Value);
         }
 
