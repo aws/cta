@@ -64,7 +64,7 @@ namespace CTA.Rules.Common.WebConfigManagement
 
         private static object LoadWebConfig(string projectDir, ConfigLoadingDelegate configLoadingDelegate)
         {
-            string webConfigFile = Path.Combine(projectDir, Constants.WebConfig);
+            string webConfigFile = Path.Combine(projectDir, Config.Constants.WebConfig);
 
             if (File.Exists(webConfigFile))
             {

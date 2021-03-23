@@ -52,5 +52,21 @@ namespace CTA.FeatureDetection.Tests.FeatureDetection.ProjectType
             Assert.True(_webClassLibraryFeatureDetectionResult.FeatureStatus[featureName],
                 $"Expected project type of {WebClassLibraryProjectName} to be WebClassLibrary.");
         }
+
+        [Test]
+        public void DotnetFrameworkFeature_Is_Present_In_MvcProject()
+        {
+            var featureName = "DotnetFrameworkFeature";
+            Assert.True(_mvcFeatureDetectionResult.FeatureStatus[featureName],
+                $"Expected project type of {MvcProjectName} to be DotnetFrameworkFeature.");
+        }
+
+        [Test]
+        public void DotnetCoreFeature_Is_Present_In_CoreMvcProject()
+        {
+            var featureName = "DotnetCoreFeature";
+            Assert.True(_coreMvcFeatureDetectionResult.FeatureStatus[featureName],
+                $"Expected project type of {CoreMvcProjectName} to be DotnetCoreFeature.");
+        }
     }
 }
