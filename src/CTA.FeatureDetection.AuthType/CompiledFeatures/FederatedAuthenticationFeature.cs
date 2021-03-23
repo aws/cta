@@ -39,7 +39,7 @@ namespace CTA.FeatureDetection.AuthType.CompiledFeatures
         public bool IsPresentInCode(AnalyzerResult analyzerResult)
         {
             return analyzerResult.ProjectResult.SourceFileResults.Any(s => 
-                s.AllInvocationExpressions().Any(i => i.SemanticOriginalDefinition.StartsWith(Constants.WsFederationAuthenticationQualifiedName)));
+                s.AllInvocationExpressions().Any(i => i.SemanticOriginalDefinition?.StartsWith(Constants.WsFederationAuthenticationQualifiedName) == true));
         }
     }
 }
