@@ -23,7 +23,7 @@ namespace CTA.FeatureDetection.AuthType.CompiledFeatures
         {
             return analyzerResult.ProjectResult.ContainsNugetDependency(Constants.DotNetOpenAuthReferenceIdentifier)
                    || analyzerResult.ProjectResult.SourceFileResults.Any(s =>
-                       s.AllInvocationExpressions().Any(i => i.SemanticOriginalDefinition.StartsWith(Constants.OpenIdConnectAuthenticationQualifiedName)));
+                       s.AllInvocationExpressions().Any(i => i.SemanticOriginalDefinition?.StartsWith(Constants.OpenIdConnectAuthenticationQualifiedName) == true));
         }
     }
 }
