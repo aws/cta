@@ -331,9 +331,10 @@ namespace CTA.Rules.Test
             StringAssert.Contains(@"PhysicalFileProvider", startupText);
             StringAssert.Contains(@"FileProvider", startupText);
             StringAssert.Contains(@"If FileSystem was not present before FileProvider was added", startupText);
+            StringAssert.DoesNotContain(@"PhysicalFileSystems", startupText);
             StringAssert.DoesNotContain(@"Microsoft.Owin.StaticFiles", startupText);
             StringAssert.DoesNotContain(@"Microsoft.Owin.FileSystems", startupText);
-
+ 
             StringAssert.Contains("WebHostBuilder", programText);
 
             //Check that package has been added:
