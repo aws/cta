@@ -25,11 +25,24 @@ namespace CTA.Rules.Test.Actions
         }
 
         [Test]
-        public void GetReplaceMethodAction()
+        public void GetReplaceMethodWithObjectAndParametersAction()
+        {
+            const string newMethod = "Math.Floor";
+            const string newParameter = "(-2)";
+            var appendMethodFunc =
+                _invocationExpressionActions.GetReplaceMethodWithObjectAndParametersAction(newMethod, newParameter);
+            var newNode = appendMethodFunc(_syntaxGenerator, _node);
+
+            var expectedResult = "Math.Floor(-2)";
+            Assert.AreEqual(expectedResult, newNode.ToFullString());
+        }
+
+        [Test]
+        public void GetReplaceMethodWithObjectAction()
         {
             const string newMethod = "Math.Floor";
             var appendMethodFunc =
-                _invocationExpressionActions.GetReplaceMethodAction(newMethod);
+                _invocationExpressionActions.GetReplaceMethodWithObjectAction(newMethod);
             var newNode = appendMethodFunc(_syntaxGenerator, _node);
 
             var expectedResult = "Math.Floor(-1)";
@@ -37,11 +50,24 @@ namespace CTA.Rules.Test.Actions
         }
 
         [Test]
-        public void GetReplaceOnlyMethodAction()
+        public void GetReplaceMethodAndParametersAction()
+        {
+            const string newMethod = "Floor";
+            const string newParameter = "(-2)";
+            var appendMethodFunc =
+                _invocationExpressionActions.GetReplaceMethodAndParametersAction("Abs", newMethod, newParameter);
+            var newNode = appendMethodFunc(_syntaxGenerator, _node);
+
+            var expectedResult = "Math.Floor(-2)";
+            Assert.AreEqual(expectedResult, newNode.ToFullString());
+        }
+
+        [Test]
+        public void GetReplaceMethodOnlyAction()
         {
             const string newMethod = "Floor";
             var appendMethodFunc =
-                _invocationExpressionActions.GetReplaceOnlyMethodAction("Abs",newMethod);
+                _invocationExpressionActions.GetReplaceMethodOnlyAction("Abs",newMethod);
             var newNode = appendMethodFunc(_syntaxGenerator, _node);
 
             var expectedResult = "Math.Floor(-1)";

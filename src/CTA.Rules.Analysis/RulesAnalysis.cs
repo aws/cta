@@ -184,6 +184,10 @@ namespace CTA.Rules.Analyzer
                         case IdConstants.InvocationIdName:
                             {
                                 InvocationExpression invocationExpression = (InvocationExpression)child;
+
+                                ////If we don't have a semantic analysis, we dont want to replace invocation expressions, otherwise we'll be replacing expressions regardless of their class/namespace
+                                if (string.IsNullOrEmpty(invocationExpression.SemanticOriginalDefinition)) break;
+
                                 var compareToken = new InvocationExpressionToken() { Key = invocationExpression.SemanticOriginalDefinition, Namespace = invocationExpression.Reference.Namespace, Type = invocationExpression.SemanticClassType };
                                 _rootNodes.Invocationexpressiontokens.TryGetValue(compareToken, out var token);
                                 if (token != null)
