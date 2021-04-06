@@ -83,7 +83,7 @@
           "Condition": {
             "Type": "XmlFileQuery",
             "Properties": {
-              "FileNamePatterns": [ "App.config", "Web.config" ],
+              "FileNamePatterns": [ ".*(app.config)$", ".*(web.config)$" ],
               "XmlElementPath": "configuration/entityFramework/providers/provider",
               "XmlElementAttributes": {
                 "invariantName": "IBM.Data.DB2"
@@ -96,7 +96,7 @@
           "Condition": {
             "Type": "XmlFileQuery",
             "Properties": {
-              "FileNamePatterns": [ "App.config", "Web.config" ],
+              "FileNamePatterns": [ ".*(app.config)$", ".*(web.config)$" ],
               "XmlElementPath": "configuration/entityFramework/providers/provider",
               "XmlElementAttributes": {
                 "invariantName": "MySql.Data.MySqlClient"
@@ -109,7 +109,7 @@
           "Condition": {
             "Type": "XmlFileQuery",
             "Properties": {
-              "FileNamePatterns": [ "App.config", "Web.config" ],
+              "FileNamePatterns": [ ".*(app.config)$", ".*(web.config)$" ],
               "XmlElementPath": "configuration/entityFramework/providers/provider",
               "XmlElementAttributes": {
                 "invariantName": "Oracle.ManagedDataAccess.Client"
@@ -122,7 +122,7 @@
           "Condition": {
             "Type": "XmlFileQuery",
             "Properties": {
-              "FileNamePatterns": [ "App.config", "Web.config" ],
+              "FileNamePatterns": [ ".*(app.config)$", ".*(web.config)$" ],
               "XmlElementPath": "configuration/entityFramework/providers/provider",
               "XmlElementAttributes": {
                 "invariantName": "Npgsql"
@@ -135,7 +135,7 @@
           "Condition": {
             "Type": "XmlFileQuery",
             "Properties": {
-              "FileNamePatterns": [ "App.config", "Web.config" ],
+              "FileNamePatterns": [ ".*(app.config)$", ".*(web.config)$" ],
               "XmlElementPath": "configuration/entityFramework/providers/provider",
               "XmlElementAttributes": {
                 "invariantName": "System.Data.SQLite.EF6"
@@ -148,7 +148,7 @@
           "Condition": {
             "Type": "XmlFileQuery",
             "Properties": {
-              "FileNamePatterns": [ "App.config", "Web.config" ],
+              "FileNamePatterns": [ ".*(app.config)$", ".*(web.config)$" ],
               "XmlElementPath": "configuration/entityFramework/providers/provider",
               "XmlElementAttributes": {
                 "invariantName": "System.Data.SQLite"
@@ -161,7 +161,7 @@
           "Condition": {
             "Type": "XmlFileQuery",
             "Properties": {
-              "FileNamePatterns": [ "App.config", "Web.config" ],
+              "FileNamePatterns": [ ".*(app.config)$", ".*(web.config)$" ],
               "XmlElementPath": "configuration/entityFramework/providers/provider",
               "XmlElementAttributes": {
                 "invariantName": "System.Data.SqlServerCe.3.5"
@@ -174,7 +174,7 @@
           "Condition": {
             "Type": "XmlFileQuery",
             "Properties": {
-              "FileNamePatterns": [ "App.config", "Web.config" ],
+              "FileNamePatterns": [ ".*(app.config)$", ".*(web.config)$" ],
               "XmlElementPath": "configuration/entityFramework/providers/provider",
               "XmlElementAttributes": {
                 "invariantName": "System.Data.SqlServerCe.4.0"
@@ -190,7 +190,7 @@
               {
                 "Type": "XmlFileQuery",
                 "Properties": {
-                  "FileNamePatterns": [ "App.config", "Web.config" ],
+                  "FileNamePatterns": [ ".*(app.config)$", ".*(web.config)$" ],
                   "XmlElementPath": "configuration/entityFramework/providers/provider",
                   "XmlElementAttributes": {
                     "invariantName": "System.Data.SqlClient"
@@ -200,7 +200,7 @@
               {
                 "Type": "XmlFileQuery",
                 "Properties": {
-                  "FileNamePatterns": [ "App.config", "Web.config" ],
+                  "FileNamePatterns": [ ".*(app.config)$", ".*(web.config)$" ],
                   "XmlElementPath": "configuration/connectionStrings/add",
                   "XmlElementAttributes": {
                     "providerName": "System.Data.SqlClient"
