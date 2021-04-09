@@ -111,6 +111,6 @@ namespace CTA.FeatureDetection.Common.Extensions
         /// <param name="attributeType">Semantic type of attribute being searched for</param>
         /// <returns>Whether or not the class declaration node has the specified attribute</returns>
         public static bool HasAttribute(this UstNode node, string attributeType)
-            => node.AllAnnotations().Any(a => a.SemanticClassType.Equals(attributeType, StringComparison.OrdinalIgnoreCase));
+            => node.AllAnnotations().Any(a => a.SemanticClassType?.Equals(attributeType, StringComparison.OrdinalIgnoreCase) == true);
     }
 }

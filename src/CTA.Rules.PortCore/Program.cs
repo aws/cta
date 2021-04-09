@@ -50,7 +50,7 @@ namespace CTA.Rules.PortCore
                         IsMockRun = cli.IsMockRun,
                         UseDefaultRules = cli.DefaultRules,
                         PackageReferences = packageReferences,
-                        PortCode = true,
+                        PortCode = false,
                         PortProject = true,
                         TargetVersions = new List<string> { cli.Version }
                     };

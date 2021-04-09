@@ -9,6 +9,9 @@ using CTA.Rules.Config;
 using CTA.Rules.Models;
 using CTA.Rules.Update.Rewriters;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.Text;
+using TextChange = CTA.Rules.Models.TextChange;
+using TextSpan = Codelyzer.Analysis.Model.TextSpan;
 
 namespace CTA.Rules.Update
 {
@@ -85,7 +88,13 @@ namespace CTA.Rules.Update
                                     }
 
                                     var newRoot = oneRewriter.Visit(root);
-                                    nodetoken.TextChanges = newRoot.SyntaxTree.GetChanges(root.SyntaxTree);
+                                    var allChanges = newRoot.SyntaxTree.GetChanges(root.SyntaxTree);
+                                    
+                                    foreach (var textChange in allChanges)
+                                    {
+                                        var fileLinePositionSpan = root.SyntaxTree.GetMappedLineSpan(textChange.Span);
+                                        nodetoken.TextChanges.Add(new TextChange() { FileLinePositionSpan = fileLinePositionSpan, NewText = textChange.NewText });
+                                    }
                                 });
                             }
                         }
@@ -231,5 +240,6 @@ namespace CTA.Rules.Update
             }
             return actions;
         }
+
     }
 }

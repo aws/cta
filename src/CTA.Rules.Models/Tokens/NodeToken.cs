@@ -1,7 +1,6 @@
-﻿using System.Collections.Generic;
-using Codelyzer.Analysis.Model;
+﻿using System.Collections.Concurrent;
+using System.Collections.Generic;
 using CTA.Rules.Config;
-using Microsoft.CodeAnalysis.Text;
 using TextSpan = Codelyzer.Analysis.Model.TextSpan;
 
 namespace CTA.Rules.Models.Tokens
@@ -26,6 +25,7 @@ namespace CTA.Rules.Models.Tokens
             ProjectLevelActions = new List<ProjectLevelAction>();
             ProjectFileActions = new List<ProjectLevelAction>();
             TargetCPU = new List<string>();
+            TextChanges = new List<TextChange>();
         }
         public string Key { get; set; }
         public string TrimmedKey => !string.IsNullOrEmpty(Key) ? Utils.EscapeAllWhitespace(Key) : string.Empty;

@@ -113,16 +113,21 @@ namespace CTA.Rules.Update
             return _projectResult;
         }
 
-        public ProjectResult RunIncremental(ProjectActions projectActions, List<string> updatedFiles)
+        public List<IDEFileActions> RunIncremental(ProjectActions projectActions1, List<string> updatedFiles, RootNodes projectRules)
         {
-            _projectResult.ProjectActions = projectActions;
+            var ideFileActions = new List<IDEFileActions>();
 
-            RulesAnalysis walker = new RulesAnalysis(_sourceFileResults, projectActions.ProjectRules);
-            projectActions = walker.Analyze();
+            RulesAnalysis walker = new RulesAnalysis(_sourceFileResults, projectRules);
+            var projectActions = walker.Analyze();
 
             CodeReplacer baseReplacer = new CodeReplacer(_sourceFileBuildResults, RulesEngineConfiguration, _metaReferences, updatedFiles);
             _projectResult.ExecutedActions = baseReplacer.Run(projectActions, RulesEngineConfiguration.ProjectType);
-            return _projectResult;
+
+            ideFileActions = projectActions
+                .FileActions
+                .SelectMany(f => f.NodeTokens.Select(n => new IDEFileActions() { Description = n.Description, FilePath = f.FilePath, TextChanges = n.TextChanges }))
+                .ToList();
+            return ideFileActions;
         }
 
 

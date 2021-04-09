@@ -179,10 +179,9 @@ namespace CTA.Rules.PortCore
             return _portSolutionResult;
         }
 
-        public PortSolutionResult RunIncremental(Dictionary<string, ProjectActions> projectActions, List<string> updatedFiles)
+        public List<IDEFileActions> RunIncremental(Dictionary<string, ProjectActions> projectActions1, RootNodes projectRules, List<string> updatedFiles)
         {
-            _portSolutionResult.AddSolutionResult(_solutionRewriter.RunIncremental(projectActions, updatedFiles));
-            return _portSolutionResult;
+            return _solutionRewriter.RunIncremental(projectActions1, projectRules, updatedFiles);
         }
 
         private void DownloadResources()

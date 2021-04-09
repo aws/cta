@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Codelyzer.Analysis;
@@ -85,14 +86,16 @@ namespace CTA.Rules.Update
             return _solutionResult;
         }
 
-        public SolutionResult RunIncremental(Dictionary<string, ProjectActions> projectActions, List<string> updatedFiles)
+        public List<IDEFileActions> RunIncremental(Dictionary<string, ProjectActions> projectActions1, RootNodes projectRules, List<string> updatedFiles)
         {
+            var ideFileActions = new BlockingCollection<IDEFileActions>();
             var options = new ParallelOptions() { MaxDegreeOfParallelism = Constants.ThreadCount };
             Parallel.ForEach(_rulesRewriters, options, rulesRewriter =>
             {
-                _solutionResult.ProjectResults.Add(rulesRewriter.RunIncremental(projectActions[rulesRewriter.RulesEngineConfiguration.ProjectPath], updatedFiles));
+                var result = rulesRewriter.RunIncremental(projectActions1[rulesRewriter.RulesEngineConfiguration.ProjectPath], updatedFiles, projectRules);
+                result.ForEach(fileAction => ideFileActions.Add(fileAction));
             });
-            return _solutionResult;
+            return ideFileActions.ToList();
         }
 
         /// <summary>
