@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Codelyzer.Analysis;
+using Codelyzer.Analysis.Build;
 using CTA.Rules.Config;
 using CTA.Rules.Models;
 
@@ -60,6 +61,14 @@ namespace CTA.Rules.Update
             InitializeProjects(analyzerResults, solutionConfiguration);
         }
 
+        public SolutionRewriter(IDEProjectResult projectResult, List<ProjectConfiguration> solutionConfiguration)
+        {
+            _rulesRewriters = new List<ProjectRewriter>()
+            {
+                new ProjectRewriter(projectResult, solutionConfiguration.FirstOrDefault(s => s.ProjectPath == projectResult.ProjectPath))
+            };
+        }
+
         /// <summary>
         /// Initializes the SolutionRewriter
         /// </summary>
@@ -86,13 +95,13 @@ namespace CTA.Rules.Update
             return _solutionResult;
         }
 
-        public List<IDEFileActions> RunIncremental(Dictionary<string, ProjectActions> projectActions1, RootNodes projectRules, List<string> updatedFiles)
+        public List<IDEFileActions> RunIncremental(RootNodes projectRules, List<string> updatedFiles)
         {
             var ideFileActions = new BlockingCollection<IDEFileActions>();
             var options = new ParallelOptions() { MaxDegreeOfParallelism = Constants.ThreadCount };
             Parallel.ForEach(_rulesRewriters, options, rulesRewriter =>
             {
-                var result = rulesRewriter.RunIncremental(projectActions1[rulesRewriter.RulesEngineConfiguration.ProjectPath], updatedFiles, projectRules);
+                var result = rulesRewriter.RunIncremental(updatedFiles, projectRules);
                 result.ForEach(fileAction => ideFileActions.Add(fileAction));
             });
             return ideFileActions.ToList();

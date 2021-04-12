@@ -8,6 +8,7 @@ using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
 using Codelyzer.Analysis;
+using Codelyzer.Analysis.Build;
 using CTA.FeatureDetection;
 using CTA.FeatureDetection.Common.Models;
 using CTA.FeatureDetection.ProjectType.Extensions;
@@ -29,6 +30,8 @@ namespace CTA.Rules.PortCore
         private readonly PortSolutionResult _portSolutionResult;
         private readonly MetricsContext _context;
         private Dictionary<string, FeatureDetectionResult> _projectTypeFeatureResults;
+        private readonly IDEProjectResult _projectResult;
+        
 
         /// <summary>
         /// Initializes a new instance of Solution Port, analyzing the solution path using the provided config.
@@ -79,6 +82,12 @@ namespace CTA.Rules.PortCore
             InitSolutionRewriter(analyzerResults, solutionConfiguration);
         }
 
+        public SolutionPort(string solutionFilePath, IDEProjectResult projectResult, List<PortCoreConfiguration> solutionConfiguration)
+        {
+            _solutionPath = solutionFilePath;
+            _projectResult = projectResult;
+            _solutionRewriter = new SolutionRewriter(projectResult, solutionConfiguration.ToList<ProjectConfiguration>());
+        }
         private void InitSolutionRewriter(List<AnalyzerResult> analyzerResults, List<PortCoreConfiguration> solutionConfiguration)
         {
             CheckCache();
@@ -179,9 +188,9 @@ namespace CTA.Rules.PortCore
             return _portSolutionResult;
         }
 
-        public List<IDEFileActions> RunIncremental(Dictionary<string, ProjectActions> projectActions1, RootNodes projectRules, List<string> updatedFiles)
+        public List<IDEFileActions> RunIncremental(RootNodes projectRules, List<string> updatedFiles)
         {
-            return _solutionRewriter.RunIncremental(projectActions1, projectRules, updatedFiles);
+            return _solutionRewriter.RunIncremental(projectRules, updatedFiles);
         }
 
         private void DownloadResources()

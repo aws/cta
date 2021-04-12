@@ -51,6 +51,24 @@ namespace CTA.Rules.Update
             RulesEngineConfiguration = rulesEngineConfiguration;
 
         }
+        public ProjectRewriter(IDEProjectResult projectResult, ProjectConfiguration rulesEngineConfiguration)
+        {
+            _sourceFileResults = projectResult.RootNodes;
+            _sourceFileBuildResults = projectResult.SourceFileBuildResults;
+            RulesEngineConfiguration = rulesEngineConfiguration;
+
+            _projectResult = new ProjectResult()
+            {
+                ProjectFile = rulesEngineConfiguration.ProjectPath,
+                TargetVersions = rulesEngineConfiguration.TargetVersions,
+                UpgradePackages = rulesEngineConfiguration.PackageReferences.Select(p => new PackageAction()
+                {
+                    Name = p.Key,
+                    OriginalVersion = p.Value.Item1,
+                    Version = p.Value.Item2
+                }).ToList()
+            };
+        }
 
         /// <summary>
         /// Initializes the project rewriter by getting a list of actions that will be run
@@ -113,7 +131,7 @@ namespace CTA.Rules.Update
             return _projectResult;
         }
 
-        public List<IDEFileActions> RunIncremental(ProjectActions projectActions1, List<string> updatedFiles, RootNodes projectRules)
+        public List<IDEFileActions> RunIncremental(List<string> updatedFiles, RootNodes projectRules)
         {
             var ideFileActions = new List<IDEFileActions>();
 
