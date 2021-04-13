@@ -143,7 +143,7 @@ namespace CTA.Rules.Update
 
             ideFileActions = projectActions
                 .FileActions
-                .SelectMany(f => f.NodeTokens.Select(n => new IDEFileActions() { Description = n.Description, FilePath = f.FilePath, TextChanges = n.TextChanges }))
+                .SelectMany(f => f.NodeTokens.Select(n => new IDEFileActions() { TextSpan = n.TextSpan,  Description = n.Description, FilePath = f.FilePath, TextChanges = n.TextChanges }))
                 .ToList();
             return ideFileActions;
         }

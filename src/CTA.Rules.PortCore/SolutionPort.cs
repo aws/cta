@@ -193,6 +193,11 @@ namespace CTA.Rules.PortCore
             return _solutionRewriter.RunIncremental(projectRules, updatedFiles);
         }
 
+        public List<IDEFileActions> RunIncremental(RootNodes projectRules, string updatedFile)
+        {
+            return _solutionRewriter.RunIncremental(projectRules, new List<string> { updatedFile });
+        }
+
         private void DownloadResources()
         {
             var executingPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
