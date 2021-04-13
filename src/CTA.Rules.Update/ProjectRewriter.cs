@@ -135,6 +135,10 @@ namespace CTA.Rules.Update
         {
             var ideFileActions = new List<IDEFileActions>();
 
+            var allReferences = _sourceFileResults?.SelectMany(s => s.References).Distinct();
+            RulesFileLoader rulesFileLoader = new RulesFileLoader(allReferences, Constants.RulesDefaultPath, RulesEngineConfiguration.TargetVersions, string.Empty, RulesEngineConfiguration.AssemblyDir);
+            projectRules = rulesFileLoader.Load();
+
             RulesAnalysis walker = new RulesAnalysis(_sourceFileResults, projectRules);
             var projectActions = walker.Analyze();
 
