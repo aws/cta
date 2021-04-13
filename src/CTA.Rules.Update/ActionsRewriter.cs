@@ -357,7 +357,6 @@ namespace CTA.Rules.Update.Rewriters
                         actionExecution.InvalidExecutions = 1;
                         LogHelper.LogError(actionExecutionException);
                     }
-                    allActions.Add(actionExecution);
                 }
             }
             if (!skipChildren)

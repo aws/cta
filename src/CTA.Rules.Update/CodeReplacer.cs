@@ -3,8 +3,10 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Codelyzer.Analysis.Build;
+using CTA.FeatureDetection.Common.Extensions;
 using CTA.Rules.Config;
 using CTA.Rules.Models;
 using CTA.Rules.Update.Rewriters;
@@ -161,14 +163,23 @@ namespace CTA.Rules.Update
 
         public List<GenericActionExecution> ValidateActions(List<GenericActionExecution> actions, string fileResult)
         {
-            var trimmedResult = Utils.EscapeAllWhitespace(fileResult);
+            // Matches all types of comments and strings
+            string regComments = @"\/\*(?:(?!\*\/)(?:.|[\r\n]+))*\*\/|\/\/(.*?)\r?\n|""((\\[^\n]|[^""\n])*)""|@(""[^""""]*"")+";
 
             foreach (var action in actions)
             {
                 var actionValidation = action.ActionValidation;
+                var trimmedResult = fileResult;
                 var actionValid = true;
 
                 if (actionValidation == null) { continue; }
+
+                if (string.IsNullOrEmpty(actionValidation.CheckComments) || !bool.Parse(actionValidation.CheckComments))
+                {
+                    trimmedResult = Regex.Replace(fileResult, regComments, "");
+                }
+
+                trimmedResult = Utils.EscapeAllWhitespace(trimmedResult);
 
                 var contains = !string.IsNullOrEmpty(actionValidation.Contains) ? Utils.EscapeAllWhitespace(actionValidation.Contains) : "";
                 var notContains = !string.IsNullOrEmpty(actionValidation.NotContains) ? Utils.EscapeAllWhitespace(actionValidation.NotContains) : "";

@@ -4,5 +4,6 @@
     {
         public string Contains { get; set; }
         public string NotContains { get; set; }
+        public string CheckComments { get; set; }
     }
 }

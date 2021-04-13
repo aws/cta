@@ -48,7 +48,8 @@
               "Description": "Add a comment to explain what \"this\" refers to.",
               "ActionValidation": {
                 "Contains": "thisisaControllerobject",
-                "NotContains": ""
+                "NotContains": "",
+                "CheckComments": "True"
               }
             }
           ]
