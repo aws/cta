@@ -35,7 +35,7 @@
               "FullKey": "System.Web.HttpResponse.AppendHeader(string, string)",
               "Actions": [
                 {
-                  "Name": "ReplaceMethod",
+                  "Name": "ReplaceMethodWithObject",
                   "Type": "Method",
                   "Value": "this.Response.Headers.Add",
                   "Description": "Replace AppendHeader with a new method to add to headers"
@@ -59,7 +59,7 @@
               "FullKey": "System.Web.HttpServerUtilityBase.HtmlEncode(string)",
               "Actions": [
                 {
-                  "Name": "ReplaceMethod",
+                  "Name": "ReplaceMethodWithObject",
                   "Type": "Method",
                   "Value": "HtmlEncoder.Default.Encode",
                   "Description": "Replace HtmlEncode with a new method: HtmlEncoder.Default.Encode"

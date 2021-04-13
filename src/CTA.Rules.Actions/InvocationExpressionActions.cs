@@ -12,7 +12,34 @@ namespace CTA.Rules.Actions
     /// </summary>
     public class InvocationExpressionActions
     {
-        public Func<SyntaxGenerator, InvocationExpressionSyntax, InvocationExpressionSyntax> GetReplaceMethodAction(string newMethod)
+        /// <summary>
+        /// This Method replaces the entire expression including the parameters. For example, Math.Round(5.5) invocation expression matching on Round with a newMethod parameter of Abs(9.5) would return Abs(9.5) not Math.Abs(9.5).
+        /// Please ensure to include the prefix part of the matching invocation expression since this method will replace it and the parameters as well.
+        /// </summary>
+        /// <param name="newMethod">The new invocation expression including the method to replace with and the parameters.</param>
+        /// <param name="newParameters">The new invocation expression parameters to replace the old parameters with.</param>
+        /// <returns></returns>
+        public Func<SyntaxGenerator, InvocationExpressionSyntax, InvocationExpressionSyntax> GetReplaceMethodWithObjectAndParametersAction(string newMethod, string newParameters)
+        {
+            //TODO what's the outcome if newMethod doesn't have a valid signature.. are there any options we could provide to parseexpression ?
+            InvocationExpressionSyntax ReplaceMethod(SyntaxGenerator syntaxGenerator, InvocationExpressionSyntax node)
+            {
+                node = SyntaxFactory.InvocationExpression(
+                        SyntaxFactory.IdentifierName(newMethod),
+                        SyntaxFactory.ParseArgumentList(newParameters))
+                    .NormalizeWhitespace();
+                return node;
+            }
+            return ReplaceMethod;
+        }
+
+        /// <summary>
+        /// This Method replaces the entire expression up to the matching invocation expression. For example, Math.Round(5.5) invocation expression matching on Round with a newMethod parameter of Abs would return Abs(5.5) not Math.Abs(5.5).
+        /// Please ensure to include the prefix part of the matching invocation expression since this method will replace it.
+        /// </summary>
+        /// <param name="newMethod">The new invocation expression including the method to replace with.</param>
+        /// <returns></returns>
+        public Func<SyntaxGenerator, InvocationExpressionSyntax, InvocationExpressionSyntax> GetReplaceMethodWithObjectAction(string newMethod)
         {
             //TODO what's the outcome if newMethod doesn't have a valid signature.. are there any options we could provide to parseexpression ?
             InvocationExpressionSyntax ReplaceMethod(SyntaxGenerator syntaxGenerator, InvocationExpressionSyntax node)
@@ -21,6 +48,42 @@ namespace CTA.Rules.Actions
                 return node;
             }
             return ReplaceMethod;
+        }
+
+        /// <summary>
+        /// This Method replaces only matching method in the invocation expression and its parameters.
+        /// For example, Math.Round(5.5) invocation expression matching on Round with a newMethod parameter of Abs and an oldMethod parameter of Round with parameters of 8.5 would return Math.Abs(8.5).
+        /// </summary>
+        /// <param name="oldMethod">The matching method in the invocation expression to be replaced.</param>
+        /// <param name="newMethod">The new method to replace the old method with in the invocation expression.</param>
+        /// <param name="newParameters">The new invocation expression parameters to replace the old parameters with.</param>
+        /// <returns></returns>
+        public Func<SyntaxGenerator, InvocationExpressionSyntax, InvocationExpressionSyntax> GetReplaceMethodAndParametersAction(string oldMethod, string newMethod, string newParameters)
+        {
+            //TODO what's the outcome if newMethod doesn't have a valid signature.. are there any options we could provide to parseexpression ?
+            InvocationExpressionSyntax ReplaceOnlyMethod(SyntaxGenerator syntaxGenerator, InvocationExpressionSyntax node)
+            {
+                node = node.WithExpression(SyntaxFactory.ParseExpression(node.Expression.ToString().Replace(oldMethod, newMethod))).WithArgumentList(SyntaxFactory.ParseArgumentList(newParameters)).NormalizeWhitespace();
+                return node;
+            }
+            return ReplaceOnlyMethod;
+        }
+
+        /// <summary>
+        /// This Method replaces only matching method in the invocation expression. For example, Math.Round(5.5) invocation expression matching on Round with a newMethod parameter of Abs and an oldMethod parameter of Round would return Math.Abs(5.5).
+        /// </summary>
+        /// <param name="oldMethod">The matching method in the invocation expression to be replaced.</param>
+        /// <param name="newMethod">The new method to replace the old method with in the invocation expression.</param>
+        /// <returns></returns>
+        public Func<SyntaxGenerator, InvocationExpressionSyntax, InvocationExpressionSyntax> GetReplaceMethodOnlyAction(string oldMethod, string newMethod)
+        {
+            //TODO what's the outcome if newMethod doesn't have a valid signature.. are there any options we could provide to parseexpression ?
+            InvocationExpressionSyntax ReplaceOnlyMethod(SyntaxGenerator syntaxGenerator, InvocationExpressionSyntax node)
+            {
+                node = node.WithExpression(SyntaxFactory.ParseExpression(node.Expression.ToString().Replace(oldMethod, newMethod))).NormalizeWhitespace();
+                return node;
+            }
+            return ReplaceOnlyMethod;
         }
 
         public Func<SyntaxGenerator, InvocationExpressionSyntax, InvocationExpressionSyntax> GetAppendMethodAction(string appendMethod)

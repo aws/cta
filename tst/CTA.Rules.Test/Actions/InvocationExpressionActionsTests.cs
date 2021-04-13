@@ -25,6 +25,56 @@ namespace CTA.Rules.Test.Actions
         }
 
         [Test]
+        public void GetReplaceMethodWithObjectAndParametersAction()
+        {
+            const string newMethod = "Math.Floor";
+            const string newParameter = "(-2)";
+            var appendMethodFunc =
+                _invocationExpressionActions.GetReplaceMethodWithObjectAndParametersAction(newMethod, newParameter);
+            var newNode = appendMethodFunc(_syntaxGenerator, _node);
+
+            var expectedResult = "Math.Floor(-2)";
+            Assert.AreEqual(expectedResult, newNode.ToFullString());
+        }
+
+        [Test]
+        public void GetReplaceMethodWithObjectAction()
+        {
+            const string newMethod = "Math.Floor";
+            var appendMethodFunc =
+                _invocationExpressionActions.GetReplaceMethodWithObjectAction(newMethod);
+            var newNode = appendMethodFunc(_syntaxGenerator, _node);
+
+            var expectedResult = "Math.Floor(-1)";
+            Assert.AreEqual(expectedResult, newNode.ToFullString());
+        }
+
+        [Test]
+        public void GetReplaceMethodAndParametersAction()
+        {
+            const string newMethod = "Floor";
+            const string newParameter = "(-2)";
+            var appendMethodFunc =
+                _invocationExpressionActions.GetReplaceMethodAndParametersAction("Abs", newMethod, newParameter);
+            var newNode = appendMethodFunc(_syntaxGenerator, _node);
+
+            var expectedResult = "Math.Floor(-2)";
+            Assert.AreEqual(expectedResult, newNode.ToFullString());
+        }
+
+        [Test]
+        public void GetReplaceMethodOnlyAction()
+        {
+            const string newMethod = "Floor";
+            var appendMethodFunc =
+                _invocationExpressionActions.GetReplaceMethodOnlyAction("Abs",newMethod);
+            var newNode = appendMethodFunc(_syntaxGenerator, _node);
+
+            var expectedResult = "Math.Floor(-1)";
+            Assert.AreEqual(expectedResult, newNode.ToFullString());
+        }
+
+        [Test]
         public void GetAppendMethodAction_Appends_A_Method_Invocation()
         {
             const string invocationToAppend = "ToString()";
