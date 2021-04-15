@@ -93,7 +93,11 @@ namespace CTA.Rules.Update
                                     foreach (var textChange in allChanges)
                                     {
                                         var fileLinePositionSpan = root.SyntaxTree.GetMappedLineSpan(textChange.Span);
-                                        nodetoken.TextChanges.Add(new TextChange() { FileLinePositionSpan = fileLinePositionSpan, NewText = textChange.NewText });
+                                        var newTextChange = new TextChange() { FileLinePositionSpan = fileLinePositionSpan, NewText = textChange.NewText };
+                                        if (!nodetoken.TextChanges.Contains(newTextChange))
+                                        {
+                                            nodetoken.TextChanges.Add(newTextChange);
+                                        }
                                     }
                                 });
                             }
