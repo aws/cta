@@ -1,0 +1,32 @@
+﻿{
+  "FeatureGroups": [
+    {
+      "FeatureScope": "SourceCode",
+      "CompiledFeatureAssemblies": [
+        {
+          "AssemblyPath": "CTA.FeatureDetection.ProjectType.dll",
+          "CompiledFeatureNamespaces": [
+            {
+              "Namespace": "CTA.FeatureDetection.ProjectType.CompiledFeatures",
+              "CompiledFeatureMetadata": [
+                {
+                  "Name": "AspNetMvcFeature",
+                  "ClassName": "AspNetMvcFeature"
+                },
+                {
+                  "Name": "AspNetWebApiFeature",
+                  "ClassName": "AspNetWebApiFeature"
+                },
+                {
+                  "Name": "WebClassLibraryFeature",
+                  "ClassName": "WebClassLibraryFeature"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "ConfiguredFeatures": []
+    }
+  ]
+}

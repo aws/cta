@@ -29,7 +29,7 @@ namespace CTA.Rules.Config
         /// <returns></returns>
         private static string GetProjectTypeTemplateDir(ProjectType projectType)
         {
-            return string.Concat("Templates", Path.DirectorySeparatorChar, projectType.ToString());
+            return string.Concat("Templates", Path.DirectorySeparatorChar, projectType.ToString().ToLower());
         }
     }
 }
