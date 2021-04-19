@@ -82,10 +82,10 @@ namespace CTA.Rules.Update
                                     
                                     var result = root.NormalizeWhitespace().ToFullString();
                                     //If true, line endings and spaces need to be normalized:
-                                    if (result != root.ToFullString())
-                                    {
-                                        File.WriteAllText(sourceFileBuildResult.SourceFileFullPath, result);
-                                    }
+                                    //if (result != root.ToFullString())
+                                    //{
+                                    //    File.WriteAllText(sourceFileBuildResult.SourceFileFullPath, result);
+                                    //}
 
                                     var newRoot = oneRewriter.Visit(root);
                                     var allChanges = newRoot.SyntaxTree.GetChanges(root.SyntaxTree);
