@@ -549,6 +549,10 @@ namespace CTA.Rules.Analyzer
             {
                 var nodeToken = token.Clone();
                 nodeToken.TextSpan = textSpan;
+                nodeToken.AllActions.ForEach(action =>
+                {
+                    action.Key = identifier;
+                });
                 fileAction.NodeTokens.Add(nodeToken);
             }
         }
