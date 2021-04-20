@@ -56,7 +56,7 @@ namespace CTA.Rules.Update
                         {
                             File.WriteAllText(sourceFileBuildResult.SourceFileFullPath, result);
                         }
-                        var processedActions = ValidateActions(oneRewriter.allActions, result);
+                        var processedActions = ValidateActions(oneRewriter.allActions, root);
                         processedActions = AddActionsWithoutExecutions(currentFileActions, oneRewriter.allActions);
 
                         if (!actionsPerProject.TryAdd(sourceFileBuildResult.SourceFileFullPath, processedActions))
@@ -161,25 +161,28 @@ namespace CTA.Rules.Update
         }
 
 
-        public List<GenericActionExecution> ValidateActions(List<GenericActionExecution> actions, string fileResult)
+        public List<GenericActionExecution> ValidateActions(List<GenericActionExecution> actions, SyntaxNode root)
         {
             // Matches all types of comments and strings
-            string regComments = @"\/\*(?:(?!\*\/)(?:.|[\r\n]+))*\*\/|\/\/(.*?)\r?\n|""((\\[^\n]|[^""\n])*)""|@(""[^""""]*"")+";
+            //string regComments = @"\/\*(?:(?!\*\/)(?:.|[\r\n]+))*\*\/|\/\/(.*?)\r?\n|""((\\[^\n]|[^""\n])*)""|@(""[^""""]*"")+";
 
             foreach (var action in actions)
             {
                 var actionValidation = action.ActionValidation;
-                var trimmedResult = fileResult;
+                string trimmedResult = "";
                 var actionValid = true;
 
                 if (actionValidation == null) { continue; }
 
                 if (string.IsNullOrEmpty(actionValidation.CheckComments) || !bool.Parse(actionValidation.CheckComments))
                 {
-                    trimmedResult = Regex.Replace(fileResult, regComments, "");
+                    //trimmedResult = Regex.Replace(fileResult, regComments, "");
+                    trimmedResult = Utils.EscapeAllWhitespace(root.NoComments().NormalizeWhitespace().ToFullString());
                 }
-
-                trimmedResult = Utils.EscapeAllWhitespace(trimmedResult);
+                else
+                {
+                    trimmedResult = Utils.EscapeAllWhitespace(root.NormalizeWhitespace().ToFullString());
+                }
 
                 var contains = !string.IsNullOrEmpty(actionValidation.Contains) ? Utils.EscapeAllWhitespace(actionValidation.Contains) : "";
                 var notContains = !string.IsNullOrEmpty(actionValidation.NotContains) ? Utils.EscapeAllWhitespace(actionValidation.NotContains) : "";
