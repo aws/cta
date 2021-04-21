@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.Reflection;
 using CTA.Rules.Models;
+using CTA.Rules.Config;
 
 namespace CTA.Rules.Config
 {
@@ -29,7 +30,7 @@ namespace CTA.Rules.Config
         /// <returns></returns>
         private static string GetProjectTypeTemplateDir(ProjectType projectType)
         {
-            return string.Concat("Templates", Path.DirectorySeparatorChar, projectType.ToString().ToLower());
+            return Path.Combine(Constants.Templates, projectType.ToString().ToLower());
         }
     }
 }
