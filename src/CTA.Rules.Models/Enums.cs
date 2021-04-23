@@ -23,7 +23,9 @@
         WebApi,
         Mvc,
         WebClassLibrary,
-        ClassLibrary
+        ClassLibrary,
+        CoreWebApi,
+        CoreMvc
     }
     public enum FileTypeCreation
     {

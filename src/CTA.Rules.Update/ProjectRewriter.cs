@@ -9,6 +9,7 @@ using CTA.Rules.Analyzer;
 using CTA.Rules.Config;
 using CTA.Rules.Models;
 using CTA.Rules.RuleFiles;
+using Microsoft.CodeAnalysis;
 
 namespace CTA.Rules.Update
 {
@@ -22,6 +23,7 @@ namespace CTA.Rules.Update
         private readonly List<SourceFileBuildResult> _sourceFileBuildResults;
         private readonly List<string> _projectReferences;
         private readonly ProjectResult _projectResult;
+        private readonly List<string> _metaReferences;
 
         /// <summary>
         /// Initializes a new instance of ProjectRewriter using an existing analysis
@@ -45,8 +47,27 @@ namespace CTA.Rules.Update
             _sourceFileBuildResults = analyzerResult?.ProjectBuildResult?.SourceFileBuildResults;
             _sourceFileResults = analyzerResult?.ProjectResult?.SourceFileResults;
             _projectReferences = analyzerResult?.ProjectBuildResult?.ExternalReferences?.ProjectReferences.Select(p => p.AssemblyLocation).ToList();
+            _metaReferences = analyzerResult.ProjectBuildResult.Project.MetadataReferences.Select(m => m.Display).ToList();
             RulesEngineConfiguration = rulesEngineConfiguration;
 
+        }
+        public ProjectRewriter(IDEProjectResult projectResult, ProjectConfiguration rulesEngineConfiguration)
+        {
+            _sourceFileResults = projectResult.RootNodes;
+            _sourceFileBuildResults = projectResult.SourceFileBuildResults;
+            RulesEngineConfiguration = rulesEngineConfiguration;
+
+            _projectResult = new ProjectResult()
+            {
+                ProjectFile = rulesEngineConfiguration.ProjectPath,
+                TargetVersions = rulesEngineConfiguration.TargetVersions,
+                UpgradePackages = rulesEngineConfiguration.PackageReferences.Select(p => new PackageAction()
+                {
+                    Name = p.Key,
+                    OriginalVersion = p.Value.Item1,
+                    Version = p.Value.Item2
+                }).ToList()
+            };
         }
 
         /// <summary>
@@ -60,9 +81,9 @@ namespace CTA.Rules.Update
             {
                 var allReferences = _sourceFileResults?.SelectMany(s => s.References).Distinct();
                 RulesFileLoader rulesFileLoader = new RulesFileLoader(allReferences, RulesEngineConfiguration.RulesDir, RulesEngineConfiguration.TargetVersions, string.Empty, RulesEngineConfiguration.AssemblyDir);
-                var result = rulesFileLoader.Load();
+                var projectRules = rulesFileLoader.Load();
 
-                RulesAnalysis walker = new RulesAnalysis(_sourceFileResults, result);
+                RulesAnalysis walker = new RulesAnalysis(_sourceFileResults, projectRules);
                 projectActions = walker.Analyze();
                 _projectReferences.ForEach(p =>
                 {
@@ -76,9 +97,9 @@ namespace CTA.Rules.Update
                     projectActions.PackageActions.Add(new PackageAction() { Name = p.Key, OriginalVersion = p.Value.Item1, Version = p.Value.Item2 });
                 }
                 MergePackages(projectActions.PackageActions);
-                projectActions.ProjectLevelActions = result.ProjectTokens.SelectMany(p => p.ProjectLevelActions).Distinct().ToList();
-                projectActions.ProjectLevelActions.AddRange(result.ProjectTokens.SelectMany(p => p.ProjectFileActions));
-
+                projectActions.ProjectLevelActions = projectRules.ProjectTokens.SelectMany(p => p.ProjectLevelActions).Distinct().ToList();
+                projectActions.ProjectLevelActions.AddRange(projectRules.ProjectTokens.SelectMany(p => p.ProjectFileActions));
+                projectActions.ProjectRules = projectRules;
                 _projectResult.ProjectActions = projectActions;
             }
             catch (Exception ex)
@@ -105,9 +126,30 @@ namespace CTA.Rules.Update
         public ProjectResult Run(ProjectActions projectActions)
         {
             _projectResult.ProjectActions = projectActions;
-            CodeReplacer baseReplacer = new CodeReplacer(_sourceFileBuildResults, RulesEngineConfiguration);
+            CodeReplacer baseReplacer = new CodeReplacer(_sourceFileBuildResults, RulesEngineConfiguration, _metaReferences);
             _projectResult.ExecutedActions = baseReplacer.Run(projectActions, RulesEngineConfiguration.ProjectType);
             return _projectResult;
+        }
+
+        public List<IDEFileActions> RunIncremental(List<string> updatedFiles, RootNodes projectRules)
+        {
+            var ideFileActions = new List<IDEFileActions>();
+
+            var allReferences = _sourceFileResults?.SelectMany(s => s.References).Distinct();
+            RulesFileLoader rulesFileLoader = new RulesFileLoader(allReferences, Constants.RulesDefaultPath, RulesEngineConfiguration.TargetVersions, string.Empty, RulesEngineConfiguration.AssemblyDir);
+            projectRules = rulesFileLoader.Load();
+
+            RulesAnalysis walker = new RulesAnalysis(_sourceFileResults, projectRules);
+            var projectActions = walker.Analyze();
+
+            CodeReplacer baseReplacer = new CodeReplacer(_sourceFileBuildResults, RulesEngineConfiguration, _metaReferences, updatedFiles);
+            _projectResult.ExecutedActions = baseReplacer.Run(projectActions, RulesEngineConfiguration.ProjectType);
+
+            ideFileActions = projectActions
+                .FileActions
+                .SelectMany(f => f.NodeTokens.Select(n => new IDEFileActions() { TextSpan = n.TextSpan,  Description = n.Description, FilePath = f.FilePath, TextChanges = n.TextChanges }))
+                .ToList();
+            return ideFileActions;
         }
 
 

@@ -56,7 +56,11 @@ namespace CTA.Rules.Test.Actions
         {
             ResetProjectFile();
             var migrationProjectFileAction = _projectFileActions.GetMigrateProjectFileAction("");
-            var result = migrationProjectFileAction(_projectFile, projectType, targetVersions, packageReferences, projectReferences);
+            var metaRefs = new List<string>
+            {
+                @"C:\\RandomFile.dll"
+            };
+            var result = migrationProjectFileAction(_projectFile, projectType, targetVersions, packageReferences, projectReferences, metaRefs);
             return string.Concat(result, File.ReadAllText(_projectFile));
         }
 

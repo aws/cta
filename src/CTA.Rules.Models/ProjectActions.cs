@@ -20,6 +20,7 @@ namespace CTA.Rules.Models
         public BlockingCollection<PackageAction> PackageActions { get; set; }
         public BlockingCollection<string> ProjectReferenceActions { get; set; }
         public List<ProjectLevelAction> ProjectLevelActions { get; set; }
+        public RootNodes ProjectRules { get; set; }
 
         public override string ToString()
         {
