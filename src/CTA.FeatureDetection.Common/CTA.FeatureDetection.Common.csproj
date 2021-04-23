@@ -10,7 +10,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\codelyzer\src\Analysis\Codelyzer.Analysis\Codelyzer.Analysis.csproj" />
+    <PackageReference Include="Codelyzer.Analysis" Version="1.4.8-alpha-g29c192f06d" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\CTA.Rules.Config\CTA.Rules.Config.csproj" />
   </ItemGroup>
 

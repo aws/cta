@@ -2,6 +2,18 @@
   "version": 1,
   "dependencies": {
     ".NETCoreApp,Version=v3.1": {
+      "Codelyzer.Analysis": {
+        "type": "Direct",
+        "requested": "[1.4.8-alpha-g29c192f06d, )",
+        "resolved": "1.4.8-alpha-g29c192f06d",
+        "contentHash": "Zm5CDILJPLKnip/cIAcLeIwHlcWHzh3FXR+kUd+fr2YgLlQXSUMY2Hw56BW8k/AfNfv15paeRAtR2tbIlVlu3Q==",
+        "dependencies": {
+          "Codelyzer.Analysis.Build": "1.4.8-alpha-g29c192f06d",
+          "Codelyzer.Analysis.CSharp": "1.4.8-alpha-g29c192f06d",
+          "CommandLineParser": "2.8.0",
+          "Microsoft.Extensions.Logging.Console": "5.0.0"
+        }
+      },
       "Microsoft.SourceLink.GitHub": {
         "type": "Direct",
         "requested": "[1.0.0, )",
@@ -52,6 +64,47 @@
           "Buildalyzer": "3.2.0",
           "Microsoft.CodeAnalysis.CSharp.Workspaces": "3.8.0",
           "Microsoft.CodeAnalysis.VisualBasic.Workspaces": "3.8.0"
+        }
+      },
+      "Codelyzer.Analysis.Build": {
+        "type": "Transitive",
+        "resolved": "1.4.8-alpha-g29c192f06d",
+        "contentHash": "GocGFZ9s0QCdj47Jx5d91anqF6LYTfSOZOK8lMVLD51fCH2oqfitNSAlIx4tYRa9rJVPDB60tUGjA64vX77NpA==",
+        "dependencies": {
+          "Buildalyzer": "3.2.0",
+          "Buildalyzer.Logger": "3.2.0",
+          "Buildalyzer.Workspaces": "3.2.0",
+          "Codelyzer.Analysis.CSharp": "1.4.8-alpha-g29c192f06d",
+          "Microsoft.Extensions.Logging": "5.0.0",
+          "NuGet.Packaging": "5.9.1"
+        }
+      },
+      "Codelyzer.Analysis.Common": {
+        "type": "Transitive",
+        "resolved": "1.4.8-alpha-g29c192f06d",
+        "contentHash": "ySXN66Xqishw0PDYk6hDm/8dz5wmZ6jUJegdIbSWQw7krfJJl/1ZKlM+/5LvcXsjL4HJ9lG3q5jVliBj/xb/Tg==",
+        "dependencies": {
+          "Codelyzer.Analysis.Model": "1.4.8-alpha-g29c192f06d",
+          "Newtonsoft.Json": "13.0.1"
+        }
+      },
+      "Codelyzer.Analysis.CSharp": {
+        "type": "Transitive",
+        "resolved": "1.4.8-alpha-g29c192f06d",
+        "contentHash": "pwDqA7pQ5y0T2LVqOajIunp8vKnWNltB4M5yYB0N4dDId81Wo9oKooxydICytWzrXH3flC4gPyR4BqTb4g+n2A==",
+        "dependencies": {
+          "Codelyzer.Analysis.Common": "1.4.8-alpha-g29c192f06d",
+          "Codelyzer.Analysis.Model": "1.4.8-alpha-g29c192f06d"
+        }
+      },
+      "Codelyzer.Analysis.Model": {
+        "type": "Transitive",
+        "resolved": "1.4.8-alpha-g29c192f06d",
+        "contentHash": "ta4vC/pAYmG1xzmZN8Jv2a4mMyvgieHrl0e3tArrk0W0ISeoOnceqGGXSrS9nDqsz8fVINC5bZMZQ4pL0zXmxA==",
+        "dependencies": {
+          "Microsoft.CodeAnalysis.CSharp": "3.8.0",
+          "Microsoft.Extensions.Logging": "5.0.0",
+          "Newtonsoft.Json": "13.0.1"
         }
       },
       "CommandLineParser": {
@@ -1637,48 +1690,6 @@
           "System.Text.Encoding": "4.3.0",
           "System.Threading": "4.3.0",
           "System.Xml.ReaderWriter": "4.3.0"
-        }
-      },
-      "codelyzer.analysis": {
-        "type": "Project",
-        "dependencies": {
-          "Codelyzer.Analysis.Build": "1.0.0",
-          "Codelyzer.Analysis.CSharp": "1.0.0",
-          "CommandLineParser": "2.8.0",
-          "Microsoft.Extensions.Logging.Console": "5.0.0"
-        }
-      },
-      "codelyzer.analysis.build": {
-        "type": "Project",
-        "dependencies": {
-          "Buildalyzer": "3.2.0",
-          "Buildalyzer.Logger": "3.2.0",
-          "Buildalyzer.Workspaces": "3.2.0",
-          "Codelyzer.Analysis.CSharp": "1.0.0",
-          "Microsoft.Extensions.Logging": "5.0.0",
-          "NuGet.Packaging": "5.9.1"
-        }
-      },
-      "codelyzer.analysis.common": {
-        "type": "Project",
-        "dependencies": {
-          "Codelyzer.Analysis.Model": "1.0.0",
-          "Newtonsoft.Json": "13.0.1"
-        }
-      },
-      "codelyzer.analysis.csharp": {
-        "type": "Project",
-        "dependencies": {
-          "Codelyzer.Analysis.Common": "1.0.0",
-          "Codelyzer.Analysis.Model": "1.0.0"
-        }
-      },
-      "codelyzer.analysis.model": {
-        "type": "Project",
-        "dependencies": {
-          "Microsoft.CodeAnalysis.CSharp": "3.8.0",
-          "Microsoft.Extensions.Logging": "5.0.0",
-          "Newtonsoft.Json": "13.0.1"
         }
       },
       "cta.rules.config": {

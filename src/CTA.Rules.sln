@@ -42,10 +42,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CTA.FeatureDetection.AuthTy
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CTA.Rules.Common", "CTA.Rules.Common\CTA.Rules.Common.csproj", "{F3A3E693-81B4-46AF-9457-B10B20C6B2C8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Codelyzer.Analysis", "..\..\codelyzer\src\Analysis\Codelyzer.Analysis\Codelyzer.Analysis.csproj", "{226DA196-EDCA-4DD3-931A-F0B6DFE51913}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Codelyzer.Analysis.Model", "..\..\codelyzer\src\Analysis\Codelyzer.Analysis.Model\Codelyzer.Analysis.Model.csproj", "{A21E7167-4E7A-43D7-B10F-9349B66541BC}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -120,14 +116,6 @@ Global
 		{F3A3E693-81B4-46AF-9457-B10B20C6B2C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F3A3E693-81B4-46AF-9457-B10B20C6B2C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F3A3E693-81B4-46AF-9457-B10B20C6B2C8}.Release|Any CPU.Build.0 = Release|Any CPU
-		{226DA196-EDCA-4DD3-931A-F0B6DFE51913}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{226DA196-EDCA-4DD3-931A-F0B6DFE51913}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{226DA196-EDCA-4DD3-931A-F0B6DFE51913}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{226DA196-EDCA-4DD3-931A-F0B6DFE51913}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A21E7167-4E7A-43D7-B10F-9349B66541BC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A21E7167-4E7A-43D7-B10F-9349B66541BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A21E7167-4E7A-43D7-B10F-9349B66541BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A21E7167-4E7A-43D7-B10F-9349B66541BC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
