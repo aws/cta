@@ -5,6 +5,8 @@ using System.IO;
 using System.Linq;
 using CTA.Rules.Config;
 using CTA.Rules.Models;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.Extensions.Logging;
 
 namespace CTA.Rules.PortCore
