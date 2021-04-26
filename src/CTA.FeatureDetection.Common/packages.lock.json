@@ -477,8 +477,8 @@
       },
       "Namotion.Reflection": {
         "type": "Transitive",
-        "resolved": "1.0.14",
-        "contentHash": "wuJGiFvGfehH2w7jAhMbCJt0/rvUuHyqSZn0sMhNTviDfBZRyX8LFlR/ndQcofkGWulPDfH5nKYTeGXE8xBHPA==",
+        "resolved": "1.0.19",
+        "contentHash": "+eY1uabKkJEvjfHvr8uHLB1lvrb8S+akpXOe6fKMLTeZEMYIQywFL0/5+zrpNFklJIYzaEoApw2p3zFx357LjQ==",
         "dependencies": {
           "Microsoft.CSharp": "4.3.0"
         }
@@ -541,10 +541,10 @@
       },
       "NJsonSchema": {
         "type": "Transitive",
-        "resolved": "10.3.1",
-        "contentHash": "k5ptrRSxMy1lZXxU7dXW2Gy9Q7uPufSGtb609tfuFdo+w45UMHdBolvbWeEq482BPXhYfoBZ2uNzjJgcny2o3g==",
+        "resolved": "10.4.1",
+        "contentHash": "XzOfrW2QRS7B6/Z4dVfXXta740oVXvonV2W3OXfhzW+g5tF5FXzwtgseR2vBOf0c6LvLNcR4Wj4vop8uqiSIJA==",
         "dependencies": {
-          "Namotion.Reflection": "1.0.14",
+          "Namotion.Reflection": "1.0.19",
           "Newtonsoft.Json": "9.0.1"
         }
       },
@@ -1698,7 +1698,7 @@
           "Microsoft.Extensions.Logging": "5.0.0",
           "Microsoft.Extensions.Logging.Abstractions": "5.0.0",
           "Microsoft.Extensions.Logging.Console": "5.0.0",
-          "NJsonSchema": "10.3.1"
+          "NJsonSchema": "10.4.1"
         }
       }
     }

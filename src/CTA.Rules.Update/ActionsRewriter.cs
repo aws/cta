@@ -42,6 +42,16 @@ namespace CTA.Rules.Update.Rewriters
             allExecutedActions = new List<GenericActionExecution>();
         }
 
+        public ActionsRewriter(SemanticModel semanticModel, SemanticModel preportSemanticModel, SyntaxGenerator syntaxGenerator, string filePath, GenericAction runningAction)
+        {
+            _semanticModel = semanticModel;
+            _preportSemanticModel = preportSemanticModel;
+            _syntaxGenerator = syntaxGenerator;
+            _filePath = filePath;
+            _allActions = new List<GenericAction>() { runningAction };
+            allExecutedActions = new List<GenericActionExecution>();
+        }
+
         public override SyntaxNode VisitAttributeList(AttributeListSyntax node)
         {
             AttributeListSyntax attributeListSyntax = (AttributeListSyntax)base.VisitAttributeList(node);
