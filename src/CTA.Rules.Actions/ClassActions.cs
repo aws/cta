@@ -45,7 +45,15 @@ namespace CTA.Rules.Actions
         {
             ClassDeclarationSyntax AddBaseClass(SyntaxGenerator syntaxGenerator, ClassDeclarationSyntax node)
             {
-                node = (ClassDeclarationSyntax)syntaxGenerator.AddBaseType(node, SyntaxFactory.ParseName(baseClass));
+                if (syntaxGenerator != null)
+                {
+                    node = (ClassDeclarationSyntax)syntaxGenerator.AddBaseType(node, SyntaxFactory.ParseName(baseClass));
+                }
+                else
+                {
+                    var baseType = SyntaxFactory.SimpleBaseType(SyntaxFactory.ParseTypeName(baseClass));
+                    node = node.AddBaseListTypes(baseType);
+                }
                 return node;
             }
             return AddBaseClass;

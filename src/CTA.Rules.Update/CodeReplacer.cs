@@ -9,6 +9,9 @@ using CTA.Rules.Config;
 using CTA.Rules.Models;
 using CTA.Rules.Update.Rewriters;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.Text;
+using TextChange = CTA.Rules.Models.TextChange;
+using TextSpan = Codelyzer.Analysis.Model.TextSpan;
 
 namespace CTA.Rules.Update
 {
@@ -16,11 +19,17 @@ namespace CTA.Rules.Update
     {
         private readonly ProjectConfiguration _projectConfiguration;
         private readonly IEnumerable<SourceFileBuildResult> _sourceFileBuildResults;
+        private readonly List<string> _metadataReferences;
 
-        public CodeReplacer(List<SourceFileBuildResult> sourceFileBuildResults, ProjectConfiguration projectConfiguration)
+        public CodeReplacer(List<SourceFileBuildResult> sourceFileBuildResults, ProjectConfiguration projectConfiguration, List<string> metadataReferences, List<string> updatedFiles = null)
         {
             _sourceFileBuildResults = sourceFileBuildResults;
+            if(updatedFiles != null)
+            {
+                _sourceFileBuildResults = _sourceFileBuildResults.Where(s => updatedFiles.Contains(s.SourceFileFullPath));
+            }
             _projectConfiguration = projectConfiguration;
+            _metadataReferences = metadataReferences;
         }
 
         public Dictionary<string, List<GenericActionExecution>> Run(ProjectActions projectActions, ProjectType projectType)
@@ -30,6 +39,7 @@ namespace CTA.Rules.Update
             ConcurrentDictionary<string, List<GenericActionExecution>> actionsPerProject = new ConcurrentDictionary<string, List<GenericActionExecution>>();
 
             var parallelOptions = new ParallelOptions() { MaxDegreeOfParallelism = Constants.ThreadCount };
+            var fileActionsCount = fileActions.Count();
 
             Parallel.ForEach(_sourceFileBuildResults, parallelOptions, sourceFileBuildResult =>
             {
@@ -44,22 +54,13 @@ namespace CTA.Rules.Update
                         LogHelper.LogInformation("---------------------------------------------------------------------------");
                         LogHelper.LogInformation("Processing file " + sourceFileBuildResult.SourceFilePath);
 
-                        ActionsRewriter oneRewriter = new ActionsRewriter(sourceFileBuildResult.SemanticModel, sourceFileBuildResult.SyntaxGenerator, currentFileActions);
-                        root = oneRewriter.Visit(root);
-
-
-                        var result = root.NormalizeWhitespace().ToFullString();
-                        //TODO : Can you send a result
-                        if (!_projectConfiguration.IsMockRun)
+                        if (_projectConfiguration.PortCode)
                         {
-                            File.WriteAllText(sourceFileBuildResult.SourceFileFullPath, result);
-                        }
-                        var processedActions = ValidateActions(oneRewriter.allActions, result);
-                        processedActions = AddActionsWithoutExecutions(currentFileActions, oneRewriter.allActions);
-
-                        if (!actionsPerProject.TryAdd(sourceFileBuildResult.SourceFileFullPath, processedActions))
+                            RunCodeChanges(root, sourceFileBuildResult, currentFileActions, actionsPerProject);
+                        }                       
+                        else
                         {
-                            throw new FilePortingException(sourceFileBuildResult.SourceFilePath, new Exception("File already exists in collection"));
+                            GenerateCodeChanges(root, sourceFileBuildResult, currentFileActions, fileActionsCount, actionsPerProject);
                         }
                     }
                 }
@@ -72,6 +73,74 @@ namespace CTA.Rules.Update
 
             var projectRunActions = new List<GenericActionExecution>();
 
+            if (_projectConfiguration.PortProject)
+            {
+                projectRunActions = ApplyProjectActions(projectActions, projectType);
+
+                if (!actionsPerProject.TryAdd(Constants.Project, projectRunActions))
+                {
+                    LogHelper.LogError(new FilePortingException(Constants.Project, new Exception("Error adding project to actions collection")));
+                }
+            }
+            return actionsPerProject.ToDictionary(a => a.Key, a => a.Value);
+        }
+
+        private void RunCodeChanges(SyntaxNode root, SourceFileBuildResult sourceFileBuildResult, FileActions currentFileActions, ConcurrentDictionary<string, List<GenericActionExecution>> actionsPerProject)
+        {
+            ActionsRewriter oneRewriter = new ActionsRewriter(sourceFileBuildResult.SemanticModel, sourceFileBuildResult.PrePortSemanticModel, sourceFileBuildResult.SyntaxGenerator, currentFileActions.FilePath, currentFileActions.AllActions);
+            root = oneRewriter.Visit(root);
+            var result = root.NormalizeWhitespace().ToFullString();
+
+            if (!_projectConfiguration.IsMockRun)
+            {
+                File.WriteAllText(sourceFileBuildResult.SourceFileFullPath, result);
+            }
+
+            var processedActions = ValidateActions(oneRewriter.allExecutedActions, result);
+            processedActions = AddActionsWithoutExecutions(currentFileActions, oneRewriter.allExecutedActions);
+
+            if (!actionsPerProject.TryAdd(sourceFileBuildResult.SourceFileFullPath, processedActions))
+            {
+                throw new FilePortingException(sourceFileBuildResult.SourceFilePath, new Exception("File already exists in collection"));
+            }
+        }
+        private void GenerateCodeChanges(SyntaxNode root, SourceFileBuildResult sourceFileBuildResult, FileActions currentFileActions, int fileActionsCount, ConcurrentDictionary<string, List<GenericActionExecution>> actionsPerProject)
+        {
+            if (currentFileActions != null)
+            {
+                var normalizedRoot = root.NormalizeWhitespace().ToFullString();
+                //If true, and we are doing a full analysis, line endings and spaces need to be normalized:
+                //TODO change the condition to be a config value in ProjectConfiguration instead of file count
+                if (normalizedRoot != root.ToFullString() && fileActionsCount > 1)
+                {
+                    File.WriteAllText(sourceFileBuildResult.SourceFileFullPath, normalizedRoot);
+                }
+
+                currentFileActions.NodeTokens.ForEach(nodetoken =>
+                {
+                    nodetoken.AllActions.ForEach(nodeAction => {
+                        ActionsRewriter oneRewriter = new ActionsRewriter(sourceFileBuildResult.SemanticModel, sourceFileBuildResult.PrePortSemanticModel, sourceFileBuildResult.SyntaxGenerator, currentFileActions.FilePath, nodeAction);
+
+                        var newRoot = oneRewriter.Visit(root);
+                        var allChanges = newRoot.SyntaxTree.GetChanges(root.SyntaxTree);
+
+                        foreach (var textChange in allChanges)
+                        {
+                            var fileLinePositionSpan = root.SyntaxTree.GetMappedLineSpan(textChange.Span);
+                            var newTextChange = new TextChange() { FileLinePositionSpan = fileLinePositionSpan, NewText = textChange.NewText };
+                            if (!nodetoken.TextChanges.Contains(newTextChange))
+                            {
+                                nodetoken.TextChanges.Add(newTextChange);
+                            }
+                        }
+                    });
+                });
+            }
+        }
+
+        private List<GenericActionExecution> ApplyProjectActions(ProjectActions projectActions, ProjectType projectType)
+        {
+            var projectRunActions = new List<GenericActionExecution>();
             //Project Level Actions
             foreach (var projectLevelAction in projectActions.ProjectLevelActions)
             {
@@ -99,7 +168,12 @@ namespace CTA.Rules.Update
                     {
                         try
                         {
-                            runResult = projectLevelAction.ProjectFileActionFunc(_projectConfiguration.ProjectPath, projectType, _projectConfiguration.TargetVersions, projectActions.PackageActions.Distinct().ToDictionary(p => p.Name, p => p.Version), projectActions.ProjectReferenceActions.ToList());
+                            runResult = projectLevelAction.ProjectFileActionFunc(_projectConfiguration.ProjectPath,
+                                projectType,
+                                _projectConfiguration.TargetVersions,
+                                projectActions.PackageActions.Distinct().ToDictionary(p => p.Name, p => p.Version),
+                                projectActions.ProjectReferenceActions.ToList(),
+                                _metadataReferences);
                         }
                         catch (Exception ex)
                         {
@@ -116,13 +190,7 @@ namespace CTA.Rules.Update
                     LogHelper.LogInformation(projectLevelAction.Description);
                 }
             }
-
-            if (!actionsPerProject.TryAdd(Constants.Project, projectRunActions))
-            {
-                LogHelper.LogError(new FilePortingException(Constants.Project, new Exception("Error adding project to actions collection")));
-            }
-
-            return actionsPerProject.ToDictionary(a => a.Key, a => a.Value);
+            return projectRunActions;
         }
 
         private List<GenericActionExecution> AddActionsWithoutExecutions(FileActions currentFileActions, List<GenericActionExecution> allActions)
@@ -194,5 +262,6 @@ namespace CTA.Rules.Update
             }
             return actions;
         }
+
     }
 }

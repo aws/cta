@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Codelyzer.Analysis.CSharp;
 using CTA.Rules.Config;
 using CTA.Rules.Models;
 using Microsoft.CodeAnalysis;
@@ -12,10 +13,14 @@ namespace CTA.Rules.Update.Rewriters
 {
     public class ActionsRewriter : CSharpSyntaxRewriter
     {
-        private readonly FileActions _fileActions;
         private readonly SemanticModel _semanticModel;
+        private readonly SemanticModel _preportSemanticModel;
         private readonly SyntaxGenerator _syntaxGenerator;
-        public List<GenericActionExecution> allActions { get; private set; }
+
+        private readonly string _filePath;
+        private readonly List<GenericAction> _allActions;
+
+        public List<GenericActionExecution> allExecutedActions { get; private set; }
 
         private static readonly Type[] identifierNameTypes = new Type[] {
             typeof(MethodDeclarationSyntax),
@@ -27,12 +32,24 @@ namespace CTA.Rules.Update.Rewriters
             typeof(ParameterSyntax),
             typeof(ObjectCreationExpressionSyntax)};
 
-        public ActionsRewriter(SemanticModel semanticModel, SyntaxGenerator syntaxGenerator, FileActions fileActions)
+        public ActionsRewriter(SemanticModel semanticModel, SemanticModel preportSemanticModel, SyntaxGenerator syntaxGenerator, string filePath, List<GenericAction> allActions)
         {
             _semanticModel = semanticModel;
+            _preportSemanticModel = preportSemanticModel;
             _syntaxGenerator = syntaxGenerator;
-            _fileActions = fileActions;
-            allActions = new List<GenericActionExecution>();
+            _filePath = filePath;
+            _allActions = allActions;
+            allExecutedActions = new List<GenericActionExecution>();
+        }
+
+        public ActionsRewriter(SemanticModel semanticModel, SemanticModel preportSemanticModel, SyntaxGenerator syntaxGenerator, string filePath, GenericAction runningAction)
+        {
+            _semanticModel = semanticModel;
+            _preportSemanticModel = preportSemanticModel;
+            _syntaxGenerator = syntaxGenerator;
+            _filePath = filePath;
+            _allActions = new List<GenericAction>() { runningAction };
+            allExecutedActions = new List<GenericActionExecution>();
         }
 
         public override SyntaxNode VisitAttributeList(AttributeListSyntax node)
@@ -41,13 +58,13 @@ namespace CTA.Rules.Update.Rewriters
 
             foreach (var attributeSyntax in attributeListSyntax.Attributes)
             {
-                foreach (var action in _fileActions.AttributeActions)
+                foreach (var action in _allActions.OfType<AttributeAction>())
                 {
                     if (action.Key == attributeSyntax.Name.ToString())
                     {
                         if (action.AttributeListActionFunc != null)
                         {
-                            var actionExecution = new GenericActionExecution(action, _fileActions.FilePath)
+                            var actionExecution = new GenericActionExecution(action, _filePath)
                             {
                                 TimesRun = 1
                             };
@@ -62,7 +79,7 @@ namespace CTA.Rules.Update.Rewriters
                                 actionExecution.InvalidExecutions = 1;
                                 LogHelper.LogError(actionExecutionException);
                             }
-                            allActions.Add(actionExecution);
+                            allExecutedActions.Add(actionExecution);
                         }
                     }
                 }
@@ -72,16 +89,15 @@ namespace CTA.Rules.Update.Rewriters
         }
         public override SyntaxNode VisitAttribute(AttributeSyntax node)
         {
-            var attributeSymbol = _semanticModel.GetSymbolInfo(node);
             AttributeSyntax attributeSyntax = (AttributeSyntax)base.VisitAttribute(node);
 
-            foreach (var action in _fileActions.AttributeActions)
+            foreach (var action in _allActions.OfType<AttributeAction>())
             {
                 if (action.Key == node.Name.ToString())
                 {
                     if (action.AttributeActionFunc != null)
                     {
-                        var actionExecution = new GenericActionExecution(action, _fileActions.FilePath)
+                        var actionExecution = new GenericActionExecution(action, _filePath)
                         {
                             TimesRun = 1
                         };
@@ -96,7 +112,7 @@ namespace CTA.Rules.Update.Rewriters
                             actionExecution.InvalidExecutions = 1;
                             LogHelper.LogError(actionExecutionException);
                         }
-                        allActions.Add(actionExecution);
+                        allExecutedActions.Add(actionExecution);
                     }
                 }
             }
@@ -105,14 +121,14 @@ namespace CTA.Rules.Update.Rewriters
         }
         public override SyntaxNode VisitClassDeclaration(ClassDeclarationSyntax node)
         {
-            var classSymbol = _semanticModel.GetDeclaredSymbol(node);
+            var classSymbol = SemanticHelper.GetDeclaredSymbol(node, _semanticModel, _preportSemanticModel);
             ClassDeclarationSyntax newNode = (ClassDeclarationSyntax)base.VisitClassDeclaration(node);
 
-            foreach (var action in _fileActions.ClassDeclarationActions)
+            foreach (var action in _allActions.OfType<ClassDeclarationAction>())
             {
                 if (action.Key == node.Identifier.Text.Trim())
                 {
-                    var actionExecution = new GenericActionExecution(action, _fileActions.FilePath)
+                    var actionExecution = new GenericActionExecution(action, _filePath)
                     {
                         TimesRun = 1
                     };
@@ -127,21 +143,21 @@ namespace CTA.Rules.Update.Rewriters
                         actionExecution.InvalidExecutions = 1;
                         LogHelper.LogError(actionExecutionException);
                     }
-                    allActions.Add(actionExecution);
+                    allExecutedActions.Add(actionExecution);
                 }
             }
             return newNode;
         }
         public override SyntaxNode VisitInterfaceDeclaration(InterfaceDeclarationSyntax node)
         {
-            var classSymbol = _semanticModel.GetDeclaredSymbol(node);
+            var classSymbol = SemanticHelper.GetDeclaredSymbol(node, _semanticModel, _preportSemanticModel);
             InterfaceDeclarationSyntax newNode = (InterfaceDeclarationSyntax)base.VisitInterfaceDeclaration(node);
 
-            foreach (var action in _fileActions.InterfaceDeclarationActions)
+            foreach (var action in _allActions.OfType<InterfaceDeclarationAction>())
             {
                 if (action.Key == node.Identifier.Text.Trim())
                 {
-                    var actionExecution = new GenericActionExecution(action, _fileActions.FilePath)
+                    var actionExecution = new GenericActionExecution(action, _filePath)
                     {
                         TimesRun = 1
                     };
@@ -156,23 +172,23 @@ namespace CTA.Rules.Update.Rewriters
                         actionExecution.InvalidExecutions = 1;
                         LogHelper.LogError(actionExecutionException);
                     }
-                    allActions.Add(actionExecution);
+                    allExecutedActions.Add(actionExecution);
                 }
             }
             return newNode;
         }
         public override SyntaxNode VisitIdentifierName(IdentifierNameSyntax node)
         {
-            var symbolInfo = _semanticModel.GetSymbolInfo(node);
+            var symbol = SemanticHelper.GetSemanticSymbol(node, _semanticModel, _preportSemanticModel);
 
             var identifierNameSyntax = (IdentifierNameSyntax)base.VisitIdentifierName(node);
-            if (symbolInfo.Symbol != null)
+            if (symbol != null)
             {
-                foreach (var action in _fileActions.IdentifierNameActions)
+                foreach (var action in _allActions.OfType<IdentifierNameAction>())
                 {
-                    if (symbolInfo.Symbol.ToString() == action.Key && identifierNameTypes.Contains(identifierNameSyntax.Parent?.GetType()))
+                    if (symbol.ToString() == action.Key && identifierNameTypes.Contains(identifierNameSyntax.Parent?.GetType()))
                     {
-                        var actionExecution = new GenericActionExecution(action, _fileActions.FilePath)
+                        var actionExecution = new GenericActionExecution(action, _filePath)
                         {
                             TimesRun = 1
                         };
@@ -187,7 +203,7 @@ namespace CTA.Rules.Update.Rewriters
                             actionExecution.InvalidExecutions = 1;
                             LogHelper.LogError(actionExecutionException);
                         }
-                        allActions.Add(actionExecution);
+                        allExecutedActions.Add(actionExecution);
                     }
                 }
             }
@@ -195,10 +211,9 @@ namespace CTA.Rules.Update.Rewriters
         }
         public override SyntaxNode VisitInvocationExpression(InvocationExpressionSyntax node)
         {
-            var symbols = _semanticModel.GetSymbolInfo(node);
+            var symbol = SemanticHelper.GetSemanticSymbol(node, _semanticModel, _preportSemanticModel);
             var newNode = (InvocationExpressionSyntax)base.VisitInvocationExpression(node);
 
-            var symbol = symbols.Symbol;
 
             if(symbol == null)
             {
@@ -207,11 +222,11 @@ namespace CTA.Rules.Update.Rewriters
 
             var nodeKey = symbol.OriginalDefinition.ToString();
 
-            foreach (var action in _fileActions.InvocationExpressionActions)
+            foreach (var action in _allActions.OfType<InvocationExpressionAction>())
             {
                 if (nodeKey == action.Key)
                 {
-                    var actionExecution = new GenericActionExecution(action, _fileActions.FilePath)
+                    var actionExecution = new GenericActionExecution(action, _filePath)
                     {
                         TimesRun = 1
                     };
@@ -226,7 +241,7 @@ namespace CTA.Rules.Update.Rewriters
                         actionExecution.InvalidExecutions = 1;
                         LogHelper.LogError(actionExecutionException);
                     }
-                    allActions.Add(actionExecution);
+                    allExecutedActions.Add(actionExecution);
                 }
             }
             return newNode;
@@ -234,20 +249,19 @@ namespace CTA.Rules.Update.Rewriters
 
         public override SyntaxNode VisitElementAccessExpression(ElementAccessExpressionSyntax node)
         {
-            var symbols = _semanticModel.GetSymbolInfo(node);
+            var symbol = SemanticHelper.GetSemanticSymbol(node, _semanticModel, _preportSemanticModel);
             var newNode = (ElementAccessExpressionSyntax)base.VisitElementAccessExpression(node);
 
-            var symbol = symbols.Symbol;
 
             if (symbol != null)
             {
                 var nodeKey = $"{symbol.ContainingType}.{node.Expression}";
 
-                foreach (var action in _fileActions.ElementAccessActions)
+                foreach (var action in _allActions.OfType<ElementAccessAction>())
                 {
                     if (nodeKey == action.Key)
                     {
-                        var actionExecution = new GenericActionExecution(action, _fileActions.FilePath)
+                        var actionExecution = new GenericActionExecution(action, _filePath)
                         {
                             TimesRun = 1
                         };
@@ -262,7 +276,7 @@ namespace CTA.Rules.Update.Rewriters
                             actionExecution.InvalidExecutions = 1;
                             LogHelper.LogError(actionExecutionException);
                         }
-                        allActions.Add(actionExecution);
+                        allExecutedActions.Add(actionExecution);
                     }
                 }
             }
@@ -271,19 +285,18 @@ namespace CTA.Rules.Update.Rewriters
 
         public override SyntaxNode VisitMemberAccessExpression(MemberAccessExpressionSyntax node)
         {
-            var symbols = _semanticModel.GetSymbolInfo(node);
+            var symbol = SemanticHelper.GetSemanticSymbol(node, _semanticModel, _preportSemanticModel);
             var newNode = base.VisitMemberAccessExpression(node);
-            var symbol = symbols.Symbol;
 
             if (symbol != null)
             {
                 var nodeKey = $"{symbol.ContainingType}.{node.Name}";
 
-                foreach (var action in _fileActions.MemberAccessActions)
+                foreach (var action in _allActions.OfType<MemberAccessAction>())
                 {
                     if (nodeKey == action.Key)
                     {
-                        var actionExecution = new GenericActionExecution(action, _fileActions.FilePath)
+                        var actionExecution = new GenericActionExecution(action, _filePath)
                         {
                             TimesRun = 1
                         };
@@ -298,7 +311,7 @@ namespace CTA.Rules.Update.Rewriters
                             actionExecution.InvalidExecutions = 1;
                             LogHelper.LogError(actionExecutionException);
                         }
-                        allActions.Add(actionExecution);
+                        allExecutedActions.Add(actionExecution);
                     }
                 }
             }
@@ -309,9 +322,9 @@ namespace CTA.Rules.Update.Rewriters
         {
             CompilationUnitSyntax newNode = (CompilationUnitSyntax)base.VisitCompilationUnit(node);
             //Applying using actions
-            foreach (var action in _fileActions.Usingactions)
+            foreach (var action in _allActions.OfType<UsingAction>())
             {
-                var actionExecution = new GenericActionExecution(action, _fileActions.FilePath)
+                var actionExecution = new GenericActionExecution(action, _filePath)
                 {
                     TimesRun = 1
                 };
@@ -326,21 +339,21 @@ namespace CTA.Rules.Update.Rewriters
                     actionExecution.InvalidExecutions = 1;
                     LogHelper.LogError(actionExecutionException);
                 }
-                allActions.Add(actionExecution);
+                allExecutedActions.Add(actionExecution);
             }
 
             return newNode;
         }
         public override SyntaxNode VisitObjectCreationExpression(ObjectCreationExpressionSyntax node)
         {
-            var symbols = _semanticModel.GetSymbolInfo(node);
+            var symbol = SemanticHelper.GetSemanticSymbol(node, _semanticModel, _preportSemanticModel);
             ExpressionSyntax newNode = node;
             bool skipChildren = false; // This is here to skip actions on children node when the main identifier was changed. Just use new expression for the subsequent children actions.
-            foreach (var action in _fileActions.ObjectCreationExpressionActions)
+            foreach (var action in _allActions.OfType<ObjectCreationExpressionAction>())
             {
-                if (newNode.ToString() == action.Key || symbols.Symbol?.OriginalDefinition.ToDisplayString() == action.Key)
+                if (newNode.ToString() == action.Key || symbol?.OriginalDefinition.ToDisplayString() == action.Key)
                 {
-                    var actionExecution = new GenericActionExecution(action, _fileActions.FilePath)
+                    var actionExecution = new GenericActionExecution(action, _filePath)
                     {
                         TimesRun = 1
                     };
@@ -348,7 +361,7 @@ namespace CTA.Rules.Update.Rewriters
                     {
                         skipChildren = true;
                         newNode = action.ObjectCreationExpressionGenericActionFunc(_syntaxGenerator, (ObjectCreationExpressionSyntax)newNode);
-                        allActions.Add(actionExecution);
+                        allExecutedActions.Add(actionExecution);
                         LogHelper.LogInformation(string.Format("{0}", action.Description));
                     }
                     catch (Exception ex)
@@ -357,7 +370,7 @@ namespace CTA.Rules.Update.Rewriters
                         actionExecution.InvalidExecutions = 1;
                         LogHelper.LogError(actionExecutionException);
                     }
-                    allActions.Add(actionExecution);
+                    allExecutedActions.Add(actionExecution);
                 }
             }
             if (!skipChildren)
@@ -369,11 +382,11 @@ namespace CTA.Rules.Update.Rewriters
         public override SyntaxNode VisitNamespaceDeclaration(NamespaceDeclarationSyntax node)
         {
             NamespaceDeclarationSyntax newNode = (NamespaceDeclarationSyntax)base.VisitNamespaceDeclaration(node);
-            foreach (var action in _fileActions.NamespaceActions)
+            foreach (var action in _allActions.OfType<NamespaceAction>())
             {
                 if (action.Key == newNode.Name.ToString())
                 {
-                    var actionExecution = new GenericActionExecution(action, _fileActions.FilePath)
+                    var actionExecution = new GenericActionExecution(action, _filePath)
                     {
                         TimesRun = 1
                     };
@@ -388,7 +401,7 @@ namespace CTA.Rules.Update.Rewriters
                         actionExecution.InvalidExecutions = 1;
                         LogHelper.LogError(actionExecutionException);
                     }
-                    allActions.Add(actionExecution);
+                    allExecutedActions.Add(actionExecution);
                 }
             }
             return newNode;
