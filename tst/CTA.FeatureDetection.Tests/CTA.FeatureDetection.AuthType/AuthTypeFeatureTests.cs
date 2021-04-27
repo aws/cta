@@ -1,4 +1,7 @@
-﻿using CTA.FeatureDetection.Tests.TestBase;
+﻿using System.Linq;
+using CTA.FeatureDetection.AuthType.CompiledFeatures;
+using CTA.FeatureDetection.Tests.TestBase;
+using CTA.FeatureDetection.Tests.Utils;
 using NUnit.Framework;
 
 namespace CTA.FeatureDetection.Tests.CTA.FeatureDetection.AuthType
@@ -59,6 +62,18 @@ namespace CTA.FeatureDetection.Tests.CTA.FeatureDetection.AuthType
             var featureName = "FederatedAuthenticationFeature";
             Assert.True(_federatedAuthenticationFeatureDetectionResult.FeatureStatus[featureName],
                 $"Expected authentication type of {featureName} to be present.");
+        }
+
+        [Test]
+        public void IsAuthorizeRoleAttributeInCode_Returns_True_When_Attribute_Exists_In_Code()
+        {
+            var windowsAuthorizationRolesFeature = new WindowsAuthorizationRolesFeature();
+            var method = TestUtils.GetPrivateMethod(windowsAuthorizationRolesFeature.GetType(), "IsAuthorizeRoleAttributeInCode");
+
+            var analyzerResult = TestProjectsSetupFixture.FormsAuthenticationAnalyzerResults.First();
+            var isAuthorizeRoleAttributeInCode = (bool?)method.Invoke(windowsAuthorizationRolesFeature, new object []{ analyzerResult });
+            
+            Assert.True(isAuthorizeRoleAttributeInCode, "Expected Authorize Role attribute to be present.");
         }
     }
 }

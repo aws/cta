@@ -8,6 +8,7 @@ using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
 using Codelyzer.Analysis;
+using Codelyzer.Analysis.Build;
 using CTA.FeatureDetection;
 using CTA.FeatureDetection.Common.Models;
 using CTA.FeatureDetection.ProjectType.Extensions;
@@ -29,6 +30,8 @@ namespace CTA.Rules.PortCore
         private readonly PortSolutionResult _portSolutionResult;
         private readonly MetricsContext _context;
         private Dictionary<string, FeatureDetectionResult> _projectTypeFeatureResults;
+        private readonly IDEProjectResult _projectResult;
+        
 
         /// <summary>
         /// Initializes a new instance of Solution Port, analyzing the solution path using the provided config.
@@ -79,6 +82,12 @@ namespace CTA.Rules.PortCore
             InitSolutionRewriter(analyzerResults, solutionConfiguration);
         }
 
+        public SolutionPort(string solutionFilePath, IDEProjectResult projectResult, List<PortCoreConfiguration> solutionConfiguration)
+        {
+            _solutionPath = solutionFilePath;
+            _projectResult = projectResult;
+            _solutionRewriter = new SolutionRewriter(projectResult, solutionConfiguration.ToList<ProjectConfiguration>());
+        }
         private void InitSolutionRewriter(List<AnalyzerResult> analyzerResults, List<PortCoreConfiguration> solutionConfiguration)
         {
             CheckCache();
@@ -177,6 +186,27 @@ namespace CTA.Rules.PortCore
                 LogHelper.LogError($"{Constants.MetricsTag}: {reportGenerator.PortSolutionResultJsonReport}");
             }
             return _portSolutionResult;
+        }
+
+        /// <summary>
+        /// Runs an incremental actions analysis on files
+        /// </summary>
+        /// <param name="projectRules">The rules list to be used</param>
+        /// <param name="updatedFiles">The files to be analyzed</param>
+        /// <returns></returns>
+        public List<IDEFileActions> RunIncremental(RootNodes projectRules, List<string> updatedFiles)
+        {
+            return _solutionRewriter.RunIncremental(projectRules, updatedFiles);
+        }
+        /// <summary>
+        /// Runs an incremental actions analysis on a file
+        /// </summary>
+        /// <param name="projectRules">The rules list to be used</param>
+        /// <param name="updatedFile">The file to be analyzed</param>
+        /// <returns></returns>
+        public List<IDEFileActions> RunIncremental(RootNodes projectRules, string updatedFile)
+        {
+            return _solutionRewriter.RunIncremental(projectRules, new List<string> { updatedFile });
         }
 
         private void DownloadResources()

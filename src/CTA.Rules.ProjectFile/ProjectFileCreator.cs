@@ -12,17 +12,20 @@ namespace CTA.Rules.ProjectFile
     {
         private readonly string _projectFile;
         private readonly List<string> _targetVersions;
+        private readonly List<string> _metaReferences;
         private Dictionary<string, string> _packages;
         private IEnumerable<string> _projectReferences;
         private ProjectType _projectType;
+        private XDocument _projectFileXml;
 
-        private readonly string _csCoreProjSyntaxWeb = 
+        private readonly string _csCoreProjSyntaxWeb =
 @"<Project Sdk=""{0}"">
   <PropertyGroup>
     <TargetFramework>{1}</TargetFramework>
   </PropertyGroup>
 {2}
 {3}
+{4}
 </Project>";
 
         private readonly string _csCoreProjSyntaxWebClassLibrary =
@@ -35,6 +38,7 @@ namespace CTA.Rules.ProjectFile
   </ItemGroup>
 {2}
 {3}
+{4}
 </Project>";
 
         private readonly string _csCoreProjSyntaxClassLibrary =
@@ -44,6 +48,7 @@ namespace CTA.Rules.ProjectFile
   </PropertyGroup>
 {2}
 {3}
+{4}
 </Project>";
 
         private readonly string _itemGroupTemplate =
@@ -51,19 +56,35 @@ namespace CTA.Rules.ProjectFile
 {0}
 </ItemGroup>";
 
+        private readonly string _portingInfoItemGroupTemplate =
+@"<ItemGroup Label=""PortingInfo"">
+<!-- DO NOT REMOVE WHILE PORTING
+{0}
+-->
+</ItemGroup>";
+
         private const string PackageReferenceTemplate = @"<PackageReference Include=""{0}"" Version=""{1}"" />";
         private const string ProjectReferenceTemplate = @"<ProjectReference Include=""{0}"" />";
         private const string IndentationPerLevel = "  ";
 
         public ProjectFileCreator(string projectFile, List<string> targetVersions, Dictionary<string, string> packages,
-            List<string> projectReferences, ProjectType projectType)
+            List<string> projectReferences, ProjectType projectType, List<string> metaReferences)
         {
             _projectFile = projectFile;
             _targetVersions = targetVersions;
             _packages = packages;
             _projectReferences = projectReferences;
             _projectType = projectType;
-            PopulateFromExistingFile();
+            _metaReferences = metaReferences;
+
+            try
+            {
+                _projectFileXml = XDocument.Load(projectFile);
+            }
+            catch (Exception ex)
+            {
+                LogHelper.LogError(ex, "Error initializing project file");
+            }
         }
 
         private string GetTargetVersions()
@@ -103,9 +124,18 @@ namespace CTA.Rules.ProjectFile
 
                 string packages = GetPackagesSection();
                 string projects = GetProjectReferencesSection();
+                string metaReferences = GetMetaReferencesSection();
 
-                string csProjContent = string.Format(csProj, sdkName, GetTargetVersions(), AddItemGroup(packages), AddItemGroup(projects));
-                File.WriteAllText(_projectFile, csProjContent);
+                if (IsCoreProject() == true)
+                {
+                    UpdateExistingFile();
+                    _projectFileXml.Save(_projectFile);
+                }
+                else
+                {
+                    string csProjContent = string.Format(csProj, sdkName, GetTargetVersions(), AddItemGroup(packages), AddItemGroup(projects), AddItemGroup(metaReferences, _portingInfoItemGroupTemplate));
+                    File.WriteAllText(_projectFile, csProjContent);
+                }
             }
             catch (Exception ex)
             {
@@ -115,14 +145,18 @@ namespace CTA.Rules.ProjectFile
             return true;
         }
 
-        private string AddItemGroup(string content)
+        private string GetMetaReferencesSection() => String.Join(Environment.NewLine, _metaReferences);
+
+        private string AddItemGroup(string content, string itemGroupTemplate = null)
         {
-            if (string.IsNullOrEmpty(content))
+            if (string.IsNullOrEmpty(content?.Trim()))
             {
                 return string.Empty;
             }
-            
-            var itemGroupContent = string.Format(_itemGroupTemplate, content);
+
+            var currentGroupTemplate = itemGroupTemplate ?? _itemGroupTemplate;
+
+            var itemGroupContent = string.Format(currentGroupTemplate, content);
             itemGroupContent = IndentAllLines(itemGroupContent);
 
             return itemGroupContent;
@@ -143,7 +177,7 @@ namespace CTA.Rules.ProjectFile
             {
                 LogChange(string.Format("Adding reference to packages {0}", string.Join(",", _packages.Select(p => p.Key))));
             }
-            
+
             var content = string.Join(Environment.NewLine, packages);
             content = IndentAllLines(content);
             return content;
@@ -154,7 +188,7 @@ namespace CTA.Rules.ProjectFile
             IEnumerable<string> references = new List<string>();
             if (_projectReferences != null)
             {
-                references = _projectReferences.Select(projectReference => 
+                references = _projectReferences.Select(projectReference =>
                     string.Format(ProjectReferenceTemplate, projectReference));
             }
 
@@ -169,62 +203,56 @@ namespace CTA.Rules.ProjectFile
             LogHelper.LogInformation(message);
         }
 
-        private void PopulateFromExistingFile()
+        private bool? IsCoreProject() =>
+            _projectType == ProjectType.CoreMvc
+            || _projectType == ProjectType.CoreWebApi
+            || _projectFileXml.Descendants().Any(d => d.Name?.LocalName == "TargetFramework" && (d.Value?.Equals("net5.0") == true || d.Value?.Equals("netcoreapp3.1") == true))
+            || _projectFileXml.Descendants().Any(d => d.Name?.LocalName == "TargetFrameworks" && (d.Value?.Contains("net5.0") == true || d.Value?.Contains("netcoreapp3.1") == true));
+
+
+
+        private void UpdateExistingFile()
         {
-            var xDocument = XDocument.Load(_projectFile);
+            UpdateVersion();
+            UpdatePackageReferences();
+        }
 
-            try
+        private void UpdateVersion()
+        {
+            var currentVersionTag = _projectFileXml.Descendants().FirstOrDefault(d => d.Name == "TargetFramework");
+            if(currentVersionTag == null)
             {
-                var sdk = xDocument.Descendants()?.First()?.Attribute("Sdk")?.Value;
-                if (sdk == Constants.WebSdkName)
-                {
-                    if (_projectType == ProjectType.ClassLibrary || _projectType == ProjectType.WebClassLibrary)
-                    {
-                        _projectType = ProjectType.Mvc;
-                    }
-                }
-            }
-            catch (Exception)
-            {
-                //If we're using a framework csproj, we will get an error. No need to catch since we're overwriting the csproj file
+                currentVersionTag = _projectFileXml.Descendants().FirstOrDefault(d => d.Name == "TargetFrameworks");
             }
 
-            try
+            var currentVersion = currentVersionTag.Value;
+            var targetVersion = GetTargetVersions();
+            if (!targetVersion.Equals(currentVersion))
             {
-                var packages = xDocument.Descendants()
-                    .Where(d => d.Name == "PackageReference")
-                    .ToDictionary(p => p.Attributes("Include").First().Value, p => p.Attributes("Version").First().Value);
+                currentVersionTag.Value = targetVersion;
+            }
+        }
 
-                _packages = packages.Union(_packages).ToDictionary(d => d.Key, d => d.Value);
-            }
-            catch (Exception)
-            {
-                //If we're using a framework csproj, we will get an error. No need to catch since we're overwriting the csproj file
-            }
+        private void UpdatePackageReferences()
+        {
+            var existingPackages = _projectFileXml.Descendants()
+                .Where(d => d.Name == "PackageReference")
+                .ToDictionary(p => p.Attributes("Include").First().Value, p => p.Attributes("Version").First().Value);
 
-            try
-            {
-                var projects = xDocument.Descendants()
-                    .Where(d => d.Name == "ProjectReference")
-                    .Select(p => p.Attributes("Include").First().Value).ToList();
+            _packages = _packages.Where(p => existingPackages.Keys?.Contains(p.Key) == false).ToDictionary(d => d.Key, d => d.Value);
 
-                _projectReferences = projects.Union(_projectReferences).Distinct().ToList();
-            }
-            catch (Exception)
-            {
-                //If we're using a framework csproj, we will get an error. No need to catch since we're overwriting the csproj file
-            }
+            //No packages to add
+            if (_packages.Count == 0) return;
 
-            try
+            var packages = GetPackagesSection();
+            if (existingPackages.Count == 0)
             {
-                if (_projectType == ProjectType.ClassLibrary && xDocument.Descendants().Where(d => d.Name == "FrameworkReference").Any())
-                {
-                    _projectType = ProjectType.WebClassLibrary;
-                }
+                packages = AddItemGroup(packages);
+                _projectFileXml.Descendants().Last(d => d.Name == "ItemGroup").AddAfterSelf(XElement.Parse(packages));
             }
-            catch (Exception)
+            else
             {
-                //If we're using a framework csproj, we will get an error. No need to catch since we're overwriting the csproj file
+                _projectFileXml.Descendants().Last(d => d.Name == "PackageReference").AddAfterSelf(XElement.Parse(packages));
             }
         }
 

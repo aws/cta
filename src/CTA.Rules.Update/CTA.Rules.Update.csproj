@@ -6,10 +6,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\CTA.Rules.Actions\CTA.Rules.Actions.csproj" />
     <ProjectReference Include="..\CTA.Rules.Analysis\CTA.Rules.Analysis.csproj" />
     <ProjectReference Include="..\CTA.Rules.Config\CTA.Rules.Config.csproj" />
@@ -20,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Update="Nerdbank.GitVersioning" Version="3.3.37" />
+    <PackageReference Update="Nerdbank.GitVersioning" Version="3.4.194" />
   </ItemGroup>
 
 </Project>
