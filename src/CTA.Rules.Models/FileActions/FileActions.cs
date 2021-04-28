@@ -47,6 +47,7 @@ namespace CTA.Rules.Models
                 allActions.AddRange(ClassDeclarationActions);
                 allActions.AddRange(InterfaceDeclarationActions);
                 allActions.AddRange(ElementAccessActions);
+                allActions.AddRange(MemberAccessActions);
                 allActions.AddRange(IdentifierNameActions);
                 allActions.AddRange(InvocationExpressionActions);
                 allActions.AddRange(MemberAccessActions);

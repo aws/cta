@@ -34,13 +34,17 @@ namespace CTA.Rules.Test
                 "TheMainProject",
                 "TheDependency"
             };
+            var metaRefs = new List<string>
+            {
+                @"C:\\RandomFile.dll"
+            };
 
             _mvcProjectFileCreator = new ProjectFileCreator(_mvcProjectFilePath, targetFramework, 
-                packages, projectReferences, ProjectType.Mvc);
+                packages, projectReferences, ProjectType.Mvc, metaRefs);
             _classLibraryProjectFileCreator = new ProjectFileCreator(_classLibraryProjectFilePath, targetFramework, 
-                packages, projectReferences, ProjectType.ClassLibrary);
+                packages, projectReferences, ProjectType.ClassLibrary, metaRefs);
             _webClassLibraryProjectFileCreator = new ProjectFileCreator(_webClassLibraryProjectFilePath, targetFramework, 
-                packages, projectReferences, ProjectType.WebClassLibrary);
+                packages, projectReferences, ProjectType.WebClassLibrary, metaRefs);
         }
 
         [TearDown]
@@ -71,6 +75,11 @@ namespace CTA.Rules.Test
     <ProjectReference Include=""TheMainProject"" />
     <ProjectReference Include=""TheDependency"" />
   </ItemGroup>
+  <ItemGroup Label=""PortingInfo"">
+  <!-- DO NOT REMOVE WHILE PORTING
+  C:\\RandomFile.dll
+  -->
+  </ItemGroup>
 </Project>";
 
             Assert.AreEqual(expectedProjectFileContents, projectFileContents);
@@ -94,6 +103,11 @@ namespace CTA.Rules.Test
   <ItemGroup>
     <ProjectReference Include=""TheMainProject"" />
     <ProjectReference Include=""TheDependency"" />
+  </ItemGroup>
+  <ItemGroup Label=""PortingInfo"">
+  <!-- DO NOT REMOVE WHILE PORTING
+  C:\\RandomFile.dll
+  -->
   </ItemGroup>
 </Project>";
 
@@ -121,6 +135,11 @@ namespace CTA.Rules.Test
   <ItemGroup>
     <ProjectReference Include=""TheMainProject"" />
     <ProjectReference Include=""TheDependency"" />
+  </ItemGroup>
+  <ItemGroup Label=""PortingInfo"">
+  <!-- DO NOT REMOVE WHILE PORTING
+  C:\\RandomFile.dll
+  -->
   </ItemGroup>
 </Project>";
 

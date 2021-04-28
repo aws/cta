@@ -6,7 +6,7 @@ namespace CTA.Rules.Models
     public class ProjectLevelAction : GenericAction
     {
         public Func<string, ProjectType, string> ProjectLevelActionFunc { get; set; }
-        public Func<string, ProjectType, List<string>, Dictionary<string, string>, List<string>, string> ProjectFileActionFunc { get; set; }
+        public Func<string, ProjectType, List<string>, Dictionary<string, string>, List<string>, List<string>, string> ProjectFileActionFunc { get; set; }
         public override bool Equals(object obj)
         {
             var action = (ProjectLevelAction)obj;

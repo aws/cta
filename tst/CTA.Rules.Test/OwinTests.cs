@@ -82,6 +82,8 @@ namespace CTA.Rules.Test
 
             StringAssert.Contains(@"using Microsoft.AspNetCore.Http", displayText);
             StringAssert.Contains(@"HttpContext ", displayText);
+            StringAssert.Contains(@"HttpRequest ", displayText);
+            StringAssert.Contains(@"HttpResponse ", displayText);
             StringAssert.Contains(@"RequestDelegate ", displayText);
             StringAssert.Contains(@"TryGetValue", displayText);
             StringAssert.Contains(@"RequestDelegate _next", displayText);
@@ -92,6 +94,7 @@ namespace CTA.Rules.Test
 
             StringAssert.Contains(@"using Microsoft.AspNetCore.Http", addText);
             StringAssert.Contains(@"HttpContext ", addText);
+            StringAssert.Contains(@"HttpRequest ", addText);
             StringAssert.Contains(@"RequestDelegate ", addText);
             StringAssert.Contains(@"_next", addText);
             StringAssert.Contains(@"RequestDelegate _next", addText);
