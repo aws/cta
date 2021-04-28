@@ -3,8 +3,10 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Codelyzer.Analysis.Build;
+using CTA.FeatureDetection.Common.Extensions;
 using CTA.Rules.Config;
 using CTA.Rules.Models;
 using CTA.Rules.Update.Rewriters;
@@ -96,7 +98,7 @@ namespace CTA.Rules.Update
                 File.WriteAllText(sourceFileBuildResult.SourceFileFullPath, result);
             }
 
-            var processedActions = ValidateActions(oneRewriter.allExecutedActions, result);
+            var processedActions = ValidateActions(oneRewriter.allExecutedActions, root);
             processedActions = AddActionsWithoutExecutions(currentFileActions, oneRewriter.allExecutedActions);
 
             if (!actionsPerProject.TryAdd(sourceFileBuildResult.SourceFileFullPath, processedActions))
@@ -227,16 +229,28 @@ namespace CTA.Rules.Update
         }
 
 
-        public List<GenericActionExecution> ValidateActions(List<GenericActionExecution> actions, string fileResult)
+        public List<GenericActionExecution> ValidateActions(List<GenericActionExecution> actions, SyntaxNode root)
         {
-            var trimmedResult = Utils.EscapeAllWhitespace(fileResult);
+            // Matches all types of comments and strings
+            //string regComments = @"\/\*(?:(?!\*\/)(?:.|[\r\n]+))*\*\/|\/\/(.*?)\r?\n|""((\\[^\n]|[^""\n])*)""|@(""[^""""]*"")+";
 
             foreach (var action in actions)
             {
                 var actionValidation = action.ActionValidation;
+                string trimmedResult = "";
                 var actionValid = true;
 
                 if (actionValidation == null) { continue; }
+
+                if (string.IsNullOrEmpty(actionValidation.CheckComments) || !bool.Parse(actionValidation.CheckComments))
+                {
+                    //trimmedResult = Regex.Replace(fileResult, regComments, "");
+                    trimmedResult = Utils.EscapeAllWhitespace(root.NoComments().NormalizeWhitespace().ToFullString());
+                }
+                else
+                {
+                    trimmedResult = Utils.EscapeAllWhitespace(root.NormalizeWhitespace().ToFullString());
+                }
 
                 var contains = !string.IsNullOrEmpty(actionValidation.Contains) ? Utils.EscapeAllWhitespace(actionValidation.Contains) : "";
                 var notContains = !string.IsNullOrEmpty(actionValidation.NotContains) ? Utils.EscapeAllWhitespace(actionValidation.NotContains) : "";
@@ -262,6 +276,5 @@ namespace CTA.Rules.Update
             }
             return actions;
         }
-
     }
 }

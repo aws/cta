@@ -99,7 +99,8 @@
               "Description": "Add a comment to explain how to migrate Owin.IAppBuilder.Use to UseOwin.",
               "ActionValidation": {
                 "Contains": "ReplaceOwin.IAppBuilder.Usewith.UseOwin",
-                "NotContains": ""
+                "NotContains": "",
+                "CheckComments": "True"
               }
             }
           ]
@@ -135,7 +136,8 @@
               "Description": "Add a comment to explain how to migrate Owin.IAppBuilder.Use to either UseMiddleWare or UseOwin.",
               "ActionValidation": {
                 "Contains": "replacewithMicrosoft.AspNetCore.Builder.IApplicationBuilder.UseMiddleware<MiddlewareNameHere>otherwisereplacewith.UseOwin",
-                "NotContains": ""
+                "NotContains": "",
+                "CheckComments": "True"
               }
             }
           ]
@@ -171,7 +173,8 @@
               "Description": "Add a comment to explain how to migrate Owin.IAppBuilder.Use to UseOwin.",
               "ActionValidation": {
                 "Contains": "ReplaceOwin.IAppBuilder.Usewith.UseOwin",
-                "NotContains": ""
+                "NotContains": "",
+                "CheckComments": "True"
               }
             }
           ]
@@ -220,7 +223,8 @@
               "Description": "Add a comment on adding a new configureservices method.",
               "ActionValidation": {
                 "Contains": "publicvoidConfigureServices(IServiceCollectionservices){services.AddControllers();}",
-                "NotContains": ""
+                "NotContains": "",
+                "CheckComments": "True"
               }
             },
             {
@@ -230,7 +234,8 @@
               "Description": "Add a comment on how to setup your MVC controller in startup class.",
               "ActionValidation": {
                 "Contains": "IApplicationBuilder.UseEndpoints(endpoints=>{endpoints.MapControllers();});",
-                "NotContains": ""
+                "NotContains": "",
+                "CheckComments": "True"
               }
             },
             {
@@ -335,7 +340,8 @@
               "Description": "Add a comment on adding a new configureservices method.",
               "ActionValidation": {
                 "Contains": "publicvoidConfigureServices(IServiceCollectionservices){services.AddSignalR();}",
-                "NotContains": ""
+                "NotContains": "",
+                "CheckComments": "True"
               }
             },
             {
@@ -345,7 +351,8 @@
               "Description": "Add a comment on how to setup your MVC controller in startup class.",
               "ActionValidation": {
                 "Contains": "PleasesetupyoursignalRhubconfigurationhere",
-                "NotContains": ""
+                "NotContains": "",
+                "CheckComments": "True"
               }
             }
           ]
@@ -430,7 +437,8 @@
               "Description": "Add a comment on adding a new configureservices method.",
               "ActionValidation": {
                 "Contains": "publicvoidConfigureServices(IServiceCollectionservices){services.AddDirectoryBrowser();}",
-                "NotContains": ""
+                "NotContains": "",
+                "CheckComments": "True"
               }
             }
           ]
