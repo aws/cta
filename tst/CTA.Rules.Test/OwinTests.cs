@@ -106,7 +106,9 @@ namespace CTA.Rules.Test
 
             StringAssert.Contains(@"using Microsoft.AspNetCore.Http", startupText);
             StringAssert.Contains(@"HttpContext ", startupText);
-            StringAssert.Contains(@"UseMiddleware", startupText);
+            StringAssert.Contains(@"Please replace CreatePerOwinContext<T>(System.Func<T>)", startupText);
+            StringAssert.Contains(@"Please replace CreatePerOwinContext<T>(System.Func<Microsoft.AspNet.Identity.Owin.IdentityFactoryOptions<T>, Microsoft.Owin.IOwinContext, T>)", startupText);
+            StringAssert.Contains(@"Please replace CreatePerOwinContext<T>(System.Func<Microsoft.AspNet.Identity.Owin.IdentityFactoryOptions<T>, Microsoft.Owin.IOwinContext, T>, System.Action<Microsoft.AspNet.Identity.Owin.IdentityFactoryOptions<T>, T>)", startupText);
 
             //Check that package has been added:
             StringAssert.Contains(@"Microsoft.AspNetCore.Owin", csProjContent);
