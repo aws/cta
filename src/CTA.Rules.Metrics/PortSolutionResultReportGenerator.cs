@@ -33,13 +33,21 @@ namespace CTA.Rules.Metrics
             Context = context;
             PortSolutionResult = portSolutionResult;
             FeatureDetectionResults = featureDetectionResults;
+
+            ReferencesMetrics = new List<ReferencesMetric>();
+            DownloadedFilesMetrics = new List<DownloadedFilesMetric>();
+            TargetVersionMetrics = new List<TargetVersionMetric>();
+            UpgradePackageMetrics = new List<UpgradePackageMetric>();
+            ActionPackageMetrics = new List<ActionPackageMetric>();
+            GenericActionMetrics = new List<GenericActionMetric>();
+            FeatureDetectionMetrics = new List<FeatureDetectionMetric>();
+            GenericActionExecutionMetrics = new List<GenericActionExecutionMetric>();
+            BuildErrorMetrics = new List<BuildErrorMetric>();
         }
 
         public PortSolutionResultReportGenerator(MetricsContext context,PortSolutionResult portSolutionResult)
+            : this(context, portSolutionResult, new Dictionary<string, FeatureDetectionResult>())
         {
-            Context = context;
-            PortSolutionResult = portSolutionResult;
-            FeatureDetectionResults = new Dictionary<string, FeatureDetectionResult>();
         }
 
         public void GenerateAndExportReports()
@@ -68,7 +76,8 @@ namespace CTA.Rules.Metrics
                 .Concat(ActionPackageMetrics)
                 .Concat(GenericActionMetrics)
                 .Concat(FeatureDetectionMetrics)
-                .Concat(GenericActionExecutionMetrics);
+                .Concat(GenericActionExecutionMetrics)
+                .Concat(BuildErrorMetrics);
         }
 
         private void GenerateAnalysisMetrics()

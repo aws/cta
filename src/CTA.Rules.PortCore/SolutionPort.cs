@@ -15,6 +15,7 @@ using CTA.FeatureDetection.ProjectType.Extensions;
 using CTA.Rules.Config;
 using CTA.Rules.Metrics;
 using CTA.Rules.Models;
+using CTA.Rules.Models.Metrics;
 using CTA.Rules.Update;
 using Microsoft.Extensions.Logging;
 
@@ -159,15 +160,16 @@ namespace CTA.Rules.PortCore
         public SolutionResult AnalysisRun()
         {
             var solutionResult = _solutionRewriter.AnalysisRun();
-            _portSolutionResult.AddSolutionResult(solutionResult);
             if (!string.IsNullOrEmpty(_solutionPath))
             {
                 PortSolutionResultReportGenerator reportGenerator = new PortSolutionResultReportGenerator(_context, _portSolutionResult, _projectTypeFeatureResults);
                 reportGenerator.GenerateAnalysisReport();
+                solutionResult.CTAMetrics = reportGenerator.GetAllGeneratedMetrics();
 
                 LogHelper.LogInformation("Generating Post-Analysis Report");
-                LogHelper.LogError($"{Constants.MetricsTag}: {reportGenerator.AnalyzeSolutionResultJsonReport}");
+                LogHelper.LogInformation($"{Constants.MetricsTag}: {reportGenerator.AnalyzeSolutionResultJsonReport}");
             }
+            _portSolutionResult.AddSolutionResult(solutionResult);
             return solutionResult;
         }
 
@@ -176,15 +178,17 @@ namespace CTA.Rules.PortCore
         /// </summary>
         public PortSolutionResult Run()
         {
-            _portSolutionResult.AddSolutionResult(_solutionRewriter.Run());
+            var solutionResult = _solutionRewriter.Run();
             if (!string.IsNullOrEmpty(_solutionPath))
             {
                 PortSolutionResultReportGenerator reportGenerator = new PortSolutionResultReportGenerator(_context, _portSolutionResult);
                 reportGenerator.GenerateAndExportReports();
+                solutionResult.CTAMetrics = reportGenerator.GetAllGeneratedMetrics();
 
                 LogHelper.LogInformation("Generating Post-Build Report");
-                LogHelper.LogError($"{Constants.MetricsTag}: {reportGenerator.PortSolutionResultJsonReport}");
+                LogHelper.LogInformation($"{Constants.MetricsTag}: {reportGenerator.PortSolutionResultJsonReport}");
             }
+            _portSolutionResult.AddSolutionResult(solutionResult);
             return _portSolutionResult;
         }
 
