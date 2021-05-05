@@ -2,7 +2,7 @@
 using Codelyzer.Analysis;
 using CTA.Rules.Config;
 
-namespace CTA.Rules.Metrics
+namespace CTA.Rules.Models.Metrics
 {
     public class MetricsContext
     {

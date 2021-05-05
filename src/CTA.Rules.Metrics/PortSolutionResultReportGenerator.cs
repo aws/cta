@@ -5,6 +5,7 @@ using System.Linq;
 using CTA.FeatureDetection.Common.Models;
 using CTA.Rules.Config;
 using CTA.Rules.Models;
+using CTA.Rules.Models.Metrics;
 using Newtonsoft.Json;
 
 namespace CTA.Rules.Metrics
@@ -55,6 +56,19 @@ namespace CTA.Rules.Metrics
         {
             GenerateAnalysisMetrics();
             GenerateAnalyzeSolutionResultJsonReport();
+        }
+
+        public IEnumerable<CTAMetric> GetAllGeneratedMetrics()
+        {
+            return new List<CTAMetric>()
+                .Concat(ReferencesMetrics)
+                .Concat(DownloadedFilesMetrics)
+                .Concat(TargetVersionMetrics)
+                .Concat(UpgradePackageMetrics)
+                .Concat(ActionPackageMetrics)
+                .Concat(GenericActionMetrics)
+                .Concat(FeatureDetectionMetrics)
+                .Concat(GenericActionExecutionMetrics);
         }
 
         private void GenerateAnalysisMetrics()

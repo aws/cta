@@ -3,7 +3,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 
-namespace CTA.Rules.Metrics
+namespace CTA.Rules.Models.Metrics
 {
     public class BuildErrorMetric : CTAMetric
     {

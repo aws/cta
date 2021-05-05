@@ -1,14 +1,13 @@
 ﻿using System.Collections.Generic;
 using CTA.Rules.Config;
-using CTA.Rules.Models;
 using Newtonsoft.Json;
 
-namespace CTA.Rules.Metrics
+namespace CTA.Rules.Models.Metrics
 {
-    public class GenericActionMetric : CTAMetric
+    public class GenericActionExecutionMetric : CTAMetric
     {
         [JsonProperty("metricName", Order = 10)]
-        public string MetricName => "GenericAction";
+        public string MetricName => "ActionExecution";
 
         [JsonProperty("actionName", Order = 11)]
         public string ActionName { get; set; }
@@ -19,6 +18,12 @@ namespace CTA.Rules.Metrics
         [JsonProperty("actionValue", Order = 13)]
         public string ActionValue { get; set; }
 
+        [JsonProperty("timesRun", Order = 14)]
+        public int TimesRun { get; set; }
+
+        [JsonProperty("invalidExecutions", Order = 15)]
+        public int InvalidExecutions { get; set; }
+
         [JsonProperty("solutionPath", Order = 16)]
         public string SolutionPath { get; set; }
 
@@ -28,11 +33,13 @@ namespace CTA.Rules.Metrics
         [JsonProperty("filePath", Order = 18)]
         public string FilePath { get; set; }
 
-        public GenericActionMetric(MetricsContext context, GenericAction action, string filePath, string projectPath)
+        public GenericActionExecutionMetric(MetricsContext context, GenericActionExecution action, string projectPath)
         {
             ActionName = action.Name;
             ActionType = action.Type;
             ActionValue = action.Value;
+            TimesRun = action.TimesRun;
+            InvalidExecutions = action.InvalidExecutions;
             SolutionPath = context.SolutionPathHash;
             ProjectGuid = context.ProjectGuidMap.GetValueOrDefault(projectPath, "N/A");
 
@@ -42,7 +49,7 @@ namespace CTA.Rules.Metrics
             }
             else
             {
-                FilePath = string.IsNullOrEmpty(filePath) ? "N/A" : EncryptionHelper.ConvertToSHA256Hex(filePath);
+                FilePath = string.IsNullOrEmpty(action.FilePath) ? "N/A" : EncryptionHelper.ConvertToSHA256Hex(action.FilePath);
             }
         }
     }

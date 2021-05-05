@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace CTA.Rules.Metrics
+namespace CTA.Rules.Models.Metrics
 {
     public abstract class CTAMetric
     {

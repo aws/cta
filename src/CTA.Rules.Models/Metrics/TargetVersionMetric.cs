@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Newtonsoft.Json;
 
-namespace CTA.Rules.Metrics
+namespace CTA.Rules.Models.Metrics
 {
     public class TargetVersionMetric : CTAMetric
     {

@@ -2,6 +2,7 @@
 using System.Linq;
 using CTA.FeatureDetection.Common.Models;
 using CTA.Rules.Models;
+using CTA.Rules.Models.Metrics;
 
 namespace CTA.Rules.Metrics
 {
@@ -71,7 +72,6 @@ namespace CTA.Rules.Metrics
 
             return upgradePackagesMetric;
         }
-
 
         internal static IEnumerable<ActionPackageMetric> TransformActionPackages(MetricsContext context, ProjectResult projectResult)
         {

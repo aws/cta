@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
-using CTA.Rules.Models;
 using Newtonsoft.Json;
 
-namespace CTA.Rules.Metrics
+namespace CTA.Rules.Models.Metrics
 {
     public class ActionPackageMetric : CTAMetric
     {
