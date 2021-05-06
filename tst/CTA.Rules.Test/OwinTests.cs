@@ -39,27 +39,24 @@ namespace CTA.Rules.Test
             //var programText = File.ReadAllText(Path.Combine(projectDir, "Program.cs"));
             var owinapp2Text = File.ReadAllText(Path.Combine(projectDir, "OwinApp2.cs"));
 
-            //Check that namespace was added
-            StringAssert.Contains(@"using Microsoft.AspNetCore.Http", owinapp2Text);
-
-            //Check that httpcontext is added (with a space) to make sure it's not httpcontextbase
-            StringAssert.Contains(@"HttpContext ", owinapp2Text);
-
             //Check that namespaces were added
             //StringAssert.Contains(@"Microsoft.AspNetCore.Hosting", programText);
             //StringAssert.Contains(@"Microsoft.Extensions.Hosting;", programText);
 
-            //Check that namespace was added
+            StringAssert.Contains(@"using Microsoft.AspNetCore.Http", owinapp2Text);
+            StringAssert.Contains(@"HttpContext ", owinapp2Text);
+            StringAssert.Contains(@"IQueryCollection ", owinapp2Text);
+            StringAssert.Contains(@"IRequestCookieCollection ", owinapp2Text);
+            StringAssert.DoesNotContain(@"IReadableStringCollection ", owinapp2Text);
+
             StringAssert.Contains(@"Microsoft.AspNetCore.Http", startupText);
-
-            //Check that httpcontext is added (with a space) to make sure it's not httpcontextbase
             StringAssert.Contains(@"HttpContext ", startupText);
+            StringAssert.Contains(@"IResponseCookies ", startupText);
+            StringAssert.DoesNotContain(@"ResponseCookieCollection ", startupText);
 
-            //Check that files have been created
             FileAssert.Exists(Path.Combine(projectDir, "Startup.cs"));
             //FileAssert.Exists(Path.Combine(projectDir, "Program.cs")); // This should be added but class library does not do this
 
-            //Check that package has been added:
             StringAssert.Contains(@"Microsoft.AspNetCore.Owin", csProjContent);
             StringAssert.Contains(@"Microsoft.AspNetCore.Diagnostics", csProjContent);
 
