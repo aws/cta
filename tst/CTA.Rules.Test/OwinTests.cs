@@ -367,9 +367,15 @@ namespace CTA.Rules.Test
             StringAssert.Contains(@"MapControllers", startupText);
             StringAssert.Contains(@"Microsoft.AspNetCore.Builder", startupText);
             StringAssert.Contains(@"Microsoft.Extensions.DependencyInjection", startupText);
-
+            StringAssert.DoesNotContain(@"UseOpenIdConnectAuthentication", startupText);
+            StringAssert.Contains(@"UseAuthentication", startupText);
+            StringAssert.Contains(@"Please add services.AddAuthentication().AddOpenIdConnect();", startupText);
+            StringAssert.Contains(@"Microsoft.AspNetCore.Authentication.OpenIdConnect", startupText);
+            StringAssert.DoesNotContain(@"Microsoft.Owin.Security.OpenIdConnect", startupText);
+    
             //Check that package has been added:
-            StringAssert.Contains(@"Microsoft.AspNetCore.Diagnostics", csProjContent);
+            StringAssert.Contains(version == TargetFramework.Dotnet5 ? @"Microsoft.AspNetCore.Diagnostics" : @"<PackageReference Include=""Microsoft.AspNetCore.Authentication.OpenIdConnect"" Version=""3.1.15"" />", csProjContent);
+            StringAssert.Contains(@"Microsoft.AspNetCore.Authentication.OpenIdConnect", csProjContent);
 
             //Check that correct version is used
             Assert.True(csProjContent.IndexOf(string.Concat(">", version, "<")) > 0);
