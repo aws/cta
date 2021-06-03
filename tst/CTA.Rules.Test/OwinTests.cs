@@ -13,7 +13,7 @@ namespace CTA.Rules.Test
         public void Setup()
         {
             Setup(this.GetType());
-            tempDir = GetTstPath(Path.Combine(new string[] { "Projects", "Temp" }));
+            tempDir = GetTstPath(Path.Combine(new string[] { "Projects", "Temp", "Owin" }));
             DownloadTestProjects();
         }
 
@@ -414,7 +414,7 @@ namespace CTA.Rules.Test
         [TearDown]
         public void Cleanup()
         {
-            Directory.Delete(GetTstPath(Path.Combine(new string[] { "Projects", "Temp" })), true);
+            Directory.Delete(tempDir, true);
         }
     }
 }

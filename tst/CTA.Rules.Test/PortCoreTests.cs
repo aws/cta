@@ -16,7 +16,7 @@ namespace CTA.Rules.Test
         public void Setup()
         {
             Setup(this.GetType());
-            tempDir = GetTstPath(Path.Combine(new string[] { "Projects", "Temp" }));
+            tempDir = GetTstPath(Path.Combine(new string[] { "Projects", "Temp", "PortCore" }));
             DownloadTestProjects();
         }
 
@@ -379,7 +379,7 @@ namespace CTA.Rules.Test
             {
                 try
                 {
-                    Directory.Delete(GetTstPath(Path.Combine("Projects", "Temp")), true);
+                    Directory.Delete(tempDir, true);
                 }
                 catch (Exception)
                 {
