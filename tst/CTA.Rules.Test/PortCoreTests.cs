@@ -63,7 +63,7 @@ namespace CTA.Rules.Test
             }
             else
             {
-                results = AnalyzeSolution("SampleWebApi.sln", solutionDir, downloadLocation, version, true);
+                results = AnalyzeSolution("SampleWebApi.sln", solutionDir, downloadLocation, version, null, true);
             }
 
             var analysisResult = results.ProjectResults.FirstOrDefault().ProjectAnalysisResult;
@@ -125,7 +125,7 @@ namespace CTA.Rules.Test
         public void TestWebApiWithReferences(string version)
         {
             TestSolutionAnalysis results = AnalyzeSolution("WebApiWithReferences.sln", tempDir, downloadLocation, version);
-
+            
             StringAssert.Contains("IActionResult", results.SolutionAnalysisResult);
             StringAssert.Contains("Startup", results.SolutionAnalysisResult);
 
@@ -198,6 +198,27 @@ namespace CTA.Rules.Test
         {
             TestSolutionAnalysis results = AnalyzeSolution("MvcMusicStore.sln", tempDir, downloadLocation, version);
 
+            ValidateMvcMusicStore(results, version);            
+        }        
+        
+  
+
+
+        [TestCase(TargetFramework.Dotnet5)]
+        [TestCase(TargetFramework.DotnetCoreApp31)]
+        public void TestMvcMusicStoreWithReferences(string version)
+        {
+            var solutionPath = CopySolutionFolderToTemp("MvcMusicStore.sln", tempDir);
+            var analyzerResults = GenerateSolutionAnalysis(solutionPath);
+
+            var metaReferences = analyzerResults.ToDictionary(a => a.ProjectResult.ProjectFilePath, a => a.ProjectBuildResult.Project.MetadataReferences.Select(m => m.Display).ToList());
+            TestSolutionAnalysis results = AnalyzeSolution("MvcMusicStore.sln", Directory.GetParent(solutionPath).FullName, downloadLocation, version, metaReferences, true);
+
+            ValidateMvcMusicStore(results, version);
+        }
+
+        private void ValidateMvcMusicStore(TestSolutionAnalysis results, string version)
+        {
             var analysisResult = results.ProjectResults.FirstOrDefault().ProjectAnalysisResult;
             var csProjContent = results.ProjectResults.FirstOrDefault().CsProjectContent;
             string projectDir = results.ProjectResults.FirstOrDefault().ProjectDirectory;
@@ -257,7 +278,7 @@ namespace CTA.Rules.Test
 
             Assert.AreEqual(mvcProjectActions.Count, 4);
         }
-        
+
         [TestCase(TargetFramework.DotnetCoreApp31)]
         public void TestAntlrSampleSolution(string version)
         {

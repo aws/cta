@@ -1,6 +1,8 @@
-﻿using CTA.Rules.Config;
+﻿using Codelyzer.Analysis;
+using CTA.Rules.Config;
 using CTA.Rules.Models;
 using CTA.Rules.PortCore;
+using Microsoft.Extensions.Logging.Abstractions;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
@@ -58,7 +60,7 @@ namespace CTA.Rules.Test
             return Path.Combine(srcPath, path);
         }
 
-        public TestSolutionAnalysis AnalyzeSolution(string solutionName, string tempDir, string downloadLocation, string version, bool skipCopy = false)
+        public TestSolutionAnalysis AnalyzeSolution(string solutionName, string tempDir, string downloadLocation, string version, Dictionary<string, List<string>> metaReferences = null, bool skipCopy = false)
         {
             TestSolutionAnalysis result = new TestSolutionAnalysis();
 
@@ -97,6 +99,11 @@ namespace CTA.Rules.Test
                             TargetVersions = new List<string> { version },
                             PackageReferences = packages
                         };
+
+                        if(metaReferences != null)
+                        {
+                            projectConfiguration.MetaReferences = metaReferences.ContainsKey(projectFile) ? metaReferences[projectFile] : null;
+                        }
 
                         //project.CsProjectContent = File.ReadAllText(projectFile);
                         project.ProjectDirectory = Directory.GetParent(projectFile).FullName;
@@ -183,6 +190,45 @@ namespace CTA.Rules.Test
                 DirectoryInfo destinationSub = new DirectoryInfo(Path.Combine(target.FullName, dir.Name));
                 CopyDirectory(dir, destinationSub);
             }
+        }
+
+        protected string CopySolutionFolderToTemp(string solutionName, string tempDir)
+        {
+            string solutionPath = Directory.EnumerateFiles(tempDir, solutionName, SearchOption.AllDirectories).FirstOrDefault();
+            string solutionDir = Directory.GetParent(solutionPath).FullName;
+            var newTempDir = Path.Combine(Directory.GetParent(solutionDir).FullName, Guid.NewGuid().ToString());
+            CopyDirectory(new DirectoryInfo(solutionDir), new DirectoryInfo(newTempDir));
+
+            solutionPath = Directory.EnumerateFiles(newTempDir, solutionName, SearchOption.AllDirectories).FirstOrDefault();
+            return solutionPath;
+        }
+
+        protected List<AnalyzerResult> GenerateSolutionAnalysis(string solutionPath)
+        {
+            AnalyzerConfiguration configuration = new AnalyzerConfiguration(LanguageOptions.CSharp)
+            {
+                ExportSettings =
+                {
+                    GenerateJsonOutput = false,
+                    OutputPath = @"/tmp/UnitTests"
+                },
+
+                MetaDataSettings =
+                {
+                    LiteralExpressions = true,
+                    MethodInvocations = true,
+                    Annotations = true,
+                    DeclarationNodes = true,
+                    LocationData = false,
+                    ReferenceData = true,
+                    LoadBuildData = true,
+                    ElementAccess = true,
+                    MemberAccess = true
+                }
+            };
+            CodeAnalyzer analyzer = CodeAnalyzerFactory.GetAnalyzer(configuration, NullLogger.Instance);
+            var result = analyzer.AnalyzeSolution(solutionPath).Result;
+            return result;
         }
     }
 }

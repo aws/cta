@@ -9,6 +9,7 @@ namespace CTA.Rules.Models
         public List<PackageAction> UpgradePackages { get; set; }
         public List<PackageAction> ActionPackages { get; set; }
         public List<string> TargetVersions { get; set; }
+        public List<string> MetaReferences { get; set; }
 
         public ProjectResult()
         {
