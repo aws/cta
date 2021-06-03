@@ -62,8 +62,6 @@ namespace CTA.Rules.Test
 
         public TestSolutionAnalysis AnalyzeSolution(string solutionName, string tempDir, string downloadLocation, string version, Dictionary<string, List<string>> metaReferences = null, bool skipCopy = false)
         {
-            TestSolutionAnalysis result = new TestSolutionAnalysis();
-
             var sourceDir = Directory.GetParent(Directory.EnumerateFiles(downloadLocation, solutionName, SearchOption.AllDirectories).FirstOrDefault());
             var solutionDir = Path.Combine(tempDir, version);
 
@@ -75,7 +73,15 @@ namespace CTA.Rules.Test
             {
                 solutionDir = tempDir;
             }
+
             string solutionPath = Directory.EnumerateFiles(solutionDir, solutionName, SearchOption.AllDirectories).FirstOrDefault();
+            return AnalyzeSolution(solutionPath, version, metaReferences);
+        }
+
+        public TestSolutionAnalysis AnalyzeSolution(string solutionPath, string version, Dictionary<string, List<string>> metaReferences = null, bool skipCopy = false)
+        {
+            TestSolutionAnalysis result = new TestSolutionAnalysis();
+            var solutionDir = Directory.GetParent(solutionPath).FullName;
 
             if (solutionPath != null && solutionPath.Length > 0)
             {
@@ -100,7 +106,7 @@ namespace CTA.Rules.Test
                             PackageReferences = packages
                         };
 
-                        if(metaReferences != null)
+                        if (metaReferences != null)
                         {
                             projectConfiguration.MetaReferences = metaReferences.ContainsKey(projectFile) ? metaReferences[projectFile] : null;
                         }

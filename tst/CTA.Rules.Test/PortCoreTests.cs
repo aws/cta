@@ -1,7 +1,9 @@
 using CTA.Rules.PortCore;
 using NUnit.Framework;
+using System;
 using System.IO;
 using System.Linq;
+using System.Threading;
 
 namespace CTA.Rules.Test
 {
@@ -124,7 +126,8 @@ namespace CTA.Rules.Test
         [TestCase(TargetFramework.DotnetCoreApp31)]
         public void TestWebApiWithReferences(string version)
         {
-            TestSolutionAnalysis results = AnalyzeSolution("WebApiWithReferences.sln", tempDir, downloadLocation, version);
+            var solutionPath = CopySolutionFolderToTemp("WebApiWithReferences.sln", tempDir);
+            TestSolutionAnalysis results = AnalyzeSolution(solutionPath, version);
             
             StringAssert.Contains("IActionResult", results.SolutionAnalysisResult);
             StringAssert.Contains("Startup", results.SolutionAnalysisResult);
@@ -196,7 +199,8 @@ namespace CTA.Rules.Test
         [TestCase(TargetFramework.DotnetCoreApp31)]
         public void TestMvcMusicStore(string version)
         {
-            TestSolutionAnalysis results = AnalyzeSolution("MvcMusicStore.sln", tempDir, downloadLocation, version);
+            var solutionPath = CopySolutionFolderToTemp("MvcMusicStore.sln", tempDir);
+            TestSolutionAnalysis results = AnalyzeSolution(solutionPath, version);
 
             ValidateMvcMusicStore(results, version);            
         }        
@@ -212,7 +216,7 @@ namespace CTA.Rules.Test
             var analyzerResults = GenerateSolutionAnalysis(solutionPath);
 
             var metaReferences = analyzerResults.ToDictionary(a => a.ProjectResult.ProjectFilePath, a => a.ProjectBuildResult.Project.MetadataReferences.Select(m => m.Display).ToList());
-            TestSolutionAnalysis results = AnalyzeSolution("MvcMusicStore.sln", Directory.GetParent(solutionPath).FullName, downloadLocation, version, metaReferences, true);
+            TestSolutionAnalysis results = AnalyzeSolution(solutionPath, version, metaReferences, true);
 
             ValidateMvcMusicStore(results, version);
         }
@@ -366,7 +370,23 @@ namespace CTA.Rules.Test
         [TearDown]
         public void Cleanup()
         {
-            Directory.Delete(GetTstPath(Path.Combine(new string[] { "Projects", "Temp" })), true);
+            DeleteDir(0);
+        }
+
+        private void DeleteDir(int retries)
+        {
+            if (retries <= 10)
+            {
+                try
+                {
+                    Directory.Delete(GetTstPath(Path.Combine("Projects", "Temp")), true);
+                }
+                catch (Exception)
+                {
+                    Thread.Sleep(10000);
+                    DeleteDir(retries + 1);
+                }
+            }
         }
     }
 }
