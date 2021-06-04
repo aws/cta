@@ -1,6 +1,8 @@
 ﻿using NUnit.Framework;
+using System;
 using System.IO;
 using System.Linq;
+using System.Threading;
 
 namespace CTA.Rules.Test
 {
@@ -414,7 +416,23 @@ namespace CTA.Rules.Test
         [TearDown]
         public void Cleanup()
         {
-            Directory.Delete(tempDir, true);
+            DeleteDir(0);
+        }
+
+        private void DeleteDir(int retries)
+        {
+            if (retries <= 10)
+            {
+                try
+                {
+                    Directory.Delete(tempDir, true);
+                }
+                catch (Exception)
+                {
+                    Thread.Sleep(60000);
+                    DeleteDir(retries + 1);
+                }
+            }
         }
     }
 }

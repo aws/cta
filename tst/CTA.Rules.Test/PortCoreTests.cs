@@ -383,7 +383,7 @@ namespace CTA.Rules.Test
                 }
                 catch (Exception)
                 {
-                    Thread.Sleep(10000);
+                    Thread.Sleep(60000);
                     DeleteDir(retries + 1);
                 }
             }
