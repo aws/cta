@@ -44,15 +44,17 @@ namespace CTA.FeatureDetection.Common.Models.Features.Conditions
 
         private Dictionary<string, XDocument> FindFileNamePatternInDirectory(string directory)
         {
-            var filePatternsToLookFor = FileNamePatterns.ToList();
+            var filePatternsToLookFor = FileNamePatterns.Select(f => 
+                //Trim the expression being sent. We need this to support not changing the files until customers have moved to a later version:
+                f.Replace(".*(", "*").Replace(")$", "")
+            ).ToList();
+
             if (!string.IsNullOrEmpty(FileNamePattern))
             {
                 filePatternsToLookFor.Add(FileNamePattern);
             }
 
-            var filesFound = filePatternsToLookFor.SelectMany(filePattern =>
-                Directory.EnumerateFiles(directory, "*", SearchOption)
-                    .Where(name => Regex.IsMatch(name, filePattern, IgnoreCase)));
+            var filesFound = filePatternsToLookFor.SelectMany(filePattern => Directory.EnumerateFiles(directory, filePattern, SearchOption));
 
             var filesAsXDocuments = new Dictionary<string, XDocument>();
             foreach (var fileFound in filesFound)

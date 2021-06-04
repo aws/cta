@@ -1,7 +1,9 @@
 using CTA.Rules.PortCore;
 using NUnit.Framework;
+using System;
 using System.IO;
 using System.Linq;
+using System.Threading;
 
 namespace CTA.Rules.Test
 {
@@ -14,7 +16,7 @@ namespace CTA.Rules.Test
         public void Setup()
         {
             Setup(this.GetType());
-            tempDir = GetTstPath(Path.Combine(new string[] { "Projects", "Temp" }));
+            tempDir = GetTstPath(Path.Combine(new string[] { "Projects", "Temp", "PortCore" }));
             DownloadTestProjects();
         }
 
@@ -63,7 +65,7 @@ namespace CTA.Rules.Test
             }
             else
             {
-                results = AnalyzeSolution("SampleWebApi.sln", solutionDir, downloadLocation, version, true);
+                results = AnalyzeSolution("SampleWebApi.sln", solutionDir, downloadLocation, version, null, true);
             }
 
             var analysisResult = results.ProjectResults.FirstOrDefault().ProjectAnalysisResult;
@@ -124,8 +126,9 @@ namespace CTA.Rules.Test
         [TestCase(TargetFramework.DotnetCoreApp31)]
         public void TestWebApiWithReferences(string version)
         {
-            TestSolutionAnalysis results = AnalyzeSolution("WebApiWithReferences.sln", tempDir, downloadLocation, version);
-
+            var solutionPath = CopySolutionFolderToTemp("WebApiWithReferences.sln", tempDir);
+            TestSolutionAnalysis results = AnalyzeSolution(solutionPath, version);
+            
             StringAssert.Contains("IActionResult", results.SolutionAnalysisResult);
             StringAssert.Contains("Startup", results.SolutionAnalysisResult);
 
@@ -196,8 +199,30 @@ namespace CTA.Rules.Test
         [TestCase(TargetFramework.DotnetCoreApp31)]
         public void TestMvcMusicStore(string version)
         {
-            TestSolutionAnalysis results = AnalyzeSolution("MvcMusicStore.sln", tempDir, downloadLocation, version);
+            var solutionPath = CopySolutionFolderToTemp("MvcMusicStore.sln", tempDir);
+            TestSolutionAnalysis results = AnalyzeSolution(solutionPath, version);
 
+            ValidateMvcMusicStore(results, version);            
+        }        
+        
+  
+
+
+        [TestCase(TargetFramework.Dotnet5)]
+        [TestCase(TargetFramework.DotnetCoreApp31)]
+        public void TestMvcMusicStoreWithReferences(string version)
+        {
+            var solutionPath = CopySolutionFolderToTemp("MvcMusicStore.sln", tempDir);
+            var analyzerResults = GenerateSolutionAnalysis(solutionPath);
+
+            var metaReferences = analyzerResults.ToDictionary(a => a.ProjectResult.ProjectFilePath, a => a.ProjectBuildResult.Project.MetadataReferences.Select(m => m.Display).ToList());
+            TestSolutionAnalysis results = AnalyzeSolution(solutionPath, version, metaReferences, true);
+
+            ValidateMvcMusicStore(results, version);
+        }
+
+        private void ValidateMvcMusicStore(TestSolutionAnalysis results, string version)
+        {
             var analysisResult = results.ProjectResults.FirstOrDefault().ProjectAnalysisResult;
             var csProjContent = results.ProjectResults.FirstOrDefault().CsProjectContent;
             string projectDir = results.ProjectResults.FirstOrDefault().ProjectDirectory;
@@ -257,7 +282,7 @@ namespace CTA.Rules.Test
 
             Assert.AreEqual(mvcProjectActions.Count, 4);
         }
-        
+
         [TestCase(TargetFramework.DotnetCoreApp31)]
         public void TestAntlrSampleSolution(string version)
         {
@@ -345,7 +370,23 @@ namespace CTA.Rules.Test
         [TearDown]
         public void Cleanup()
         {
-            Directory.Delete(GetTstPath(Path.Combine(new string[] { "Projects", "Temp" })), true);
+            DeleteDir(0);
+        }
+
+        private void DeleteDir(int retries)
+        {
+            if (retries <= 10)
+            {
+                try
+                {
+                    Directory.Delete(tempDir, true);
+                }
+                catch (Exception)
+                {
+                    Thread.Sleep(60000);
+                    DeleteDir(retries + 1);
+                }
+            }
         }
     }
 }

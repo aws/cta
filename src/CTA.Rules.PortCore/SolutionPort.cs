@@ -64,7 +64,20 @@ namespace CTA.Rules.PortCore
             };
 
             CodeAnalyzer analyzer = CodeAnalyzerFactory.GetAnalyzer(analyzerConfiguration, LogHelper.Logger);
-            var analyzerResults = analyzer.AnalyzeSolution(solutionFilePath).Result;
+
+            List<AnalyzerResult> analyzerResults = null;
+            //We are building using references
+            if (solutionConfiguration.Any(p => p.MetaReferences?.Any() == true))
+            {
+                var currentReferences = solutionConfiguration.ToDictionary(s => s.ProjectPath, s => s.MetaReferences);
+                var frameworkReferences = solutionConfiguration.ToDictionary(s => s.ProjectPath, s => s.FrameworkMetaReferences);
+                analyzerResults = analyzer.AnalyzeSolution(solutionFilePath, frameworkReferences, currentReferences).Result;
+            }
+            else
+            {
+                analyzerResults = analyzer.AnalyzeSolution(solutionFilePath).Result;
+            }
+
 
             _context = new MetricsContext(solutionFilePath, analyzerResults);
             InitSolutionRewriter(analyzerResults, solutionConfiguration);
@@ -95,13 +108,8 @@ namespace CTA.Rules.PortCore
             _solutionRewriter = new SolutionRewriter(analyzerResults, solutionConfiguration.ToList<ProjectConfiguration>());
         }
 
-        private void DownloadRecommendationFiles(List<AnalyzerResult> analyzerResults)
+        private void DownloadRecommendationFiles(HashSet<string> allReferences)
         {
-            var allReferences = analyzerResults
-                .SelectMany(a => a.ProjectResult?.SourceFileResults?
-                    .SelectMany(s => s.References))?
-                .Select(r => r.Namespace).Distinct().ToList();
-
             allReferences.Add(Constants.ProjectRecommendationFile);
 
             _portSolutionResult.References = allReferences.ToHashSet<string>();
@@ -140,18 +148,30 @@ namespace CTA.Rules.PortCore
         private void InitRules(List<PortCoreConfiguration> solutionConfiguration, List<AnalyzerResult> analyzerResults)
         {
             using var projectTypeFeatureDetector = new FeatureDetector();
+
+            analyzerResults = analyzerResults.Where(a => solutionConfiguration.Select(s => s.ProjectPath).Contains(a.ProjectResult?.ProjectFilePath)).ToList();
             _projectTypeFeatureResults = projectTypeFeatureDetector.DetectFeaturesInProjects(analyzerResults);
 
+            var allReferences = new HashSet<string>();
             foreach (var projectConfiguration in solutionConfiguration)
             {
                 var projectTypeFeatureResult = _projectTypeFeatureResults[projectConfiguration.ProjectPath];
                 projectConfiguration.ProjectType = GetProjectType(projectTypeFeatureResult);
                 if (projectConfiguration.UseDefaultRules)
                 {
-                    DownloadRecommendationFiles(analyzerResults);
                     projectConfiguration.RulesDir = Constants.RulesDefaultPath;
+                    analyzerResults
+                        .FirstOrDefault(a => a.ProjectResult?.ProjectFilePath == projectConfiguration.ProjectPath)
+                        .ProjectResult?.SourceFileResults?.SelectMany(s => s.References)?.Select(r => r.Namespace).Distinct().ToList().ForEach(currentReference=> {
+                            if (!allReferences.Contains(currentReference))
+                            {
+                                allReferences.Add(currentReference);
+                            }
+                        });
                 }
             }
+            DownloadRecommendationFiles(allReferences);
+
         }
         /// <summary>
         /// Initializes the Solution Port

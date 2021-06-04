@@ -60,7 +60,11 @@ namespace CTA.Rules.Models
             var analyzerResults = new List<AnalyzerResult>();
             try
             {
-                analyzerResults = codeAnalyzer.AnalyzeSolution(SolutionPath).Result;
+                if (ProjectResults.Any(p => p.MetaReferences != null))
+                {
+                    var metaReferences = ProjectResults.ToDictionary(p => p.ProjectFile, p => p.MetaReferences);
+                    analyzerResults = codeAnalyzer.AnalyzeSolution(SolutionPath, null, metaReferences).Result;
+                }
 
                 // Process build errors by project
                 foreach (var analyzerResult in analyzerResults)
