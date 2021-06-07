@@ -11,6 +11,7 @@ using System.IO.Compression;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 
 namespace CTA.Rules.Test
 {
@@ -23,7 +24,7 @@ namespace CTA.Rules.Test
         public void Setup()
         {
             Setup(this.GetType());
-            tempDir = GetTstPath(Path.Combine(new string[] { "Projects", "Temp" }));
+            tempDir = GetTstPath(Path.Combine(new string[] { "Projects", "Temp", "Cta" }));
             DownloadTestProjects();
         }
 
@@ -252,7 +253,23 @@ namespace CTA.Rules.Test
         [TearDown]
         public void Cleanup()
         {
-            Directory.Delete(GetTstPath(Path.Combine(new string[] { "Projects", "Temp" })), true);
+            DeleteDir(0);
+        }
+
+        private void DeleteDir(int retries)
+        {
+            if (retries <= 10)
+            {
+                try
+                {
+                    Directory.Delete(tempDir, true);
+                }
+                catch (Exception)
+                {
+                    Thread.Sleep(60000);
+                    DeleteDir(retries + 1);
+                }
+            }
         }
     }
 }

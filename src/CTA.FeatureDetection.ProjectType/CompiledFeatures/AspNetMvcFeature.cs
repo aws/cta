@@ -15,9 +15,10 @@ namespace CTA.FeatureDetection.ProjectType.CompiledFeatures
         public override bool IsPresent(AnalyzerResult analyzerResult)
         {
             var project = analyzerResult.ProjectResult;
-            var isPresent = project.ContainsNugetDependency(Constants.MvcNugetReferenceIdentifier)
-                            && project.DeclaresClassWithBaseType(Constants.MvcControllerOriginalDefinition)
-                            && project.ContainsNonEmptyDirectory(Constants.MvcViewsDirectory);
+            var isPresent = (project.ContainsNugetDependency(Constants.MvcNugetReferenceIdentifier)
+                || project.ContainsDependency(Constants.MvcReferenceIdentifier))
+                && project.DeclaresClassWithBaseType(Constants.MvcControllerOriginalDefinition)
+                && project.ContainsNonEmptyDirectory(Constants.MvcViewsDirectory);
 
             return isPresent;
         }

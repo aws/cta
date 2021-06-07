@@ -20,5 +20,6 @@ namespace CTA.Rules.Models
         public bool PortProject = true;
         public bool PortCode = true;
         public ProjectType ProjectType = ProjectType.ClassLibrary;
+        public List<string> MetaReferences;
     }
 }
