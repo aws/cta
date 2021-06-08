@@ -1,18 +1,23 @@
-﻿using System;
+﻿using System.Linq;
+using System.Threading.Tasks;
+using System.Collections.Generic;
+using CTA.WebForms2Blazor.Factories;
+using CTA.WebForms2Blazor.FileInformationModel;
 
 namespace CTA.WebForms2Blazor
 {
     public class MigrationManager
     {
-        private readonly string _sourceProjectPath;
-        private readonly string _outputProjectPath;
+        private readonly WebFormsProjectAnalyzer _projectAnalayzer;
+        private readonly BlazorProjectBuilder _projectBuilder;
+        private readonly IEnumerable<FileInformation> _fileInformationCollection;
 
-        public MigrationManager(string sourceProjectPath, string outputProjectPath)
+        public MigrationManager(string inputProjectPath, string outputProjectPath)
         {
-            _sourceProjectPath = sourceProjectPath;
-            _outputProjectPath = outputProjectPath;
+            _projectAnalayzer = new WebFormsProjectAnalyzer(inputProjectPath);
+            _projectBuilder = new BlazorProjectBuilder(outputProjectPath);
 
-            // Initialize any objects or services needed for migration here
+            _fileInformationCollection = FileInformationFactory.BuildMany(_projectAnalayzer.GetProjectFileInfo());
         }
 
         public void PerformMigration()

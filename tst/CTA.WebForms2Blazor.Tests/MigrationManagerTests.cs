@@ -2,7 +2,7 @@ using NUnit.Framework;
 
 namespace CTA.WebForms2Blazor.Tests
 {
-    public class Tests
+    public class MigrationManagerTests
     {
         [SetUp]
         public void Setup()
