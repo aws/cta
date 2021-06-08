@@ -1,7 +1,12 @@
-﻿using CTA.FeatureDetection.Common.Models.Configuration;
+﻿using System;
+using System.Collections.Generic;
+using CTA.FeatureDetection.Common.Models.Configuration;
 using CTA.Rules.Config;
 using NUnit.Framework;
 using System.IO;
+using System.Net.NetworkInformation;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace CTA.Rules.Test
 {
@@ -39,6 +44,28 @@ namespace CTA.Rules.Test
             var expectedHash = "7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d9069";
 
             Assert.AreEqual(expectedHash, hash);
+        }
+
+        [Test]
+        public void GenerateUniqueFileName_Maintains_Uniqueness_Across_Concurrent_Processes()
+        {
+            var fileName = "MyFile";
+            var extension = "json";
+            var mutexName = "mutex";
+            var tasks = new List<Task>();
+            var fileNames = new List<string>();
+
+            for (int i = 0; i < 10000; i++)
+            {
+                tasks.Add(Task.Run(() => {
+                    fileNames.Add(Utils.GenerateUniqueFileName(fileName, extension, mutexName));
+                }));
+            }
+            var t = Task.WhenAll(tasks);
+            t.Wait();
+            
+            Assert.True(t.Status == TaskStatus.RanToCompletion);
+            CollectionAssert.AllItemsAreUnique(fileNames);
         }
     }
 }

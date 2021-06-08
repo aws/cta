@@ -131,5 +131,36 @@ namespace CTA.Rules.Config
 
             return destinationFile;
         }
+
+        /// <summary>
+        /// Generates a unique file name by appending the number of Ticks to the original file name.
+        /// A mutex is used so only 1 unique file name can be generated at a time, thus acting as
+        /// enough of a delay to ensure each filename is unique.
+        /// 
+        /// Note: 1 tick is 100 ns
+        /// </summary>
+        /// <param name="fileName">Original name of file</param>
+        /// <param name="extension">Extension to be appended to file name</param>
+        /// <param name="mutexName">Identifier name of mutex</param>
+        /// <param name="timeoutInSeconds">Time to wait for the mutex handle</param>
+        /// <returns>File name with unique tick identifier and file extension appended to it</returns>
+        public static string GenerateUniqueFileName(string fileName, string extension, string mutexName, int timeoutInSeconds = 5)
+        {
+            long now;
+            using Mutex mutex = new Mutex(false, mutexName);
+            if (mutex.WaitOne(timeoutInSeconds))
+            {
+                now = DateTime.Now.Ticks;
+                mutex.ReleaseMutex();
+            }
+            else
+            {
+                // Mutex is used as a delay so if mutex wait time has been exceeded,
+                // we can use current datetime anyway
+                now = DateTime.Now.Ticks;
+            }
+
+            return $"{fileName}_{now}.{extension}";
+        }
     }
 }
