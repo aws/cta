@@ -1,4 +1,5 @@
 using System.IO;
+using System.IO.Compression;
 using CTA.Rules.Actions;
 using CTA.Rules.Models;
 using CTA.Rules.Config;
@@ -19,11 +20,22 @@ namespace CTA.Rules.Test
             // Setup an empty project folder for testing
             Directory.CreateDirectory(_testProjectDir);
             CreateEmptyXmlDocument(_testProjectPath);
+            // Download resources.zip and extract it at current directory
+            // resources.zip contains two directories: Input and Templates
+            var zipFile = Utils.DownloadFile(
+               Constants.S3CTAFiles, 
+               Path.Combine(Directory.GetCurrentDirectory(), "resources.zip"));
+            ZipFile.ExtractToDirectory(zipFile, Directory.GetCurrentDirectory(), true);
         }
 
         [TearDown]
         public void TearDown()
         {
+            // Delete resources.zip and the extracted files
+            File.Delete(Path.Combine(Directory.GetCurrentDirectory(), "resources.zip"));
+            Directory.Delete(Path.Combine(Directory.GetCurrentDirectory(), "Input"), true);
+            Directory.Delete(Path.Combine(Directory.GetCurrentDirectory(), Constants.Templates), true);
+            // Delete test project
             if (Directory.Exists(_testProjectDir))
             {
                 Directory.Delete(_testProjectDir, true);
