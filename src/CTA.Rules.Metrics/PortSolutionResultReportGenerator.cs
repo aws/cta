@@ -11,8 +11,6 @@ namespace CTA.Rules.Metrics
 {
     public class PortSolutionResultReportGenerator
     {
-        private const string ReportGeneratorMutex = "ReportGeneratorMutex";
-
         public MetricsContext Context { get; set; }
         public PortSolutionResult PortSolutionResult { get; set; }
         public Dictionary<string, FeatureDetectionResult> FeatureDetectionResults { get; set; }
@@ -48,11 +46,9 @@ namespace CTA.Rules.Metrics
             GenerateMetrics();
             GeneratePortSolutionResultJsonReport();
             GeneratePortSolutionResultTextReport();
-
-            var jsonReportFileName = Utils.GenerateUniqueFileName("PortSolutionResult", "json", ReportGeneratorMutex);
-            var textReportFileName = Utils.GenerateUniqueFileName("PortSolutionResult", "txt", ReportGeneratorMutex);
-            ExportStringToFile(PortSolutionResult.SolutionPath, jsonReportFileName, PortSolutionResultJsonReport);
-            ExportStringToFile(PortSolutionResult.SolutionPath, textReportFileName, PortSolutionResultTextReport);
+            
+            ExportStringToFile(PortSolutionResult.SolutionPath, "PortSolutionResult.json", PortSolutionResultJsonReport);
+            ExportStringToFile(PortSolutionResult.SolutionPath, "PortSolutionResult.txt", PortSolutionResultTextReport);
         }
 
         public void GenerateAnalysisReport()
@@ -150,7 +146,7 @@ namespace CTA.Rules.Metrics
             try
             {
                 var filePath = GetFilePath(projectOrSolutionPath, fileName);
-                File.WriteAllText(filePath, content);
+                Utils.ThreadSafeExportStringToFile(filePath, content);
             }
             catch (Exception ex)
             {

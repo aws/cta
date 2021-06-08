@@ -13,6 +13,8 @@ namespace CTA.Rules.Config
 {
     public class Utils
     {
+        private const string DefaultMutexName = "DefaultMutex";
+
         public static int GenerateHashCode(int prime, string str)
         {
             int hash = 0;
@@ -144,23 +146,55 @@ namespace CTA.Rules.Config
         /// <param name="mutexName">Identifier name of mutex</param>
         /// <param name="timeoutInSeconds">Time to wait for the mutex handle</param>
         /// <returns>File name with unique tick identifier and file extension appended to it</returns>
-        public static string GenerateUniqueFileName(string fileName, string extension, string mutexName, int timeoutInSeconds = 5)
+        public static string GenerateUniqueFileName(string fileName, string extension, string mutexName,
+            int timeoutInSeconds = 5)
         {
-            long now;
+            string now;
             using Mutex mutex = new Mutex(false, mutexName);
             if (mutex.WaitOne(timeoutInSeconds))
             {
-                now = DateTime.Now.Ticks;
+                now = DateTime.Now.ToString("yyyyMMdd_HH_mm_ss_fffffff");
                 mutex.ReleaseMutex();
             }
             else
             {
                 // Mutex is used as a delay so if mutex wait time has been exceeded,
                 // we can use current datetime anyway
-                now = DateTime.Now.Ticks;
+                now = DateTime.Now.ToString("yyyyMMdd_HH_mm_ss_fffffff");
             }
 
-            return $"{fileName}_{now}.{extension}";
+            return $"{fileName}_CONFLICT_{now}{extension}";
+        }
+
+        /// <summary>
+        /// Writes string content to a file in a thread-safe manner
+        /// </summary>
+        /// <param name="filePath">File to write string content</param>
+        /// <param name="content">String content to persist</param>
+        /// <param name="fileShare">FileShare mode</param>
+        /// <param name="mutexName">Mutex identifier</param>
+        /// <exception cref="IOException">Throws if there is an unexpected IOException during writing</exception>
+        public static void ThreadSafeExportStringToFile(string filePath, string content, FileShare fileShare = FileShare.ReadWrite, string mutexName = DefaultMutexName)
+        {
+            try
+            {
+                using var fileStream = File.Open(filePath, FileMode.OpenOrCreate, FileAccess.ReadWrite, fileShare);
+                using var streamWriter = new StreamWriter(fileStream);
+                streamWriter.Write(content);
+            }
+            catch (IOException)
+            {
+                // IOException is thrown if filePath is locked by an external process
+                // If this happens, generate a unique identifier, append it to the file name,
+                // and try writing again.
+                var fileName = Path.GetFileNameWithoutExtension(filePath);
+                var extension = Path.GetExtension(filePath);
+                var uniqueFileName = GenerateUniqueFileName(fileName, extension, mutexName);
+                
+                using var fileStream = File.Open(uniqueFileName, FileMode.OpenOrCreate, FileAccess.ReadWrite, fileShare);
+                using var streamWriter = new StreamWriter(fileStream);
+                streamWriter.Write(content);
+            }
         }
     }
 }

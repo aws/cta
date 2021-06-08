@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using CTA.FeatureDetection.Common.Models.Configuration;
 using CTA.Rules.Config;
 using NUnit.Framework;
 using System.IO;
-using System.Net.NetworkInformation;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace CTA.Rules.Test
@@ -55,7 +52,7 @@ namespace CTA.Rules.Test
             var tasks = new List<Task>();
             var fileNames = new List<string>();
 
-            for (int i = 0; i < 10000; i++)
+            for (int i = 0; i < 100; i++)
             {
                 tasks.Add(Task.Run(() => {
                     fileNames.Add(Utils.GenerateUniqueFileName(fileName, extension, mutexName));
@@ -63,9 +60,28 @@ namespace CTA.Rules.Test
             }
             var t = Task.WhenAll(tasks);
             t.Wait();
-            
+
             Assert.True(t.Status == TaskStatus.RanToCompletion);
             CollectionAssert.AllItemsAreUnique(fileNames);
+        }
+
+        [Test]
+        public void ThreadSafeExportStringToFile_Permits_Concurrent_Processes()
+        {
+            var filePath = "test.txt";
+            var content = "Test file content";
+            var tasks = new List<Task>();
+
+            for (int i = 0; i < 10; i++)
+            {
+                tasks.Add(Task.Run(() => {
+                    Utils.ThreadSafeExportStringToFile(filePath, content);
+                }));
+            }
+            var t = Task.WhenAll(tasks);
+            t.Wait();
+
+            Assert.True(t.Status == TaskStatus.RanToCompletion);
         }
     }
 }
