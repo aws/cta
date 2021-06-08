@@ -151,7 +151,6 @@ namespace CTA.Rules.Metrics
             {
                 var filePath = GetFilePath(projectOrSolutionPath, fileName);
                 File.WriteAllText(filePath, content);
-                
             }
             catch (Exception ex)
             {
