@@ -6,6 +6,9 @@ using NUnit.Framework;
 
 namespace CTA.WebForms2Blazor.Tests
 {
+    // TODO: Make a more complex test fixture setup
+    // once more complex functionality is implemented
+    [TestFixture]
     public class BlazorProjectBuilderTests
     {
         private const string TEST_AREA_DIRECTORY_NAME = "TestingArea";
@@ -17,9 +20,10 @@ namespace CTA.WebForms2Blazor.Tests
         private string _testingAreaPath;
         private string _testFilesPath;
         private string _testBlazorProjectPath;
+        private BlazorProjectBuilder _projectBuilder;
 
-        [SetUp]
-        public void Setup()
+        [OneTimeSetUp]
+        public void OneTimeSetup()
         {
             var workingDirectory = Environment.CurrentDirectory;
             _testProjectPath = Directory.GetParent(workingDirectory).Parent.Parent.FullName;
@@ -30,6 +34,12 @@ namespace CTA.WebForms2Blazor.Tests
             ClearTestBlazorProjectDirectory();
         }
 
+        [SetUp]
+        public void Setup()
+        {
+            _projectBuilder = new BlazorProjectBuilder(_testBlazorProjectPath);
+        }
+
         [TearDown]
         public void TearDown()
         {
@@ -37,16 +47,7 @@ namespace CTA.WebForms2Blazor.Tests
         }
 
         [Test]
-        public void Constructor_Creates_Project_Folder_If_Not_Exists()
-        {
-            Assert.False(Directory.Exists(_testBlazorProjectPath));
-
-            var _ = new BlazorProjectBuilder(_testBlazorProjectPath);
-
-            Assert.True(Directory.Exists(_testBlazorProjectPath));
-        }
-
-        [Test]
+        [NonParallelizable]
         public void CreateRelativeDirectoryIfNotExists_Creates_Directory_In_Correct_Location()
         {
             var testDirectoryName = "folder1";
@@ -54,13 +55,13 @@ namespace CTA.WebForms2Blazor.Tests
 
             Assert.False(Directory.Exists(testTargetDirectory));
 
-            var projectBuilder = new BlazorProjectBuilder(_testBlazorProjectPath);
-            projectBuilder.CreateRelativeDirectoryIfNotExists(testDirectoryName);
+            _projectBuilder.CreateRelativeDirectoryIfNotExists(testDirectoryName);
 
             Assert.True(Directory.Exists(testTargetDirectory));
         }
 
         [Test]
+        [NonParallelizable]
         public void WriteFileBytesToProject_Writes_New_File_With_Full_Fidelity()
         {
             var testClassFilePath = Path.Combine(_testFilesPath, TEST_CLASS_FILE_NAME);
@@ -76,8 +77,7 @@ namespace CTA.WebForms2Blazor.Tests
 
             Assert.False(File.Exists(testClassTargetPath));
 
-            var projectBuilder = new BlazorProjectBuilder(_testBlazorProjectPath);
-            projectBuilder.WriteFileBytesToProject(testClassTargetPath, originalBytesContent);
+            _projectBuilder.WriteFileBytesToProject(testClassTargetPath, originalBytesContent);
 
             Assert.True(File.Exists(testClassTargetPath));
 
@@ -91,6 +91,7 @@ namespace CTA.WebForms2Blazor.Tests
         }
 
         [Test]
+        [NonParallelizable]
         public void WriteFileBytesToProject_Creates_Missing_Parent_Directories()
         {
             var deepTestClassTargetParentPath = Path.Combine(_testBlazorProjectPath, "folder1", "folder2");
@@ -99,8 +100,7 @@ namespace CTA.WebForms2Blazor.Tests
 
             Assert.False(Directory.Exists(deepTestClassTargetParentPath));
 
-            var projectBuilder = new BlazorProjectBuilder(_testBlazorProjectPath);
-            projectBuilder.WriteFileBytesToProject(deepTestClassTargetPath, contentBytes);
+            _projectBuilder.WriteFileBytesToProject(deepTestClassTargetPath, contentBytes);
 
             Assert.True(Directory.Exists(deepTestClassTargetParentPath));
             Assert.True(File.Exists(deepTestClassTargetPath));

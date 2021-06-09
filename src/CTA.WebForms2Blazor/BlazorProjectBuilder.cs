@@ -12,17 +12,6 @@ namespace CTA.WebForms2Blazor
         public BlazorProjectBuilder(string outputProjectPath)
         {
             _outputProjectPath = outputProjectPath;
-
-            // No exception is thrown if the directory already exists
-            Directory.CreateDirectory(outputProjectPath);
-        }
-
-        public void WriteFileInformationToProject(FileInformation newDocument)
-        {
-            WriteFileBytesToProject(newDocument.RelativePath, newDocument.GetFileBytes());
-
-            // TODO: Update destination project semantic model if added file
-            // was a .cs file
         }
 
         public void CreateRelativeDirectoryIfNotExists(string relativePath)
@@ -31,6 +20,14 @@ namespace CTA.WebForms2Blazor
 
             // No exception is thrown if the directory already exists
             Directory.CreateDirectory(fullPath);
+        }
+
+        public void WriteFileInformationToProject(FileInformation newDocument)
+        {
+            WriteFileBytesToProject(newDocument.RelativePath, newDocument.GetFileBytes());
+
+            // TODO: Update destination project semantic model if added file
+            // was a .cs file
         }
 
         public void WriteFileBytesToProject(string relativePath, byte[] fileContent)
