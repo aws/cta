@@ -14,14 +14,8 @@ namespace CTA.Rules.Test
         [SetUp]
         public void Setup()
         {
-            Setup(this.GetType());
-            tempDir = GetTstPath(Path.Combine(new string[] { "Projects", "Temp", "Owin" }));
-            DownloadTestProjects();
-        }
-
-        private void DownloadTestProjects()
-        {
-            downloadLocation = DownloadTestProjects(tempDir);
+            tempDir = SetupTests.TempDir;
+            downloadLocation = SetupTests.DownloadLocation;
         }
 
         [TestCase(TargetFramework.Dotnet5)]
@@ -418,28 +412,6 @@ namespace CTA.Rules.Test
             StringAssert.Contains(@"Microsoft.AspNetCore.Owin", serverProjContent);
 
             Assert.True(serverProjContent.IndexOf(string.Concat(">", version, "<")) > 0);
-        }
-
-        [TearDown]
-        public void Cleanup()
-        {
-            DeleteDir(0);
-        }
-
-        private void DeleteDir(int retries)
-        {
-            if (retries <= 10)
-            {
-                try
-                {
-                    Directory.Delete(tempDir, true);
-                }
-                catch (Exception)
-                {
-                    Thread.Sleep(60000);
-                    DeleteDir(retries + 1);
-                }
-            }
         }
     }
 }
