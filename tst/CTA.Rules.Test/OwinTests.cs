@@ -437,7 +437,8 @@ namespace CTA.Rules.Test
             var StaticFilesSampleText = File.ReadAllText(Path.Combine(owinParadise.ProjectDirectory, "StaticFilesSample.cs"));
             var WebSocketSampleText = File.ReadAllText(Path.Combine(owinParadise.ProjectDirectory, "WebSocketSample.cs"));
 
-            Console.Out.WriteLine("Woohoo");
+            var buildErrors = GetSolutionBuildErrors(results.SolutionRunResult.SolutionPath);
+            Assert.AreEqual(0, buildErrors.Count);
         }
 
     }
