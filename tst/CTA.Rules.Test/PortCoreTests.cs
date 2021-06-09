@@ -323,13 +323,11 @@ namespace CTA.Rules.Test
         }
 
         [TestCase(TargetFramework.DotnetCoreApp31)]
-        [TestCase(TargetFramework.Dotnet5)]
         public void TestBuildableMvcSolution(string version)
         {
             TestSolutionAnalysis resultWithoutCodePort = AnalyzeSolution("BuildableMvc.sln", tempDir, downloadLocation, version, portCode: false);
             var buildErrorsWithoutPortCode = GetSolutionBuildErrors(resultWithoutCodePort.SolutionRunResult.SolutionPath);
-            //29 errors. We have it set to more than 0 because it might vary based on other environments
-            Assert.Greater(buildErrorsWithoutPortCode.Count, 0);
+            Assert.AreEqual(29, buildErrorsWithoutPortCode.Count);
 
             TestSolutionAnalysis results = AnalyzeSolution("BuildableMvc.sln", tempDir, downloadLocation, version);
             var buildErrors = GetSolutionBuildErrors(results.SolutionRunResult.SolutionPath);
@@ -337,13 +335,11 @@ namespace CTA.Rules.Test
         }
 
         [TestCase(TargetFramework.DotnetCoreApp31)]
-        [TestCase(TargetFramework.Dotnet5)]
         public void TestBuildableWebApiSolution(string version)
         {
             TestSolutionAnalysis resultWithoutCodePort = AnalyzeSolution("BuildableWebApi.sln", tempDir, downloadLocation, version, portCode: false);
             var buildErrorsWithoutPortCode = GetSolutionBuildErrors(resultWithoutCodePort.SolutionRunResult.SolutionPath);
-            //35 errors. We have it set to more than 0 because it might vary based on other environments
-            Assert.Greater(buildErrorsWithoutPortCode.Count, 0);
+            Assert.AreEqual(35, buildErrorsWithoutPortCode.Count);
 
             TestSolutionAnalysis results = AnalyzeSolution("BuildableWebApi.sln", tempDir, downloadLocation, version);
             var buildErrors = GetSolutionBuildErrors(results.SolutionRunResult.SolutionPath);
