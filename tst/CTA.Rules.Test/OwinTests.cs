@@ -399,7 +399,6 @@ namespace CTA.Rules.Test
 
             StringAssert.Contains(@"Microsoft.AspNetCore.Builder", serverStartupText);
             StringAssert.Contains(@"IApplicationBuilder", serverStartupText);
-            StringAssert.Contains(@"UseOwin", serverStartupText);
             StringAssert.Contains(@"Please replace Get with Items. Such as (Casting_Type)context.Items[""String_To_Search_For""];", serverStartupText);
 
             StringAssert.Contains("WebHostBuilder", serverProgramText);
