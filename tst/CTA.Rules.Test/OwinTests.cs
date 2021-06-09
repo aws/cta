@@ -349,34 +349,34 @@ namespace CTA.Rules.Test
             Assert.True(csProjContent.IndexOf(string.Concat(">", version, "<")) > 0);
         }
 
-//        [TestCase(TargetFramework.Dotnet5)]
-//        [TestCase(TargetFramework.DotnetCoreApp31)]
-//        public void TestWebApi(string version)
-//        {
-//            TestSolutionAnalysis results = AnalyzeSolution("OwinWebApi.sln", tempDir, downloadLocation, version);
-//
-//            string projectDir = results.ProjectResults.FirstOrDefault().ProjectDirectory;
-//            var csProjContent = results.ProjectResults.FirstOrDefault().CsProjectContent;
-//            var startupText = File.ReadAllText(Path.Combine(projectDir, "Startup.cs"));
-//
-//            StringAssert.Contains(@"UseEndpoints", startupText);
-//            StringAssert.Contains(@"ConfigureServices", startupText);
-//            StringAssert.Contains(@"MapControllers", startupText);
-//            StringAssert.Contains(@"Microsoft.AspNetCore.Builder", startupText);
-//            StringAssert.Contains(@"Microsoft.Extensions.DependencyInjection", startupText);
-//            StringAssert.DoesNotContain(@"UseOpenIdConnectAuthentication", startupText);
-//            StringAssert.Contains(@"UseAuthentication", startupText);
-//            StringAssert.Contains(@"Please add services.AddAuthentication().AddOpenIdConnect();", startupText);
-//            StringAssert.Contains(@"Microsoft.AspNetCore.Authentication.OpenIdConnect", startupText);
-//            StringAssert.DoesNotContain(@"Microsoft.Owin.Security.OpenIdConnect", startupText);
-//    
-//            //Check that package has been added:
-//            StringAssert.Contains(version == TargetFramework.Dotnet5 ? @"Microsoft.AspNetCore.Diagnostics" : @"<PackageReference Include=""Microsoft.AspNetCore.Authentication.OpenIdConnect"" Version=""3.1.15"" />", csProjContent);
-//            StringAssert.Contains(@"Microsoft.AspNetCore.Authentication.OpenIdConnect", csProjContent);
-//
-//            //Check that correct version is used
-//            Assert.True(csProjContent.IndexOf(string.Concat(">", version, "<")) > 0);
-//        }
+        [TestCase(TargetFramework.Dotnet5)]
+        [TestCase(TargetFramework.DotnetCoreApp31)]
+        public void TestWebApi(string version)
+        {
+            TestSolutionAnalysis results = AnalyzeSolution("OwinWebApi.sln", tempDir, downloadLocation, version);
+
+            string projectDir = results.ProjectResults.FirstOrDefault().ProjectDirectory;
+            var csProjContent = results.ProjectResults.FirstOrDefault().CsProjectContent;
+            var startupText = File.ReadAllText(Path.Combine(projectDir, "Startup.cs"));
+
+            StringAssert.Contains(@"UseEndpoints", startupText);
+            StringAssert.Contains(@"ConfigureServices", startupText);
+            StringAssert.Contains(@"MapControllers", startupText);
+            StringAssert.Contains(@"Microsoft.AspNetCore.Builder", startupText);
+            StringAssert.Contains(@"Microsoft.Extensions.DependencyInjection", startupText);
+            StringAssert.DoesNotContain(@"UseOpenIdConnectAuthentication", startupText);
+            StringAssert.Contains(@"UseAuthentication", startupText);
+            StringAssert.Contains(@"Please add services.AddAuthentication().AddOpenIdConnect();", startupText);
+            StringAssert.Contains(@"Microsoft.AspNetCore.Authentication.OpenIdConnect", startupText);
+            StringAssert.DoesNotContain(@"Microsoft.Owin.Security.OpenIdConnect", startupText);
+
+            //Check that package has been added:
+            StringAssert.Contains(version == TargetFramework.Dotnet5 ? @"Microsoft.AspNetCore.Diagnostics" : @"<PackageReference Include=""Microsoft.AspNetCore.Authentication.OpenIdConnect"" Version=""3.1.15"" />", csProjContent);
+            StringAssert.Contains(@"Microsoft.AspNetCore.Authentication.OpenIdConnect", csProjContent);
+
+            //Check that correct version is used
+            Assert.True(csProjContent.IndexOf(string.Concat(">", version, "<")) > 0);
+        }
 
 
         [TestCase(TargetFramework.Dotnet5)]
