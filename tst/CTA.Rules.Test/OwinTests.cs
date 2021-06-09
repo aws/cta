@@ -99,6 +99,7 @@ namespace CTA.Rules.Test
 
             StringAssert.Contains(@"using Microsoft.AspNetCore.Http", startupText);
             StringAssert.Contains(@"HttpContext ", startupText);
+            StringAssert.Contains(@"UseMiddleware", startupText);
             StringAssert.Contains(@"Please replace CreatePerOwinContext<T>(System.Func<T>)", startupText);
             StringAssert.Contains(@"Please replace CreatePerOwinContext<T>(System.Func<Microsoft.AspNet.Identity.Owin.IdentityFactoryOptions<T>, Microsoft.Owin.IOwinContext, T>)", startupText);
             StringAssert.Contains(@"Please replace CreatePerOwinContext<T>(System.Func<Microsoft.AspNet.Identity.Owin.IdentityFactoryOptions<T>, Microsoft.Owin.IOwinContext, T>, System.Action<Microsoft.AspNet.Identity.Owin.IdentityFactoryOptions<T>, T>)", startupText);
@@ -289,7 +290,7 @@ namespace CTA.Rules.Test
             var startupText = File.ReadAllText(Path.Combine(projectDir, "Startup.cs"));
             var programText = File.ReadAllText(Path.Combine(projectDir, "Program.cs"));
 
-            StringAssert.Contains(@"UseSignalR", startupText);
+            StringAssert.Contains(@"UseEndpoints", startupText);
             StringAssert.Contains(@"ConfigureServices", startupText);
             StringAssert.Contains(@"AddSignalR", startupText);
             StringAssert.Contains(@"MapHub", startupText);
@@ -399,6 +400,7 @@ namespace CTA.Rules.Test
             StringAssert.Contains(@"Microsoft.AspNetCore.Builder", serverStartupText);
             StringAssert.Contains(@"IApplicationBuilder", serverStartupText);
             StringAssert.Contains(@"UseOwin", serverStartupText);
+            StringAssert.Contains(@"Please replace Get with Items. Such as (Casting_Type)context.Items[""String_To_Search_For""];", serverStartupText);
 
             StringAssert.Contains("WebHostBuilder", serverProgramText);
 
@@ -413,5 +415,31 @@ namespace CTA.Rules.Test
 
             Assert.True(serverProjContent.IndexOf(string.Concat(">", version, "<")) > 0);
         }
+
+        [TestCase(TargetFramework.Dotnet5)]
+        [TestCase(TargetFramework.DotnetCoreApp31)]
+        public void TestOwinParadise(string version)
+        {
+            TestSolutionAnalysis results = AnalyzeSolution("OwinParadise.sln", tempDir, downloadLocation, version);
+
+            var owinParadise = results.ProjectResults.Where(p => p.CsProjectPath.EndsWith("OwinParadise.csproj")).FirstOrDefault();
+            FileAssert.Exists(owinParadise.CsProjectPath);
+
+            var owinProjContent = owinParadise.CsProjectContent;
+            var AspNetRoutesText = File.ReadAllText(Path.Combine(owinParadise.ProjectDirectory, "AspNetRoutes.cs"));
+            var BranchingPipelinesText = File.ReadAllText(Path.Combine(owinParadise.ProjectDirectory, "BranchingPipelines.cs"));
+            var CustomServerText = File.ReadAllText(Path.Combine(owinParadise.ProjectDirectory, "CustomServer.cs"));
+            var EmbeddedText = File.ReadAllText(Path.Combine(owinParadise.ProjectDirectory, "Embedded.cs"));
+            var HelloWorldText = File.ReadAllText(Path.Combine(owinParadise.ProjectDirectory, "HelloWorld.cs"));
+            var HelloWorldRawOwinText = File.ReadAllText(Path.Combine(owinParadise.ProjectDirectory, "HelloWorldRawOwin.cs"));
+            var OwinSelfHostText = File.ReadAllText(Path.Combine(owinParadise.ProjectDirectory, "OwinSelfHost.cs"));
+            var OwinWebAPIText = File.ReadAllText(Path.Combine(owinParadise.ProjectDirectory, "OwinWebAPI.cs"));
+            var SignalRText = File.ReadAllText(Path.Combine(owinParadise.ProjectDirectory, "SignalR.cs"));
+            var StaticFilesSampleText = File.ReadAllText(Path.Combine(owinParadise.ProjectDirectory, "StaticFilesSample.cs"));
+            var WebSocketSampleText = File.ReadAllText(Path.Combine(owinParadise.ProjectDirectory, "WebSocketSample.cs"));
+
+            Console.Out.WriteLine("Woohoo");
+        }
+
     }
 }

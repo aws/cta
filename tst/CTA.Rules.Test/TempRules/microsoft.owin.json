@@ -295,7 +295,7 @@
                 "methodName": "Invoke",
                 "modifiers": "public"
               },
-              "Description": "Replace all the invoke method modifiers with only public in order to remove the override modifier.",
+              "Description": "Replace all the invoke method modifiers with only public in order to remove the override modifier."
             },
             {
               "Name": "AddExpression",
@@ -488,6 +488,43 @@
               "Description": "Add a comment to explain how to replace IOwinContext.Request.Headers.Get with TryGetValue instead.",
               "ActionValidation": {
                 "Contains": "PleasereplaceGetwithTryGetValue.",
+                "NotContains": "",
+                "CheckComments": "True"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Type": "Method",
+      "Name": "Microsoft.Owin.IOwinContext.Get<T>(string)",
+      "Value": "Microsoft.Owin.IOwinContext.Get<T>(string)",
+      "KeyType": "Name",
+      "ContainingType": "IOwinContext",
+      "RecommendedActions": [
+        {
+          "Source": "Amazon",
+          "Preferred": "Yes",
+          "TargetFrameworks": [
+            {
+              "Name": "netcoreapp3.1",
+              "TargetCPU": [ "x86", "x64", "ARM32", "ARM64" ]
+            },
+            {
+              "Name": "net5.0",
+              "TargetCPU": [ "x86", "x64", "ARM32", "ARM64" ]
+            }
+          ],
+          "Description": "Add a comment to explain how to replace the Get method with Items collection.",
+          "Actions": [
+            {
+              "Name": "AddComment",
+              "Type": "Method",
+              "Value": "Please replace Get with Items. Such as (Casting_Type)context.Items[\"String_To_Search_For\"];",
+              "Description": "Add a comment to explain how to replace IOwinContext.Get with HttpContext.Items instead.",
+              "ActionValidation": {
+                "Contains": "Please replace Get with Items. Such as (Casting_Type)context.Items[\"String_To_Search_For\"];",
                 "NotContains": "",
                 "CheckComments": "True"
               }
