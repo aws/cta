@@ -16,6 +16,8 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\CTA.Rules.Common\CTA.Rules.Common.csproj" />
     <ProjectReference Include="..\..\src\CTA.Rules.PortCore\CTA.Rules.PortCore.csproj" />
+    <ProjectReference Include="..\..\src\CTA.Rules.Actions\CTA.Rules.Actions.csproj" />
+    <ProjectReference Include="..\..\src\CTA.Rules.Config\CTA.Rules.Config.csproj" />
   </ItemGroup>
 
   <ItemGroup>

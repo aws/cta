@@ -31,6 +31,7 @@ namespace CTA.Rules.Actions
         public string Run()
         {
             string runResult = string.Empty;
+            LogChange(string.Format("Project type: {0}", _projectType.ToString()));
             if (_projectType == ProjectType.Mvc)
             {
                 CreateMvcDirs(_projectDir);
@@ -85,11 +86,11 @@ namespace CTA.Rules.Actions
         private void CreateMvcDirs(string projectDir)
         {
             string wwwrootdir = Path.Combine(projectDir, Constants.Wwwroot);
-            string contentdir = string.Concat(projectDir, Constants.Content);
-            string scriptsdir = string.Concat(projectDir, Constants.Scripts);
+            string contentdir = Path.Combine(projectDir, Constants.Content);
+            string scriptsdir = Path.Combine(projectDir, Constants.Scripts);
 
-            string targetContentDir = string.Concat(wwwrootdir, Constants.Content);
-            string targetScriptsDir = string.Concat(wwwrootdir, Constants.Scripts);
+            string targetContentDir = Path.Combine(wwwrootdir, Constants.Content);
+            string targetScriptsDir = Path.Combine(wwwrootdir, Constants.Scripts);
 
             Directory.CreateDirectory(wwwrootdir);
 
