@@ -290,6 +290,16 @@
               }
             },
             {
+              "Name": "AddDirective",
+              "Type": "Using",
+              "Value": "Microsoft.AspNetCore.SignalR",
+              "Description": "Add Microsoft.AspNetCore.SignalR namespace",
+              "ActionValidation": {
+                "Contains": "using Microsoft.AspNetCore.SignalR;",
+                "NotContains": ""
+              }
+            },
+            {
               "Name": "ReplaceMethodAndParameters",
               "Type": "Method",
               "Value": {
@@ -427,6 +437,16 @@
           "Description": "Add a comment to explain how to replace CreatePerOwinContext<T>(System.Func<T>) with a service in ConfigureServices method.",
           "Actions": [
             {
+              "Name": "RemoveDirective",
+              "Type": "Using",
+              "Value": "Microsoft.AspNet.Identity.Owin",
+              "Description": "Remove Microsoft.AspNet.Identity.Owin namespace",
+              "ActionValidation": {
+                "Contains": "",
+                "NotContains": "using Microsoft.AspNet.Identity.Owin;"
+              }
+            },
+            {
               "Name": "AddComment",
               "Type": "Method",
               "Value": "Please replace CreatePerOwinContext<T>(System.Func<T>) and add a new ConfigureServices method: public void ConfigureServices(IServiceCollection services) { Register your service here instead of using CreatePerOwinContext }. For example, app.CreatePerOwinContext(ApplicationDbContext.Create); would become: services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(config.GetConnectionString(\"DefaultConnection\"))); ",
@@ -463,6 +483,16 @@
           "Description": "Add a comment to explain how to replace CreatePerOwinContext<T>(System.Func<Microsoft.AspNet.Identity.Owin.IdentityFactoryOptions<T>, Microsoft.Owin.IOwinContext, T>) with a service in ConfigureServices method.",
           "Actions": [
             {
+              "Name": "RemoveDirective",
+              "Type": "Using",
+              "Value": "Microsoft.AspNet.Identity.Owin",
+              "Description": "Remove Microsoft.AspNet.Identity.Owin namespace",
+              "ActionValidation": {
+                "Contains": "",
+                "NotContains": "using Microsoft.AspNet.Identity.Owin;"
+              }
+            },
+            {
               "Name": "AddComment",
               "Type": "Method",
               "Value": "Please replace CreatePerOwinContext<T>(System.Func<Microsoft.AspNet.Identity.Owin.IdentityFactoryOptions<T>, Microsoft.Owin.IOwinContext, T>) and add a new ConfigureServices method: public void ConfigureServices(IServiceCollection services) { Register your service here instead of using CreatePerOwinContext }. For example, app.CreatePerOwinContext(ApplicationDbContext.Create); would become: services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(config.GetConnectionString(\"DefaultConnection\"))); ",
@@ -498,6 +528,16 @@
           ],
           "Description": "Add a comment to explain how to replace CreatePerOwinContext<T>(System.Func<Microsoft.AspNet.Identity.Owin.IdentityFactoryOptions<T>, Microsoft.Owin.IOwinContext, T>, System.Action<Microsoft.AspNet.Identity.Owin.IdentityFactoryOptions<T>, T>) with a service in ConfigureServices method.",
           "Actions": [
+            {
+              "Name": "RemoveDirective",
+              "Type": "Using",
+              "Value": "Microsoft.AspNet.Identity.Owin",
+              "Description": "Remove Microsoft.AspNet.Identity.Owin namespace",
+              "ActionValidation": {
+                "Contains": "",
+                "NotContains": "using Microsoft.AspNet.Identity.Owin;"
+              }
+            },
             {
               "Name": "AddComment",
               "Type": "Method",
