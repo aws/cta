@@ -1,9 +1,10 @@
+using Codelyzer.Analysis;
 using CTA.Rules.PortCore;
+using Microsoft.Extensions.Logging.Abstractions;
 using NUnit.Framework;
-using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading;
 
 namespace CTA.Rules.Test
 {
@@ -15,14 +16,8 @@ namespace CTA.Rules.Test
         [SetUp]
         public void Setup()
         {
-            Setup(this.GetType());
-            tempDir = GetTstPath(Path.Combine(new string[] { "Projects", "Temp", "PortCore" }));
-            DownloadTestProjects();
-        }
-
-        private void DownloadTestProjects()
-        {
-            downloadLocation = DownloadTestProjects(tempDir);
+            tempDir = SetupTests.TempDir;
+            downloadLocation = SetupTests.DownloadLocation;
         }
 
         [Test]
@@ -49,13 +44,18 @@ namespace CTA.Rules.Test
         [Test]
         public void TestSampleWebApi3Solution()
         {
-            TestWebApi(TargetFramework.DotnetCoreApp31);
+            var solutionDir = TestWebApiApp(TargetFramework.DotnetCoreApp31);
             SolutionPort.ResetCache(false, false);
-            TestWebApi(TargetFramework.Dotnet5, Path.Combine(tempDir, TargetFramework.DotnetCoreApp31));
+            TestWebApi(TargetFramework.Dotnet5, solutionDir);
         }
 
         [TestCase(TargetFramework.Dotnet5)]
         public void TestWebApi(string version, string solutionDir = "")
+        {
+            TestWebApiApp(version, solutionDir);
+        }
+
+        private string TestWebApiApp(string version, string solutionDir = "")
         {
             TestSolutionAnalysis results;
 
@@ -69,7 +69,6 @@ namespace CTA.Rules.Test
             }
 
             var analysisResult = results.ProjectResults.FirstOrDefault().ProjectAnalysisResult;
-
 
             var csProjContent = results.ProjectResults.FirstOrDefault().CsProjectContent;
             string projectDir = results.ProjectResults.FirstOrDefault().ProjectDirectory;
@@ -121,6 +120,7 @@ namespace CTA.Rules.Test
             {
                 Assert.AreEqual(webApiProjectActions.Count, 2);
             }
+            return Directory.GetParent(results.SolutionRunResult.SolutionPath).FullName;
         }
 
         [TestCase(TargetFramework.DotnetCoreApp31)]
@@ -194,9 +194,9 @@ namespace CTA.Rules.Test
             Assert.AreEqual(classlibrary2Actions.Count, 2);
             Assert.AreEqual(webApiProjectActions.Count, 4);
         }
-        
-        [TestCase(TargetFramework.Dotnet5)]
+
         [TestCase(TargetFramework.DotnetCoreApp31)]
+        [TestCase(TargetFramework.Dotnet5)]
         public void TestMvcMusicStore(string version)
         {
             var solutionPath = CopySolutionFolderToTemp("MvcMusicStore.sln", tempDir);
@@ -204,9 +204,6 @@ namespace CTA.Rules.Test
 
             ValidateMvcMusicStore(results, version);            
         }        
-        
-  
-
 
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.DotnetCoreApp31)]
@@ -325,6 +322,69 @@ namespace CTA.Rules.Test
 
         }
 
+        [TestCase(TargetFramework.DotnetCoreApp31)]
+        [TestCase(TargetFramework.Dotnet5)]
+        public void TestBuildableMvcSolution(string version)
+        {
+            TestSolutionAnalysis resultWithoutCodePort = AnalyzeSolution("BuildableMvc.sln", tempDir, downloadLocation, version, portCode: false);
+            var buildErrorsWithoutPortCode = GetSolutionBuildErrors(resultWithoutCodePort.SolutionRunResult.SolutionPath);
+            Assert.AreEqual(buildErrorsWithoutPortCode.Count, 29);
+
+            TestSolutionAnalysis results = AnalyzeSolution("BuildableMvc.sln", tempDir, downloadLocation, version);
+            var buildErrors = GetSolutionBuildErrors(results.SolutionRunResult.SolutionPath);
+            Assert.AreEqual(buildErrors.Count, 0);
+        }
+
+        [TestCase(TargetFramework.DotnetCoreApp31)]
+        [TestCase(TargetFramework.Dotnet5)]
+        public void TestBuildableWebApiSolution(string version)
+        {
+            TestSolutionAnalysis resultWithoutCodePort = AnalyzeSolution("BuildableWebApi.sln", tempDir, downloadLocation, version, portCode: false);
+            var buildErrorsWithoutPortCode = GetSolutionBuildErrors(resultWithoutCodePort.SolutionRunResult.SolutionPath);
+            Assert.AreEqual(buildErrorsWithoutPortCode.Count, 35);
+
+            TestSolutionAnalysis results = AnalyzeSolution("BuildableWebApi.sln", tempDir, downloadLocation, version);
+            var buildErrors = GetSolutionBuildErrors(results.SolutionRunResult.SolutionPath);
+            Assert.AreEqual(buildErrors.Count, 0);
+        }
+
+        private List<string> GetSolutionBuildErrors(string solutionPath)
+        {
+            var result = GetBuildResults(solutionPath);
+
+            var allErrors = new List<string>();
+            result.ForEach(r => allErrors.AddRange(r.ProjectBuildResult.BuildErrors));
+            return allErrors;
+        }
+
+        private List<AnalyzerResult> GetBuildResults(string solutionPath)
+        {
+            AnalyzerConfiguration configuration = new AnalyzerConfiguration(LanguageOptions.CSharp)
+            {
+                ExportSettings =
+                {
+                    GenerateJsonOutput = false,
+                    OutputPath = @"/tmp/UnitTests"
+                },
+
+                MetaDataSettings =
+                {
+                    LiteralExpressions = true,
+                    MethodInvocations = true,
+                    Annotations = true,
+                    DeclarationNodes = true,
+                    LocationData = false,
+                    ReferenceData = true,
+                    LoadBuildData = true,
+                    ElementAccess = true,
+                    MemberAccess = true
+                }
+            };
+            CodeAnalyzer analyzer = CodeAnalyzerFactory.GetAnalyzer(configuration, NullLogger.Instance);
+            var result = analyzer.AnalyzeSolution(solutionPath).Result;
+            return result;
+        }
+
         private void ValidateConfig(string controllerText)
         {
             StringAssert.Contains(@"var conn = ConfigurationManager.Configuration.GetSection(""ConnectionStrings"")[""FirstConnectionString""]", controllerText);
@@ -365,28 +425,6 @@ namespace CTA.Rules.Test
             // Verify the new package has been added
             var csProjectContent = ionicZipProjectFile.CsProjectContent;
             StringAssert.Contains("Include=\"DotNetZip\"", csProjectContent);
-        }
-
-        [TearDown]
-        public void Cleanup()
-        {
-            DeleteDir(0);
-        }
-
-        private void DeleteDir(int retries)
-        {
-            if (retries <= 10)
-            {
-                try
-                {
-                    Directory.Delete(tempDir, true);
-                }
-                catch (Exception)
-                {
-                    Thread.Sleep(60000);
-                    DeleteDir(retries + 1);
-                }
-            }
         }
     }
 }

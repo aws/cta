@@ -354,28 +354,28 @@ namespace CTA.Rules.Test
             Assert.True(csProjContent.IndexOf(string.Concat(">", version, "<")) > 0);
         }
 
-        [TestCase(TargetFramework.Dotnet5)]
-        [TestCase(TargetFramework.DotnetCoreApp31)]
-        public void TestWebApi(string version)
-        {
-            TestSolutionAnalysis results = AnalyzeSolution("OwinWebApi.sln", tempDir, downloadLocation, version);
+        //[TestCase(TargetFramework.Dotnet5)]
+        //[TestCase(TargetFramework.DotnetCoreApp31)]
+        //public void TestWebApi(string version)
+        //{
+        //    TestSolutionAnalysis results = AnalyzeSolution("OwinWebApi.sln", tempDir, downloadLocation, version);
 
-            string projectDir = results.ProjectResults.FirstOrDefault().ProjectDirectory;
-            var csProjContent = results.ProjectResults.FirstOrDefault().CsProjectContent;
-            var startupText = File.ReadAllText(Path.Combine(projectDir, "Startup.cs"));
+        //    string projectDir = results.ProjectResults.FirstOrDefault().ProjectDirectory;
+        //    var csProjContent = results.ProjectResults.FirstOrDefault().CsProjectContent;
+        //    var startupText = File.ReadAllText(Path.Combine(projectDir, "Startup.cs"));
 
-            StringAssert.Contains(@"UseEndpoints", startupText);
-            StringAssert.Contains(@"ConfigureServices", startupText);
-            StringAssert.Contains(@"MapControllers", startupText);
-            StringAssert.Contains(@"Microsoft.AspNetCore.Builder", startupText);
-            StringAssert.Contains(@"Microsoft.Extensions.DependencyInjection", startupText);
+        //    StringAssert.Contains(@"UseEndpoints", startupText);
+        //    StringAssert.Contains(@"ConfigureServices", startupText);
+        //    StringAssert.Contains(@"MapControllers", startupText);
+        //    StringAssert.Contains(@"Microsoft.AspNetCore.Builder", startupText);
+        //    StringAssert.Contains(@"Microsoft.Extensions.DependencyInjection", startupText);
 
-            //Check that package has been added:
-            StringAssert.Contains(@"Microsoft.AspNetCore.Diagnostics", csProjContent);
+        //    //Check that package has been added:
+        //    StringAssert.Contains(@"Microsoft.AspNetCore.Diagnostics", csProjContent);
 
-            //Check that correct version is used
-            Assert.True(csProjContent.IndexOf(string.Concat(">", version, "<")) > 0);
-        }
+        //    //Check that correct version is used
+        //    Assert.True(csProjContent.IndexOf(string.Concat(">", version, "<")) > 0);
+        //}
 
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.DotnetCoreApp31)]

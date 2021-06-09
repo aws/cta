@@ -9,6 +9,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Codelyzer.Analysis;
 using Codelyzer.Analysis.Build;
+using Codelyzer.Analysis.Model;
 using CTA.FeatureDetection;
 using CTA.FeatureDetection.Common.Models;
 using CTA.FeatureDetection.ProjectType.Extensions;
@@ -160,14 +161,23 @@ namespace CTA.Rules.PortCore
                 if (projectConfiguration.UseDefaultRules)
                 {
                     projectConfiguration.RulesDir = Constants.RulesDefaultPath;
-                    analyzerResults
+                    var projectResult = analyzerResults
                         .FirstOrDefault(a => a.ProjectResult?.ProjectFilePath == projectConfiguration.ProjectPath)
-                        .ProjectResult?.SourceFileResults?.SelectMany(s => s.References)?.Select(r => r.Namespace).Distinct().ToList().ForEach(currentReference=> {
-                            if (!allReferences.Contains(currentReference))
+                        .ProjectResult;
+
+                    projectResult?.SourceFileResults?.SelectMany(s => s.References)?.Select(r => r.Namespace).Distinct().ToList().ForEach(currentReference=> {
+                            if (currentReference != null && !allReferences.Contains(currentReference))
                             {
                                 allReferences.Add(currentReference);
                             }
                         });
+
+                    projectResult?.SourceFileResults?.SelectMany(s => s.Children.OfType<UsingDirective>())?.Select(u=>u.Identifier).Distinct().ToList().ForEach(currentReference => {
+                        if (currentReference != null && !allReferences.Contains(currentReference))
+                        {
+                            allReferences.Add(currentReference);
+                        }
+                    });
                 }
             }
             DownloadRecommendationFiles(allReferences);
