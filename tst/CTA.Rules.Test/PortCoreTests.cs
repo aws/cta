@@ -348,42 +348,6 @@ namespace CTA.Rules.Test
             Assert.AreEqual(buildErrors.Count, 0);
         }
 
-        private List<string> GetSolutionBuildErrors(string solutionPath)
-        {
-            var result = GetBuildResults(solutionPath);
-
-            var allErrors = new List<string>();
-            result.ForEach(r => allErrors.AddRange(r.ProjectBuildResult.BuildErrors));
-            return allErrors;
-        }
-
-        private List<AnalyzerResult> GetBuildResults(string solutionPath)
-        {
-            AnalyzerConfiguration configuration = new AnalyzerConfiguration(LanguageOptions.CSharp)
-            {
-                ExportSettings =
-                {
-                    GenerateJsonOutput = false,
-                    OutputPath = @"/tmp/UnitTests"
-                },
-
-                MetaDataSettings =
-                {
-                    LiteralExpressions = true,
-                    MethodInvocations = true,
-                    Annotations = true,
-                    DeclarationNodes = true,
-                    LocationData = false,
-                    ReferenceData = true,
-                    LoadBuildData = true,
-                    ElementAccess = true,
-                    MemberAccess = true
-                }
-            };
-            CodeAnalyzer analyzer = CodeAnalyzerFactory.GetAnalyzer(configuration, NullLogger.Instance);
-            var result = analyzer.AnalyzeSolution(solutionPath).Result;
-            return result;
-        }
 
         private void ValidateConfig(string controllerText)
         {
