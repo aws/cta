@@ -90,15 +90,29 @@
               "TargetCPU": [ "x86", "x64", "ARM32", "ARM64" ]
             }
           ],
-          "Description": "Add a comment to help replace Owin.IAppBuilder.Use with .UseOwin.",
+          "Description": "Replace Owin.IAppBuilder.Use(object, params object[]) with .UseOwin.",
           "Actions": [
+            {
+              "Name": "ReplaceMethodAndParameters",
+              "Type": "Method",
+              "Value": {
+                "oldMethod": "Use",
+                "newMethod": "UseOwin",
+                "newParameters": "(pipeline => { pipeline(next => Invoke); })"
+              },
+              "Description": "Replace Use(object, params object[]) with UseOwin",
+              "ActionValidation": {
+                "Contains": "UseOwin",
+                "NotContains": ""
+              }
+            },
             {
               "Name": "AddComment",
               "Type": "Method",
-              "Value": "Replace Owin.IAppBuilder.Use with .UseOwin(pipeline => { pipeline(next => Invoke); }) with Invoke being the function you wanted to call in your lambda function.",
-              "Description": "Add a comment to explain how to migrate Owin.IAppBuilder.Use to UseOwin.",
+              "Value": "Invoke being the function you wanted to call in your lambda function.",
+              "Description": "Add a comment to explain how to migrate Owin.IAppBuilder.Use(object, params object[]) to UseOwin.",
               "ActionValidation": {
-                "Contains": "ReplaceOwin.IAppBuilder.Usewith.UseOwin",
+                "Contains": "Invoke being the function you wanted to call in your lambda function.",
                 "NotContains": "",
                 "CheckComments": "True"
               }
@@ -127,54 +141,19 @@
               "TargetCPU": [ "x86", "x64", "ARM32", "ARM64" ]
             }
           ],
-          "Description": "Add a comment to help replace Owin.IAppBuilder.Use with either .UseMiddleware<MiddlewareNameHere> or .UseOwin.",
+          "Description": "Replace Owin.IAppBuilder.Use<T>(params object[]) with .UseMiddleware<MiddlewareNameHere>.",
           "Actions": [
             {
-              "Name": "AddComment",
+              "Name": "ReplaceMethodOnly",
               "Type": "Method",
-              "Value": "If this format is used \".Use<MiddlewareNameHere>\" replace with Microsoft.AspNetCore.Builder.IApplicationBuilder.UseMiddleware<MiddlewareNameHere> otherwise replace with .UseOwin(pipeline => { pipeline(next => Invoke); }) with Invoke being the function you wanted to call in your lambda function.",
-              "Description": "Add a comment to explain how to migrate Owin.IAppBuilder.Use to either UseMiddleWare or UseOwin.",
+              "Value": {
+                "oldMethod": "Use",
+                "newMethod": "UseMiddleware"
+              },
+              "Description": "Replace Owin.IAppBuilder.Use<T>(params object[]) with UseMiddleware",
               "ActionValidation": {
-                "Contains": "replacewithMicrosoft.AspNetCore.Builder.IApplicationBuilder.UseMiddleware<MiddlewareNameHere>otherwisereplacewith.UseOwin",
-                "NotContains": "",
-                "CheckComments": "True"
-              }
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "Type": "Method",
-      "Name": "Owin.IAppBuilder.Use(System.Func<Microsoft.Owin.IOwinContext, System.Func<System.Threading.Tasks.Task>, System.Threading.Tasks.Task>)",
-      "Value": "Owin.IAppBuilder.Use(System.Func<Microsoft.Owin.IOwinContext, System.Func<System.Threading.Tasks.Task>, System.Threading.Tasks.Task>)",
-      "KeyType": "Name",
-      "ContainingType": "AppBuilderUseExtensions",
-      "RecommendedActions": [
-        {
-          "Source": "Amazon",
-          "Preferred": "Yes",
-          "TargetFrameworks": [
-            {
-              "Name": "netcoreapp3.1",
-              "TargetCPU": [ "x86", "x64", "ARM32", "ARM64" ]
-            },
-            {
-              "Name": "net5.0",
-              "TargetCPU": [ "x86", "x64", "ARM32", "ARM64" ]
-            }
-          ],
-          "Description": "Add a comment to help replace Owin.IAppBuilder.Use with .UseOwin.",
-          "Actions": [
-            {
-              "Name": "AddComment",
-              "Type": "Method",
-              "Value": "Replace Owin.IAppBuilder.Use with .UseOwin(pipeline => { pipeline(next => Invoke); }) with Invoke being the function you wanted to call in your lambda function.",
-              "Description": "Add a comment to explain how to migrate Owin.IAppBuilder.Use to UseOwin.",
-              "ActionValidation": {
-                "Contains": "ReplaceOwin.IAppBuilder.Usewith.UseOwin",
-                "NotContains": "",
-                "CheckComments": "True"
+                "Contains": "UseMiddleware",
+                "NotContains": ""
               }
             }
           ]
@@ -204,11 +183,12 @@
           "Description": "Replace UseWebApi with UseEndpoints and add a comment to create a configure services method. Add Microsoft.AspNetCore.Builder, Microsoft.Extensions.DependencyInjection namespaces and remove System.Web.Http namespace.",
           "Actions": [
             {
-              "Name": "ReplaceMethodOnly",
+              "Name": "ReplaceMethodAndParameters",
               "Type": "Method",
               "Value": {
                 "oldMethod": "UseWebApi",
-                "newMethod": "UseEndpoints"
+                "newMethod": "UseEndpoints",
+                "newParameters": "(endpoints => { endpoints.MapControllers(); })"
               },
               "Description": "Replace UseWebApi with UseEndpoints",
               "ActionValidation": {
@@ -223,17 +203,6 @@
               "Description": "Add a comment on adding a new configureservices method.",
               "ActionValidation": {
                 "Contains": "publicvoidConfigureServices(IServiceCollectionservices){services.AddControllers();}",
-                "NotContains": "",
-                "CheckComments": "True"
-              }
-            },
-            {
-              "Name": "AddComment",
-              "Type": "Method",
-              "Value": "Please setup your routes here you can use a lambda function if needed such as IApplicationBuilder.UseEndpoints(endpoints => { endpoints.MapControllers(); } );",
-              "Description": "Add a comment on how to setup your MVC controller in startup class.",
-              "ActionValidation": {
-                "Contains": "IApplicationBuilder.UseEndpoints(endpoints=>{endpoints.MapControllers();});",
                 "NotContains": "",
                 "CheckComments": "True"
               }
@@ -292,7 +261,7 @@
               "TargetCPU": [ "x86", "x64", "ARM32", "ARM64" ]
             }
           ],
-          "Description": "Add Microsoft.AspNetCore.SignalR package and replace MapSignalR with UseSignalR. Add a comment to add a configure services method. Add Microsoft.AspNetCore.Builder, Microsoft.Extensions.DependencyInjection namespaces.",
+          "Description": "Add Microsoft.AspNetCore.SignalR package and replace MapSignalR with UseEndpoints. Add a comment to add a configure services method. Add Microsoft.AspNetCore.Builder, Microsoft.Extensions.DependencyInjection namespaces.",
           "Actions": [
             {
               "Name": "AddPackage",
@@ -321,15 +290,16 @@
               }
             },
             {
-              "Name": "ReplaceMethodOnly",
+              "Name": "ReplaceMethodAndParameters",
               "Type": "Method",
               "Value": {
                 "oldMethod": "MapSignalR",
-                "newMethod": "UseSignalR"
+                "newMethod": "UseEndpoints",
+                "newParameters": "(routes => routes.MapHub<Hub>(\"pattern\"))"
               },
-              "Description": "Replace MapSignalR with UseSignalR",
+              "Description": "Replace MapSignalR with UseEndpoints",
               "ActionValidation": {
-                "Contains": "UseSignalR",
+                "Contains": "UseEndpoints",
                 "NotContains": ""
               }
             },
@@ -340,17 +310,6 @@
               "Description": "Add a comment on adding a new configureservices method.",
               "ActionValidation": {
                 "Contains": "publicvoidConfigureServices(IServiceCollectionservices){services.AddSignalR();}",
-                "NotContains": "",
-                "CheckComments": "True"
-              }
-            },
-            {
-              "Name": "AddComment",
-              "Type": "Method",
-              "Value": "Please setup your signalR hub configuration here you can use a lambda function if needed such as .AddSignalR(routes => { routes.MapHub<StronglyTypedChatHub>(\"chathub\")); }",
-              "Description": "Add a comment on how to setup your MVC controller in startup class.",
-              "ActionValidation": {
-                "Contains": "PleasesetupyoursignalRhubconfigurationhere",
                 "NotContains": "",
                 "CheckComments": "True"
               }
@@ -470,10 +429,10 @@
             {
               "Name": "AddComment",
               "Type": "Method",
-              "Value": "Please replace CreatePerOwinContext<T>(System.Func<T>) and add a new ConfigureServices method: public void ConfigureServices(IServiceCollection services) { /* Register your service here instead of using CreatePerOwinContext */ }. For example, app.CreatePerOwinContext(ApplicationDbContext.Create); would become: services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(config.GetConnectionString(\"DefaultConnection\"))); ",
+              "Value": "Please replace CreatePerOwinContext<T>(System.Func<T>) and add a new ConfigureServices method: public void ConfigureServices(IServiceCollection services) { Register your service here instead of using CreatePerOwinContext }. For example, app.CreatePerOwinContext(ApplicationDbContext.Create); would become: services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(config.GetConnectionString(\"DefaultConnection\"))); ",
               "Description": "Add a comment to explain how to replace CreatePerOwinContext<T>(System.Func<T>) with a service in ConfigureServices method.",
               "ActionValidation": {
-                "Contains": "Please replace CreatePerOwinContext<T>(System.Func<T>) and add a new ConfigureServices method: public void ConfigureServices(IServiceCollection services) { /* Register your service here instead of using CreatePerOwinContext */ }.",
+                "Contains": "Please replace CreatePerOwinContext<T>(System.Func<T>) and add a new ConfigureServices method: public void ConfigureServices(IServiceCollection services) { Register your service here instead of using CreatePerOwinContext }.",
                 "NotContains": ""
               }
             }
@@ -506,10 +465,10 @@
             {
               "Name": "AddComment",
               "Type": "Method",
-              "Value": "Please replace CreatePerOwinContext<T>(System.Func<Microsoft.AspNet.Identity.Owin.IdentityFactoryOptions<T>, Microsoft.Owin.IOwinContext, T>) and add a new ConfigureServices method: public void ConfigureServices(IServiceCollection services) { /* Register your service here instead of using CreatePerOwinContext */ }. For example, app.CreatePerOwinContext(ApplicationDbContext.Create); would become: services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(config.GetConnectionString(\"DefaultConnection\"))); ",
+              "Value": "Please replace CreatePerOwinContext<T>(System.Func<Microsoft.AspNet.Identity.Owin.IdentityFactoryOptions<T>, Microsoft.Owin.IOwinContext, T>) and add a new ConfigureServices method: public void ConfigureServices(IServiceCollection services) { Register your service here instead of using CreatePerOwinContext }. For example, app.CreatePerOwinContext(ApplicationDbContext.Create); would become: services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(config.GetConnectionString(\"DefaultConnection\"))); ",
               "Description": "Add a comment to explain how to replace CreatePerOwinContext<T>(System.Func<Microsoft.AspNet.Identity.Owin.IdentityFactoryOptions<T>, Microsoft.Owin.IOwinContext, T>) with a service in ConfigureServices method.",
               "ActionValidation": {
-                "Contains": "Please replace CreatePerOwinContext<T>(System.Func<Microsoft.AspNet.Identity.Owin.IdentityFactoryOptions<T>, Microsoft.Owin.IOwinContext, T>) and add a new ConfigureServices method: public void ConfigureServices(IServiceCollection services) { /* Register your service here instead of using CreatePerOwinContext */ }.",
+                "Contains": "Please replace CreatePerOwinContext<T>(System.Func<Microsoft.AspNet.Identity.Owin.IdentityFactoryOptions<T>, Microsoft.Owin.IOwinContext, T>) and add a new ConfigureServices method: public void ConfigureServices(IServiceCollection services) { Register your service here instead of using CreatePerOwinContext }.",
                 "NotContains": ""
               }
             }
@@ -542,10 +501,10 @@
             {
               "Name": "AddComment",
               "Type": "Method",
-              "Value": "Please replace CreatePerOwinContext<T>(System.Func<Microsoft.AspNet.Identity.Owin.IdentityFactoryOptions<T>, Microsoft.Owin.IOwinContext, T>, System.Action<Microsoft.AspNet.Identity.Owin.IdentityFactoryOptions<T>, T>) and add a new ConfigureServices method: public void ConfigureServices(IServiceCollection services) { /* Register your service here instead of using CreatePerOwinContext */ }. For example, app.CreatePerOwinContext(ApplicationDbContext.Create); would become: services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(config.GetConnectionString(\"DefaultConnection\"))); ",
+              "Value": "Please replace CreatePerOwinContext<T>(System.Func<Microsoft.AspNet.Identity.Owin.IdentityFactoryOptions<T>, Microsoft.Owin.IOwinContext, T>, System.Action<Microsoft.AspNet.Identity.Owin.IdentityFactoryOptions<T>, T>) and add a new ConfigureServices method: public void ConfigureServices(IServiceCollection services) { Register your service here instead of using CreatePerOwinContext }. For example, app.CreatePerOwinContext(ApplicationDbContext.Create); would become: services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(config.GetConnectionString(\"DefaultConnection\"))); ",
               "Description": "Add a comment to explain how to replace CreatePerOwinContext<T>(System.Func<Microsoft.AspNet.Identity.Owin.IdentityFactoryOptions<T>, Microsoft.Owin.IOwinContext, T>, System.Action<Microsoft.AspNet.Identity.Owin.IdentityFactoryOptions<T>, T>) with a service in ConfigureServices method.",
               "ActionValidation": {
-                "Contains": "Please replace CreatePerOwinContext<T>(System.Func<Microsoft.AspNet.Identity.Owin.IdentityFactoryOptions<T>, Microsoft.Owin.IOwinContext, T>, System.Action<Microsoft.AspNet.Identity.Owin.IdentityFactoryOptions<T>, T>) and add a new ConfigureServices method: public void ConfigureServices(IServiceCollection services) { /* Register your service here instead of using CreatePerOwinContext */ }.",
+                "Contains": "Please replace CreatePerOwinContext<T>(System.Func<Microsoft.AspNet.Identity.Owin.IdentityFactoryOptions<T>, Microsoft.Owin.IOwinContext, T>, System.Action<Microsoft.AspNet.Identity.Owin.IdentityFactoryOptions<T>, T>) and add a new ConfigureServices method: public void ConfigureServices(IServiceCollection services) { Register your service here instead of using CreatePerOwinContext }.",
                 "NotContains": ""
               }
             }
