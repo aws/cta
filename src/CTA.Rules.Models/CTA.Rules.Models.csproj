@@ -11,8 +11,8 @@
 
 
   <ItemGroup>
-    <PackageReference Include="Codelyzer.Analysis" Version="1.4.28-alpha-g24dd059054" />
-    <PackageReference Include="Codelyzer.Analysis.Model" Version="1.4.28-alpha-g24dd059054" />
+    <PackageReference Include="Codelyzer.Analysis" Version="1.5.4-alpha-gb3fb19bc09" />
+    <PackageReference Include="Codelyzer.Analysis.Model" Version="1.5.4-alpha-gb3fb19bc09" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
   </ItemGroup>
 

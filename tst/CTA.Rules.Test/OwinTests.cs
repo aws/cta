@@ -14,14 +14,8 @@ namespace CTA.Rules.Test
         [SetUp]
         public void Setup()
         {
-            Setup(this.GetType());
-            tempDir = GetTstPath(Path.Combine(new string[] { "Projects", "Temp", "Owin" }));
-            DownloadTestProjects();
-        }
-
-        private void DownloadTestProjects()
-        {
-            downloadLocation = DownloadTestProjects(tempDir);
+            tempDir = SetupTests.TempDir;
+            downloadLocation = SetupTests.DownloadLocation;
         }
 
         [TestCase(TargetFramework.Dotnet5)]
@@ -105,6 +99,7 @@ namespace CTA.Rules.Test
 
             StringAssert.Contains(@"using Microsoft.AspNetCore.Http", startupText);
             StringAssert.Contains(@"HttpContext ", startupText);
+            StringAssert.Contains(@"UseMiddleware", startupText);
             StringAssert.Contains(@"Please replace CreatePerOwinContext<T>(System.Func<T>)", startupText);
             StringAssert.Contains(@"Please replace CreatePerOwinContext<T>(System.Func<Microsoft.AspNet.Identity.Owin.IdentityFactoryOptions<T>, Microsoft.Owin.IOwinContext, T>)", startupText);
             StringAssert.Contains(@"Please replace CreatePerOwinContext<T>(System.Func<Microsoft.AspNet.Identity.Owin.IdentityFactoryOptions<T>, Microsoft.Owin.IOwinContext, T>, System.Action<Microsoft.AspNet.Identity.Owin.IdentityFactoryOptions<T>, T>)", startupText);
@@ -295,7 +290,7 @@ namespace CTA.Rules.Test
             var startupText = File.ReadAllText(Path.Combine(projectDir, "Startup.cs"));
             var programText = File.ReadAllText(Path.Combine(projectDir, "Program.cs"));
 
-            StringAssert.Contains(@"UseSignalR", startupText);
+            StringAssert.Contains(@"UseEndpoints", startupText);
             StringAssert.Contains(@"ConfigureServices", startupText);
             StringAssert.Contains(@"AddSignalR", startupText);
             StringAssert.Contains(@"MapHub", startupText);
@@ -374,7 +369,7 @@ namespace CTA.Rules.Test
             StringAssert.Contains(@"Please add services.AddAuthentication().AddOpenIdConnect();", startupText);
             StringAssert.Contains(@"Microsoft.AspNetCore.Authentication.OpenIdConnect", startupText);
             StringAssert.DoesNotContain(@"Microsoft.Owin.Security.OpenIdConnect", startupText);
-    
+
             //Check that package has been added:
             StringAssert.Contains(version == TargetFramework.Dotnet5 ? @"Microsoft.AspNetCore.Diagnostics" : @"<PackageReference Include=""Microsoft.AspNetCore.Authentication.OpenIdConnect"" Version=""3.1.15"" />", csProjContent);
             StringAssert.Contains(@"Microsoft.AspNetCore.Authentication.OpenIdConnect", csProjContent);
@@ -382,6 +377,7 @@ namespace CTA.Rules.Test
             //Check that correct version is used
             Assert.True(csProjContent.IndexOf(string.Concat(">", version, "<")) > 0);
         }
+
 
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.DotnetCoreApp31)]
@@ -403,7 +399,7 @@ namespace CTA.Rules.Test
 
             StringAssert.Contains(@"Microsoft.AspNetCore.Builder", serverStartupText);
             StringAssert.Contains(@"IApplicationBuilder", serverStartupText);
-            StringAssert.Contains(@"UseOwin", serverStartupText);
+            StringAssert.Contains(@"Please replace Get with Items. Such as (Casting_Type)context.Items[""String_To_Search_For""];", serverStartupText);
 
             StringAssert.Contains("WebHostBuilder", serverProgramText);
 
@@ -419,26 +415,18 @@ namespace CTA.Rules.Test
             Assert.True(serverProjContent.IndexOf(string.Concat(">", version, "<")) > 0);
         }
 
-        [TearDown]
-        public void Cleanup()
+        [TestCase(TargetFramework.Dotnet5)]
+        [TestCase(TargetFramework.DotnetCoreApp31)]
+        public void TestOwinParadise(string version)
         {
-            DeleteDir(0);
+            TestSolutionAnalysis results = AnalyzeSolution("OwinParadise.sln", tempDir, downloadLocation, version);
+
+            var owinParadise = results.ProjectResults.Where(p => p.CsProjectPath.EndsWith("OwinParadise.csproj")).FirstOrDefault();
+            FileAssert.Exists(owinParadise.CsProjectPath);
+
+            var buildErrors = GetSolutionBuildErrors(results.SolutionRunResult.SolutionPath);
+            Assert.AreEqual(0, buildErrors.Count);
         }
 
-        private void DeleteDir(int retries)
-        {
-            if (retries <= 10)
-            {
-                try
-                {
-                    Directory.Delete(tempDir, true);
-                }
-                catch (Exception)
-                {
-                    Thread.Sleep(60000);
-                    DeleteDir(retries + 1);
-                }
-            }
-        }
     }
 }
