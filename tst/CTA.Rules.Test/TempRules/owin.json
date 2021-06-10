@@ -52,7 +52,7 @@
               "Value": "Microsoft.AspNetCore.Builder",
               "Description": "Add Microsoft.AspNetCore.Builder namespace",
               "ActionValidation": {
-                "Contains": "usingMicrosoft.AspNetCore.Builder;",
+                "Contains": "using Microsoft.AspNetCore.Builder;",
                 "NotContains": ""
               }
             },
@@ -63,7 +63,7 @@
               "Description": "Remove Owin namespace",
               "ActionValidation": {
                 "Contains": "",
-                "NotContains": "usingOwin;"
+                "NotContains": "using Owin;"
               }
             }
           ]
@@ -202,7 +202,7 @@
               "Value": "Please add a new ConfigureServices method: public void ConfigureServices(IServiceCollection services) { services.AddControllers(); }",
               "Description": "Add a comment on adding a new configureservices method.",
               "ActionValidation": {
-                "Contains": "publicvoidConfigureServices(IServiceCollectionservices){services.AddControllers();}",
+                "Contains": "Please add a new ConfigureServices method: public void ConfigureServices(IServiceCollection services) { services.AddControllers(); }",
                 "NotContains": "",
                 "CheckComments": "True"
               }
@@ -213,7 +213,7 @@
               "Value": "Microsoft.AspNetCore.Builder",
               "Description": "Add Microsoft.AspNetCore.Builder namespace",
               "ActionValidation": {
-                "Contains": "usingMicrosoft.AspNetCore.Builder;",
+                "Contains": "using Microsoft.AspNetCore.Builder;",
                 "NotContains": ""
               }
             },
@@ -223,7 +223,7 @@
               "Value": "Microsoft.Extensions.DependencyInjection",
               "Description": "Add Microsoft.AspNetCore.Builder namespace",
               "ActionValidation": {
-                "Contains": "usingMicrosoft.Extensions.DependencyInjection;",
+                "Contains": "using Microsoft.Extensions.DependencyInjection;",
                 "NotContains": ""
               }
             },
@@ -234,7 +234,7 @@
               "Description": "Remove System.Web.Http namespace",
               "ActionValidation": {
                 "Contains": "",
-                "NotContains": "usingSystem.Web.Http;"
+                "NotContains": "using System.Web.Http;"
               }
             }
           ]
@@ -275,7 +275,7 @@
               "Value": "Microsoft.AspNetCore.Builder",
               "Description": "Add Microsoft.AspNetCore.Builder namespace",
               "ActionValidation": {
-                "Contains": "usingMicrosoft.AspNetCore.Builder;",
+                "Contains": "using Microsoft.AspNetCore.Builder;",
                 "NotContains": ""
               }
             },
@@ -285,7 +285,7 @@
               "Value": "Microsoft.Extensions.DependencyInjection",
               "Description": "Add Microsoft.AspNetCore.Builder namespace",
               "ActionValidation": {
-                "Contains": "usingMicrosoft.Extensions.DependencyInjection;",
+                "Contains": "using Microsoft.Extensions.DependencyInjection;",
                 "NotContains": ""
               }
             },
@@ -319,7 +319,7 @@
               "Value": "Please add a new ConfigureServices method: public void ConfigureServices(IServiceCollection services) { services.AddSignalR(); }",
               "Description": "Add a comment on adding a new configureservices method.",
               "ActionValidation": {
-                "Contains": "publicvoidConfigureServices(IServiceCollectionservices){services.AddSignalR();}",
+                "Contains": "Please add a new ConfigureServices method: public void ConfigureServices(IServiceCollection services) { services.AddSignalR(); }",
                 "NotContains": "",
                 "CheckComments": "True"
               }
@@ -395,7 +395,7 @@
               "Value": "Microsoft.Extensions.DependencyInjection",
               "Description": "Add Microsoft.AspNetCore.Builder namespace",
               "ActionValidation": {
-                "Contains": "usingMicrosoft.Extensions.DependencyInjection;",
+                "Contains": "using Microsoft.Extensions.DependencyInjection;",
                 "NotContains": ""
               }
             },
@@ -405,7 +405,7 @@
               "Value": "Please add a new ConfigureServices method: public void ConfigureServices(IServiceCollection services) { services.AddDirectoryBrowser(); }",
               "Description": "Add a comment on adding a new configureservices method.",
               "ActionValidation": {
-                "Contains": "publicvoidConfigureServices(IServiceCollectionservices){services.AddDirectoryBrowser();}",
+                "Contains": "Please add a new ConfigureServices method: public void ConfigureServices(IServiceCollection services) { services.AddDirectoryBrowser(); }",
                 "NotContains": "",
                 "CheckComments": "True"
               }
