@@ -141,13 +141,11 @@ namespace CTA.Rules.Config
         /// 
         /// Note: 1 tick is 100 ns
         /// </summary>
-        /// <param name="fileName">Original name of file</param>
-        /// <param name="extension">Extension to be appended to file name</param>
+        /// <param name="filePath">Original name of file</param>
         /// <param name="mutexName">Identifier name of mutex</param>
         /// <param name="timeoutInSeconds">Time to wait for the mutex handle</param>
         /// <returns>File name with unique tick identifier and file extension appended to it</returns>
-        public static string GenerateUniqueFileName(string fileName, string extension, string mutexName,
-            int timeoutInSeconds = 5)
+        public static string GenerateUniqueFileName(string filePath, string mutexName, int timeoutInSeconds = 5)
         {
             string now;
             using Mutex mutex = new Mutex(false, mutexName);
@@ -163,6 +161,8 @@ namespace CTA.Rules.Config
                 now = DateTime.Now.ToString("yyyyMMdd_HH_mm_ss_fffffff");
             }
 
+            var fileName = Path.GetFileNameWithoutExtension(filePath);
+            var extension = Path.GetExtension(filePath);
             return $"{fileName}_CONFLICT_{now}{extension}";
         }
 
@@ -173,27 +173,30 @@ namespace CTA.Rules.Config
         /// <param name="content">String content to persist</param>
         /// <param name="fileShare">FileShare mode</param>
         /// <param name="mutexName">Mutex identifier</param>
+        /// <returns>File path that was written to</returns>
         /// <exception cref="IOException">Throws if there is an unexpected IOException during writing</exception>
-        public static void ThreadSafeExportStringToFile(string filePath, string content, FileShare fileShare = FileShare.ReadWrite, string mutexName = DefaultMutexName)
+        public static string ThreadSafeExportStringToFile(string filePath, string content, FileShare fileShare = FileShare.ReadWrite, string mutexName = DefaultMutexName)
         {
             try
             {
                 using var fileStream = File.Open(filePath, FileMode.OpenOrCreate, FileAccess.ReadWrite, fileShare);
                 using var streamWriter = new StreamWriter(fileStream);
                 streamWriter.Write(content);
+
+                return filePath;
             }
             catch (IOException)
             {
                 // IOException is thrown if filePath is locked by an external process
                 // If this happens, generate a unique identifier, append it to the file name,
                 // and try writing again.
-                var fileName = Path.GetFileNameWithoutExtension(filePath);
-                var extension = Path.GetExtension(filePath);
-                var uniqueFileName = GenerateUniqueFileName(fileName, extension, mutexName);
+                var uniqueFileName = GenerateUniqueFileName(filePath, mutexName);
                 
                 using var fileStream = File.Open(uniqueFileName, FileMode.OpenOrCreate, FileAccess.ReadWrite, fileShare);
                 using var streamWriter = new StreamWriter(fileStream);
                 streamWriter.Write(content);
+
+                return uniqueFileName;
             }
         }
     }
