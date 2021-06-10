@@ -424,19 +424,6 @@ namespace CTA.Rules.Test
             var owinParadise = results.ProjectResults.Where(p => p.CsProjectPath.EndsWith("OwinParadise.csproj")).FirstOrDefault();
             FileAssert.Exists(owinParadise.CsProjectPath);
 
-            var owinProjContent = owinParadise.CsProjectContent;
-            var AspNetRoutesText = File.ReadAllText(Path.Combine(owinParadise.ProjectDirectory, "AspNetRoutes.cs"));
-            var BranchingPipelinesText = File.ReadAllText(Path.Combine(owinParadise.ProjectDirectory, "BranchingPipelines.cs"));
-            var CustomServerText = File.ReadAllText(Path.Combine(owinParadise.ProjectDirectory, "CustomServer.cs"));
-            var EmbeddedText = File.ReadAllText(Path.Combine(owinParadise.ProjectDirectory, "Embedded.cs"));
-            var HelloWorldText = File.ReadAllText(Path.Combine(owinParadise.ProjectDirectory, "HelloWorld.cs"));
-            var HelloWorldRawOwinText = File.ReadAllText(Path.Combine(owinParadise.ProjectDirectory, "HelloWorldRawOwin.cs"));
-            var OwinSelfHostText = File.ReadAllText(Path.Combine(owinParadise.ProjectDirectory, "OwinSelfHost.cs"));
-            var OwinWebAPIText = File.ReadAllText(Path.Combine(owinParadise.ProjectDirectory, "OwinWebAPI.cs"));
-            var SignalRText = File.ReadAllText(Path.Combine(owinParadise.ProjectDirectory, "SignalR.cs"));
-            var StaticFilesSampleText = File.ReadAllText(Path.Combine(owinParadise.ProjectDirectory, "StaticFilesSample.cs"));
-            var WebSocketSampleText = File.ReadAllText(Path.Combine(owinParadise.ProjectDirectory, "WebSocketSample.cs"));
-
             var buildErrors = GetSolutionBuildErrors(results.SolutionRunResult.SolutionPath);
             Assert.AreEqual(0, buildErrors.Count);
         }
