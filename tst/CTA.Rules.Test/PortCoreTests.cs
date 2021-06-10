@@ -323,6 +323,7 @@ namespace CTA.Rules.Test
         }
 
         [TestCase(TargetFramework.DotnetCoreApp31)]
+        [TestCase(TargetFramework.Dotnet5)]
         public void TestBuildableMvcSolution(string version)
         {
             TestSolutionAnalysis resultWithoutCodePort = AnalyzeSolution("BuildableMvc.sln", tempDir, downloadLocation, version, portCode: false);
@@ -335,6 +336,7 @@ namespace CTA.Rules.Test
         }
 
         [TestCase(TargetFramework.DotnetCoreApp31)]
+        [TestCase(TargetFramework.Dotnet5)]
         public void TestBuildableWebApiSolution(string version)
         {
             TestSolutionAnalysis resultWithoutCodePort = AnalyzeSolution("BuildableWebApi.sln", tempDir, downloadLocation, version, portCode: false);
