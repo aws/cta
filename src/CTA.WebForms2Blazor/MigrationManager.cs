@@ -1,7 +1,8 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
-using System.Collections.Generic;
+using CTA.WebForms2Blazor.Services;
 using CTA.WebForms2Blazor.Factories;
+using CTA.WebForms2Blazor.ProjectManagement;
 using CTA.WebForms2Blazor.FileInformationModel;
 
 namespace CTA.WebForms2Blazor
@@ -11,13 +12,11 @@ namespace CTA.WebForms2Blazor
         private readonly string _inputProjectPath;
         private readonly string _outputProjectPath;
 
-        // At the moment these are only being used in the
-        // PerformMigration method, but they are likely to
-        // be used in other places later on. Leaving them
-        // in for now
-        private WebFormsProjectAnalyzer _projectAnalayzer;
-        private BlazorProjectBuilder _projectBuilder;
-        private IEnumerable<FileInformation> _fileInformationCollection;
+        // Do these need to be class fields?
+        private WorkspaceManagerService _webFormsWorkspaceBuilder;
+        private WorkspaceManagerService _blazorWorkspaceBuilder;
+        private ProjectAnalyzer _webFormsProjectAnalyzer;
+        private ProjectBuilder _blazorProjectBuilder;
 
         public MigrationManager(string inputProjectPath, string outputProjectPath)
         {
@@ -25,13 +24,18 @@ namespace CTA.WebForms2Blazor
             _outputProjectPath = outputProjectPath;
         }
 
-        public async void PerformMigration()
+        public async Task PerformMigration()
         {
-            _projectAnalayzer = new WebFormsProjectAnalyzer(_inputProjectPath);
-            _projectBuilder = new BlazorProjectBuilder(_outputProjectPath);
-            _fileInformationCollection = FileInformationFactory.BuildMany(_projectAnalayzer.GetProjectFileInfo());
+            SetUpWorkspaceBuilders();
 
-            var migrationTasks = _fileInformationCollection.Select(fileInformation =>
+            _webFormsProjectAnalyzer = new ProjectAnalyzer(_inputProjectPath);
+            _blazorProjectBuilder = new ProjectBuilder(_outputProjectPath);
+
+            // Pass workspace build manager to factory constructor
+
+            var fileInformationCollection = FileInformationFactory.BuildMany(_webFormsProjectAnalyzer.GetProjectFileInfo());
+
+            var migrationTasks = fileInformationCollection.Select(fileInformation =>
                 // ContinueWith specifies the action to be run after each task completes,
                 // in this case it sends each generated file to the project builder
                 fileInformation.MigrateFileAsync().ContinueWith(generatedFiles =>
@@ -42,14 +46,24 @@ namespace CTA.WebForms2Blazor
                     // would force our lambda expression to be async
                     foreach (FileInformation generatedFile in generatedFiles.Result)
                     {
-                        _projectBuilder.WriteFileInformationToProject(generatedFile);
+                        _blazorProjectBuilder.WriteFileInformationToProject(generatedFile);
                     }
-                }));
+                }
+            ));
 
             // Combines migration tasks into a single task we can await
             await Task.WhenAll(migrationTasks);
 
             // TODO: Any necessary cleanup or last checks on new project
+        }
+
+        private void SetUpWorkspaceBuilders()
+        {
+            _webFormsWorkspaceBuilder = new WorkspaceManagerService();
+            _blazorWorkspaceBuilder = new WorkspaceManagerService();
+
+            _blazorWorkspaceBuilder.CreateSolutionFile();
+            _webFormsWorkspaceBuilder.CreateSolutionFile();
         }
     }
 }

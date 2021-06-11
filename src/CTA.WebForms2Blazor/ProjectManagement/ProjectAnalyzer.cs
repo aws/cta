@@ -1,23 +1,23 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Collections.Generic;
 
-namespace CTA.WebForms2Blazor
+namespace CTA.WebForms2Blazor.ProjectManagement
 {
-    public class WebFormsProjectAnalyzer
+    public class ProjectAnalyzer
     {
         private readonly string _inputProjectPath;
 
         public string InputProjectPath { get { return _inputProjectPath; } }
 
-        public WebFormsProjectAnalyzer(string inputProjectPath)
+        public ProjectAnalyzer(string inputProjectPath)
         {
             _inputProjectPath = inputProjectPath;
         }
 
         public IEnumerable<FileInfo> GetProjectFileInfo()
         {
-            throw new NotImplementedException();
+            var directoryInfo = new DirectoryInfo(_inputProjectPath);
+            return directoryInfo.GetFiles("*", SearchOption.AllDirectories);
         }
     }
 }
