@@ -210,6 +210,8 @@ namespace CTA.Rules.Analyzer
                             }
                         case IdConstants.InvocationIdName:
                             {
+                                string overrideKey = string.Empty;
+
                                 InvocationExpression invocationExpression = (InvocationExpression)child;
 
                                 ////If we don't have a semantic analysis, we dont want to replace invocation expressions, otherwise we'll be replacing expressions regardless of their class/namespace
@@ -229,15 +231,14 @@ namespace CTA.Rules.Analyzer
                                         if (token != null)
                                         {
                                             //We set the key so that we don't do another wildcard search during replacement, we just use the name as it was declared in the code
-                                            token.Key = compareToken.Key;
-                                            token.FullKey = compareToken.Key;
+                                            overrideKey = compareToken.Key;
                                         }
                                     }
                                 }
 
                                 if (token != null)
                                 {
-                                    AddActions(fileAction, token, child.TextSpan);
+                                    AddActions(fileAction, token, child.TextSpan, overrideKey);
                                     containsActions = true;
                                 }
                                 if (AnalyzeChildren(fileAction, child.Children, ++level, parentNamespace, parentClass)) { containsActions = true; }
@@ -367,7 +368,7 @@ namespace CTA.Rules.Analyzer
         /// </summary>
         /// <param name="fileAction">The file to run actions on</param>
         /// <param name="token">The token that matched the file</param>
-        private void AddActions(FileActions fileAction, NodeToken token, TextSpan textSpan)
+        private void AddActions(FileActions fileAction, NodeToken token, TextSpan textSpan, string overrideKey = "")
         {
             fileAction.AttributeActions.UnionWith(token.AttributeActions.Select(a => new AttributeAction()
             {
@@ -409,7 +410,7 @@ namespace CTA.Rules.Analyzer
 
             fileAction.InvocationExpressionActions.UnionWith(token.InvocationExpressionActions.Select(a => new InvocationExpressionAction()
             {
-                Key = a.Key.Contains("*") ? token.Key : a.Key,
+                Key = !string.IsNullOrEmpty(overrideKey) ? overrideKey : a.Key,
                 Description = a.Description,
                 Value = a.Value,
                 Name = a.Name,

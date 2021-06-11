@@ -589,6 +589,144 @@
           ]
         }
       ]
+    },
+    {
+      "Type": "Method",
+      "Name": "System.Web.Mvc.Controller.TryUpdateModel(*)",
+      "Value": "System.Web.Mvc.Controller.TryUpdateModel(*)",
+      "KeyType": "Name",
+      "ContainingType": "Controller",
+      "RecommendedActions": [
+        {
+          "Source": "Amazon",
+          "Preferred": "Yes",
+          "TargetFrameworks": [
+            {
+              "Name": "netcoreapp3.1",
+              "TargetCPU": [ "x86", "x64", "ARM32", "ARM64" ]
+            },
+            {
+              "Name": "net5.0",
+              "TargetCPU": [ "x86", "x64", "ARM32", "ARM64" ]
+            }
+          ],
+          "Description": "Replace TryUpdateModel with TryUpdateModelAsync and replace System.Web.Mvc namespace with Microsoft.AspNetCore.Mvc.",
+          "Actions": [
+            {
+              "Name": "ReplaceMethodOnly",
+              "Type": "Method",
+              "Value": {
+                "oldMethod": "TryUpdateModel",
+                "newMethod": "TryUpdateModelAsync"
+              },
+              "Description": "Replace TryUpdateModel with TryUpdateModelAsync",
+              "ActionValidation": {
+                "Contains": "TryUpdateModelAsync"
+              }
+            },
+            {
+              "Name": "AddDirective",
+              "Type": "Using",
+              "Value": "Microsoft.AspNetCore.Mvc",
+              "Description": "Add Microsoft.AspNetCore.Mvc namespace",
+              "ActionValidation": {
+                "Contains": "using Microsoft.AspNetCore.Mvc;",
+                "NotContains": ""
+              }
+            },
+            {
+              "Name": "RemoveDirective",
+              "Type": "Using",
+              "Value": "System.Web.Mvc",
+              "Description": "Remove System.Web.Mvc namespace",
+              "ActionValidation": {
+                "Contains": "",
+                "NotContains": "using System.Web.Mvc;"
+              }
+            },
+            {
+              "Name": "AddComment",
+              "Type": "Method",
+              "Value": "This updated method might require the parameters to be re-organized",
+              "Description": "Add a comment to inform the user to reorganize the parameters",
+              "ActionValidation": {
+                "Contains": "This method might require the parameters to be re-organized",
+                "NotContains": "",
+                "CheckComments": "True"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Type": "Method",
+      "Name": "System.Web.Mvc.Controller.TryUpdateModel<*>(*)",
+      "Value": "System.Web.Mvc.Controller.TryUpdateModel<*>(*)",
+      "KeyType": "Name",
+      "ContainingType": "Controller",
+      "RecommendedActions": [
+        {
+          "Source": "Amazon",
+          "Preferred": "Yes",
+          "TargetFrameworks": [
+            {
+              "Name": "netcoreapp3.1",
+              "TargetCPU": [ "x86", "x64", "ARM32", "ARM64" ]
+            },
+            {
+              "Name": "net5.0",
+              "TargetCPU": [ "x86", "x64", "ARM32", "ARM64" ]
+            }
+          ],
+          "Description": "Replace TryUpdateModel with TryUpdateModelAsync and replace System.Web.Mvc namespace with Microsoft.AspNetCore.Mvc.",
+          "Actions": [
+            {
+              "Name": "ReplaceMethodOnly",
+              "Type": "Method",
+              "Value": {
+                "oldMethod": "TryUpdateModel",
+                "newMethod": "TryUpdateModelAsync"
+              },
+              "Description": "Replace TryUpdateModel with TryUpdateModelAsync",
+              "ActionValidation": {
+                "Contains": "TryUpdateModelAsync"
+              }
+            },
+            {
+              "Name": "AddDirective",
+              "Type": "Using",
+              "Value": "Microsoft.AspNetCore.Mvc",
+              "Description": "Add Microsoft.AspNetCore.Mvc namespace",
+              "ActionValidation": {
+                "Contains": "using Microsoft.AspNetCore.Mvc;",
+                "NotContains": ""
+              }
+            },
+            {
+              "Name": "RemoveDirective",
+              "Type": "Using",
+              "Value": "System.Web.Mvc",
+              "Description": "Remove System.Web.Mvc namespace",
+              "ActionValidation": {
+                "Contains": "",
+                "NotContains": "using System.Web.Mvc;"
+              }
+            },
+            {
+              "Name": "AddComment",
+              "Type": "Method",
+              "Value": "This updated method might require the parameters to be re-organized",
+              "Description": "Add a comment to inform the user to reorganize the parameters",
+              "ActionValidation": {
+                "Contains": "This method might require the parameters to be re-organized",
+                "NotContains": "",
+                "CheckComments": "True"
+              }
+            }
+          ]
+        }
+      ]
     }
   ]
 }
