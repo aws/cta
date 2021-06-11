@@ -18,18 +18,20 @@ namespace CTA.WebForms2Blazor
         private WebFormsProjectAnalyzer _projectAnalayzer;
         private BlazorProjectBuilder _projectBuilder;
         private IEnumerable<FileInformation> _fileInformationCollection;
+        private FileInformationFactory fileFactory;
 
         public MigrationManager(string inputProjectPath, string outputProjectPath)
         {
             _inputProjectPath = inputProjectPath;
             _outputProjectPath = outputProjectPath;
+            fileFactory = new FileInformationFactory(_inputProjectPath);
         }
 
         public async void PerformMigration()
         {
             _projectAnalayzer = new WebFormsProjectAnalyzer(_inputProjectPath);
             _projectBuilder = new BlazorProjectBuilder(_outputProjectPath);
-            _fileInformationCollection = FileInformationFactory.BuildMany(_projectAnalayzer.GetProjectFileInfo());
+            _fileInformationCollection = fileFactory.BuildMany(_projectAnalayzer.GetProjectFileInfo());
 
             var migrationTasks = _fileInformationCollection.Select(fileInformation =>
                 // ContinueWith specifies the action to be run after each task completes,
