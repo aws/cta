@@ -13,9 +13,9 @@ namespace CTA.WebForms2Blazor.Tests.ProjectManagement
             var projectFileInfo = projectAnalyzer.GetProjectFileInfo();
 
             Assert.AreEqual(projectFileInfo.Count(), 3);
-            Assert.True(projectFileInfo.Any(fileInfo => fileInfo.Name.Equals(PartialProjectSetupFixture.TEST_XML_FILE_NAME)));
-            Assert.True(projectFileInfo.Any(fileInfo => fileInfo.Name.Equals(PartialProjectSetupFixture.NESTED_TEST_CLASS_FILE_NAME)));
-            Assert.True(projectFileInfo.Any(fileInfo => fileInfo.Name.Equals(PartialProjectSetupFixture.NESTED_TEST_TEXT_FILE_NAME)));
+            Assert.True(projectFileInfo.Any(fileInfo => fileInfo.Name.Equals(PartialProjectSetupFixture.TestXMLFileName)));
+            Assert.True(projectFileInfo.Any(fileInfo => fileInfo.Name.Equals(PartialProjectSetupFixture.NestedTestClassFileName)));
+            Assert.True(projectFileInfo.Any(fileInfo => fileInfo.Name.Equals(PartialProjectSetupFixture.NestedTestTextFileName)));
         }
     }
 }

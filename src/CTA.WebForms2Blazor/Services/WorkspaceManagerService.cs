@@ -10,9 +10,9 @@ namespace CTA.WebForms2Blazor.Services
 {
     public class WorkspaceManagerService
     {
-        private const string WORKSPACE_DUPLICATE_ERROR = "Attempted to create a new Blazor workspace when one already exists";
-        private const string WORKSPACE_MISSING_ERROR_TEMPLATE = "Workspace {0} operation attempted, but no workspace exists";
-        private const string WORKSPACE_UPDATE_FAILED_ERROR_TEMPLATE = "Workspace {0} operation attempted, but workspace failed to apply changes";
+        private const string WorkspaceDuplicateError = "Attempted to create a new Blazor workspace when one already exists";
+        private const string WorkspaceMissingeErrorTemplate = "Workspace {0} operation attempted, but no workspace exists";
+        private const string WorkspaceUpdateFailedErrorTemplate = "Workspace {0} operation attempted, but workspace failed to apply changes";
 
         // We track number of projects and documents explicitly because the number of
         // documents in the workspace only equates to code files, and also for use by
@@ -31,7 +31,7 @@ namespace CTA.WebForms2Blazor.Services
         {
             if (_workspace != null)
             {
-                throw new InvalidOperationException(WORKSPACE_DUPLICATE_ERROR);
+                throw new InvalidOperationException(WorkspaceDuplicateError);
             }
 
             _workspace = new AdhocWorkspace();
@@ -72,7 +72,7 @@ namespace CTA.WebForms2Blazor.Services
         {
             if (_workspace == null)
             {
-                throw new InvalidOperationException(string.Format(WORKSPACE_MISSING_ERROR_TEMPLATE, "add project reference"));
+                throw new InvalidOperationException(string.Format(WorkspaceMissingeErrorTemplate, "add project reference"));
             }
 
             var targetProject = _workspace.CurrentSolution.Projects.Where(project => project.Name.Equals(projectName)).Single();
@@ -80,7 +80,7 @@ namespace CTA.WebForms2Blazor.Services
 
             if (!_workspace.TryApplyChanges(newSolution))
             {
-                throw new InvalidOperationException(string.Format(WORKSPACE_UPDATE_FAILED_ERROR_TEMPLATE, "add project reference"));
+                throw new InvalidOperationException(string.Format(WorkspaceUpdateFailedErrorTemplate, "add project reference"));
             }
         }
 
@@ -88,7 +88,7 @@ namespace CTA.WebForms2Blazor.Services
         {
             if (_workspace == null)
             {
-                throw new InvalidOperationException(string.Format(WORKSPACE_MISSING_ERROR_TEMPLATE, "add metadata reference"));
+                throw new InvalidOperationException(string.Format(WorkspaceMissingeErrorTemplate, "add metadata reference"));
             }
 
             var targetProject = _workspace.CurrentSolution.Projects.Where(project => project.Name.Equals(projectName)).Single();
@@ -96,7 +96,7 @@ namespace CTA.WebForms2Blazor.Services
 
             if (!_workspace.TryApplyChanges(newSolution))
             {
-                throw new InvalidOperationException(string.Format(WORKSPACE_UPDATE_FAILED_ERROR_TEMPLATE, "add metadata reference"));
+                throw new InvalidOperationException(string.Format(WorkspaceUpdateFailedErrorTemplate, "add metadata reference"));
             }
         }
 
@@ -104,7 +104,7 @@ namespace CTA.WebForms2Blazor.Services
         {
             if (_workspace == null)
             {
-                throw new InvalidOperationException(string.Format(WORKSPACE_MISSING_ERROR_TEMPLATE, "add document"));
+                throw new InvalidOperationException(string.Format(WorkspaceMissingeErrorTemplate, "add document"));
             }
 
             var targetProject = _workspace.CurrentSolution.Projects.Where(project => project.Name.Equals(projectName)).Single();

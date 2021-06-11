@@ -19,26 +19,26 @@ namespace CTA.WebForms2Blazor
         private ProjectAnalyzer _webFormsProjectAnalyzer;
         private ProjectBuilder _blazorProjectBuilder;
 
-        private WorkspaceManagerService _webFormsWorkspaceBuilder;
-        private WorkspaceManagerService _blazorWorkspaceBuilder;
-        private FileInformationFactory fileFactory;
+        private WorkspaceManagerService _webFormsWorkspaceManager;
+        private WorkspaceManagerService _blazorWorkspaceManager;
+        private FileInformationFactory _fileFactory;
 
         public MigrationManager(string inputProjectPath, string outputProjectPath)
         {
             _inputProjectPath = inputProjectPath;
             _outputProjectPath = outputProjectPath;
-            fileFactory = new FileInformationFactory(_inputProjectPath);
         }
 
         public async Task PerformMigration()
         {
-            SetUpWorkspaceBuilders();
+            SetUpWorkspaceManagers();
 
             _webFormsProjectAnalyzer = new ProjectAnalyzer(_inputProjectPath);
             _blazorProjectBuilder = new ProjectBuilder(_outputProjectPath);
+            _fileFactory = new FileInformationFactory(_inputProjectPath, _blazorWorkspaceManager, _webFormsWorkspaceManager);
 
             // Pass workspace build manager to factory constructor
-            var fileInformationCollection = fileFactory.BuildMany(_webFormsProjectAnalyzer.GetProjectFileInfo());
+            var fileInformationCollection = _fileFactory.BuildMany(_webFormsProjectAnalyzer.GetProjectFileInfo());
 
             var migrationTasks = fileInformationCollection.Select(fileInformation =>
                 // ContinueWith specifies the action to be run after each task completes,
@@ -62,13 +62,13 @@ namespace CTA.WebForms2Blazor
             // TODO: Any necessary cleanup or last checks on new project
         }
 
-        private void SetUpWorkspaceBuilders()
+        private void SetUpWorkspaceManagers()
         {
-            _webFormsWorkspaceBuilder = new WorkspaceManagerService();
-            _blazorWorkspaceBuilder = new WorkspaceManagerService();
+            _webFormsWorkspaceManager = new WorkspaceManagerService();
+            _blazorWorkspaceManager = new WorkspaceManagerService();
 
-            _blazorWorkspaceBuilder.CreateSolutionFile();
-            _webFormsWorkspaceBuilder.CreateSolutionFile();
+            _blazorWorkspaceManager.CreateSolutionFile();
+            _webFormsWorkspaceManager.CreateSolutionFile();
         }
     }
 }

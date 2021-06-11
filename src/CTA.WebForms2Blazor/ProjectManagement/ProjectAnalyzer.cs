@@ -17,6 +17,9 @@ namespace CTA.WebForms2Blazor.ProjectManagement
         public IEnumerable<FileInfo> GetProjectFileInfo()
         {
             var directoryInfo = new DirectoryInfo(_inputProjectPath);
+
+            // TODO: Filter out un-needed files from the source
+            // project, i.e. build artifacts
             return directoryInfo.GetFiles("*", SearchOption.AllDirectories);
         }
     }

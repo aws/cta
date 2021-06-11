@@ -41,8 +41,8 @@ namespace CTA.WebForms2Blazor.Tests.ProjectManagement
         [NonParallelizable]
         public void WriteFileBytesToProject_Writes_New_File_With_Full_Fidelity()
         {
-            var testClassFilePath = Path.Combine(PartialProjectSetupFixture.TestFilesPath, PartialProjectSetupFixture.TEST_CLASS_FILE_NAME);
-            var testClassTargetPath = Path.Combine(PartialProjectSetupFixture.TestBlazorProjectPath, PartialProjectSetupFixture.TEST_CLASS_FILE_NAME);
+            var testClassFilePath = Path.Combine(PartialProjectSetupFixture.TestFilesPath, PartialProjectSetupFixture.TestClassFileName);
+            var testClassTargetPath = Path.Combine(PartialProjectSetupFixture.TestBlazorProjectPath, PartialProjectSetupFixture.TestClassFileName);
             byte[] originalBytesContent = null;
             byte[] newBytesContent = null;
 
@@ -72,7 +72,7 @@ namespace CTA.WebForms2Blazor.Tests.ProjectManagement
         public void WriteFileBytesToProject_Creates_Missing_Parent_Directories()
         {
             var deepTestClassTargetParentPath = Path.Combine(PartialProjectSetupFixture.TestBlazorProjectPath, "folder1", "folder2");
-            var deepTestClassTargetPath = Path.Combine(deepTestClassTargetParentPath, PartialProjectSetupFixture.TEST_CLASS_FILE_NAME);
+            var deepTestClassTargetPath = Path.Combine(deepTestClassTargetParentPath, PartialProjectSetupFixture.TestClassFileName);
             var contentBytes = Encoding.UTF8.GetBytes("namespace SomeNS { public class NewClass {} }");
 
             Assert.False(Directory.Exists(deepTestClassTargetParentPath));
