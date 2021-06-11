@@ -8,7 +8,14 @@ namespace CTA.WebForms2Blazor.Factories
 {
     public class FileInformationFactory
     {
-        public FileInformation Build(FileInfo document, string sourceProjectPath)
+        private string _sourceProjectPath;
+
+        public FileInformationFactory(string sourceProjectPath)
+        {
+            _sourceProjectPath = sourceProjectPath;
+        }
+
+        public FileInformation Build(FileInfo document)
         {
             // NOTE
             // Existing Type:   FileInfo = System.IO.FileInfo
@@ -18,7 +25,7 @@ namespace CTA.WebForms2Blazor.Factories
             // object to create, likely using the file type specified
             // in the FileInfo object
 
-            string relativePath = Path.GetRelativePath(sourceProjectPath, document.FullName);
+            string relativePath = Path.GetRelativePath(_sourceProjectPath, document.FullName);
             string extension = document.Extension;
 
             FileInformation fi;
@@ -43,9 +50,9 @@ namespace CTA.WebForms2Blazor.Factories
             return fi;
         }
 
-        public IEnumerable<FileInformation> BuildMany(IEnumerable<FileInfo> documents, string sourceProjectPath)
+        public IEnumerable<FileInformation> BuildMany(IEnumerable<FileInfo> documents)
         {
-            return documents.Select(document => Build(document, sourceProjectPath));
+            return documents.Select(document => Build(document));
         }
     }
 }
