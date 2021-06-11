@@ -12,16 +12,22 @@ namespace CTA.WebForms2Blazor
         private readonly string _inputProjectPath;
         private readonly string _outputProjectPath;
 
-        // Do these need to be class fields?
-        private WorkspaceManagerService _webFormsWorkspaceBuilder;
-        private WorkspaceManagerService _blazorWorkspaceBuilder;
+        // At the moment these are only being used in the
+        // PerformMigration method, but they are likely to
+        // be used in other places later on. Leaving them
+        // in for now
         private ProjectAnalyzer _webFormsProjectAnalyzer;
         private ProjectBuilder _blazorProjectBuilder;
+
+        private WorkspaceManagerService _webFormsWorkspaceBuilder;
+        private WorkspaceManagerService _blazorWorkspaceBuilder;
+        private FileInformationFactory fileFactory;
 
         public MigrationManager(string inputProjectPath, string outputProjectPath)
         {
             _inputProjectPath = inputProjectPath;
             _outputProjectPath = outputProjectPath;
+            fileFactory = new FileInformationFactory(_inputProjectPath);
         }
 
         public async Task PerformMigration()
@@ -32,8 +38,7 @@ namespace CTA.WebForms2Blazor
             _blazorProjectBuilder = new ProjectBuilder(_outputProjectPath);
 
             // Pass workspace build manager to factory constructor
-
-            var fileInformationCollection = FileInformationFactory.BuildMany(_webFormsProjectAnalyzer.GetProjectFileInfo());
+            var fileInformationCollection = fileFactory.BuildMany(_webFormsProjectAnalyzer.GetProjectFileInfo());
 
             var migrationTasks = fileInformationCollection.Select(fileInformation =>
                 // ContinueWith specifies the action to be run after each task completes,
