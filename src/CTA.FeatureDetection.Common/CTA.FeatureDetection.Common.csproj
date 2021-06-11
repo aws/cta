@@ -10,7 +10,7 @@
   </ItemGroup>
   
   <ItemGroup>
-    <PackageReference Include="Codelyzer.Analysis" Version="1.5.4-alpha-gb3fb19bc09" />
+    <PackageReference Include="Codelyzer.Analysis" Version="1.5.5" />
   </ItemGroup>
   
   <ItemGroup>    
