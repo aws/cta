@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Codelyzer.Analysis.Model;
+using CTA.Rules.Common.Extensions;
 using CTA.Rules.Config;
 using CTA.Rules.Models;
 using CTA.Rules.Models.Tokens;
@@ -216,6 +217,24 @@ namespace CTA.Rules.Analyzer
 
                                 var compareToken = new InvocationExpressionToken() { Key = invocationExpression.SemanticOriginalDefinition, Namespace = invocationExpression.Reference.Namespace, Type = invocationExpression.SemanticClassType };
                                 _rootNodes.Invocationexpressiontokens.TryGetValue(compareToken, out var token);
+
+                                //Attempt a wildcard search, if applicable. This is invocation expression specific because it has to look inside the invocation expressions only
+                                if(token == null)
+                                {
+                                    var wildcardMatches = _rootNodes.Invocationexpressiontokens.Where(i => i.Key.Contains("*"));
+                                    if (wildcardMatches.Any())
+                                    {
+                                        token = wildcardMatches.FirstOrDefault(i => compareToken.Key.WildcardEquals(i.Key) && compareToken.Namespace == i.Namespace && compareToken.Type == i.Type);
+
+                                        if (token != null)
+                                        {
+                                            //We set the key so that we don't do another wildcard search during replacement, we just use the name as it was declared in the code
+                                            token.Key = compareToken.Key;
+                                            token.FullKey = compareToken.Key;
+                                        }
+                                    }
+                                }
+
                                 if (token != null)
                                 {
                                     AddActions(fileAction, token, child.TextSpan);
@@ -390,7 +409,7 @@ namespace CTA.Rules.Analyzer
 
             fileAction.InvocationExpressionActions.UnionWith(token.InvocationExpressionActions.Select(a => new InvocationExpressionAction()
             {
-                Key = a.Key,
+                Key = a.Key.Contains("*") ? token.Key : a.Key,
                 Description = a.Description,
                 Value = a.Value,
                 Name = a.Name,
