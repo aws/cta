@@ -199,5 +199,48 @@ namespace CTA.Rules.Config
                 return uniqueFileName;
             }
         }
+
+        /// <summary>
+        /// Copies a solution to a new location under a folder with a randomly generated name
+        /// </summary>
+        /// <param name="solutionName">The name of the solution (MySolution.sln)</param>
+        /// <param name="tempDir">The folder the location resides in</param>
+        /// <returns></returns>
+        public static string CopySolutionFolderToTemp(string solutionName, string tempDir)
+        {
+            string solutionPath = Directory.EnumerateFiles(tempDir, solutionName, SearchOption.AllDirectories).FirstOrDefault(s => !s.Contains(string.Concat(Path.DirectorySeparatorChar, Path.DirectorySeparatorChar)));
+            string solutionDir = Directory.GetParent(solutionPath).FullName;
+            var newTempDir = Path.Combine(Directory.GetParent(solutionDir).FullName, Guid.NewGuid().ToString());
+            CopyDirectory(new DirectoryInfo(solutionDir), new DirectoryInfo(newTempDir));
+
+            solutionPath = Directory.EnumerateFiles(newTempDir, solutionName, SearchOption.AllDirectories).FirstOrDefault();
+            return solutionPath;
+        }
+
+        /// <summary>
+        /// Copies a directory to another folder
+        /// </summary>
+        /// <param name="source">Source directory</param>
+        /// <param name="target">Destination directory</param>
+        public static void CopyDirectory(DirectoryInfo source, DirectoryInfo target)
+        {
+            if (!Directory.Exists(target.FullName))
+            {
+                Directory.CreateDirectory(target.FullName);
+            }
+
+            var files = source.GetFiles();
+            foreach (var file in files)
+            {
+                file.CopyTo(Path.Combine(target.FullName, file.Name));
+            }
+
+            var dirs = source.GetDirectories();
+            foreach (var dir in dirs)
+            {
+                DirectoryInfo destinationSub = new DirectoryInfo(Path.Combine(target.FullName, dir.Name));
+                CopyDirectory(dir, destinationSub);
+            }
+        }
     }
 }

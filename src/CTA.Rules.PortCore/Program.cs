@@ -31,6 +31,11 @@ namespace CTA.Rules.PortCore
                     cli.RulesDir = Config.Constants.RulesDefaultPath;
                 }
 
+                if (cli.CreateNew)
+                {
+                    cli.FilePath = Utils.CopySolutionFolderToTemp(Path.GetFileName(cli.FilePath), Directory.GetParent(cli.FilePath).FullName);
+                }
+
                 string solutionDir = Directory.GetParent(cli.FilePath).FullName;
                 var projectFiles = Directory.EnumerateFiles(solutionDir, "*.csproj", SearchOption.AllDirectories);
 

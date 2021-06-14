@@ -26,6 +26,10 @@ namespace CTA.Rules.PortCore
 
         [Option('m', "mock-run", Required = false, HelpText = "Mock run to generate output only (no changes will be made)")]
         public string IsMockRun { get; set; }
+
+        [Option('c', "create-new", Required = false, HelpText = "Create a new folder for ported solution")]
+        public string CreateNew { get; set; }
+
     }
 
     public class PortCoreRulesCli
@@ -36,6 +40,7 @@ namespace CTA.Rules.PortCore
         public bool IsMockRun;
         public bool DefaultRules;
         public string Version;
+        public bool CreateNew;
 
         public void HandleCommand(String[] args)
         {
@@ -70,6 +75,10 @@ namespace CTA.Rules.PortCore
                     if (!string.IsNullOrEmpty(o.IsMockRun) && o.IsMockRun.ToLower() == "true")
                     {
                         IsMockRun = true;
+                    }
+                    if (!string.IsNullOrEmpty(o.CreateNew) && o.CreateNew.ToLower() == "true")
+                    {
+                        CreateNew = true;
                     }
                 });
         }
