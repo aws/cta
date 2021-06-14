@@ -1,15 +1,15 @@
 ﻿using System.IO;
 using CTA.WebForms2Blazor.FileInformationModel;
 
-namespace CTA.WebForms2Blazor
+namespace CTA.WebForms2Blazor.ProjectManagement
 {
-    public class BlazorProjectBuilder
+    public class ProjectBuilder
     {
         private readonly string _outputProjectPath;
 
         public string OutputProjectPath { get { return _outputProjectPath; } }
 
-        public BlazorProjectBuilder(string outputProjectPath)
+        public ProjectBuilder(string outputProjectPath)
         {
             _outputProjectPath = outputProjectPath;
         }
@@ -25,9 +25,6 @@ namespace CTA.WebForms2Blazor
         public void WriteFileInformationToProject(FileInformation newDocument)
         {
             WriteFileBytesToProject(newDocument.RelativePath, newDocument.GetFileBytes());
-
-            // TODO: Update destination project semantic model if added file
-            // was a .cs file
         }
 
         public void WriteFileBytesToProject(string relativePath, byte[] fileContent)

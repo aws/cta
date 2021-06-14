@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Linq;
 using System.IO;
 using NUnit.Framework;
+using CTA.WebForms2Blazor.Factories;
+using CTA.WebForms2Blazor.Services;
 
-namespace CTA.WebForms2Blazor.Tests
+namespace CTA.WebForms2Blazor.Tests.Factories
 {
     [TestFixture]
     class FileInformationFactoryTests
@@ -19,7 +20,7 @@ namespace CTA.WebForms2Blazor.Tests
         private string _testViewFilePath;
         private string _testProjectFilePath;
 
-        private Factories.FileInformationFactory _fileFactory;
+        private FileInformationFactory _fileFactory;
 
         [OneTimeSetUp]
         public void OneTimeSetup()
@@ -37,7 +38,13 @@ namespace CTA.WebForms2Blazor.Tests
         [SetUp]
         public void Setup()
         {
-            _fileFactory = new Factories.FileInformationFactory(_testProjectPath);
+            var webFormsWorkspaceManager = new WorkspaceManagerService();
+            var blazorWorkspaceManager = new WorkspaceManagerService();
+
+            blazorWorkspaceManager.CreateSolutionFile();
+            webFormsWorkspaceManager.CreateSolutionFile();
+
+            _fileFactory = new FileInformationFactory(_testProjectPath, blazorWorkspaceManager, webFormsWorkspaceManager);
         }
 
         [Test]

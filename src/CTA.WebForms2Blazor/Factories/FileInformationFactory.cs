@@ -3,16 +3,24 @@ using System.Linq;
 using System.Collections.Generic;
 using System.IO;
 using CTA.WebForms2Blazor.FileInformationModel;
+using CTA.WebForms2Blazor.Services;
 
 namespace CTA.WebForms2Blazor.Factories
 {
     public class FileInformationFactory
     {
-        private string _sourceProjectPath;
+        private readonly string _sourceProjectPath;
+        private readonly WorkspaceManagerService _blazorWorkspaceManager;
+        private readonly WorkspaceManagerService _webFormsWorkspaceManager;
 
-        public FileInformationFactory(string sourceProjectPath)
+        public FileInformationFactory(
+            string sourceProjectPath,
+            WorkspaceManagerService blazorWorkspaceManager,
+            WorkspaceManagerService webFormsWorkspaceManager)
         {
             _sourceProjectPath = sourceProjectPath;
+            _blazorWorkspaceManager = blazorWorkspaceManager;
+            _webFormsWorkspaceManager = webFormsWorkspaceManager;
         }
 
         public FileInformation Build(FileInfo document)
@@ -31,7 +39,7 @@ namespace CTA.WebForms2Blazor.Factories
             FileInformation fi;
             if (extension.Equals(".cs"))
             {
-                fi = new CodeFileInformation(relativePath);
+                fi = new CodeFileInformation(relativePath, _blazorWorkspaceManager, _webFormsWorkspaceManager);
             } else if (extension.Equals(".config"))
             {
                 fi = new ConfigFileInformation(relativePath);
@@ -40,7 +48,7 @@ namespace CTA.WebForms2Blazor.Factories
                 fi = new ViewFileInformation(relativePath);
             } else if (extension.Equals(".csproj"))
             {
-                fi = new ProjectFileInformation(relativePath);
+                fi = new ProjectFileInformation(relativePath, _blazorWorkspaceManager, _webFormsWorkspaceManager);
             } else
             {
                 fi = new StaticFileInformation(relativePath);
