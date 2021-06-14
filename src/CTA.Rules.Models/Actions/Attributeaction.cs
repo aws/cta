@@ -8,7 +8,7 @@ namespace CTA.Rules.Models
     {
         public Func<SyntaxGenerator, AttributeSyntax, AttributeSyntax> AttributeActionFunc { get; set; }
         public Func<SyntaxGenerator, AttributeListSyntax, AttributeListSyntax> AttributeListActionFunc { get; set; }
-
+        public new AttributeAction Clone() => (AttributeAction)this.MemberwiseClone();
         public override bool Equals(object obj)
         {
             var action = (AttributeAction)obj;

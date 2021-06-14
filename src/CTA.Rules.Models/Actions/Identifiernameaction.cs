@@ -8,6 +8,8 @@ namespace CTA.Rules.Models
     public class IdentifierNameAction : GenericAction
     {
         public Func<SyntaxGenerator, IdentifierNameSyntax, IdentifierNameSyntax> IdentifierNameActionFunc { get; set; }
+
+        public new IdentifierNameAction Clone() => (IdentifierNameAction)this.MemberwiseClone();
         public override bool Equals(object obj)
         {
             var action = (IdentifierNameAction)obj;

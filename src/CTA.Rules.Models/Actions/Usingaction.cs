@@ -8,6 +8,8 @@ namespace CTA.Rules.Models
     public class UsingAction : GenericAction
     {
         public Func<SyntaxGenerator, CompilationUnitSyntax, CompilationUnitSyntax> UsingActionFunc { get; set; }
+
+        public new UsingAction Clone() => (UsingAction)this.MemberwiseClone();
         public override bool Equals(object obj)
         {
             var action = (UsingAction)obj;

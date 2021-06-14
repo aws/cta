@@ -8,6 +8,8 @@ namespace CTA.Rules.Models
     public class InvocationExpressionAction : GenericAction
     {
         public Func<SyntaxGenerator, InvocationExpressionSyntax, InvocationExpressionSyntax> InvocationExpressionActionFunc { get; set; }
+
+        public new InvocationExpressionAction Clone() => (InvocationExpressionAction)this.MemberwiseClone();
         public override bool Equals(object obj)
         {
             var action = (InvocationExpressionAction)obj;

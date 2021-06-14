@@ -9,6 +9,8 @@ namespace CTA.Rules.Models
         public string OriginalVersion { get; set; }
         public string Version = "*";
         public TextSpan TextSpan { get; set; }
+
+        public PackageAction Clone() => (PackageAction)this.MemberwiseClone();
         public override bool Equals(object obj)
         {
             var action = (PackageAction)obj;
