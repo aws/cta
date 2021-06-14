@@ -62,9 +62,16 @@ namespace CTA.Rules.Test
             return Path.Combine(srcPath, path);
         }
 
-        public TestSolutionAnalysis AnalyzeSolution(string solutionName, string tempDir, string downloadLocation, string version, Dictionary<string, List<string>> metaReferences = null, 
-            bool skipCopy = false, bool portCode = true)
-        {         
+        public TestSolutionAnalysis AnalyzeSolution(
+            string solutionName,
+            string tempDir,
+            string downloadLocation,
+            string version,
+            Dictionary<string, List<string>> metaReferences = null,
+            bool skipCopy = false,
+            bool portCode = true,
+            bool portProject = true)
+        {
             string solutionPath = Directory.EnumerateFiles(tempDir, solutionName, SearchOption.AllDirectories).FirstOrDefault();
 
             if (!skipCopy)
@@ -72,10 +79,16 @@ namespace CTA.Rules.Test
                 solutionPath = CopySolutionFolderToTemp(solutionName, downloadLocation);
             }
 
-            return AnalyzeSolution(solutionPath, version, metaReferences, true, portCode);
+            return AnalyzeSolution(solutionPath, version, metaReferences, true, portCode, portProject);
         }
 
-        public TestSolutionAnalysis AnalyzeSolution(string solutionPath, string version, Dictionary<string, List<string>> metaReferences = null, bool skipCopy = false, bool portCode = true)
+        public TestSolutionAnalysis AnalyzeSolution(
+            string solutionPath,
+            string version,
+            Dictionary<string, List<string>> metaReferences = null,
+            bool skipCopy = false,
+            bool portCode = true,
+            bool portProject = true)
         {
             TestSolutionAnalysis result = new TestSolutionAnalysis();
             var solutionDir = Directory.GetParent(solutionPath).FullName;
@@ -101,7 +114,8 @@ namespace CTA.Rules.Test
                             UseDefaultRules = true,
                             TargetVersions = new List<string> { version },
                             PackageReferences = packages,
-                            PortCode = portCode
+                            PortCode = portCode,
+                            PortProject = portProject
                         };
 
                         if (metaReferences != null)
