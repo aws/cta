@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using CTA.WebForms2Blazor.FileInformationModel;
 using CTA.WebForms2Blazor.Services;
 
-namespace CTA.WebForms2Blazor.FileInformationModel
+namespace CTA.WebForms2Blazor.FileConverters
 {
     public class ProjectFileConverter : FileConverter
     {
@@ -24,12 +25,12 @@ namespace CTA.WebForms2Blazor.FileInformationModel
             _webFormsWorkspaceManager.NotifyNewExpectedProject();
         }
 
-        public override byte[] GetFileBytes()
+        protected override byte[] GetFileBytes()
         {
             throw new NotImplementedException();
         }
 
-        public override Task<IEnumerable<FileConverter>> MigrateFileAsync()
+        public override Task<IEnumerable<FileInformation>> MigrateFileAsync()
         {
             // TODO: Extract info from project files and
             // call _blazorWorkspaceManager.CreateProjectFile

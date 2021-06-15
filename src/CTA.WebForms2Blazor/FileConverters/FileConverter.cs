@@ -1,7 +1,8 @@
 ﻿using System.Threading.Tasks;
 using System.Collections.Generic;
+using CTA.WebForms2Blazor.FileInformationModel;
 
-namespace CTA.WebForms2Blazor.FileInformationModel
+namespace CTA.WebForms2Blazor.FileConverters
 {
     public abstract class FileConverter
     {
@@ -14,8 +15,8 @@ namespace CTA.WebForms2Blazor.FileInformationModel
             _relativePath = relativePath;
         }
 
-        public abstract Task<IEnumerable<FileConverter>> MigrateFileAsync();
+        public abstract Task<IEnumerable<FileInformation>> MigrateFileAsync();
 
-        public abstract byte[] GetFileBytes();
+        protected abstract byte[] GetFileBytes();
     }
 }

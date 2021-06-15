@@ -21,7 +21,7 @@ namespace CTA.WebForms2Blazor
 
         private WorkspaceManagerService _webFormsWorkspaceManager;
         private WorkspaceManagerService _blazorWorkspaceManager;
-        private FileInformationFactory _fileFactory;
+        private FileConverterFactory _fileFactory;
 
         public MigrationManager(string inputProjectPath, string outputProjectPath)
         {
@@ -35,7 +35,7 @@ namespace CTA.WebForms2Blazor
 
             _webFormsProjectAnalyzer = new ProjectAnalyzer(_inputProjectPath);
             _blazorProjectBuilder = new ProjectBuilder(_outputProjectPath);
-            _fileFactory = new FileInformationFactory(_inputProjectPath, _blazorWorkspaceManager, _webFormsWorkspaceManager);
+            _fileFactory = new FileConverterFactory(_inputProjectPath, _blazorWorkspaceManager, _webFormsWorkspaceManager);
 
             // Pass workspace build manager to factory constructor
             var fileInformationCollection = _fileFactory.BuildMany(_webFormsProjectAnalyzer.GetProjectFileInfo());
@@ -49,7 +49,7 @@ namespace CTA.WebForms2Blazor
                     // the ContinueWith block only executes once the original task
                     // is complete. Task.Result is also preferred because await
                     // would force our lambda expression to be async
-                    foreach (FileConverter generatedFile in generatedFiles.Result)
+                    foreach (FileInformation generatedFile in generatedFiles.Result)
                     {
                         _blazorProjectBuilder.WriteFileInformationToProject(generatedFile);
                     }

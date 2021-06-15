@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using CTA.WebForms2Blazor.FileInformationModel;
 using CTA.WebForms2Blazor.Services;
 
-namespace CTA.WebForms2Blazor.FileInformationModel
+namespace CTA.WebForms2Blazor.FileConverters
 {
     public class CodeFileConverter : FileConverter
     {
@@ -28,12 +29,12 @@ namespace CTA.WebForms2Blazor.FileInformationModel
             // are produced by this file information type
         }
 
-        public override byte[] GetFileBytes()
+        protected override byte[] GetFileBytes()
         {
             throw new NotImplementedException();
         }
 
-        public override Task<IEnumerable<FileConverter>> MigrateFileAsync()
+        public override Task<IEnumerable<FileInformation>> MigrateFileAsync()
         {
             // TODO: Retrieve cancellation token from thread manager service
             // await _webFormsWorkspaceBuilder.WaitUntilAllProjectsInWorkspace(token);

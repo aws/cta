@@ -1,19 +1,19 @@
-﻿using System;
-using System.Linq;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using CTA.WebForms2Blazor.FileConverters;
 using CTA.WebForms2Blazor.FileInformationModel;
 using CTA.WebForms2Blazor.Services;
 
 namespace CTA.WebForms2Blazor.Factories
 {
-    public class FileInformationFactory
+    public class FileConverterFactory
     {
         private readonly string _sourceProjectPath;
         private readonly WorkspaceManagerService _blazorWorkspaceManager;
         private readonly WorkspaceManagerService _webFormsWorkspaceManager;
 
-        public FileInformationFactory(
+        public FileConverterFactory(
             string sourceProjectPath,
             WorkspaceManagerService blazorWorkspaceManager,
             WorkspaceManagerService webFormsWorkspaceManager)
