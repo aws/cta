@@ -12,7 +12,7 @@ namespace CTA.WebForms2Blazor.Tests.Factories
     [TestFixture]
     class FileConverterFactoryTests
     {
-        private const string TestFilesDirectoryPath = "TestingArea\\TestFiles";
+        private string TestFilesDirectoryPath = Path.Combine("TestingArea", "TestFiles");
 
         private string _testProjectPath;
         private string _testCodeFilePath;

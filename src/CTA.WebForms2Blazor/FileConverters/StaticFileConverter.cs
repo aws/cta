@@ -19,8 +19,8 @@ namespace CTA.WebForms2Blazor.FileConverters
         {
             var newPath = Path.Combine("wwwroot", RelativePath);
             var workingDirectory = Environment.CurrentDirectory;
-            var testProjectPath = Directory.GetParent(workingDirectory).Parent.Parent.FullName;
-            var fullPath = Path.Combine(testProjectPath, RelativePath);
+            var projectPrefix = Directory.GetParent(workingDirectory).Parent.Parent.FullName;
+            var fullPath = Path.Combine(projectPrefix, RelativePath);
 
             FileInformation fi = new FileInformation(newPath, File.ReadAllBytes(fullPath));
 
