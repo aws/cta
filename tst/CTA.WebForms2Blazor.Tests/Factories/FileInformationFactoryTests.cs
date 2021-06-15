@@ -50,17 +50,17 @@ namespace CTA.WebForms2Blazor.Tests.Factories
         [Test]
         public void TestBuildBasic()
         {
-            FileInformationModel.FileInformation codeFileObj = _fileFactory.Build(new FileInfo(_testCodeFilePath));
-            FileInformationModel.FileInformation configFileObj = _fileFactory.Build(new FileInfo(_testConfigFilePath));
-            FileInformationModel.FileInformation staticFileObj = _fileFactory.Build(new FileInfo(_testStaticFilePath));
-            FileInformationModel.FileInformation viewFileObj = _fileFactory.Build(new FileInfo(_testViewFilePath));
-            FileInformationModel.FileInformation projectFileObj = _fileFactory.Build(new FileInfo(_testProjectFilePath));
+            FileInformationModel.FileConverter codeFileObj = _fileFactory.Build(new FileInfo(_testCodeFilePath));
+            FileInformationModel.FileConverter configFileObj = _fileFactory.Build(new FileInfo(_testConfigFilePath));
+            FileInformationModel.FileConverter staticFileObj = _fileFactory.Build(new FileInfo(_testStaticFilePath));
+            FileInformationModel.FileConverter viewFileObj = _fileFactory.Build(new FileInfo(_testViewFilePath));
+            FileInformationModel.FileConverter projectFileObj = _fileFactory.Build(new FileInfo(_testProjectFilePath));
 
-            Assert.True(typeof(FileInformationModel.CodeFileInformation).IsInstanceOfType(codeFileObj));
-            Assert.True(typeof(FileInformationModel.ConfigFileInformation).IsInstanceOfType(configFileObj));
-            Assert.True(typeof(FileInformationModel.StaticFileInformation).IsInstanceOfType(staticFileObj));
-            Assert.True(typeof(FileInformationModel.ViewFileInformation).IsInstanceOfType(viewFileObj));
-            Assert.True(typeof(FileInformationModel.ProjectFileInformation).IsInstanceOfType(projectFileObj));
+            Assert.True(typeof(FileInformationModel.CodeFileConverter).IsInstanceOfType(codeFileObj));
+            Assert.True(typeof(FileInformationModel.ConfigFileConverter).IsInstanceOfType(configFileObj));
+            Assert.True(typeof(FileInformationModel.StaticFileConverter).IsInstanceOfType(staticFileObj));
+            Assert.True(typeof(FileInformationModel.ViewFileConverter).IsInstanceOfType(viewFileObj));
+            Assert.True(typeof(FileInformationModel.ProjectFileConverter).IsInstanceOfType(projectFileObj));
 
         }
 
@@ -74,12 +74,12 @@ namespace CTA.WebForms2Blazor.Tests.Factories
             files.Add(new FileInfo(_testViewFilePath));
             files.Add(new FileInfo(_testProjectFilePath));
 
-            List<FileInformationModel.FileInformation> fileObjects = _fileFactory.BuildMany(files).ToList();
-            Assert.True(typeof(FileInformationModel.CodeFileInformation).IsInstanceOfType(fileObjects[0]));
-            Assert.True(typeof(FileInformationModel.ConfigFileInformation).IsInstanceOfType(fileObjects[1]));
-            Assert.True(typeof(FileInformationModel.StaticFileInformation).IsInstanceOfType(fileObjects[2]));
-            Assert.True(typeof(FileInformationModel.ViewFileInformation).IsInstanceOfType(fileObjects[3]));
-            Assert.True(typeof(FileInformationModel.ProjectFileInformation).IsInstanceOfType(fileObjects[4]));
+            List<FileInformationModel.FileConverter> fileObjects = _fileFactory.BuildMany(files).ToList();
+            Assert.True(typeof(FileInformationModel.CodeFileConverter).IsInstanceOfType(fileObjects[0]));
+            Assert.True(typeof(FileInformationModel.ConfigFileConverter).IsInstanceOfType(fileObjects[1]));
+            Assert.True(typeof(FileInformationModel.StaticFileConverter).IsInstanceOfType(fileObjects[2]));
+            Assert.True(typeof(FileInformationModel.ViewFileConverter).IsInstanceOfType(fileObjects[3]));
+            Assert.True(typeof(FileInformationModel.ProjectFileConverter).IsInstanceOfType(fileObjects[4]));
         }
     }
 }

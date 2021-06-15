@@ -5,19 +5,19 @@ using System.Threading.Tasks;
 
 namespace CTA.WebForms2Blazor.FileInformationModel
 {
-    public class StaticFileInformation : FileInformation
+    public class ConfigFileConverter : FileConverter
     {
-        public StaticFileInformation(string relativePath) : base(relativePath)
+        public ConfigFileConverter(string relativePath) : base(relativePath)
         {
 
         }
-        
+
         public override byte[] GetFileBytes()
         {
             throw new NotImplementedException();
         }
 
-        public override Task<IEnumerable<FileInformation>> MigrateFileAsync()
+        public override Task<IEnumerable<FileConverter>> MigrateFileAsync()
         {
             throw new NotImplementedException();
         }

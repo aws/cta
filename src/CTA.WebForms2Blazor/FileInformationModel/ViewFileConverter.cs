@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 
 namespace CTA.WebForms2Blazor.FileInformationModel
 {
-    public class ConfigFileInformation : FileInformation
+    public class ViewFileConverter : FileConverter
     {
-        public ConfigFileInformation(string relativePath) : base(relativePath)
+        public ViewFileConverter(string relativePath) : base(relativePath)
         {
 
         }
@@ -17,7 +17,7 @@ namespace CTA.WebForms2Blazor.FileInformationModel
             throw new NotImplementedException();
         }
 
-        public override Task<IEnumerable<FileInformation>> MigrateFileAsync()
+        public override Task<IEnumerable<FileConverter>> MigrateFileAsync()
         {
             throw new NotImplementedException();
         }

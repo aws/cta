@@ -49,7 +49,7 @@ namespace CTA.WebForms2Blazor
                     // the ContinueWith block only executes once the original task
                     // is complete. Task.Result is also preferred because await
                     // would force our lambda expression to be async
-                    foreach (FileInformation generatedFile in generatedFiles.Result)
+                    foreach (FileConverter generatedFile in generatedFiles.Result)
                     {
                         _blazorProjectBuilder.WriteFileInformationToProject(generatedFile);
                     }

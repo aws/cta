@@ -23,7 +23,7 @@ namespace CTA.WebForms2Blazor.Factories
             _webFormsWorkspaceManager = webFormsWorkspaceManager;
         }
 
-        public FileInformation Build(FileInfo document)
+        public FileConverter Build(FileInfo document)
         {
             // NOTE
             // Existing Type:   FileInfo = System.IO.FileInfo
@@ -36,29 +36,29 @@ namespace CTA.WebForms2Blazor.Factories
             string relativePath = Path.GetRelativePath(_sourceProjectPath, document.FullName);
             string extension = document.Extension;
 
-            FileInformation fi;
+            FileConverter fi;
             if (extension.Equals(".cs"))
             {
-                fi = new CodeFileInformation(relativePath, _blazorWorkspaceManager, _webFormsWorkspaceManager);
+                fi = new CodeFileConverter(relativePath, _blazorWorkspaceManager, _webFormsWorkspaceManager);
             } else if (extension.Equals(".config"))
             {
-                fi = new ConfigFileInformation(relativePath);
+                fi = new ConfigFileConverter(relativePath);
             } else if (extension.Equals(".aspx") || extension.Equals(".asax") || extension.Equals(".ascx"))
             {
-                fi = new ViewFileInformation(relativePath);
+                fi = new ViewFileConverter(relativePath);
             } else if (extension.Equals(".csproj"))
             {
-                fi = new ProjectFileInformation(relativePath, _blazorWorkspaceManager, _webFormsWorkspaceManager);
+                fi = new ProjectFileConverter(relativePath, _blazorWorkspaceManager, _webFormsWorkspaceManager);
             } else
             {
-                fi = new StaticFileInformation(relativePath);
+                fi = new StaticFileConverter(relativePath);
             }
 
 
             return fi;
         }
 
-        public IEnumerable<FileInformation> BuildMany(IEnumerable<FileInfo> documents)
+        public IEnumerable<FileConverter> BuildMany(IEnumerable<FileInfo> documents)
         {
             return documents.Select(document => Build(document));
         }

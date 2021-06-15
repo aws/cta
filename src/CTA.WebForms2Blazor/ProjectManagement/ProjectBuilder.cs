@@ -22,7 +22,7 @@ namespace CTA.WebForms2Blazor.ProjectManagement
             Directory.CreateDirectory(fullPath);
         }
 
-        public void WriteFileInformationToProject(FileInformation newDocument)
+        public void WriteFileInformationToProject(FileConverter newDocument)
         {
             WriteFileBytesToProject(newDocument.RelativePath, newDocument.GetFileBytes());
         }

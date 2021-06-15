@@ -6,12 +6,12 @@ using CTA.WebForms2Blazor.Services;
 
 namespace CTA.WebForms2Blazor.FileInformationModel
 {
-    public class ProjectFileInformation : FileInformation
+    public class ProjectFileConverter : FileConverter
     {
         private readonly WorkspaceManagerService _blazorWorkspaceManager;
         private readonly WorkspaceManagerService _webFormsWorkspaceManager;
 
-        public ProjectFileInformation(
+        public ProjectFileConverter(
             string relativePath,
             WorkspaceManagerService blazorWorkspaceManager,
             WorkspaceManagerService webFormsWorkspaceManager
@@ -29,7 +29,7 @@ namespace CTA.WebForms2Blazor.FileInformationModel
             throw new NotImplementedException();
         }
 
-        public override Task<IEnumerable<FileInformation>> MigrateFileAsync()
+        public override Task<IEnumerable<FileConverter>> MigrateFileAsync()
         {
             // TODO: Extract info from project files and
             // call _blazorWorkspaceManager.CreateProjectFile

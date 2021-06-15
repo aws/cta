@@ -3,18 +3,18 @@ using System.Collections.Generic;
 
 namespace CTA.WebForms2Blazor.FileInformationModel
 {
-    public abstract class FileInformation
+    public abstract class FileConverter
     {
         private readonly string _relativePath;
 
         public string RelativePath { get { return _relativePath; } }
 
-        protected FileInformation(string relativePath)
+        protected FileConverter(string relativePath)
         {
             _relativePath = relativePath;
         }
 
-        public abstract Task<IEnumerable<FileInformation>> MigrateFileAsync();
+        public abstract Task<IEnumerable<FileConverter>> MigrateFileAsync();
 
         public abstract byte[] GetFileBytes();
     }

@@ -6,12 +6,12 @@ using CTA.WebForms2Blazor.Services;
 
 namespace CTA.WebForms2Blazor.FileInformationModel
 {
-    public class CodeFileInformation : FileInformation
+    public class CodeFileConverter : FileConverter
     {
         private readonly WorkspaceManagerService _blazorWorkspaceBuilder;
         private readonly WorkspaceManagerService _webFormsWorkspaceBuilder;
 
-        public CodeFileInformation(
+        public CodeFileConverter(
             string relativePath,
             WorkspaceManagerService blazorWorkspaceManager,
             WorkspaceManagerService webFormsWorkspaceManager
@@ -33,7 +33,7 @@ namespace CTA.WebForms2Blazor.FileInformationModel
             throw new NotImplementedException();
         }
 
-        public override Task<IEnumerable<FileInformation>> MigrateFileAsync()
+        public override Task<IEnumerable<FileConverter>> MigrateFileAsync()
         {
             // TODO: Retrieve cancellation token from thread manager service
             // await _webFormsWorkspaceBuilder.WaitUntilAllProjectsInWorkspace(token);
