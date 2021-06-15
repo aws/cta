@@ -21,7 +21,7 @@ namespace CTA.WebForms2Blazor.Tests.Factories
         private string _testViewFilePath;
         private string _testProjectFilePath;
 
-        private FileConverterFactory _fileFactory;
+        private FileConverterFactory _fileConverterFactory;
 
         [OneTimeSetUp]
         public void OneTimeSetup()
@@ -45,17 +45,17 @@ namespace CTA.WebForms2Blazor.Tests.Factories
             blazorWorkspaceManager.CreateSolutionFile();
             webFormsWorkspaceManager.CreateSolutionFile();
 
-            _fileFactory = new FileConverterFactory(_testProjectPath, blazorWorkspaceManager, webFormsWorkspaceManager);
+            _fileConverterFactory = new FileConverterFactory(_testProjectPath, blazorWorkspaceManager, webFormsWorkspaceManager);
         }
 
         [Test]
         public void TestBuildBasic()
         {
-            FileConverter codeFileObj = _fileFactory.Build(new FileInfo(_testCodeFilePath));
-            FileConverter configFileObj = _fileFactory.Build(new FileInfo(_testConfigFilePath));
-            FileConverter staticFileObj = _fileFactory.Build(new FileInfo(_testStaticFilePath));
-            FileConverter viewFileObj = _fileFactory.Build(new FileInfo(_testViewFilePath));
-            FileConverter projectFileObj = _fileFactory.Build(new FileInfo(_testProjectFilePath));
+            FileConverter codeFileObj = _fileConverterFactory.Build(new FileInfo(_testCodeFilePath));
+            FileConverter configFileObj = _fileConverterFactory.Build(new FileInfo(_testConfigFilePath));
+            FileConverter staticFileObj = _fileConverterFactory.Build(new FileInfo(_testStaticFilePath));
+            FileConverter viewFileObj = _fileConverterFactory.Build(new FileInfo(_testViewFilePath));
+            FileConverter projectFileObj = _fileConverterFactory.Build(new FileInfo(_testProjectFilePath));
 
             Assert.True(typeof(CodeFileConverter).IsInstanceOfType(codeFileObj));
             Assert.True(typeof(ConfigFileConverter).IsInstanceOfType(configFileObj));
@@ -75,7 +75,7 @@ namespace CTA.WebForms2Blazor.Tests.Factories
             files.Add(new FileInfo(_testViewFilePath));
             files.Add(new FileInfo(_testProjectFilePath));
 
-            List<FileConverter> fileObjects = _fileFactory.BuildMany(files).ToList();
+            List<FileConverter> fileObjects = _fileConverterFactory.BuildMany(files).ToList();
             Assert.True(typeof(CodeFileConverter).IsInstanceOfType(fileObjects[0]));
             Assert.True(typeof(ConfigFileConverter).IsInstanceOfType(fileObjects[1]));
             Assert.True(typeof(StaticFileConverter).IsInstanceOfType(fileObjects[2]));

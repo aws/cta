@@ -4,7 +4,7 @@ using System.Text;
 
 namespace CTA.WebForms2Blazor.FileInformationModel
 {
-    public abstract class FileInformation
+    public class FileInformation
     {
         private readonly string _relativePath;
         private readonly byte[] _fileBytes;

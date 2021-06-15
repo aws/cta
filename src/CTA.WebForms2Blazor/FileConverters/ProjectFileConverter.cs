@@ -25,10 +25,6 @@ namespace CTA.WebForms2Blazor.FileConverters
             _webFormsWorkspaceManager.NotifyNewExpectedProject();
         }
 
-        protected override byte[] GetFileBytes()
-        {
-            throw new NotImplementedException();
-        }
 
         public override Task<IEnumerable<FileInformation>> MigrateFileAsync()
         {

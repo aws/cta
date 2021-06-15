@@ -17,6 +17,5 @@ namespace CTA.WebForms2Blazor.FileConverters
 
         public abstract Task<IEnumerable<FileInformation>> MigrateFileAsync();
 
-        protected abstract byte[] GetFileBytes();
     }
 }

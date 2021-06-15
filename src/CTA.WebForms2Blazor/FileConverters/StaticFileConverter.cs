@@ -15,18 +15,14 @@ namespace CTA.WebForms2Blazor.FileConverters
 
         }
 
-        protected override byte[] GetFileBytes()
-        {
-            var workingDirectory = Environment.CurrentDirectory;
-            var testProjectPath = Directory.GetParent(workingDirectory).Parent.Parent.FullName;
-            var path = Path.Combine(testProjectPath, RelativePath);
-            return File.ReadAllBytes(path);
-        }
-
         public override async Task<IEnumerable<FileInformation>> MigrateFileAsync()
         {
             var newPath = Path.Combine("wwwroot", RelativePath);
-            FileInformation fi = new StaticFileInformation(newPath, GetFileBytes());
+            var workingDirectory = Environment.CurrentDirectory;
+            var testProjectPath = Directory.GetParent(workingDirectory).Parent.Parent.FullName;
+            var fullPath = Path.Combine(testProjectPath, RelativePath);
+
+            FileInformation fi = new FileInformation(newPath, File.ReadAllBytes(fullPath));
 
             var fileList = new List<FileInformation>();
             fileList.Add(fi);

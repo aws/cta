@@ -13,11 +13,6 @@ namespace CTA.WebForms2Blazor.FileConverters
 
         }
 
-        protected override byte[] GetFileBytes()
-        {
-            throw new NotImplementedException();
-        }
-
         public override Task<IEnumerable<FileInformation>> MigrateFileAsync()
         {
             throw new NotImplementedException();

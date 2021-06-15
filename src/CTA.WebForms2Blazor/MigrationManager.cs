@@ -38,9 +38,9 @@ namespace CTA.WebForms2Blazor
             _fileFactory = new FileConverterFactory(_inputProjectPath, _blazorWorkspaceManager, _webFormsWorkspaceManager);
 
             // Pass workspace build manager to factory constructor
-            var fileInformationCollection = _fileFactory.BuildMany(_webFormsProjectAnalyzer.GetProjectFileInfo());
+            var fileConverterCollection = _fileFactory.BuildMany(_webFormsProjectAnalyzer.GetProjectFileInfo());
 
-            var migrationTasks = fileInformationCollection.Select(fileInformation =>
+            var migrationTasks = fileConverterCollection.Select(fileInformation =>
                 // ContinueWith specifies the action to be run after each task completes,
                 // in this case it sends each generated file to the project builder
                 fileInformation.MigrateFileAsync().ContinueWith(generatedFiles =>

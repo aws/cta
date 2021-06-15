@@ -36,26 +36,26 @@ namespace CTA.WebForms2Blazor.Factories
             string relativePath = Path.GetRelativePath(_sourceProjectPath, document.FullName);
             string extension = document.Extension;
 
-            FileConverter fi;
+            FileConverter fc;
             if (extension.Equals(".cs"))
             {
-                fi = new CodeFileConverter(relativePath, _blazorWorkspaceManager, _webFormsWorkspaceManager);
+                fc = new CodeFileConverter(relativePath, _blazorWorkspaceManager, _webFormsWorkspaceManager);
             } else if (extension.Equals(".config"))
             {
-                fi = new ConfigFileConverter(relativePath);
+                fc = new ConfigFileConverter(relativePath);
             } else if (extension.Equals(".aspx") || extension.Equals(".asax") || extension.Equals(".ascx"))
             {
-                fi = new ViewFileConverter(relativePath);
+                fc = new ViewFileConverter(relativePath);
             } else if (extension.Equals(".csproj"))
             {
-                fi = new ProjectFileConverter(relativePath, _blazorWorkspaceManager, _webFormsWorkspaceManager);
+                fc = new ProjectFileConverter(relativePath, _blazorWorkspaceManager, _webFormsWorkspaceManager);
             } else
             {
-                fi = new StaticFileConverter(relativePath);
+                fc = new StaticFileConverter(relativePath);
             }
 
 
-            return fi;
+            return fc;
         }
 
         public IEnumerable<FileConverter> BuildMany(IEnumerable<FileInfo> documents)

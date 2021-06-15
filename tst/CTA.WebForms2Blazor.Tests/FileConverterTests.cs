@@ -15,7 +15,7 @@ namespace CTA.WebForms2Blazor.Tests
     [TestFixture]
     class FileConverterTests
     {
-        private const string TestFilesDirectoryPath = "TestingArea\\TestFiles";
+        private string TestFilesDirectoryPath = Path.Combine("TestingArea", "TestFiles");
 
         //These are relative paths
         private string _testProjectPath;
@@ -28,6 +28,8 @@ namespace CTA.WebForms2Blazor.Tests
         [OneTimeSetUp]
         public void OneTimeSetup()
         {
+            var workingDirectory = Environment.CurrentDirectory;
+            _testProjectPath = Directory.GetParent(workingDirectory).Parent.Parent.FullName;
             _testCodeFilePath = Path.Combine(TestFilesDirectoryPath, "TestClassFile.cs");
             _testConfigFilePath = Path.Combine(TestFilesDirectoryPath, "SampleConfigFile.config");
             _testStaticFilePath = Path.Combine(TestFilesDirectoryPath, "SampleStaticFile.png");
@@ -50,8 +52,10 @@ namespace CTA.WebForms2Blazor.Tests
             FileInformation fi = fileList.First();
             byte[] bytes = fi.FileBytes;
 
-            Assert.IsTrue(bytes.Length != 0);
-            Assert.IsTrue(fi.RelativePath.Equals("wwwroot\\TestingArea\\TestFiles\\SampleStaticFile.png"));
+            string fullPath = Path.Combine(_testProjectPath, _testStaticFilePath);
+
+            Assert.IsTrue(bytes.Length == new FileInfo(fullPath).Length);
+            Assert.IsTrue(fi.RelativePath.Equals(Path.Combine("wwwroot", _testStaticFilePath)));
         }
     }
 }
