@@ -328,7 +328,7 @@ namespace CTA.Rules.Test
         {
             TestSolutionAnalysis resultWithoutCodePort = AnalyzeSolution("BuildableMvc.sln", tempDir, downloadLocation, version, portCode: false);
             var buildErrorsWithoutPortCode = GetSolutionBuildErrors(resultWithoutCodePort.SolutionRunResult.SolutionPath);
-            Assert.AreEqual(29, buildErrorsWithoutPortCode.Count);
+            Assert.AreEqual(42, buildErrorsWithoutPortCode.Count);
 
             TestSolutionAnalysis results = AnalyzeSolution("BuildableMvc.sln", tempDir, downloadLocation, version);
             var buildErrors = GetSolutionBuildErrors(results.SolutionRunResult.SolutionPath);
@@ -346,6 +346,22 @@ namespace CTA.Rules.Test
             TestSolutionAnalysis results = AnalyzeSolution("BuildableWebApi.sln", tempDir, downloadLocation, version);
             var buildErrors = GetSolutionBuildErrors(results.SolutionRunResult.SolutionPath);
             Assert.AreEqual(buildErrors.Count, 0);
+        }
+
+
+        [TestCase(TargetFramework.DotnetCoreApp31)]
+        [TestCase(TargetFramework.Dotnet5)]
+        public void TestSampleMvcWebApiSolution(string version)
+        {
+            TestSolutionAnalysis results = AnalyzeSolution("SampleMvcWebApp.sln", tempDir, downloadLocation, version);
+
+            string projectDir = results.ProjectResults.FirstOrDefault().ProjectDirectory;
+            var csProjContent = results.ProjectResults.FirstOrDefault().CsProjectContent;
+            var homeController = File.ReadAllText(Path.Combine(projectDir, "Controllers", "HomeController.cs"));
+
+            StringAssert.Contains("Microsoft.AspNetCore.Mvc", homeController);
+            StringAssert.Contains("This updated method might require the parameters to be re-organized", homeController);
+            StringAssert.Contains("TryUpdateModelAsync", homeController);
         }
 
 
