@@ -11,13 +11,14 @@
 
 
   <ItemGroup>
-    <PackageReference Include="Codelyzer.Analysis" Version="1.5.4-alpha-gb3fb19bc09" />
-    <PackageReference Include="Codelyzer.Analysis.Model" Version="1.5.4-alpha-gb3fb19bc09" />
+    <PackageReference Include="Codelyzer.Analysis" Version="1.6.5-alpha-g229faeaa7f" />
+    <PackageReference Include="Codelyzer.Analysis.Model" Version="1.6.5-alpha-g229faeaa7f" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
   </ItemGroup>
 
 
   <ItemGroup>
+    <ProjectReference Include="..\CTA.Rules.Common\CTA.Rules.Common.csproj" />
     <ProjectReference Include="..\CTA.Rules.Config\CTA.Rules.Config.csproj" />
   </ItemGroup>
 
