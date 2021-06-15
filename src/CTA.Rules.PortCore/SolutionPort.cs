@@ -160,6 +160,11 @@ namespace CTA.Rules.PortCore
                 projectConfiguration.ProjectType = GetProjectType(projectTypeFeatureResult);
                 if (projectConfiguration.UseDefaultRules)
                 {
+                    //If a rules dir was provided, copy files from that dir into the rules folder
+                    if (!string.IsNullOrEmpty(projectConfiguration.RulesDir))
+                    {
+                        CopyOverrideRules(projectConfiguration.RulesDir);
+                    }
                     projectConfiguration.RulesDir = Constants.RulesDefaultPath;
                     var projectResult = analyzerResults
                         .FirstOrDefault(a => a.ProjectResult?.ProjectFilePath == projectConfiguration.ProjectPath)
@@ -252,6 +257,14 @@ namespace CTA.Rules.PortCore
             {
                 LogHelper.LogError(ex, string.Format("Unable to download resources from {0}", Constants.S3CTAFiles));
             }
+        }
+
+        private void CopyOverrideRules(string sourceDir)
+        {
+            var files = Directory.EnumerateFiles(sourceDir, "*.json").ToList();
+            files.ForEach(file => {
+                File.Copy(file, Path.Combine(Constants.RulesDefaultPath, Path.GetFileName(file)), true);
+            });
         }
 
         private void CheckCache()
