@@ -21,7 +21,7 @@ namespace CTA.WebForms2Blazor
 
         private WorkspaceManagerService _webFormsWorkspaceManager;
         private WorkspaceManagerService _blazorWorkspaceManager;
-        private FileConverterFactory _fileFactory;
+        private FileConverterFactory _converterFactory;
 
         public MigrationManager(string inputProjectPath, string outputProjectPath)
         {
@@ -35,15 +35,15 @@ namespace CTA.WebForms2Blazor
 
             _webFormsProjectAnalyzer = new ProjectAnalyzer(_inputProjectPath);
             _blazorProjectBuilder = new ProjectBuilder(_outputProjectPath);
-            _fileFactory = new FileConverterFactory(_inputProjectPath, _blazorWorkspaceManager, _webFormsWorkspaceManager);
+            _converterFactory = new FileConverterFactory(_inputProjectPath, _blazorWorkspaceManager, _webFormsWorkspaceManager);
 
             // Pass workspace build manager to factory constructor
-            var fileConverterCollection = _fileFactory.BuildMany(_webFormsProjectAnalyzer.GetProjectFileInfo());
+            var fileConverterCollection = _converterFactory.BuildMany(_webFormsProjectAnalyzer.GetProjectFileInfo());
 
-            var migrationTasks = fileConverterCollection.Select(fileInformation =>
+            var migrationTasks = fileConverterCollection.Select(fileConverter =>
                 // ContinueWith specifies the action to be run after each task completes,
                 // in this case it sends each generated file to the project builder
-                fileInformation.MigrateFileAsync().ContinueWith(generatedFiles =>
+                fileConverter.MigrateFileAsync().ContinueWith(generatedFiles =>
                 {
                     // It's ok to use Task.Result here because the lambda within
                     // the ContinueWith block only executes once the original task
