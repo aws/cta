@@ -24,7 +24,7 @@ namespace CTA.WebForms2Blazor.ProjectManagement
 
         public void WriteFileInformationToProject(FileInformation newDocument)
         {
-            WriteFileBytesToProject(newDocument.RelativePath, newDocument.GetFileBytes());
+            WriteFileBytesToProject(newDocument.RelativePath, newDocument.FileBytes);
         }
 
         public void WriteFileBytesToProject(string relativePath, byte[] fileContent)

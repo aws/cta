@@ -2,16 +2,17 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using CTA.WebForms2Blazor.FileInformationModel;
 using CTA.WebForms2Blazor.Services;
 
-namespace CTA.WebForms2Blazor.FileInformationModel
+namespace CTA.WebForms2Blazor.FileConverters
 {
-    public class CodeFileInformation : FileInformation
+    public class CodeFileConverter : FileConverter
     {
         private readonly WorkspaceManagerService _blazorWorkspaceBuilder;
         private readonly WorkspaceManagerService _webFormsWorkspaceBuilder;
 
-        public CodeFileInformation(
+        public CodeFileConverter(
             string relativePath,
             WorkspaceManagerService blazorWorkspaceManager,
             WorkspaceManagerService webFormsWorkspaceManager
@@ -28,10 +29,6 @@ namespace CTA.WebForms2Blazor.FileInformationModel
             // are produced by this file information type
         }
 
-        public override byte[] GetFileBytes()
-        {
-            throw new NotImplementedException();
-        }
 
         public override Task<IEnumerable<FileInformation>> MigrateFileAsync()
         {

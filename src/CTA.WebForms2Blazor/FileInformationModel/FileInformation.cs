@@ -1,21 +1,22 @@
-﻿using System.Threading.Tasks;
+﻿using System;
 using System.Collections.Generic;
+using System.Text;
 
 namespace CTA.WebForms2Blazor.FileInformationModel
 {
-    public abstract class FileInformation
+    public class FileInformation
     {
         private readonly string _relativePath;
+        private readonly byte[] _fileBytes;
 
         public string RelativePath { get { return _relativePath; } }
 
-        protected FileInformation(string relativePath)
+        public byte[] FileBytes { get { return _fileBytes; } }
+
+        public FileInformation(string relativePath, byte[] fileBytes)
         {
             _relativePath = relativePath;
+            _fileBytes = fileBytes;
         }
-
-        public abstract Task<IEnumerable<FileInformation>> MigrateFileAsync();
-
-        public abstract byte[] GetFileBytes();
     }
 }
