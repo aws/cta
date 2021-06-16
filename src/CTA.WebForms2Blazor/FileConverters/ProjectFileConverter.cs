@@ -2,16 +2,17 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using CTA.WebForms2Blazor.FileInformationModel;
 using CTA.WebForms2Blazor.Services;
 
-namespace CTA.WebForms2Blazor.FileInformationModel
+namespace CTA.WebForms2Blazor.FileConverters
 {
-    public class ProjectFileInformation : FileInformation
+    public class ProjectFileConverter : FileConverter
     {
         private readonly WorkspaceManagerService _blazorWorkspaceManager;
         private readonly WorkspaceManagerService _webFormsWorkspaceManager;
 
-        public ProjectFileInformation(
+        public ProjectFileConverter(
             string relativePath,
             WorkspaceManagerService blazorWorkspaceManager,
             WorkspaceManagerService webFormsWorkspaceManager
@@ -24,10 +25,6 @@ namespace CTA.WebForms2Blazor.FileInformationModel
             _webFormsWorkspaceManager.NotifyNewExpectedProject();
         }
 
-        public override byte[] GetFileBytes()
-        {
-            throw new NotImplementedException();
-        }
 
         public override Task<IEnumerable<FileInformation>> MigrateFileAsync()
         {

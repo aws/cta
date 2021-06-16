@@ -5,13 +5,14 @@ using System.IO;
 using NUnit.Framework;
 using CTA.WebForms2Blazor.Factories;
 using CTA.WebForms2Blazor.Services;
+using CTA.WebForms2Blazor.FileConverters;
 
 namespace CTA.WebForms2Blazor.Tests.Factories
 {
     [TestFixture]
-    class FileInformationFactoryTests
+    class FileConverterFactoryTests
     {
-        private const string TestFilesDirectoryPath = "TestingArea/TestFiles";
+        private string TestFilesDirectoryPath = Path.Combine("TestingArea", "TestFiles");
 
         private string _testProjectPath;
         private string _testCodeFilePath;
@@ -20,7 +21,7 @@ namespace CTA.WebForms2Blazor.Tests.Factories
         private string _testViewFilePath;
         private string _testProjectFilePath;
 
-        private FileInformationFactory _fileFactory;
+        private FileConverterFactory _fileConverterFactory;
 
         [OneTimeSetUp]
         public void OneTimeSetup()
@@ -44,23 +45,23 @@ namespace CTA.WebForms2Blazor.Tests.Factories
             blazorWorkspaceManager.CreateSolutionFile();
             webFormsWorkspaceManager.CreateSolutionFile();
 
-            _fileFactory = new FileInformationFactory(_testProjectPath, blazorWorkspaceManager, webFormsWorkspaceManager);
+            _fileConverterFactory = new FileConverterFactory(_testProjectPath, blazorWorkspaceManager, webFormsWorkspaceManager);
         }
 
         [Test]
         public void TestBuildBasic()
         {
-            FileInformationModel.FileInformation codeFileObj = _fileFactory.Build(new FileInfo(_testCodeFilePath));
-            FileInformationModel.FileInformation configFileObj = _fileFactory.Build(new FileInfo(_testConfigFilePath));
-            FileInformationModel.FileInformation staticFileObj = _fileFactory.Build(new FileInfo(_testStaticFilePath));
-            FileInformationModel.FileInformation viewFileObj = _fileFactory.Build(new FileInfo(_testViewFilePath));
-            FileInformationModel.FileInformation projectFileObj = _fileFactory.Build(new FileInfo(_testProjectFilePath));
+            FileConverter codeFileObj = _fileConverterFactory.Build(new FileInfo(_testCodeFilePath));
+            FileConverter configFileObj = _fileConverterFactory.Build(new FileInfo(_testConfigFilePath));
+            FileConverter staticFileObj = _fileConverterFactory.Build(new FileInfo(_testStaticFilePath));
+            FileConverter viewFileObj = _fileConverterFactory.Build(new FileInfo(_testViewFilePath));
+            FileConverter projectFileObj = _fileConverterFactory.Build(new FileInfo(_testProjectFilePath));
 
-            Assert.True(typeof(FileInformationModel.CodeFileInformation).IsInstanceOfType(codeFileObj));
-            Assert.True(typeof(FileInformationModel.ConfigFileInformation).IsInstanceOfType(configFileObj));
-            Assert.True(typeof(FileInformationModel.StaticFileInformation).IsInstanceOfType(staticFileObj));
-            Assert.True(typeof(FileInformationModel.ViewFileInformation).IsInstanceOfType(viewFileObj));
-            Assert.True(typeof(FileInformationModel.ProjectFileInformation).IsInstanceOfType(projectFileObj));
+            Assert.True(typeof(CodeFileConverter).IsInstanceOfType(codeFileObj));
+            Assert.True(typeof(ConfigFileConverter).IsInstanceOfType(configFileObj));
+            Assert.True(typeof(StaticFileConverter).IsInstanceOfType(staticFileObj));
+            Assert.True(typeof(ViewFileConverter).IsInstanceOfType(viewFileObj));
+            Assert.True(typeof(ProjectFileConverter).IsInstanceOfType(projectFileObj));
 
         }
 
@@ -74,12 +75,12 @@ namespace CTA.WebForms2Blazor.Tests.Factories
             files.Add(new FileInfo(_testViewFilePath));
             files.Add(new FileInfo(_testProjectFilePath));
 
-            List<FileInformationModel.FileInformation> fileObjects = _fileFactory.BuildMany(files).ToList();
-            Assert.True(typeof(FileInformationModel.CodeFileInformation).IsInstanceOfType(fileObjects[0]));
-            Assert.True(typeof(FileInformationModel.ConfigFileInformation).IsInstanceOfType(fileObjects[1]));
-            Assert.True(typeof(FileInformationModel.StaticFileInformation).IsInstanceOfType(fileObjects[2]));
-            Assert.True(typeof(FileInformationModel.ViewFileInformation).IsInstanceOfType(fileObjects[3]));
-            Assert.True(typeof(FileInformationModel.ProjectFileInformation).IsInstanceOfType(fileObjects[4]));
+            List<FileConverter> fileObjects = _fileConverterFactory.BuildMany(files).ToList();
+            Assert.True(typeof(CodeFileConverter).IsInstanceOfType(fileObjects[0]));
+            Assert.True(typeof(ConfigFileConverter).IsInstanceOfType(fileObjects[1]));
+            Assert.True(typeof(StaticFileConverter).IsInstanceOfType(fileObjects[2]));
+            Assert.True(typeof(ViewFileConverter).IsInstanceOfType(fileObjects[3]));
+            Assert.True(typeof(ProjectFileConverter).IsInstanceOfType(fileObjects[4]));
         }
     }
 }
