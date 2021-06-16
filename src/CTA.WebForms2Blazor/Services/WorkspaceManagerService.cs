@@ -11,7 +11,9 @@ namespace CTA.WebForms2Blazor.Services
     public class WorkspaceManagerService
     {
         private const string WorkspaceDuplicateError = "Attempted to create a new Blazor workspace when one already exists";
-        private const string WorkspaceMissingeErrorTemplate = "Workspace {0} operation attempted, but no workspace exists";
+        private const string WorkspaceMissingeErrorTemplate = "Attempted {0} operation, but no workspace exists";
+        private const string ProjectMissingErrorTemplate = "Attempted {0} operation, but required project [id:{1}] does not exist";
+        private const string DocumentMissingErrorTemplate = "Attempted {0} operation, but required document [id:{1}] does not exist";
         private const string WorkspaceUpdateFailedErrorTemplate = "Workspace {0} operation attempted, but workspace failed to apply changes";
 
         // We track number of projects and documents explicitly because the number of
@@ -39,7 +41,7 @@ namespace CTA.WebForms2Blazor.Services
             _workspace.AddSolution(solutionInfo);
         }
 
-        public Project CreateProjectFile(string projectName, IEnumerable<ProjectReference> projectReferences = null, IEnumerable<MetadataReference> metadataReferences = null)
+        public ProjectId CreateProjectFile(string projectName, IEnumerable<ProjectReference> projectReferences = null, IEnumerable<MetadataReference> metadataReferences = null)
         {
             if (_workspace == null)
             {
@@ -65,53 +67,38 @@ namespace CTA.WebForms2Blazor.Services
             Project project = _workspace.AddProject(projectInfo);
             _numProjects += 1;
 
-            return project;
+            return project.Id;
         }
 
-        public void AddProjectReferences(string projectName, IEnumerable<ProjectReference> projectReferences)
+        public void AddProjectReferences(ProjectId projectId, IEnumerable<ProjectReference> projectReferences)
         {
-            if (_workspace == null)
-            {
-                throw new InvalidOperationException(string.Format(WorkspaceMissingeErrorTemplate, "add project reference"));
-            }
+            ThrowErrorIfProjectNotExists("add project reference");
 
-            var targetProject = _workspace.CurrentSolution.Projects.Where(project => project.Name.Equals(projectName)).Single();
+            var targetProject = GetProjectById(projectId, "add project reference");
             var newSolution = _workspace.CurrentSolution.WithProjectReferences(targetProject.Id, projectReferences);
 
-            if (!_workspace.TryApplyChanges(newSolution))
-            {
-                throw new InvalidOperationException(string.Format(WorkspaceUpdateFailedErrorTemplate, "add project reference"));
-            }
+            ApplyWorkspaceChanges(newSolution, "add project reference");
         }
 
-        public void AddMetadataReferences(string projectName, IEnumerable<MetadataReference> metadataReferences)
+        public void AddMetadataReferences(ProjectId projectId, IEnumerable<MetadataReference> metadataReferences)
         {
-            if (_workspace == null)
-            {
-                throw new InvalidOperationException(string.Format(WorkspaceMissingeErrorTemplate, "add metadata reference"));
-            }
+            ThrowErrorIfProjectNotExists("add metadata reference");
 
-            var targetProject = _workspace.CurrentSolution.Projects.Where(project => project.Name.Equals(projectName)).Single();
+            var targetProject = GetProjectById(projectId, "add metadata reference");
             var newSolution = _workspace.CurrentSolution.WithProjectMetadataReferences(targetProject.Id, metadataReferences);
 
-            if (!_workspace.TryApplyChanges(newSolution))
-            {
-                throw new InvalidOperationException(string.Format(WorkspaceUpdateFailedErrorTemplate, "add metadata reference"));
-            }
+            ApplyWorkspaceChanges(newSolution, "add metadata reference");
         }
 
-        public Document AddDocument(string projectName, string documentName, string documentText)
+        public DocumentId AddDocument(ProjectId projectId, string documentName, string documentText)
         {
-            if (_workspace == null)
-            {
-                throw new InvalidOperationException(string.Format(WorkspaceMissingeErrorTemplate, "add document"));
-            }
+            ThrowErrorIfProjectNotExists("add document");
 
-            var targetProject = _workspace.CurrentSolution.Projects.Where(project => project.Name.Equals(projectName)).Single();
+            var targetProject = GetProjectById(projectId, "add document");
             Document document = _workspace.AddDocument(targetProject.Id, documentName, SourceText.From(documentText));
             _numDocuments += 1;
 
-            return document;
+            return document.Id;
         }
 
         public void NotifyNewExpectedProject()
@@ -148,6 +135,60 @@ namespace CTA.WebForms2Blazor.Services
 
                 await Task.Delay(25);
             }
+        }
+
+        public async Task<SyntaxTree> GetCurrentDocumentSyntaxTree(DocumentId documentId)
+        {
+            var document = GetDocumentById(documentId, "get syntax tree");
+
+            return await document.GetSyntaxTreeAsync();
+        }
+
+        public async Task<SemanticModel> GetCurrentDocumentSemanticModel(DocumentId documentId)
+        {
+            var document = GetDocumentById(documentId, "get semantic model");
+
+            return await document.GetSemanticModelAsync();
+        }
+
+        private void ThrowErrorIfProjectNotExists(string operation)
+        {
+            if (_workspace == null)
+            {
+                throw new InvalidOperationException(string.Format(WorkspaceMissingeErrorTemplate, operation));
+            }
+        }
+
+        private void ApplyWorkspaceChanges(Solution solution, string operation)
+        {
+            if (!_workspace.TryApplyChanges(solution))
+            {
+                throw new InvalidOperationException(string.Format(WorkspaceUpdateFailedErrorTemplate, operation));
+            }
+        }
+
+        private Project GetProjectById(ProjectId projectId, string operation)
+        {
+            var project = _workspace.CurrentSolution.GetProject(projectId);
+
+            if (project == null)
+            {
+                throw new ArgumentException(string.Format(ProjectMissingErrorTemplate, operation, projectId.Id));
+            }
+
+            return project;
+        }
+
+        private Document GetDocumentById(DocumentId documentId, string operation)
+        {
+            var document = _workspace.CurrentSolution.GetDocument(documentId);
+
+            if (document == null)
+            {
+                throw new ArgumentException(string.Format(DocumentMissingErrorTemplate, operation, documentId.Id));
+            }
+
+            return document;
         }
     }
 }

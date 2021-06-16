@@ -1,14 +1,24 @@
 ﻿using CTA.WebForms2Blazor.Services;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using NUnit.Framework;
 using System;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace CTA.WebForms2Blazor.Tests.Services
 {
     public class WorkspaceManagerServiceTests
     {
+        private const string TestDocument1Text =
+@"namespace TestNamespace1 {
+    public class TestClass1 {
+        public void TestMethod1 () { }
+    }
+}";
+
         private WorkspaceManagerService _workspaceBuilder;
 
         [SetUp]
@@ -112,9 +122,9 @@ namespace CTA.WebForms2Blazor.Tests.Services
         public void AddDocument_Adds_Single_Document_To_Project()
         {
             _workspaceBuilder.CreateSolutionFile();
-            _workspaceBuilder.CreateProjectFile("TestProjectName1");
-            _workspaceBuilder.CreateProjectFile("TestProjectName2");
-            _workspaceBuilder.AddDocument("TestProjectName2", "TestDocumentName", "");
+            var pid1 = _workspaceBuilder.CreateProjectFile("TestProjectName1");
+            var pid2 = _workspaceBuilder.CreateProjectFile("TestProjectName2");
+            _workspaceBuilder.AddDocument(pid2, "TestDocumentName", "");
 
             var project1 = _workspaceBuilder.CurrentSolution.Projects.Where(project => project.Name.Equals("TestProjectName1")).Single();
             var project2 = _workspaceBuilder.CurrentSolution.Projects.Where(project => project.Name.Equals("TestProjectName2")).Single();
@@ -127,12 +137,12 @@ namespace CTA.WebForms2Blazor.Tests.Services
         public void AddDocument_Works_For_Multiple_Documents()
         {
             _workspaceBuilder.CreateSolutionFile();
-            _workspaceBuilder.CreateProjectFile("TestProjectName1");
-            _workspaceBuilder.CreateProjectFile("TestProjectName2");
-            _workspaceBuilder.AddDocument("TestProjectName1", "TestDocumentName1", "");
-            _workspaceBuilder.AddDocument("TestProjectName2", "TestDocumentName2", "");
-            _workspaceBuilder.AddDocument("TestProjectName2", "TestDocumentName3", "");
-            _workspaceBuilder.AddDocument("TestProjectName2", "TestDocumentName4", "");
+            var pid1 = _workspaceBuilder.CreateProjectFile("TestProjectName1");
+            var pid2 = _workspaceBuilder.CreateProjectFile("TestProjectName2");
+            _workspaceBuilder.AddDocument(pid1, "TestDocumentName1", "");
+            _workspaceBuilder.AddDocument(pid2, "TestDocumentName2", "");
+            _workspaceBuilder.AddDocument(pid2, "TestDocumentName3", "");
+            _workspaceBuilder.AddDocument(pid2, "TestDocumentName4", "");
 
             var project1 = _workspaceBuilder.CurrentSolution.Projects.Where(project => project.Name.Equals("TestProjectName1")).Single();
             var project2 = _workspaceBuilder.CurrentSolution.Projects.Where(project => project.Name.Equals("TestProjectName2")).Single();
@@ -142,11 +152,11 @@ namespace CTA.WebForms2Blazor.Tests.Services
         }
 
         [Test]
-        public void AddDocument_Throws_Exception_If_Project_Doesnt_Exist()
+        public void AddDocument_Throws_Exception_On_Invalid_Project_Id()
         {
             _workspaceBuilder.CreateSolutionFile();
-            _workspaceBuilder.CreateProjectFile("TestProjectName1");
-            Assert.Throws(typeof(InvalidOperationException), () => _workspaceBuilder.AddDocument("TestProjectName2", "TestDocumentName", ""));
+            var pid1 = _workspaceBuilder.CreateProjectFile("TestProjectName1");
+            Assert.Throws(typeof(ArgumentException), () => _workspaceBuilder.AddDocument(ProjectId.CreateNewId(), "TestDocumentName", ""));
         }
 
         [Test]
@@ -163,13 +173,13 @@ namespace CTA.WebForms2Blazor.Tests.Services
             var task = _workspaceBuilder.WaitUntilAllDocumentsInWorkspace(token);
             Assert.False(task.IsCompleted);
 
-            _workspaceBuilder.CreateProjectFile("TestProjectName1");
+            var pid1 = _workspaceBuilder.CreateProjectFile("TestProjectName1");
             Assert.False(task.IsCompleted);
 
-            _workspaceBuilder.AddDocument("TestProjectName1", "TestDocumentName1", "");
+            _workspaceBuilder.AddDocument(pid1, "TestDocumentName1", "");
             Assert.False(task.IsCompleted);
 
-            _workspaceBuilder.AddDocument("TestProjectName1", "TestDocumentName2", "");
+            _workspaceBuilder.AddDocument(pid1, "TestDocumentName2", "");
             Assert.DoesNotThrowAsync(async () => await task);
             Assert.True(task.IsCompletedSuccessfully);
         }
@@ -188,15 +198,94 @@ namespace CTA.WebForms2Blazor.Tests.Services
             var task = _workspaceBuilder.WaitUntilAllDocumentsInWorkspace(token);
             Assert.False(task.IsCompleted);
 
-            _workspaceBuilder.CreateProjectFile("TestProjectName1");
+            var pid1 = _workspaceBuilder.CreateProjectFile("TestProjectName1");
             Assert.False(task.IsCompleted);
 
-            _workspaceBuilder.AddDocument("TestProjectName1", "TestDocumentName1", "");
+            _workspaceBuilder.AddDocument(pid1, "TestDocumentName1", "");
             Assert.False(task.IsCompleted);
 
             source.Cancel();
             Assert.ThrowsAsync(typeof(OperationCanceledException), async () => await task);
             Assert.True(task.IsCanceled);
+        }
+
+        [Test]
+        public async Task GetCurrentDocumentSyntaxTree_Correctly_Builds_Syntax_Tree()
+        {
+            _workspaceBuilder.CreateSolutionFile();
+            var pid1 = _workspaceBuilder.CreateProjectFile("TestProjectName1");
+            var did1 = _workspaceBuilder.AddDocument(pid1, "TestDocumentName1", TestDocument1Text);
+
+            var syntaxTree = await _workspaceBuilder.GetCurrentDocumentSyntaxTree(did1);
+
+            // Generated from TestDocument1Text using Roslyn Quoter site
+            // http://roslynquoter.azurewebsites.net/
+            var targetSyntaxTree = SyntaxFactory.CompilationUnit()
+                .WithMembers(
+                    SyntaxFactory.SingletonList<MemberDeclarationSyntax>(
+                        SyntaxFactory.NamespaceDeclaration(
+                            SyntaxFactory.IdentifierName("TestNamespace1"))
+                        .WithMembers(
+                            SyntaxFactory.SingletonList<MemberDeclarationSyntax>(
+                                SyntaxFactory.ClassDeclaration("TestClass1")
+                                .WithModifiers(
+                                    SyntaxFactory.TokenList(
+                                        SyntaxFactory.Token(SyntaxKind.PublicKeyword)))
+                                .WithMembers(
+                                    SyntaxFactory.SingletonList<MemberDeclarationSyntax>(
+                                        SyntaxFactory.MethodDeclaration(
+                                            SyntaxFactory.PredefinedType(
+                                                SyntaxFactory.Token(SyntaxKind.VoidKeyword)),
+                                            SyntaxFactory.Identifier("TestMethod1"))
+                                        .WithModifiers(
+                                            SyntaxFactory.TokenList(
+                                                SyntaxFactory.Token(SyntaxKind.PublicKeyword)))
+                                        .WithBody(
+                                            SyntaxFactory.Block())))))))
+                .NormalizeWhitespace().SyntaxTree;
+
+            Assert.True(syntaxTree.IsEquivalentTo(targetSyntaxTree));
+        }
+
+        [Test]
+        public void GetCurrentDocumentSyntaxTree_Throws_Exception_On_Invalid_Document_Id()
+        {
+            _workspaceBuilder.CreateSolutionFile();
+            var pid1 = _workspaceBuilder.CreateProjectFile("TestProjectName1");
+            var did1 = _workspaceBuilder.AddDocument(pid1, "TestDocumentName1", TestDocument1Text);
+
+            Assert.ThrowsAsync(typeof(ArgumentException), async () => await _workspaceBuilder.GetCurrentDocumentSyntaxTree(DocumentId.CreateNewId(pid1)));
+        }
+
+        [Test]
+        public async Task GetCurrentDocumentSemanticModel_Builds_Model_With_Necessary_Symbols()
+        {
+            _workspaceBuilder.CreateSolutionFile();
+            var pid1 = _workspaceBuilder.CreateProjectFile("TestProjectName1");
+            var did1 = _workspaceBuilder.AddDocument(pid1, "TestDocumentName1", TestDocument1Text);
+
+            var model = await _workspaceBuilder.GetCurrentDocumentSemanticModel(did1);
+
+            var rootNode = model.SyntaxTree.GetRoot();
+            var descendantNodes = rootNode.DescendantNodes();
+            var classDeclaration = descendantNodes.OfType<ClassDeclarationSyntax>().Single();
+            var methodDeclaration = descendantNodes.OfType<MethodDeclarationSyntax>().Single();
+
+            var classSymbol = model.GetDeclaredSymbol(classDeclaration);
+            var methodSymbol = model.GetDeclaredSymbol(methodDeclaration);
+
+            Assert.AreEqual(classSymbol.Name, "TestClass1");
+            Assert.AreEqual(methodSymbol.Name, "TestMethod1");
+        }
+
+        [Test]
+        public void GetCurrentDocumentSemanticModel_Throws_Exception_On_Invalid_Document_Id()
+        {
+            _workspaceBuilder.CreateSolutionFile();
+            var pid1 = _workspaceBuilder.CreateProjectFile("TestProjectName1");
+            var did1 = _workspaceBuilder.AddDocument(pid1, "TestDocumentName1", TestDocument1Text);
+
+            Assert.ThrowsAsync(typeof(ArgumentException), async () => await _workspaceBuilder.GetCurrentDocumentSemanticModel(DocumentId.CreateNewId(pid1)));
         }
     }
 }
