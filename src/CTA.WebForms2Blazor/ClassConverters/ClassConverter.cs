@@ -23,6 +23,6 @@ namespace CTA.WebForms2Blazor.ClassConverters
             _originalClassSymbol = originalClassSymbol;
         }
 
-        public abstract Task MigrateClassAsync();
+        public abstract Task<FileInformation> MigrateClassAsync();
     }
 }
