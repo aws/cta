@@ -218,33 +218,7 @@ namespace CTA.WebForms2Blazor.Tests.Services
 
             var syntaxTree = await _workspaceBuilder.GetCurrentDocumentSyntaxTree(did1);
 
-            // Generated from TestDocument1Text using Roslyn Quoter site
-            // http://roslynquoter.azurewebsites.net/
-            var targetSyntaxTree = SyntaxFactory.CompilationUnit()
-                .WithMembers(
-                    SyntaxFactory.SingletonList<MemberDeclarationSyntax>(
-                        SyntaxFactory.NamespaceDeclaration(
-                            SyntaxFactory.IdentifierName("TestNamespace1"))
-                        .WithMembers(
-                            SyntaxFactory.SingletonList<MemberDeclarationSyntax>(
-                                SyntaxFactory.ClassDeclaration("TestClass1")
-                                .WithModifiers(
-                                    SyntaxFactory.TokenList(
-                                        SyntaxFactory.Token(SyntaxKind.PublicKeyword)))
-                                .WithMembers(
-                                    SyntaxFactory.SingletonList<MemberDeclarationSyntax>(
-                                        SyntaxFactory.MethodDeclaration(
-                                            SyntaxFactory.PredefinedType(
-                                                SyntaxFactory.Token(SyntaxKind.VoidKeyword)),
-                                            SyntaxFactory.Identifier("TestMethod1"))
-                                        .WithModifiers(
-                                            SyntaxFactory.TokenList(
-                                                SyntaxFactory.Token(SyntaxKind.PublicKeyword)))
-                                        .WithBody(
-                                            SyntaxFactory.Block())))))))
-                .NormalizeWhitespace().SyntaxTree;
-
-            Assert.True(syntaxTree.IsEquivalentTo(targetSyntaxTree));
+            Assert.AreEqual(TestDocument1Text, syntaxTree.ToString());
         }
 
         [Test]

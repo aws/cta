@@ -16,6 +16,12 @@ namespace CTA.WebForms2Blazor.Services
         private const string DocumentMissingErrorTemplate = "Attempted {0} operation, but required document [id:{1}] does not exist";
         private const string WorkspaceUpdateFailedErrorTemplate = "Workspace {0} operation attempted, but workspace failed to apply changes";
 
+        private const string AddProjectReferenceOperation = "add project references";
+        private const string AddMetadataReferenceOperation = "add metadata reference";
+        private const string AddDocumentOperation = "add document";
+        private const string GetSyntaxTreeOperation = "get syntax tree";
+        private const string GetSemanticModelOperation = "get semantic model";
+
         // We track number of projects and documents explicitly because the number of
         // documents in the workspace only equates to code files, and also for use by
         // functions or services that wait on conditions using these values. Continually
@@ -72,29 +78,29 @@ namespace CTA.WebForms2Blazor.Services
 
         public void AddProjectReferences(ProjectId projectId, IEnumerable<ProjectReference> projectReferences)
         {
-            ThrowErrorIfProjectNotExists("add project reference");
+            ThrowErrorIfProjectNotExists(AddProjectReferenceOperation);
 
-            var targetProject = GetProjectById(projectId, "add project reference");
+            var targetProject = GetProjectById(projectId, AddProjectReferenceOperation);
             var newSolution = _workspace.CurrentSolution.WithProjectReferences(targetProject.Id, projectReferences);
 
-            ApplyWorkspaceChanges(newSolution, "add project reference");
+            ApplyWorkspaceChanges(newSolution, AddProjectReferenceOperation);
         }
 
         public void AddMetadataReferences(ProjectId projectId, IEnumerable<MetadataReference> metadataReferences)
         {
-            ThrowErrorIfProjectNotExists("add metadata reference");
+            ThrowErrorIfProjectNotExists(AddMetadataReferenceOperation);
 
-            var targetProject = GetProjectById(projectId, "add metadata reference");
+            var targetProject = GetProjectById(projectId, AddMetadataReferenceOperation);
             var newSolution = _workspace.CurrentSolution.WithProjectMetadataReferences(targetProject.Id, metadataReferences);
 
-            ApplyWorkspaceChanges(newSolution, "add metadata reference");
+            ApplyWorkspaceChanges(newSolution, AddMetadataReferenceOperation);
         }
 
         public DocumentId AddDocument(ProjectId projectId, string documentName, string documentText)
         {
-            ThrowErrorIfProjectNotExists("add document");
+            ThrowErrorIfProjectNotExists(AddDocumentOperation);
 
-            var targetProject = GetProjectById(projectId, "add document");
+            var targetProject = GetProjectById(projectId, AddDocumentOperation);
             Document document = _workspace.AddDocument(targetProject.Id, documentName, SourceText.From(documentText));
             _numDocuments += 1;
 
@@ -139,14 +145,14 @@ namespace CTA.WebForms2Blazor.Services
 
         public async Task<SyntaxTree> GetCurrentDocumentSyntaxTree(DocumentId documentId)
         {
-            var document = GetDocumentById(documentId, "get syntax tree");
+            var document = GetDocumentById(documentId, GetSyntaxTreeOperation);
 
             return await document.GetSyntaxTreeAsync();
         }
 
         public async Task<SemanticModel> GetCurrentDocumentSemanticModel(DocumentId documentId)
         {
-            var document = GetDocumentById(documentId, "get semantic model");
+            var document = GetDocumentById(documentId, GetSemanticModelOperation);
 
             return await document.GetSemanticModelAsync();
         }

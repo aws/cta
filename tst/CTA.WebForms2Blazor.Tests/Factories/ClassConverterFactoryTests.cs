@@ -109,7 +109,7 @@ namespace CTA.WebForms2Blazor.Tests.Factories
             var model = await _workspaceManager.GetCurrentDocumentSemanticModel(did);
             var classConverters = _classConverterFactory.BuildMany(testDocumentPath, model);
 
-            Assert.AreEqual(classConverters.Count(), 4);
+            Assert.AreEqual(4, classConverters.Count());
         }
     }
 }

@@ -12,15 +12,18 @@ namespace CTA.WebForms2Blazor.Factories
         private readonly string _sourceProjectPath;
         private readonly WorkspaceManagerService _blazorWorkspaceManager;
         private readonly WorkspaceManagerService _webFormsWorkspaceManager;
+        private readonly ClassConverterFactory _classConverterFactory;
 
         public FileConverterFactory(
             string sourceProjectPath,
             WorkspaceManagerService blazorWorkspaceManager,
-            WorkspaceManagerService webFormsWorkspaceManager)
+            WorkspaceManagerService webFormsWorkspaceManager,
+            ClassConverterFactory classConverterFactory)
         {
             _sourceProjectPath = sourceProjectPath;
             _blazorWorkspaceManager = blazorWorkspaceManager;
             _webFormsWorkspaceManager = webFormsWorkspaceManager;
+            _classConverterFactory = classConverterFactory;
         }
 
         public FileConverter Build(FileInfo document)
@@ -39,7 +42,7 @@ namespace CTA.WebForms2Blazor.Factories
             FileConverter fc;
             if (extension.Equals(".cs"))
             {
-                fc = new CodeFileConverter(relativePath, _blazorWorkspaceManager, _webFormsWorkspaceManager);
+                fc = new CodeFileConverter(relativePath, _blazorWorkspaceManager, _webFormsWorkspaceManager, _classConverterFactory);
             } else if (extension.Equals(".config"))
             {
                 fc = new ConfigFileConverter(relativePath);

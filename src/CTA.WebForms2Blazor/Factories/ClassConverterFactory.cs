@@ -5,6 +5,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using CTA.WebForms2Blazor.Extensions;
+using System;
 
 namespace CTA.WebForms2Blazor.Factories
 {
@@ -35,24 +36,24 @@ namespace CTA.WebForms2Blazor.Factories
             var symbol = model.GetDeclaredSymbol(typeDeclarationNode);
 
             if (symbol.GetAllInheritedBaseTypes().Any(typeSymbol => typeSymbol.Name.Equals(ExpectedGlobalBaseClass))
-                && sourceFileRelativePath.EndsWith(ExpectedGlobalFileName))
+                && sourceFileRelativePath.EndsWith(ExpectedGlobalFileName, StringComparison.InvariantCultureIgnoreCase))
             {
                 return new GlobalClassConverter(sourceFileRelativePath, model, symbol);
             }
             // NOTE: The order is important from this point on, mainly because
             // Page-derived classes are also IHttpHandler derived
             else if (symbol.GetAllInheritedBaseTypes().Any(typeSymbol => typeSymbol.Name.Equals(ExpectedPageBaseClass))
-                && sourceFileRelativePath.EndsWith(PageCodeBehindExtension))
+                && sourceFileRelativePath.EndsWith(PageCodeBehindExtension, StringComparison.InvariantCultureIgnoreCase))
             {
                 return new PageCodeBehindClassConverter(sourceFileRelativePath, model, symbol);
             }
             else if (symbol.GetAllInheritedBaseTypes().Any(typeSymbol => typeSymbol.Name.Equals(ExpectedControlBaseClass))
-                && sourceFileRelativePath.EndsWith(ControlCodeBehindExtension))
+                && sourceFileRelativePath.EndsWith(ControlCodeBehindExtension, StringComparison.InvariantCultureIgnoreCase))
             {
                 return new ControlCodeBehindClassConverter(sourceFileRelativePath, model, symbol);
             }
             else if (symbol.GetAllInheritedBaseTypes().Any(typeSymbol => typeSymbol.Name.Equals(ExpectedMasterPageBaseClass))
-                && sourceFileRelativePath.EndsWith(MasterPageCodeBehindExtension))
+                && sourceFileRelativePath.EndsWith(MasterPageCodeBehindExtension, StringComparison.InvariantCultureIgnoreCase))
             {
                 return new MasterPageCodeBehindClassConverter(sourceFileRelativePath, model, symbol);
             }

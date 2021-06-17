@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
+using System.Linq;
 using System.Collections.Generic;
 
 namespace CTA.WebForms2Blazor.ProjectManagement
@@ -18,9 +20,13 @@ namespace CTA.WebForms2Blazor.ProjectManagement
         {
             var directoryInfo = new DirectoryInfo(_inputProjectPath);
 
-            // TODO: Filter out un-needed files from the source
-            // project, i.e. build artifacts
-            return directoryInfo.GetFiles("*", SearchOption.AllDirectories);
+            return directoryInfo.GetFiles("*", SearchOption.AllDirectories).Where(fileInfo => !ShouldIgnoreFileInfo(fileInfo));
+        }
+
+        public bool ShouldIgnoreFileInfo(FileInfo fileInfo)
+        {
+            // Do filtering checks here and return true if an ignore condition is met
+            return false;
         }
     }
 }
