@@ -33,7 +33,8 @@ namespace CTA.Rules.Config
 
         public const string S3RootUrl = "https://s3.us-west-2.amazonaws.com/aws.portingassistant.dotnet.datastore";
         public const string S3RecommendationsBucketUrl = S3RootUrl + "/recommendationsync/recommendation";
-        public const string S3CTAFiles = S3RootUrl + "/ctafiles/resources.zip";
+        public const string S3TemplatesBucketUrl = S3RootUrl + "/recommendationsync/Templates";
+        
 
         public const int ThreadCount = 10;
         public const int MaxRecursionDepth = 100000;
@@ -98,5 +99,18 @@ namespace CTA.Rules.Config
         public const string ConnectionStrings = "ConnectionStrings";
 
         public static readonly List<string> SupportedMethodModifiers = new List<string>() { "public", "internal", "protected", "private", "abstract", "extern", "override", "static", "unsafe", "virtual", "async" };
+
+
+        public static readonly List<List<string>> TemplateFiles = new List<List<string>>() {
+            new List<string> {"default.json"},
+            new List<string> {"classlibrary","appsettings.json"},
+            new List<string> {"webapi","appsettings.json"},
+            new List<string> {"webapi","Program.cs"},
+            new List<string> {"webapi","Startup.cs"},
+            new List<string> {"mvc","appsettings.json"},
+            new List<string> {"mvc","Program.cs"},
+            new List<string> {"mvc","Startup.cs" },
+            new List<string> {"webclasslibrary","appsettings.json" }
+        };
     }
 }
