@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Threading.Tasks;
+using CTA.WebForms2Blazor.Factories;
 using CTA.WebForms2Blazor.FileInformationModel;
 using CTA.WebForms2Blazor.Services;
 
@@ -11,22 +11,19 @@ namespace CTA.WebForms2Blazor.FileConverters
     {
         private readonly WorkspaceManagerService _blazorWorkspaceBuilder;
         private readonly WorkspaceManagerService _webFormsWorkspaceBuilder;
+        private readonly ClassConverterFactory _classConverterFactory;
 
         public CodeFileConverter(
             string relativePath,
             WorkspaceManagerService blazorWorkspaceManager,
-            WorkspaceManagerService webFormsWorkspaceManager
-            ) : base(relativePath)
+            WorkspaceManagerService webFormsWorkspaceManager,
+            ClassConverterFactory classConverterFactory) : base(relativePath)
         {
             _blazorWorkspaceBuilder = blazorWorkspaceManager;
             _webFormsWorkspaceBuilder = webFormsWorkspaceManager;
+            _classConverterFactory = classConverterFactory;
 
             _webFormsWorkspaceBuilder.NotifyNewExpectedDocument();
-
-            // TODO: Create class information objects and call
-            // _blazorProjectBuilder.NotifyNewExpectedDocument() in
-            // each one, this is because potentially multiple files
-            // are produced by this file information type
         }
 
 
@@ -37,6 +34,11 @@ namespace CTA.WebForms2Blazor.FileConverters
 
             // TODO: Get project name, and document text
             // _webFormsWorkspaceBuilder.AddDocument("{Project Name}", Path.GetFileName(RelativePath), "{Document Text}");
+
+            // TODO: Create class information objects and call
+            // _blazorProjectBuilder.NotifyNewExpectedDocument() in
+            // each one, this is because potentially multiple files
+            // are produced by this file information type
 
             // TODO: Call migration functions on class information
             // objects and call _blazorProjectBuilder.AddDocument

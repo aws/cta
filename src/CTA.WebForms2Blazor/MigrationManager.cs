@@ -21,7 +21,8 @@ namespace CTA.WebForms2Blazor
 
         private WorkspaceManagerService _webFormsWorkspaceManager;
         private WorkspaceManagerService _blazorWorkspaceManager;
-        private FileConverterFactory _converterFactory;
+        private ClassConverterFactory _classConverterFactory;
+        private FileConverterFactory _fileConverterFactory;
 
         public MigrationManager(string inputProjectPath, string outputProjectPath)
         {
@@ -35,10 +36,11 @@ namespace CTA.WebForms2Blazor
 
             _webFormsProjectAnalyzer = new ProjectAnalyzer(_inputProjectPath);
             _blazorProjectBuilder = new ProjectBuilder(_outputProjectPath);
-            _converterFactory = new FileConverterFactory(_inputProjectPath, _blazorWorkspaceManager, _webFormsWorkspaceManager);
+            _classConverterFactory = new ClassConverterFactory();
+            _fileConverterFactory = new FileConverterFactory(_inputProjectPath, _blazorWorkspaceManager, _webFormsWorkspaceManager, _classConverterFactory);
 
             // Pass workspace build manager to factory constructor
-            var fileConverterCollection = _converterFactory.BuildMany(_webFormsProjectAnalyzer.GetProjectFileInfo());
+            var fileConverterCollection = _fileConverterFactory.BuildMany(_webFormsProjectAnalyzer.GetProjectFileInfo());
 
             var migrationTasks = fileConverterCollection.Select(fileConverter =>
                 // ContinueWith specifies the action to be run after each task completes,
