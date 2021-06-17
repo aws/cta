@@ -45,7 +45,7 @@ namespace CTA.Rules.Test
         public void TestSampleWebApi3Solution()
         {
             var solutionDir = TestWebApiApp(TargetFramework.DotnetCoreApp31);
-            SolutionPort.ResetCache(false, false);
+            SolutionPort.ResetCache();
             TestWebApi(TargetFramework.Dotnet5, solutionDir);
         }
 

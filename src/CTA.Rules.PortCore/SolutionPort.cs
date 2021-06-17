@@ -244,20 +244,7 @@ namespace CTA.Rules.PortCore
             return _solutionRewriter.RunIncremental(projectRules, new List<string> { updatedFile });
         }
 
-        private void DownloadResources()
-        {
-            var executingPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            using var httpClient = new HttpClient();
-            try
-            {
-                var zipFile = Utils.DownloadFile(Constants.S3CTAFiles, Constants.ResourcesFile);
-                ZipFile.ExtractToDirectory(zipFile, executingPath, true);
-            }
-            catch (Exception ex)
-            {
-                LogHelper.LogError(ex, string.Format("Unable to download resources from {0}", Constants.S3CTAFiles));
-            }
-        }
+
 
         private void CopyOverrideRules(string sourceDir)
         {
@@ -269,33 +256,19 @@ namespace CTA.Rules.PortCore
 
         private void CheckCache()
         {
-            var recommendationsTime = Directory.GetCreationTime(Constants.RulesDefaultPath);
-            var resourceExtractedTime = Directory.GetCreationTime(Constants.ResourcesExtractedPath);
-
-            bool cleanRecommendations = false;
-            bool cleanResources = false;
-
-            if (recommendationsTime.AddHours(Constants.CacheExpiryHours) < DateTime.Now)
-            {
-                cleanRecommendations = true;
-            }
-            if (resourceExtractedTime.AddDays(Constants.CacheExpiryDays) < DateTime.Now)
-            {
-                cleanResources = true;
-            }
-
-            ResetCache(cleanRecommendations, cleanResources);
-            if (cleanResources)
-            {
-                DownloadResources();
-            }
+            ResetCache();
+            DownloadResourceFiles();            
         }
 
-        public static void ResetCache(bool recommendations, bool resources)
+        public static void ResetCache()
         {
             try
             {
-                if (recommendations)
+                var recommendationsTime = Directory.GetCreationTime(Constants.RulesDefaultPath);
+
+                bool cleanRecommendations = recommendationsTime.AddHours(Constants.CacheExpiryHours) < DateTime.Now;
+
+                if (cleanRecommendations)
                 {
                     if (Directory.Exists(Constants.RulesDefaultPath))
                     {
@@ -303,27 +276,22 @@ namespace CTA.Rules.PortCore
                     }
                     Directory.CreateDirectory(Constants.RulesDefaultPath);
                 }
-                if (resources)
-                {
-                    if (File.Exists(Constants.ResourcesFile))
-                    {
-                        File.Delete(Constants.ResourcesFile);
-                    }
-                    if (File.Exists(Constants.DefaultFeaturesFilePath))
-                    {
-                        File.Delete(Constants.DefaultFeaturesFilePath);
-                    }
-                    if (Directory.Exists(Constants.ResourcesExtractedPath))
-                    {
-                        Directory.Delete(Constants.ResourcesExtractedPath, true);
-                    }
-                }
             }
             catch (Exception ex)
             {
                 LogHelper.LogError(ex, "Error while deleting directory");
             }
         }
+
+
+
+        private void DownloadResourceFiles()
+        {
+            Utils.DownloadFilesToFolder(Constants.S3TemplatesBucketUrl, Constants.ResourcesExtractedPath, Constants.TemplateFiles);
+        }
+
+        
+
 
         private ProjectType GetProjectType(FeatureDetectionResult projectTypeFeatureResult)
         {

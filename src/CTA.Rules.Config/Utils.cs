@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Threading.Tasks;
 using NJsonSchema.Generation;
 using NJsonSchema.Validation;
 
@@ -241,6 +242,40 @@ namespace CTA.Rules.Config
                 DirectoryInfo destinationSub = new DirectoryInfo(Path.Combine(target.FullName, dir.Name));
                 CopyDirectory(dir, destinationSub);
             }
+        }
+
+
+        public static void DownloadFilesToFolder(string s3Bucket, string targetFolder, List<List<string>> files)
+        {
+            using var httpClient = new HttpClient();
+
+            var parallelOptions = new ParallelOptions() { MaxDegreeOfParallelism = Constants.ThreadCount };
+
+            Parallel.ForEach(Constants.TemplateFiles, file => {
+                var localFile = Path.Combine(targetFolder, string.Join(Path.DirectorySeparatorChar, file));
+                var remoteFile = string.Concat(s3Bucket, "/", string.Join("/", file));
+
+                if (File.Exists(localFile))
+                {
+                    var lastModified = File.GetLastWriteTime(localFile);
+                    //File doesn't need to be refreshed
+                    if (lastModified.AddDays(Constants.CacheExpiryDays) > DateTime.Now)
+                    {
+                        return;
+                    }
+                }
+
+                try
+                {
+                    var fileContent = httpClient.GetStringAsync(remoteFile).Result;
+                    Directory.CreateDirectory(Path.GetDirectoryName(localFile));
+                    File.WriteAllText(localFile, fileContent);
+                }
+                catch (Exception ex)
+                {
+                    LogHelper.LogError(ex, $"Error while dowloading file {file}");
+                }
+            });
         }
     }
 }
