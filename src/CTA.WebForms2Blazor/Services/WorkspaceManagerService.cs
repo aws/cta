@@ -161,8 +161,16 @@ namespace CTA.WebForms2Blazor.Services
         public Task<bool> WaitUntilAllProjectsInWorkspace(CancellationToken token)
         {
             var source = new TaskCompletionSource<bool>();
-            token.Register(() => source.SetCanceled());
-            _allProjectsInWorkspaceTaskSources.Add(source);
+
+            if (_numProjects >= _expectedProjects)
+            {
+                source.SetResult(true);
+            }
+            else
+            {
+                token.Register(() => source.SetCanceled());
+                _allProjectsInWorkspaceTaskSources.Add(source);
+            }
 
             return source.Task;
         }
@@ -170,8 +178,16 @@ namespace CTA.WebForms2Blazor.Services
         public Task<bool> WaitUntilAllDocumentsInWorkspace(CancellationToken token)
         {
             var source = new TaskCompletionSource<bool>();
-            token.Register(() => source.SetCanceled());
-            _allDocumentsInWorkspaceTaskSources.Add(source);
+
+            if (_numDocuments >= _expectedDocuments)
+            {
+                source.SetResult(true);
+            }
+            else
+            {
+                token.Register(() => source.SetCanceled());
+                _allDocumentsInWorkspaceTaskSources.Add(source);
+            }
 
             return source.Task;
         }
