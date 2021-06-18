@@ -114,7 +114,7 @@ namespace CTA.WebForms2Blazor.Tests.Services
             Assert.False(task.IsCompleted);
 
             source.Cancel();
-            Assert.ThrowsAsync(typeof(OperationCanceledException), async () => await task);
+            Assert.ThrowsAsync(typeof(TaskCanceledException), async () => await task);
             Assert.True(task.IsCanceled);
         }
 
@@ -205,7 +205,7 @@ namespace CTA.WebForms2Blazor.Tests.Services
             Assert.False(task.IsCompleted);
 
             source.Cancel();
-            Assert.ThrowsAsync(typeof(OperationCanceledException), async () => await task);
+            Assert.ThrowsAsync(typeof(TaskCanceledException), async () => await task);
             Assert.True(task.IsCanceled);
         }
 
