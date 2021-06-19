@@ -30,7 +30,7 @@ namespace CTA.WebForms2Blazor.Tests.Factories
             _testProjectPath = Directory.GetParent(workingDirectory).Parent.Parent.FullName;
             var testFilesPath = Path.Combine(_testProjectPath, TestFilesDirectoryPath);
             _testCodeFilePath = Path.Combine(testFilesPath, "TestClassFile.cs");
-            _testConfigFilePath = Path.Combine(testFilesPath, "SampleConfigFile.config");
+            _testConfigFilePath = Path.Combine(testFilesPath, "web.config");
             _testStaticFilePath = Path.Combine(testFilesPath, "SampleStaticFile.png");
             _testViewFilePath = Path.Combine(testFilesPath, "SampleViewFile.aspx");
             _testProjectFilePath = Path.Combine(testFilesPath, "SampleProjectFile.csproj");

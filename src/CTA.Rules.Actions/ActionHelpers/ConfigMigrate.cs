@@ -22,6 +22,15 @@ namespace CTA.Rules.Actions
             _projectType = projectType;
             _hasData = false;
         }
+
+        public void WebformsWebConfigMigrateHelper()
+        {
+            Configuration configXml = LoadWebConfig(_projectDir);
+            var templateContent = @"{}";
+            JObject config = ProcessWebConfig(configXml, templateContent);
+            AddAppSettingsJsonFile(config, _projectDir);
+        }
+
         public string Run()
         {
             return MigrateWebConfig();
