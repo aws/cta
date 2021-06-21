@@ -20,13 +20,9 @@ namespace CTA.WebForms2Blazor.ProjectManagement
         {
             var directoryInfo = new DirectoryInfo(_inputProjectPath);
 
-            return directoryInfo.GetFiles("*", SearchOption.AllDirectories).Where(fileInfo => !ShouldIgnoreFileInfo(fileInfo));
-        }
-
-        public bool ShouldIgnoreFileInfo(FileInfo fileInfo)
-        {
-            // Do filtering checks here and return true if an ignore condition is met
-            return false;
+            return directoryInfo.GetFiles("*", SearchOption.AllDirectories).Where(fileInfo =>
+                !FileFilter.ShouldIgnoreFileAtPath(Path.GetRelativePath(_inputProjectPath, fileInfo.FullName))
+            );
         }
     }
 }
