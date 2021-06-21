@@ -104,6 +104,9 @@ namespace CTA.WebForms2Blazor.Tests.Extensions
         [Test]
         public async Task GetNamespacesReferencedByType_Does_Not_Contain_Own_Namespace()
         {
+            _workspaceManager.NotifyNewExpectedProject();
+            _workspaceManager.NotifyNewExpectedDocument();
+
             var pid1 = _workspaceManager.CreateProjectFile("TestProjectName1");
             var did1 = _workspaceManager.AddDocument(pid1, "TestDocumentName1", TestDocument1NamespaceText);
 
@@ -120,6 +123,10 @@ namespace CTA.WebForms2Blazor.Tests.Extensions
         [Test]
         public async Task GetNamespacesReferencedByType_Contains_Namespaces_In_Other_Files()
         {
+            _workspaceManager.NotifyNewExpectedProject();
+            _workspaceManager.NotifyNewExpectedDocument();
+            _workspaceManager.NotifyNewExpectedDocument();
+
             var pid1 = _workspaceManager.CreateProjectFile("TestProjectName1");
             var did1 = _workspaceManager.AddDocument(pid1, "TestDocumentName1", TestDocument1Of2Text);
             var did2 = _workspaceManager.AddDocument(pid1, "TestDocumentName2", TestDocument2Of2Text);
@@ -141,6 +148,9 @@ namespace CTA.WebForms2Blazor.Tests.Extensions
         [Test]
         public async Task GetNamespacesReferencedByType_Contains_Namespace_Used_By_Base_Class()
         {
+            _workspaceManager.NotifyNewExpectedProject();
+            _workspaceManager.NotifyNewExpectedDocument();
+
             var pid1 = _workspaceManager.CreateProjectFile("TestProjectName1");
             var did1 = _workspaceManager.AddDocument(pid1, "TestDocumentName1", TestDocumentClassExtensionText);
 
@@ -159,6 +169,9 @@ namespace CTA.WebForms2Blazor.Tests.Extensions
         [Test]
         public async Task GetNamespacesReferencedByType_Contains_Namespaces_Used_By_Implemented_Interfaces()
         {
+            _workspaceManager.NotifyNewExpectedProject();
+            _workspaceManager.NotifyNewExpectedDocument();
+
             var pid1 = _workspaceManager.CreateProjectFile("TestProjectName1");
             var did1 = _workspaceManager.AddDocument(pid1, "TestDocumentName1", TestDocumentInterfaceMultipleImplementationText);
 
@@ -180,6 +193,9 @@ namespace CTA.WebForms2Blazor.Tests.Extensions
         [Test]
         public async Task GetNamespacesReferencedByType_Contains_Namespaces_Used_In_Class_Body()
         {
+            _workspaceManager.NotifyNewExpectedProject();
+            _workspaceManager.NotifyNewExpectedDocument();
+
             var pid1 = _workspaceManager.CreateProjectFile("TestProjectName1");
             var did1 = _workspaceManager.AddDocument(pid1, "TestDocumentName1", TestDocumentMethodCallText);
 
@@ -198,6 +214,9 @@ namespace CTA.WebForms2Blazor.Tests.Extensions
         [Test]
         public async Task GetAllInheritedBaseTypes_Contains_Immediate_Base_Class()
         {
+            _workspaceManager.NotifyNewExpectedProject();
+            _workspaceManager.NotifyNewExpectedDocument();
+
             var pid1 = _workspaceManager.CreateProjectFile("TestProjectName1");
             var did1 = _workspaceManager.AddDocument(pid1, "TestDocumentName1", TestDocumentClassExtensionText);
 
@@ -217,6 +236,9 @@ namespace CTA.WebForms2Blazor.Tests.Extensions
         [Test]
         public async Task GetAllInheritedBaseTypes_Contains_Deeper_Base_Classes()
         {
+            _workspaceManager.NotifyNewExpectedProject();
+            _workspaceManager.NotifyNewExpectedDocument();
+
             var pid1 = _workspaceManager.CreateProjectFile("TestProjectName1");
             var did1 = _workspaceManager.AddDocument(pid1, "TestDocumentName1", TestDocumentStackedBaseClassesText);
 

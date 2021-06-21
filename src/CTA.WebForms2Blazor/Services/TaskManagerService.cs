@@ -13,6 +13,7 @@ namespace CTA.WebForms2Blazor.Services
 
         private IDictionary<int, ManagedTask> _managedTasks;
         private bool _stalled;
+        private int _stallOccurrenceNumber;
         private int _nextAvailableTaskId;
 
         public TaskManagerService()
@@ -59,34 +60,44 @@ namespace CTA.WebForms2Blazor.Services
 
         private void UpdateStallState()
         {
-            if (_managedTasks.Count > 0 && !_managedTasks.Values.Any(managedTask => managedTask.CurrentTaskState == TaskState.Active))
+            var shouldBeStalled = _managedTasks.Count > 0 && _managedTasks.Values.All(managedTask => managedTask.CurrentTaskState == TaskState.Waiting);
+
+            // Previously the service was unstalled and now we
+            // want to initiate an attempt to resolve the stall
+            if (shouldBeStalled && !_stalled)
             {
-                if (!_stalled)
-                {
-                    _stalled = true;
-                    TryResolveStall();
-                }
+                _stalled = true;
+                _stallOccurrenceNumber += 1;
+                TryResolveStall();
             }
-            else
+            else if (!shouldBeStalled)
             {
                 _stalled = false;
             }
+            // If service is already stalled and still should be
+            // then we do nothing
         }
 
         private async void TryResolveStall()
         {
-            // Take the delay value as a constructor parameter?
-            // await Task.Delay((int)TaskStallTimeout.Short);
-            if (_stalled)
-            {
-                var oldestTask = _managedTasks.Values.OrderBy(managedTask => managedTask.LastStatusChange).FirstOrDefault();
+            // NOTE: Commented out for use later, currently
+            // configured to immediately cancel oldest task
+            // on stall
 
-                if (oldestTask != null)
-                {
-                     oldestTask.CancelTask();
-                    _stalled = false;
-                }
+            // Take the delay value as a constructor parameter?
+            // var currentStallOccurrence = _stallOccurrenceNumber;
+            // await Task.Delay((int)TaskStallTimeout.Short);
+            // Ensure that stall state is still active and same occurrence
+            // if (_stalled && _stallOccurrenceNumber == currentStallOccurrence)
+            // {
+            var oldestTask = _managedTasks.Values.OrderBy(managedTask => managedTask.LastStatusChange).FirstOrDefault();
+
+            if (oldestTask != null)
+            {
+                oldestTask.CancelTask();
+                _stalled = false;
             }
+            // }
         }
 
         private class ManagedTask

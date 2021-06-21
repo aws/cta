@@ -45,6 +45,9 @@ namespace CTA.WebForms2Blazor.Tests.Extensions
             }")]
         public async Task GetNamespaceLevelTypes_Retrieves_All_Types(string testDocumentText)
         {
+            _workspaceManager.NotifyNewExpectedProject();
+            _workspaceManager.NotifyNewExpectedDocument();
+
             var pid1 = _workspaceManager.CreateProjectFile("TestProjectName1");
             var did1 = _workspaceManager.AddDocument(pid1, "TestDocumentName1", testDocumentText);
 
@@ -62,6 +65,9 @@ namespace CTA.WebForms2Blazor.Tests.Extensions
         [Test]
         public async Task GetNamespaceLevelTypes_Ignores_Inner_Classes()
         {
+            _workspaceManager.NotifyNewExpectedProject();
+            _workspaceManager.NotifyNewExpectedDocument();
+
             var pid1 = _workspaceManager.CreateProjectFile("TestProjectName1");
             var did1 = _workspaceManager.AddDocument(pid1, "TestDocumentName1", TestDocumentInnerClassText);
 

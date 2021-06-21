@@ -48,6 +48,7 @@ namespace CTA.WebForms2Blazor.Tests.Factories
             _classConverterFactory = new ClassConverterFactory();
             _workspaceManager = new WorkspaceManagerService();
             _workspaceManager.CreateSolutionFile();
+            _workspaceManager.NotifyNewExpectedProject();
             _primaryProjectId = _workspaceManager.CreateProjectFile("TestProjectName", metadataReferences: _metadataReferences);
         }
 
@@ -93,6 +94,8 @@ namespace CTA.WebForms2Blazor.Tests.Factories
             }")]
         public async Task Build_Recognizes_Class_Type(Type targetType, string testFileName, string testDocumentText)
         {
+            _workspaceManager.NotifyNewExpectedDocument();
+
             var testDocumentPath = Path.Combine("C:", "Directory1", "Directory2", testFileName);
             var did = _workspaceManager.AddDocument(_primaryProjectId, "TestDocument", testDocumentText);
             var model = await _workspaceManager.GetCurrentDocumentSemanticModel(did);
@@ -104,6 +107,8 @@ namespace CTA.WebForms2Blazor.Tests.Factories
         [Test]
         public async Task BuildMany_Splits_Classes()
         {
+            _workspaceManager.NotifyNewExpectedDocument();
+
             var testDocumentPath = Path.Combine("C:", "Directory1", "Directory2", "TestDocumentName.cs");
             var did = _workspaceManager.AddDocument(_primaryProjectId, "TestDocument", DocumentMultiClassText);
             var model = await _workspaceManager.GetCurrentDocumentSemanticModel(did);

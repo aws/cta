@@ -12,6 +12,7 @@ namespace CTA.WebForms2Blazor.Services
     {
         private const string WorkspaceDuplicateError = "Attempted to create a new Blazor workspace when one already exists";
         private const string WorkspaceMissingeErrorTemplate = "Attempted {0} operation, but no workspace exists";
+        private const string WorkspaceTooManyOperationsError = "Attempted {0} operation, but the expected number of these operations has been reached";
         private const string ProjectMissingErrorTemplate = "Attempted {0} operation, but required project [id:{1}] does not exist";
         private const string DocumentMissingErrorTemplate = "Attempted {0} operation, but required document [id:{1}] does not exist";
         private const string WorkspaceUpdateFailedErrorTemplate = "Workspace {0} operation attempted, but workspace failed to apply changes";
@@ -19,6 +20,7 @@ namespace CTA.WebForms2Blazor.Services
         private const string AddProjectReferenceOperation = "add project references";
         private const string AddMetadataReferenceOperation = "add metadata reference";
         private const string AddDocumentOperation = "add document";
+        private const string AddProjectOperation = "add project";
         private const string GetSyntaxTreeOperation = "get syntax tree";
         private const string GetSemanticModelOperation = "get semantic model";
 
@@ -83,15 +85,19 @@ namespace CTA.WebForms2Blazor.Services
             Project project = _workspace.AddProject(projectInfo);
             _numProjects += 1;
 
-            if (_numProjects >= _expectedProjects)
+            if (_numProjects == _expectedProjects)
             {
                 _allProjectsInWorkspaceTaskSources.ForEach(source =>
                 {
-                    if (!source.Task.IsCanceled)
+                    if (!source.Task.IsCanceled && !source.Task.IsCompleted)
                     {
                         source.SetResult(true);
                     }
                 });
+            }
+            else if (_numProjects > _expectedProjects)
+            {
+                throw new InvalidOperationException(string.Format(WorkspaceTooManyOperationsError, AddProjectOperation));
             }
 
             return project.Id;
@@ -134,15 +140,19 @@ namespace CTA.WebForms2Blazor.Services
             Document document = _workspace.AddDocument(targetProject.Id, documentName, SourceText.From(documentText));
             _numDocuments += 1;
 
-            if (_numDocuments >= _expectedDocuments)
+            if (_numDocuments == _expectedDocuments)
             {
                 _allDocumentsInWorkspaceTaskSources.ForEach(source =>
                 {
-                    if (!source.Task.IsCanceled)
+                    if (!source.Task.IsCanceled && !source.Task.IsCompleted)
                     {
                         source.SetResult(true);
                     }
                 });
+            }
+            else if (_numDocuments > _expectedDocuments)
+            {
+                throw new InvalidOperationException(string.Format(WorkspaceTooManyOperationsError, AddDocumentOperation));
             }
 
             return document.Id;
