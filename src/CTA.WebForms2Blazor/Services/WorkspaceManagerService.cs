@@ -12,6 +12,7 @@ namespace CTA.WebForms2Blazor.Services
     {
         private const string WorkspaceDuplicateError = "Attempted to create a new Blazor workspace when one already exists";
         private const string WorkspaceMissingeErrorTemplate = "Attempted {0} operation, but no workspace exists";
+        private const string WorkspaceTooManyOperationsError = "Attempted {0} operation, but the expected number of these operations has been reached";
         private const string ProjectMissingErrorTemplate = "Attempted {0} operation, but required project [id:{1}] does not exist";
         private const string DocumentMissingErrorTemplate = "Attempted {0} operation, but required document [id:{1}] does not exist";
         private const string WorkspaceUpdateFailedErrorTemplate = "Workspace {0} operation attempted, but workspace failed to apply changes";
@@ -19,6 +20,7 @@ namespace CTA.WebForms2Blazor.Services
         private const string AddProjectReferenceOperation = "add project references";
         private const string AddMetadataReferenceOperation = "add metadata reference";
         private const string AddDocumentOperation = "add document";
+        private const string AddProjectOperation = "add project";
         private const string GetSyntaxTreeOperation = "get syntax tree";
         private const string GetSemanticModelOperation = "get semantic model";
 
@@ -31,9 +33,19 @@ namespace CTA.WebForms2Blazor.Services
         private int _numDocuments;
         private int _expectedProjects;
         private int _expectedDocuments;
+        // Have to use bool because non-generic TaskCompletionSource not supported in
+        // netcore3.1
+        private List<TaskCompletionSource<bool>> _allProjectsInWorkspaceTaskSources;
+        private List<TaskCompletionSource<bool>> _allDocumentsInWorkspaceTaskSources;
         private AdhocWorkspace _workspace;
 
         public Solution CurrentSolution { get { return _workspace.CurrentSolution; } }
+
+        public WorkspaceManagerService()
+        {
+            _allProjectsInWorkspaceTaskSources = new List<TaskCompletionSource<bool>>();
+            _allDocumentsInWorkspaceTaskSources = new List<TaskCompletionSource<bool>>();
+        }
 
         public void CreateSolutionFile()
         {
@@ -73,6 +85,21 @@ namespace CTA.WebForms2Blazor.Services
             Project project = _workspace.AddProject(projectInfo);
             _numProjects += 1;
 
+            if (_numProjects == _expectedProjects)
+            {
+                _allProjectsInWorkspaceTaskSources.ForEach(source =>
+                {
+                    if (!source.Task.IsCanceled && !source.Task.IsCompleted)
+                    {
+                        source.SetResult(true);
+                    }
+                });
+            }
+            else if (_numProjects > _expectedProjects)
+            {
+                throw new InvalidOperationException(string.Format(WorkspaceTooManyOperationsError, AddProjectOperation));
+            }
+
             return project.Id;
         }
 
@@ -96,6 +123,15 @@ namespace CTA.WebForms2Blazor.Services
             ApplyWorkspaceChanges(newSolution, AddMetadataReferenceOperation);
         }
 
+        // I decided to add a new method because I wasn't sure how necessary the
+        // instantaneous wait really was for this service, we can remove the other
+        // one later if we decide we only need the async version
+        public async Task<DocumentId> AddDocumentAsync(ProjectId projectId, string documentName, string documentText, CancellationToken token)
+        {
+            await WaitUntilAllProjectsInWorkspace(token);
+            return AddDocument(projectId, documentName, documentText);
+        }
+
         public DocumentId AddDocument(ProjectId projectId, string documentName, string documentText)
         {
             ThrowErrorIfProjectNotExists(AddDocumentOperation);
@@ -103,6 +139,21 @@ namespace CTA.WebForms2Blazor.Services
             var targetProject = GetProjectById(projectId, AddDocumentOperation);
             Document document = _workspace.AddDocument(targetProject.Id, documentName, SourceText.From(documentText));
             _numDocuments += 1;
+
+            if (_numDocuments == _expectedDocuments)
+            {
+                _allDocumentsInWorkspaceTaskSources.ForEach(source =>
+                {
+                    if (!source.Task.IsCanceled && !source.Task.IsCompleted)
+                    {
+                        source.SetResult(true);
+                    }
+                });
+            }
+            else if (_numDocuments > _expectedDocuments)
+            {
+                throw new InvalidOperationException(string.Format(WorkspaceTooManyOperationsError, AddDocumentOperation));
+            }
 
             return document.Id;
         }
@@ -117,30 +168,38 @@ namespace CTA.WebForms2Blazor.Services
             _expectedDocuments += 1;
         }
 
-        public async Task WaitUntilAllProjectsInWorkspace(CancellationToken token)
+        public Task<bool> WaitUntilAllProjectsInWorkspace(CancellationToken token)
         {
-            while (_numProjects < _expectedProjects)
-            {
-                if (token.IsCancellationRequested)
-                {
-                    throw new OperationCanceledException(token);
-                }
+            var source = new TaskCompletionSource<bool>();
 
-                await Task.Delay(25);
+            if (_numProjects >= _expectedProjects)
+            {
+                source.SetResult(true);
             }
+            else
+            {
+                token.Register(() => source.SetCanceled());
+                _allProjectsInWorkspaceTaskSources.Add(source);
+            }
+
+            return source.Task;
         }
 
-        public async Task WaitUntilAllDocumentsInWorkspace(CancellationToken token)
+        public Task<bool> WaitUntilAllDocumentsInWorkspace(CancellationToken token)
         {
-            while (_numDocuments < _expectedDocuments)
-            {
-                if (token.IsCancellationRequested)
-                {
-                    throw new OperationCanceledException(token);
-                }
+            var source = new TaskCompletionSource<bool>();
 
-                await Task.Delay(25);
+            if (_numDocuments >= _expectedDocuments)
+            {
+                source.SetResult(true);
             }
+            else
+            {
+                token.Register(() => source.SetCanceled());
+                _allDocumentsInWorkspaceTaskSources.Add(source);
+            }
+
+            return source.Task;
         }
 
         public async Task<SyntaxTree> GetCurrentDocumentSyntaxTree(DocumentId documentId)

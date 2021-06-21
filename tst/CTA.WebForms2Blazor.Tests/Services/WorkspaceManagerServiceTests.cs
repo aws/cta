@@ -19,57 +19,62 @@ namespace CTA.WebForms2Blazor.Tests.Services
     }
 }";
 
-        private WorkspaceManagerService _workspaceBuilder;
+        private WorkspaceManagerService _workspaceManager;
 
         [SetUp]
         public void SetUp()
         {
-            _workspaceBuilder = new WorkspaceManagerService();
+            _workspaceManager = new WorkspaceManagerService();
         }
 
         [Test]
         public void CreateSolutionFile_Creates_Workspace_And_Solution()
         {
-            _workspaceBuilder.CreateSolutionFile();
+            _workspaceManager.CreateSolutionFile();
 
-            Assert.NotNull(_workspaceBuilder.CurrentSolution);
+            Assert.NotNull(_workspaceManager.CurrentSolution);
         }
 
         [Test]
         public void CreateSolutionFile_Throws_Exception_On_Second_Call()
         {
-            _workspaceBuilder.CreateSolutionFile();
+            _workspaceManager.CreateSolutionFile();
 
-            Assert.Throws(typeof(InvalidOperationException), () => _workspaceBuilder.CreateSolutionFile());
+            Assert.Throws(typeof(InvalidOperationException), () => _workspaceManager.CreateSolutionFile());
         }
 
         [Test]
         public void CreateProjectFile_Creates_Single_Project_On_Solution()
         {
-            _workspaceBuilder.CreateSolutionFile();
-            _workspaceBuilder.CreateProjectFile("TestProjectName");
+            _workspaceManager.CreateSolutionFile();
+            _workspaceManager.NotifyNewExpectedProject();
+            _workspaceManager.CreateProjectFile("TestProjectName");
 
-            Assert.AreEqual(_workspaceBuilder.CurrentSolution.Projects.Count(), 1);
+            Assert.AreEqual(_workspaceManager.CurrentSolution.Projects.Count(), 1);
         }
 
         [Test]
         public void CreateProjectFile_Creates_Solution_If_None_Exists()
         {
-            _workspaceBuilder.CreateProjectFile("TestProjectName");
+            _workspaceManager.NotifyNewExpectedProject();
+            _workspaceManager.CreateProjectFile("TestProjectName");
 
-            Assert.NotNull(_workspaceBuilder.CurrentSolution);
-            Assert.AreEqual(_workspaceBuilder.CurrentSolution.Projects.Count(), 1);
+            Assert.NotNull(_workspaceManager.CurrentSolution);
+            Assert.AreEqual(_workspaceManager.CurrentSolution.Projects.Count(), 1);
         }
 
         [Test]
         public void CreateProjectFile_Works_For_Multiple_Projects()
         {
-            _workspaceBuilder.CreateSolutionFile();
-            _workspaceBuilder.CreateProjectFile("TestProjectName1");
-            _workspaceBuilder.CreateProjectFile("TestProjectName2");
-            _workspaceBuilder.CreateProjectFile("TestProjectName3");
+            _workspaceManager.CreateSolutionFile();
+            _workspaceManager.NotifyNewExpectedProject();
+            _workspaceManager.NotifyNewExpectedProject();
+            _workspaceManager.NotifyNewExpectedProject();
+            _workspaceManager.CreateProjectFile("TestProjectName1");
+            _workspaceManager.CreateProjectFile("TestProjectName2");
+            _workspaceManager.CreateProjectFile("TestProjectName3");
 
-            Assert.AreEqual(_workspaceBuilder.CurrentSolution.Projects.Count(), 3);
+            Assert.AreEqual(_workspaceManager.CurrentSolution.Projects.Count(), 3);
         }
 
         [Test]
@@ -78,21 +83,21 @@ namespace CTA.WebForms2Blazor.Tests.Services
             var source = new CancellationTokenSource();
             var token = source.Token;
 
-            _workspaceBuilder.CreateSolutionFile();
-            _workspaceBuilder.NotifyNewExpectedProject();
-            _workspaceBuilder.NotifyNewExpectedProject();
-            _workspaceBuilder.NotifyNewExpectedProject();
+            _workspaceManager.CreateSolutionFile();
+            _workspaceManager.NotifyNewExpectedProject();
+            _workspaceManager.NotifyNewExpectedProject();
+            _workspaceManager.NotifyNewExpectedProject();
 
-            var task = _workspaceBuilder.WaitUntilAllProjectsInWorkspace(token);
+            var task = _workspaceManager.WaitUntilAllProjectsInWorkspace(token);
             Assert.False(task.IsCompleted);
 
-            _workspaceBuilder.CreateProjectFile("TestProjectName1");
+            _workspaceManager.CreateProjectFile("TestProjectName1");
             Assert.False(task.IsCompleted);
 
-            _workspaceBuilder.CreateProjectFile("TestProjectName2");
+            _workspaceManager.CreateProjectFile("TestProjectName2");
             Assert.False(task.IsCompleted);
 
-            _workspaceBuilder.CreateProjectFile("TestProjectName3");
+            _workspaceManager.CreateProjectFile("TestProjectName3");
             Assert.DoesNotThrowAsync(async () => await task);
             Assert.True(task.IsCompletedSuccessfully);
         }
@@ -103,31 +108,34 @@ namespace CTA.WebForms2Blazor.Tests.Services
             var source = new CancellationTokenSource();
             var token = source.Token;
 
-            _workspaceBuilder.CreateSolutionFile();
-            _workspaceBuilder.NotifyNewExpectedProject();
-            _workspaceBuilder.NotifyNewExpectedProject();
+            _workspaceManager.CreateSolutionFile();
+            _workspaceManager.NotifyNewExpectedProject();
+            _workspaceManager.NotifyNewExpectedProject();
 
-            var task = _workspaceBuilder.WaitUntilAllProjectsInWorkspace(token);
+            var task = _workspaceManager.WaitUntilAllProjectsInWorkspace(token);
             Assert.False(task.IsCompleted);
 
-            _workspaceBuilder.CreateProjectFile("TestProjectName1");
+            _workspaceManager.CreateProjectFile("TestProjectName1");
             Assert.False(task.IsCompleted);
 
             source.Cancel();
-            Assert.ThrowsAsync(typeof(OperationCanceledException), async () => await task);
+            Assert.ThrowsAsync(typeof(TaskCanceledException), async () => await task);
             Assert.True(task.IsCanceled);
         }
 
         [Test]
         public void AddDocument_Adds_Single_Document_To_Project()
         {
-            _workspaceBuilder.CreateSolutionFile();
-            var pid1 = _workspaceBuilder.CreateProjectFile("TestProjectName1");
-            var pid2 = _workspaceBuilder.CreateProjectFile("TestProjectName2");
-            _workspaceBuilder.AddDocument(pid2, "TestDocumentName", "");
+            _workspaceManager.CreateSolutionFile();
+            _workspaceManager.NotifyNewExpectedProject();
+            _workspaceManager.NotifyNewExpectedProject();
+            _workspaceManager.NotifyNewExpectedDocument();
+            var pid1 = _workspaceManager.CreateProjectFile("TestProjectName1");
+            var pid2 = _workspaceManager.CreateProjectFile("TestProjectName2");
+            _workspaceManager.AddDocument(pid2, "TestDocumentName", "");
 
-            var project1 = _workspaceBuilder.CurrentSolution.Projects.Where(project => project.Name.Equals("TestProjectName1")).Single();
-            var project2 = _workspaceBuilder.CurrentSolution.Projects.Where(project => project.Name.Equals("TestProjectName2")).Single();
+            var project1 = _workspaceManager.CurrentSolution.Projects.Where(project => project.Name.Equals("TestProjectName1")).Single();
+            var project2 = _workspaceManager.CurrentSolution.Projects.Where(project => project.Name.Equals("TestProjectName2")).Single();
 
             Assert.AreEqual(project1.Documents.Count(), 0);
             Assert.AreEqual(project2.Documents.Count(), 1);
@@ -136,16 +144,22 @@ namespace CTA.WebForms2Blazor.Tests.Services
         [Test]
         public void AddDocument_Works_For_Multiple_Documents()
         {
-            _workspaceBuilder.CreateSolutionFile();
-            var pid1 = _workspaceBuilder.CreateProjectFile("TestProjectName1");
-            var pid2 = _workspaceBuilder.CreateProjectFile("TestProjectName2");
-            _workspaceBuilder.AddDocument(pid1, "TestDocumentName1", "");
-            _workspaceBuilder.AddDocument(pid2, "TestDocumentName2", "");
-            _workspaceBuilder.AddDocument(pid2, "TestDocumentName3", "");
-            _workspaceBuilder.AddDocument(pid2, "TestDocumentName4", "");
+            _workspaceManager.CreateSolutionFile();
+            _workspaceManager.NotifyNewExpectedProject();
+            _workspaceManager.NotifyNewExpectedProject();
+            _workspaceManager.NotifyNewExpectedDocument();
+            _workspaceManager.NotifyNewExpectedDocument();
+            _workspaceManager.NotifyNewExpectedDocument();
+            _workspaceManager.NotifyNewExpectedDocument();
+            var pid1 = _workspaceManager.CreateProjectFile("TestProjectName1");
+            var pid2 = _workspaceManager.CreateProjectFile("TestProjectName2");
+            _workspaceManager.AddDocument(pid1, "TestDocumentName1", "");
+            _workspaceManager.AddDocument(pid2, "TestDocumentName2", "");
+            _workspaceManager.AddDocument(pid2, "TestDocumentName3", "");
+            _workspaceManager.AddDocument(pid2, "TestDocumentName4", "");
 
-            var project1 = _workspaceBuilder.CurrentSolution.Projects.Where(project => project.Name.Equals("TestProjectName1")).Single();
-            var project2 = _workspaceBuilder.CurrentSolution.Projects.Where(project => project.Name.Equals("TestProjectName2")).Single();
+            var project1 = _workspaceManager.CurrentSolution.Projects.Where(project => project.Name.Equals("TestProjectName1")).Single();
+            var project2 = _workspaceManager.CurrentSolution.Projects.Where(project => project.Name.Equals("TestProjectName2")).Single();
 
             Assert.AreEqual(project1.Documents.Count(), 1);
             Assert.AreEqual(project2.Documents.Count(), 3);
@@ -154,9 +168,10 @@ namespace CTA.WebForms2Blazor.Tests.Services
         [Test]
         public void AddDocument_Throws_Exception_On_Invalid_Project_Id()
         {
-            _workspaceBuilder.CreateSolutionFile();
-            var pid1 = _workspaceBuilder.CreateProjectFile("TestProjectName1");
-            Assert.Throws(typeof(ArgumentException), () => _workspaceBuilder.AddDocument(ProjectId.CreateNewId(), "TestDocumentName", ""));
+            _workspaceManager.CreateSolutionFile();
+            _workspaceManager.NotifyNewExpectedProject();
+            var pid1 = _workspaceManager.CreateProjectFile("TestProjectName1");
+            Assert.Throws(typeof(ArgumentException), () => _workspaceManager.AddDocument(ProjectId.CreateNewId(), "TestDocumentName", ""));
         }
 
         [Test]
@@ -165,21 +180,21 @@ namespace CTA.WebForms2Blazor.Tests.Services
             var source = new CancellationTokenSource();
             var token = source.Token;
 
-            _workspaceBuilder.CreateSolutionFile();
-            _workspaceBuilder.NotifyNewExpectedProject();
-            _workspaceBuilder.NotifyNewExpectedDocument();
-            _workspaceBuilder.NotifyNewExpectedDocument();
+            _workspaceManager.CreateSolutionFile();
+            _workspaceManager.NotifyNewExpectedProject();
+            _workspaceManager.NotifyNewExpectedDocument();
+            _workspaceManager.NotifyNewExpectedDocument();
 
-            var task = _workspaceBuilder.WaitUntilAllDocumentsInWorkspace(token);
+            var task = _workspaceManager.WaitUntilAllDocumentsInWorkspace(token);
             Assert.False(task.IsCompleted);
 
-            var pid1 = _workspaceBuilder.CreateProjectFile("TestProjectName1");
+            var pid1 = _workspaceManager.CreateProjectFile("TestProjectName1");
             Assert.False(task.IsCompleted);
 
-            _workspaceBuilder.AddDocument(pid1, "TestDocumentName1", "");
+            _workspaceManager.AddDocument(pid1, "TestDocumentName1", "");
             Assert.False(task.IsCompleted);
 
-            _workspaceBuilder.AddDocument(pid1, "TestDocumentName2", "");
+            _workspaceManager.AddDocument(pid1, "TestDocumentName2", "");
             Assert.DoesNotThrowAsync(async () => await task);
             Assert.True(task.IsCompletedSuccessfully);
         }
@@ -190,33 +205,35 @@ namespace CTA.WebForms2Blazor.Tests.Services
             var source = new CancellationTokenSource();
             var token = source.Token;
 
-            _workspaceBuilder.CreateSolutionFile();
-            _workspaceBuilder.NotifyNewExpectedProject();
-            _workspaceBuilder.NotifyNewExpectedDocument();
-            _workspaceBuilder.NotifyNewExpectedDocument();
+            _workspaceManager.CreateSolutionFile();
+            _workspaceManager.NotifyNewExpectedProject();
+            _workspaceManager.NotifyNewExpectedDocument();
+            _workspaceManager.NotifyNewExpectedDocument();
 
-            var task = _workspaceBuilder.WaitUntilAllDocumentsInWorkspace(token);
+            var task = _workspaceManager.WaitUntilAllDocumentsInWorkspace(token);
             Assert.False(task.IsCompleted);
 
-            var pid1 = _workspaceBuilder.CreateProjectFile("TestProjectName1");
+            var pid1 = _workspaceManager.CreateProjectFile("TestProjectName1");
             Assert.False(task.IsCompleted);
 
-            _workspaceBuilder.AddDocument(pid1, "TestDocumentName1", "");
+            _workspaceManager.AddDocument(pid1, "TestDocumentName1", "");
             Assert.False(task.IsCompleted);
 
             source.Cancel();
-            Assert.ThrowsAsync(typeof(OperationCanceledException), async () => await task);
+            Assert.ThrowsAsync(typeof(TaskCanceledException), async () => await task);
             Assert.True(task.IsCanceled);
         }
 
         [Test]
         public async Task GetCurrentDocumentSyntaxTree_Correctly_Builds_Syntax_Tree()
         {
-            _workspaceBuilder.CreateSolutionFile();
-            var pid1 = _workspaceBuilder.CreateProjectFile("TestProjectName1");
-            var did1 = _workspaceBuilder.AddDocument(pid1, "TestDocumentName1", TestDocument1Text);
+            _workspaceManager.CreateSolutionFile();
+            _workspaceManager.NotifyNewExpectedProject();
+            _workspaceManager.NotifyNewExpectedDocument();
+            var pid1 = _workspaceManager.CreateProjectFile("TestProjectName1");
+            var did1 = _workspaceManager.AddDocument(pid1, "TestDocumentName1", TestDocument1Text);
 
-            var syntaxTree = await _workspaceBuilder.GetCurrentDocumentSyntaxTree(did1);
+            var syntaxTree = await _workspaceManager.GetCurrentDocumentSyntaxTree(did1);
 
             Assert.AreEqual(TestDocument1Text, syntaxTree.ToString());
         }
@@ -224,21 +241,25 @@ namespace CTA.WebForms2Blazor.Tests.Services
         [Test]
         public void GetCurrentDocumentSyntaxTree_Throws_Exception_On_Invalid_Document_Id()
         {
-            _workspaceBuilder.CreateSolutionFile();
-            var pid1 = _workspaceBuilder.CreateProjectFile("TestProjectName1");
-            var did1 = _workspaceBuilder.AddDocument(pid1, "TestDocumentName1", TestDocument1Text);
+            _workspaceManager.CreateSolutionFile();
+            _workspaceManager.NotifyNewExpectedProject();
+            _workspaceManager.NotifyNewExpectedDocument();
+            var pid1 = _workspaceManager.CreateProjectFile("TestProjectName1");
+            var did1 = _workspaceManager.AddDocument(pid1, "TestDocumentName1", TestDocument1Text);
 
-            Assert.ThrowsAsync(typeof(ArgumentException), async () => await _workspaceBuilder.GetCurrentDocumentSyntaxTree(DocumentId.CreateNewId(pid1)));
+            Assert.ThrowsAsync(typeof(ArgumentException), async () => await _workspaceManager.GetCurrentDocumentSyntaxTree(DocumentId.CreateNewId(pid1)));
         }
 
         [Test]
         public async Task GetCurrentDocumentSemanticModel_Builds_Model_With_Necessary_Symbols()
         {
-            _workspaceBuilder.CreateSolutionFile();
-            var pid1 = _workspaceBuilder.CreateProjectFile("TestProjectName1");
-            var did1 = _workspaceBuilder.AddDocument(pid1, "TestDocumentName1", TestDocument1Text);
+            _workspaceManager.CreateSolutionFile();
+            _workspaceManager.NotifyNewExpectedProject();
+            _workspaceManager.NotifyNewExpectedDocument();
+            var pid1 = _workspaceManager.CreateProjectFile("TestProjectName1");
+            var did1 = _workspaceManager.AddDocument(pid1, "TestDocumentName1", TestDocument1Text);
 
-            var model = await _workspaceBuilder.GetCurrentDocumentSemanticModel(did1);
+            var model = await _workspaceManager.GetCurrentDocumentSemanticModel(did1);
 
             var rootNode = model.SyntaxTree.GetRoot();
             var descendantNodes = rootNode.DescendantNodes();
@@ -255,11 +276,13 @@ namespace CTA.WebForms2Blazor.Tests.Services
         [Test]
         public void GetCurrentDocumentSemanticModel_Throws_Exception_On_Invalid_Document_Id()
         {
-            _workspaceBuilder.CreateSolutionFile();
-            var pid1 = _workspaceBuilder.CreateProjectFile("TestProjectName1");
-            var did1 = _workspaceBuilder.AddDocument(pid1, "TestDocumentName1", TestDocument1Text);
+            _workspaceManager.CreateSolutionFile();
+            _workspaceManager.NotifyNewExpectedProject();
+            _workspaceManager.NotifyNewExpectedDocument();
+            var pid1 = _workspaceManager.CreateProjectFile("TestProjectName1");
+            var did1 = _workspaceManager.AddDocument(pid1, "TestDocumentName1", TestDocument1Text);
 
-            Assert.ThrowsAsync(typeof(ArgumentException), async () => await _workspaceBuilder.GetCurrentDocumentSemanticModel(DocumentId.CreateNewId(pid1)));
+            Assert.ThrowsAsync(typeof(ArgumentException), async () => await _workspaceManager.GetCurrentDocumentSemanticModel(DocumentId.CreateNewId(pid1)));
         }
     }
 }
