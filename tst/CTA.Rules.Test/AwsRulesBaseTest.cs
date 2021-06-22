@@ -200,7 +200,7 @@ namespace CTA.Rules.Test
         {
             string solutionPath = Directory.EnumerateFiles(tempDir, solutionName, SearchOption.AllDirectories).FirstOrDefault(s => !s.Contains(string.Concat(Path.DirectorySeparatorChar, CopyFolder, Path.DirectorySeparatorChar)));
             string solutionDir = Directory.GetParent(solutionPath).FullName;
-            var newTempDir = Path.Combine(Directory.GetParent(solutionDir).FullName, CopyFolder, Guid.NewGuid().ToString());
+            var newTempDir = Path.Combine(GetTstPath(this.GetType()), CopyFolder, Guid.NewGuid().ToString());
             CopyDirectory(new DirectoryInfo(solutionDir), new DirectoryInfo(newTempDir));
 
             solutionPath = Directory.EnumerateFiles(newTempDir, solutionName, SearchOption.AllDirectories).FirstOrDefault();
