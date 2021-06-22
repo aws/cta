@@ -8,7 +8,7 @@ namespace CTA.WebForms2Blazor.FileConverters
 {
     public class ViewFileConverter : FileConverter
     {
-        public ViewFileConverter(string relativePath) : base(relativePath)
+        public ViewFileConverter(string sourceProjectPath, string fullPath) : base(sourceProjectPath, fullPath)
         {
 
         }

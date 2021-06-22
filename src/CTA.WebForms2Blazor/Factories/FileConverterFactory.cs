@@ -36,25 +36,24 @@ namespace CTA.WebForms2Blazor.Factories
             // object to create, likely using the file type specified
             // in the FileInfo object
 
-            string relativePath = Path.GetRelativePath(_sourceProjectPath, document.FullName);
             string extension = document.Extension;
 
             FileConverter fc;
             if (extension.Equals(".cs"))
             {
-                fc = new CodeFileConverter(relativePath, _blazorWorkspaceManager, _webFormsWorkspaceManager, _classConverterFactory);
+                fc = new CodeFileConverter(_sourceProjectPath, document.FullName, _blazorWorkspaceManager, _webFormsWorkspaceManager, _classConverterFactory);
             } else if (extension.Equals(".config"))
             {
-                fc = new ConfigFileConverter(relativePath);
+                fc = new ConfigFileConverter(_sourceProjectPath, document.FullName);
             } else if (extension.Equals(".aspx") || extension.Equals(".asax") || extension.Equals(".ascx"))
             {
-                fc = new ViewFileConverter(relativePath);
+                fc = new ViewFileConverter(_sourceProjectPath, document.FullName);
             } else if (extension.Equals(".csproj"))
             {
-                fc = new ProjectFileConverter(relativePath, _blazorWorkspaceManager, _webFormsWorkspaceManager);
+                fc = new ProjectFileConverter(_sourceProjectPath, document.FullName, _blazorWorkspaceManager, _webFormsWorkspaceManager);
             } else
             {
-                fc = new StaticFileConverter(relativePath);
+                fc = new StaticFileConverter(_sourceProjectPath, document.FullName);
             }
 
 

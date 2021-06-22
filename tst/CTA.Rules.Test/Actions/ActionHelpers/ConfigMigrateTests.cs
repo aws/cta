@@ -22,11 +22,6 @@ namespace CTA.Rules.Test.Actions.ActionHelpers
             var processWebConfigMethod = TestUtils.GetPrivateMethod(configMigrateType, "ProcessWebConfig");
             var addAppSettingsJsonFileMethod = TestUtils.GetPrivateMethod(configMigrateType, "AddAppSettingsJsonFile");
 
-            var appSetting1 = @"ClientValidationEnabled";
-            var appSetting2 = @"UnobtrusiveJavaScriptEnabled";
-            var connectionStringWithBackSlash = @"Data Source=(LocalDb)\v11.0;Initial Catalog=ContosoUniversity2;Integrated Security=SSPI;";
-            var connectionString2 = @"Data Source=Test;Initial Catalog=ContosoUniversity1;Integrated Security=SSPI;";
-
             var webConfig = String.Format(@"
 <configuration>
   <configSections>
@@ -85,7 +80,9 @@ namespace CTA.Rules.Test.Actions.ActionHelpers
             File.Delete(Path.Combine(outputDir, "appsettings.json"));
             File.Delete(Path.Combine(outputDir, "web.config"));
 
-
+            Assert.True(appSettingsContent.Contains("UseMockData"));
+            Assert.True(appSettingsContent.Contains("UseCustomizationData"));
+            Assert.True(appSettingsContent.Contains("CatalogDBContext"));
 
         }
         

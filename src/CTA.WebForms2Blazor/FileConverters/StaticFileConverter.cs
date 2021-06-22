@@ -10,7 +10,7 @@ namespace CTA.WebForms2Blazor.FileConverters
 {
     public class StaticFileConverter : FileConverter
     {
-        public StaticFileConverter(string relativePath) : base(relativePath)
+        public StaticFileConverter(string sourceProjectPath, string fullPath) : base(sourceProjectPath, fullPath)
         {
 
         }

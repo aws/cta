@@ -23,12 +23,12 @@ namespace CTA.Rules.Actions
             _hasData = false;
         }
 
-        public void WebformsWebConfigMigrateHelper()
+        public string WebformsWebConfigMigrateHelper()
         {
             Configuration configXml = LoadWebConfig(_projectDir);
             var templateContent = @"{}";
             JObject config = ProcessWebConfig(configXml, templateContent);
-            AddAppSettingsJsonFile(config, _projectDir);
+            return config.ToString();
         }
 
         public string Run()

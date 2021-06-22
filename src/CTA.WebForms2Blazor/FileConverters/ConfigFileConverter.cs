@@ -16,16 +16,11 @@ namespace CTA.WebForms2Blazor.FileConverters
 {
     public class ConfigFileConverter : FileConverter
     {
-        private const string webConfigFile = "web.config";
-        private string _projectPrefix;
-        private string _fullPath;
+        private const string WebConfigFile = "web.config";
         private string _relativeDirectory;
 
-        public ConfigFileConverter(string relativePath) : base(relativePath)
+        public ConfigFileConverter(string sourceProjectPath, string fullPath) : base(sourceProjectPath, fullPath)
         {
-            var workingDirectory = Environment.CurrentDirectory;
-            _projectPrefix = Directory.GetParent(workingDirectory).Parent.Parent.FullName;
-            _fullPath = Path.Combine(_projectPrefix, RelativePath);
             _relativeDirectory = Path.GetDirectoryName(RelativePath);
 
         }
@@ -36,15 +31,14 @@ namespace CTA.WebForms2Blazor.FileConverters
             string filename = Path.GetFileName(RelativePath);
             FileInformation fi;
 
-            if (filename.Equals(webConfigFile))
+            if (filename.Equals(WebConfigFile, StringComparison.InvariantCultureIgnoreCase))
             {
                 //ProjectType WebForms doesn't really exist yet, but can be added for more specific configuration
-                ConfigMigrate configMigrate = new ConfigMigrate(_fullPath, ProjectType.WebForms);
-                configMigrate.WebformsWebConfigMigrateHelper();
+                ConfigMigrate configMigrate = new ConfigMigrate(FullPath, ProjectType.WebForms);
+                var migratedString = configMigrate.WebformsWebConfigMigrateHelper();
 
                 string newPath = Path.Combine(_relativeDirectory, "appsettings.json");
-                string fullNewPath = Path.Combine(_projectPrefix, newPath);
-                fi = new FileInformation(newPath, File.ReadAllBytes(fullNewPath));
+                fi = new FileInformation(newPath, Encoding.UTF8.GetBytes(migratedString));
             } else
             {
                 fi = null;

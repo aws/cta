@@ -14,10 +14,11 @@ namespace CTA.WebForms2Blazor.FileConverters
         private readonly ClassConverterFactory _classConverterFactory;
 
         public CodeFileConverter(
-            string relativePath,
+            string sourceProjectPath,
+            string fullPath,
             WorkspaceManagerService blazorWorkspaceManager,
             WorkspaceManagerService webFormsWorkspaceManager,
-            ClassConverterFactory classConverterFactory) : base(relativePath)
+            ClassConverterFactory classConverterFactory) : base(sourceProjectPath, fullPath)
         {
             _blazorWorkspaceBuilder = blazorWorkspaceManager;
             _webFormsWorkspaceBuilder = webFormsWorkspaceManager;
