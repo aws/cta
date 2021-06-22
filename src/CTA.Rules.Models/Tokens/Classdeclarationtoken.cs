@@ -1,4 +1,5 @@
 ﻿
+using System;
 using CTA.Rules.Models.Tokens;
 
 namespace CTA.Rules.Models
@@ -12,7 +13,7 @@ namespace CTA.Rules.Models
         }
         public override int GetHashCode()
         {
-            return 5 * FullKey.GetHashCode();
+            return HashCode.Combine(FullKey);
         }
     }
 }

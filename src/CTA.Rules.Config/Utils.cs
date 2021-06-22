@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Threading.Tasks;
 using NJsonSchema.Generation;
 using NJsonSchema.Validation;
 
@@ -13,6 +14,8 @@ namespace CTA.Rules.Config
 {
     public class Utils
     {
+        private const string DefaultMutexName = "DefaultMutex";
+
         public static int GenerateHashCode(int prime, string str)
         {
             int hash = 0;
@@ -130,6 +133,149 @@ namespace CTA.Rules.Config
             }
 
             return destinationFile;
+        }
+
+        /// <summary>
+        /// Generates a unique file name by appending the number of Ticks to the original file name.
+        /// A mutex is used so only 1 unique file name can be generated at a time, thus acting as
+        /// enough of a delay to ensure each filename is unique.
+        /// 
+        /// Note: 1 tick is 100 ns
+        /// </summary>
+        /// <param name="filePath">Original name of file</param>
+        /// <param name="mutexName">Identifier name of mutex</param>
+        /// <param name="timeoutInSeconds">Time to wait for the mutex handle</param>
+        /// <returns>File name with unique tick identifier and file extension appended to it</returns>
+        public static string GenerateUniqueFileName(string filePath, string mutexName, int timeoutInSeconds = 5)
+        {
+            string now;
+            using Mutex mutex = new Mutex(false, mutexName);
+            if (mutex.WaitOne(timeoutInSeconds))
+            {
+                now = DateTime.Now.ToString("yyyyMMdd_HH_mm_ss_fffffff");
+                mutex.ReleaseMutex();
+            }
+            else
+            {
+                // Mutex is used as a delay so if mutex wait time has been exceeded,
+                // we can use current datetime anyway
+                now = DateTime.Now.ToString("yyyyMMdd_HH_mm_ss_fffffff");
+            }
+
+            var fileName = Path.GetFileNameWithoutExtension(filePath);
+            var extension = Path.GetExtension(filePath);
+            return $"{fileName}_CONFLICT_{now}{extension}";
+        }
+
+        /// <summary>
+        /// Writes string content to a file in a thread-safe manner
+        /// </summary>
+        /// <param name="filePath">File to write string content</param>
+        /// <param name="content">String content to persist</param>
+        /// <param name="fileShare">FileShare mode</param>
+        /// <param name="mutexName">Mutex identifier</param>
+        /// <returns>File path that was written to</returns>
+        /// <exception cref="IOException">Throws if there is an unexpected IOException during writing</exception>
+        public static string ThreadSafeExportStringToFile(string filePath, string content, FileShare fileShare = FileShare.ReadWrite, string mutexName = DefaultMutexName)
+        {
+            try
+            {
+                using var fileStream = File.Open(filePath, FileMode.OpenOrCreate, FileAccess.ReadWrite, fileShare);
+                using var streamWriter = new StreamWriter(fileStream);
+                streamWriter.Write(content);
+
+                return filePath;
+            }
+            catch (IOException)
+            {
+                // IOException is thrown if filePath is locked by an external process
+                // If this happens, generate a unique identifier, append it to the file name,
+                // and try writing again.
+                var uniqueFileName = GenerateUniqueFileName(filePath, mutexName);
+                
+                using var fileStream = File.Open(uniqueFileName, FileMode.OpenOrCreate, FileAccess.ReadWrite, fileShare);
+                using var streamWriter = new StreamWriter(fileStream);
+                streamWriter.Write(content);
+
+                return uniqueFileName;
+            }
+        }
+
+        /// <summary>
+        /// Copies a solution to a new location under a folder with a randomly generated name
+        /// </summary>
+        /// <param name="solutionName">The name of the solution (MySolution.sln)</param>
+        /// <param name="tempDir">The folder the location resides in</param>
+        /// <returns></returns>
+        public static string CopySolutionFolderToTemp(string solutionName, string tempDir)
+        {
+            string solutionPath = Directory.EnumerateFiles(tempDir, solutionName, SearchOption.AllDirectories).FirstOrDefault(s => !s.Contains(string.Concat(Path.DirectorySeparatorChar, Path.DirectorySeparatorChar)));
+            string solutionDir = Directory.GetParent(solutionPath).FullName;
+            var newTempDir = Path.Combine(Directory.GetParent(solutionDir).FullName, Guid.NewGuid().ToString());
+            CopyDirectory(new DirectoryInfo(solutionDir), new DirectoryInfo(newTempDir));
+
+            solutionPath = Directory.EnumerateFiles(newTempDir, solutionName, SearchOption.AllDirectories).FirstOrDefault();
+            return solutionPath;
+        }
+
+        /// <summary>
+        /// Copies a directory to another folder
+        /// </summary>
+        /// <param name="source">Source directory</param>
+        /// <param name="target">Destination directory</param>
+        public static void CopyDirectory(DirectoryInfo source, DirectoryInfo target)
+        {
+            if (!Directory.Exists(target.FullName))
+            {
+                Directory.CreateDirectory(target.FullName);
+            }
+
+            var files = source.GetFiles();
+            foreach (var file in files)
+            {
+                file.CopyTo(Path.Combine(target.FullName, file.Name));
+            }
+
+            var dirs = source.GetDirectories();
+            foreach (var dir in dirs)
+            {
+                DirectoryInfo destinationSub = new DirectoryInfo(Path.Combine(target.FullName, dir.Name));
+                CopyDirectory(dir, destinationSub);
+            }
+        }
+
+
+        public static void DownloadFilesToFolder(string s3Bucket, string targetFolder, List<List<string>> files)
+        {
+            using var httpClient = new HttpClient();
+
+            var parallelOptions = new ParallelOptions() { MaxDegreeOfParallelism = Constants.ThreadCount };
+
+            Parallel.ForEach(Constants.TemplateFiles, file => {
+                var localFile = Path.Combine(targetFolder, string.Join(Path.DirectorySeparatorChar, file));
+                var remoteFile = string.Concat(s3Bucket, "/", string.Join("/", file));
+
+                if (File.Exists(localFile))
+                {
+                    var lastModified = File.GetLastWriteTime(localFile);
+                    //File doesn't need to be refreshed
+                    if (lastModified.AddDays(Constants.CacheExpiryDays) > DateTime.Now)
+                    {
+                        return;
+                    }
+                }
+
+                try
+                {
+                    var fileContent = httpClient.GetStringAsync(remoteFile).Result;
+                    Directory.CreateDirectory(Path.GetDirectoryName(localFile));
+                    File.WriteAllText(localFile, fileContent);
+                }
+                catch (Exception ex)
+                {
+                    LogHelper.LogError(ex, $"Error while dowloading file {file}");
+                }
+            });
         }
     }
 }

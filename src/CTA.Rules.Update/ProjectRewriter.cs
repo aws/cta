@@ -47,7 +47,8 @@ namespace CTA.Rules.Update
             _sourceFileBuildResults = analyzerResult?.ProjectBuildResult?.SourceFileBuildResults;
             _sourceFileResults = analyzerResult?.ProjectResult?.SourceFileResults;
             _projectReferences = analyzerResult?.ProjectBuildResult?.ExternalReferences?.ProjectReferences.Select(p => p.AssemblyLocation).ToList();
-            _metaReferences = analyzerResult.ProjectBuildResult.Project.MetadataReferences.Select(m => m.Display).ToList();
+            _metaReferences = analyzerResult?.ProjectBuildResult?.Project?.MetadataReferences?.Select(m => m.Display).ToList()
+                ?? rulesEngineConfiguration.MetaReferences;
             RulesEngineConfiguration = rulesEngineConfiguration;
 
         }
@@ -91,6 +92,7 @@ namespace CTA.Rules.Update
                 });
 
                 _projectResult.ActionPackages = projectActions.PackageActions.Distinct().ToList();
+                _projectResult.MetaReferences = _metaReferences;
 
                 foreach (var p in RulesEngineConfiguration.PackageReferences)
                 {

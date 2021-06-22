@@ -2,11 +2,8 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using System.Linq;
 using CTA.Rules.Config;
 using CTA.Rules.Models;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.Extensions.Logging;
 
 namespace CTA.Rules.PortCore
@@ -34,6 +31,11 @@ namespace CTA.Rules.PortCore
                     cli.RulesDir = Config.Constants.RulesDefaultPath;
                 }
 
+                if (cli.CreateNew)
+                {
+                    cli.FilePath = Utils.CopySolutionFolderToTemp(Path.GetFileName(cli.FilePath), Directory.GetParent(cli.FilePath).FullName);
+                }
+
                 string solutionDir = Directory.GetParent(cli.FilePath).FullName;
                 var projectFiles = Directory.EnumerateFiles(solutionDir, "*.csproj", SearchOption.AllDirectories);
 
@@ -52,7 +54,7 @@ namespace CTA.Rules.PortCore
                         IsMockRun = cli.IsMockRun,
                         UseDefaultRules = cli.DefaultRules,
                         PackageReferences = packageReferences,
-                        PortCode = false,
+                        PortCode = true,
                         PortProject = true,
                         TargetVersions = new List<string> { cli.Version }
                     };

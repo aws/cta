@@ -8,12 +8,12 @@
   <ItemGroup>
     <Compile Remove="Extensions\NamedTypeSymbolExtensions.cs" />
   </ItemGroup>
-
+  
   <ItemGroup>
-    <PackageReference Include="Codelyzer.Analysis" Version="1.4.8-alpha-g29c192f06d" />
+    <PackageReference Include="Codelyzer.Analysis" Version="1.6.5-alpha-g229faeaa7f" />
   </ItemGroup>
-
-  <ItemGroup>
+  
+  <ItemGroup>    
     <ProjectReference Include="..\CTA.Rules.Config\CTA.Rules.Config.csproj" />
   </ItemGroup>
 

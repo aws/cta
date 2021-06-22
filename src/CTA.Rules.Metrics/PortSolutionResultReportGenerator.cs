@@ -46,7 +46,7 @@ namespace CTA.Rules.Metrics
             GenerateMetrics();
             GeneratePortSolutionResultJsonReport();
             GeneratePortSolutionResultTextReport();
-
+            
             ExportStringToFile(PortSolutionResult.SolutionPath, "PortSolutionResult.json", PortSolutionResultJsonReport);
             ExportStringToFile(PortSolutionResult.SolutionPath, "PortSolutionResult.txt", PortSolutionResultTextReport);
         }
@@ -146,7 +146,7 @@ namespace CTA.Rules.Metrics
             try
             {
                 var filePath = GetFilePath(projectOrSolutionPath, fileName);
-                File.WriteAllText(filePath, content);
+                Utils.ThreadSafeExportStringToFile(filePath, content);
             }
             catch (Exception ex)
             {

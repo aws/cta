@@ -14,7 +14,9 @@
         public const string WebApiControllerOriginalDefinition = "System.Web.Http.ApiController";
         public const string SystemWebReferenceIdentifier = "System.Web";
         public const string WebApiNugetReferenceIdentifier = "Microsoft.AspNet.WebApi";
+        public const string WebApiReferenceIdentifier = "System.Web.Http";
         public const string MvcNugetReferenceIdentifier = "Microsoft.AspNet.Mvc";
+        public const string MvcReferenceIdentifier = "System.Web.Mvc";
         public const string MvcViewsDirectory = "Views";
 
         public const string AspNetMvcFeatureName = "AspNetMvcFeature";

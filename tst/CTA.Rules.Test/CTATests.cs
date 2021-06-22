@@ -7,7 +7,6 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.IO.Compression;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -22,19 +21,8 @@ namespace CTA.Rules.Test
         [SetUp]
         public void Setup()
         {
-            Setup(this.GetType());
-            tempDir = GetTstPath(Path.Combine(new string[] { "Projects", "Temp" }));
-            DownloadTestProjects();
-        }
-
-        private void DownloadTestProjects()
-        {
-            var tempDirectory = Directory.CreateDirectory(tempDir);
-            downloadLocation = Path.Combine(tempDirectory.FullName, "d");
-
-            var fileName = Path.Combine(tempDirectory.Parent.FullName, @"TestProjects.zip");
-            Utils.SaveFileFromGitHub(fileName, GithubInfo.TestGithubOwner, GithubInfo.TestGithubRepo, GithubInfo.TestGithubTag);
-            ZipFile.ExtractToDirectory(fileName, downloadLocation, true);
+            tempDir = SetupTests.TempDir;
+            downloadLocation = SetupTests.DownloadLocation;
         }
 
         [Test]
@@ -59,11 +47,9 @@ namespace CTA.Rules.Test
             //We don't care about version for CTA-only rules:
             string version = "net5.0";
 
-            var sourceDir = Directory.GetParent(Directory.EnumerateFiles(downloadLocation, "WebApiWithReferences.sln", SearchOption.AllDirectories).FirstOrDefault());
-            var solutionDir = Path.Combine(tempDir, version);
 
-            CopyDirectory(sourceDir, new DirectoryInfo(solutionDir));
-            string solutionPath = Directory.EnumerateFiles(solutionDir, "WebApiWithReferences.sln", SearchOption.AllDirectories).FirstOrDefault();
+            var solutionPath = CopySolutionFolderToTemp("WebApiWithReferences.sln", downloadLocation);
+            var solutionDir = Directory.GetParent(solutionPath).FullName;
 
             FileAssert.Exists(solutionPath);
 
@@ -133,11 +119,9 @@ namespace CTA.Rules.Test
             //We don't care about version for CTA-only rules:
             string version = "net5.0";
 
-            var sourceDir = Directory.GetParent(Directory.EnumerateFiles(downloadLocation, "MvcMusicStore.sln", SearchOption.AllDirectories).FirstOrDefault());
-            var solutionDir = Path.Combine(tempDir, version);
+            var solutionPath = CopySolutionFolderToTemp("MvcMusicStore.sln", downloadLocation);
+            var solutionDir = Directory.GetParent(solutionPath).FullName;
 
-            CopyDirectory(sourceDir, new DirectoryInfo(solutionDir));
-            string solutionPath = Directory.EnumerateFiles(solutionDir, "MvcMusicStore.sln", SearchOption.AllDirectories).FirstOrDefault();
             FileAssert.Exists(solutionPath);
 
 
@@ -247,12 +231,6 @@ namespace CTA.Rules.Test
             LogHelper.LogWarning("Test message 1");
             LogHelper.LogInformation("Test message 1");
             LogHelper.Logger = LoggerFactory.Create(builder => builder.SetMinimumLevel(LogLevel.Debug)).CreateLogger(Constants.Translator);
-        }
-
-        [TearDown]
-        public void Cleanup()
-        {
-            Directory.Delete(GetTstPath(Path.Combine(new string[] { "Projects", "Temp" })), true);
         }
     }
 }
