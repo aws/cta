@@ -16,8 +16,9 @@ namespace CTA.FeatureDetection.ProjectType.CompiledFeatures
         {
             var project = analyzerResult.ProjectResult;
 
-            var isPresent = project.ContainsNugetDependency(Constants.WebApiNugetReferenceIdentifier)
-                            && project.DeclaresClassWithBaseType(Constants.WebApiControllerOriginalDefinition);
+            var isPresent = (project.ContainsNugetDependency(Constants.WebApiNugetReferenceIdentifier)
+                || project.ContainsDependency(Constants.WebApiReferenceIdentifier))
+                && project.DeclaresClassWithBaseType(Constants.WebApiControllerOriginalDefinition);
 
             return isPresent;
         }

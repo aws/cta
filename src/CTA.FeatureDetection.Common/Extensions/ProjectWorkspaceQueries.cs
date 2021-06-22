@@ -18,6 +18,18 @@ namespace CTA.FeatureDetection.Common.Extensions
                    .Any(r => r.Identity == nugetReferenceIdentifier) == true;
 
         /// <summary>
+        /// Determines if a ProjectWorkspace has a specified Dependency
+        /// </summary>
+        /// <param name="project">ProjectWorkspace to search</param>
+        /// <param name="referenceIdentifier">Reference to search for</param>
+        /// <returns>Whether or not the reference exists in the project</returns>
+        public static bool ContainsDependency(this ProjectWorkspace project, string referenceIdentifier)
+            => project.ExternalReferences?.NugetReferences
+                .Union(project.ExternalReferences?.NugetDependencies)
+                .Union(project.ExternalReferences?.SdkReferences)
+                   .Any(r => r.Identity == referenceIdentifier) == true;
+
+        /// <summary>
         /// Determines if a ProjectWorkspace declares a class with a specified base type
         /// </summary>
         /// <param name="project">ProjectWorkspace to search</param>

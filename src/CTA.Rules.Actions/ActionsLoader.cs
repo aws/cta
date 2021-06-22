@@ -222,8 +222,8 @@ namespace CTA.Rules.Actions
         public Func<SyntaxGenerator, ElementAccessExpressionSyntax, ElementAccessExpressionSyntax> GetElementAccessExpressionActions(string name, dynamic value) =>
             GetAction<Func<SyntaxGenerator, ElementAccessExpressionSyntax, ElementAccessExpressionSyntax>>
                 (elementAccessActions, elementAccessObject, name, value);
-        public Func<SyntaxGenerator, MemberAccessExpressionSyntax, SyntaxNode> GetMemberAccessExpressionActions(string name, dynamic value) =>
-            GetAction<Func<SyntaxGenerator, MemberAccessExpressionSyntax, SyntaxNode>>
+        public Func<SyntaxGenerator, SyntaxNode, SyntaxNode> GetMemberAccessExpressionActions(string name, dynamic value) =>
+            GetAction<Func<SyntaxGenerator, SyntaxNode, SyntaxNode>>
                 (memberAccessActions, memberAccessObject, name, value);
 
         /// <summary>

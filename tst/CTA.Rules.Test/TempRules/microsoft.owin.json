@@ -90,7 +90,7 @@
               "Value": "Microsoft.AspNetCore.Owin",
               "Description": "Add Microsoft.AspNetCore.Owin namespace",
               "ActionValidation": {
-                "Contains": "usingMicrosoft.AspNetCore.Owin;",
+                "Contains": "using Microsoft.AspNetCore.Owin;",
                 "NotContains": ""
               }
             },
@@ -101,7 +101,7 @@
               "Description": "Remove Microsoft.Owin namespace",
               "ActionValidation": {
                 "Contains": "",
-                "NotContains": "usingMicrosoft.Owin;"
+                "NotContains": "using Microsoft.Owin;"
               }
             },
             {
@@ -111,7 +111,7 @@
               "Description": "Remove Owin namespace",
               "ActionValidation": {
                 "Contains": "",
-                "NotContains": "usingOwin;"
+                "NotContains": "using Owin;"
               }
             }
           ]
@@ -156,7 +156,7 @@
               "Value": "Microsoft.AspNetCore.Http",
               "Description": "Add Microsoft.AspNetCore.Http namespace",
               "ActionValidation": {
-                "Contains": "usingMicrosoft.AspNetCore.Http;",
+                "Contains": "using Microsoft.AspNetCore.Http;",
                 "NotContains": ""
               }
             }
@@ -276,7 +276,7 @@
               "TargetCPU": [ "x86", "x64", "ARM32", "ARM64" ]
             }
           ],
-          "Description": "Remove the base class for owin middleware, remove the override method modifier for the invoke method, add a new gloable xpression for RequestDelegate _next, initialize it in the constructor and remove the constructor intializer base(next).",
+          "Description": "Remove the base class for OwinMiddleware, remove the override method modifier for the invoke method, add a new global expression for RequestDelegate _next, initialize it in the constructor and remove the constructor intializer base(next).",
           "Actions": [
             {
               "Name": "RemoveBaseClass",
@@ -295,7 +295,7 @@
                 "methodName": "Invoke",
                 "modifiers": "public"
               },
-              "Description": "Replace all the invoke method modifiers with only public in order to remove the override modifier.",
+              "Description": "Replace all the invoke method modifiers with only public in order to remove the override modifier."
             },
             {
               "Name": "AddExpression",
@@ -313,7 +313,7 @@
               "Value": "_next = next;",
               "Description": "Add a new expression in the constructor to initialize the new variable of _next to the next element in the pipeline.",
               "ActionValidation": {
-                "Contains": "_next=next;",
+                "Contains": "_next = next;",
                 "NotContains": ""
               }
             },
@@ -369,7 +369,7 @@
               "Value": "Microsoft.AspNetCore.Http",
               "Description": "Add Microsoft.AspNetCore.Http namespace",
               "ActionValidation": {
-                "Contains": "usingMicrosoft.AspNetCore.Http;",
+                "Contains": "using Microsoft.AspNetCore.Http;",
                 "NotContains": ""
               }
             }
@@ -487,7 +487,44 @@
               "Value": "Please replace Get with TryGetValue.",
               "Description": "Add a comment to explain how to replace IOwinContext.Request.Headers.Get with TryGetValue instead.",
               "ActionValidation": {
-                "Contains": "PleasereplaceGetwithTryGetValue.",
+                "Contains": "Please replace Get with TryGetValue.",
+                "NotContains": "",
+                "CheckComments": "True"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Type": "Method",
+      "Name": "Microsoft.Owin.IOwinContext.Get<T>(string)",
+      "Value": "Microsoft.Owin.IOwinContext.Get<T>(string)",
+      "KeyType": "Name",
+      "ContainingType": "IOwinContext",
+      "RecommendedActions": [
+        {
+          "Source": "Amazon",
+          "Preferred": "Yes",
+          "TargetFrameworks": [
+            {
+              "Name": "netcoreapp3.1",
+              "TargetCPU": [ "x86", "x64", "ARM32", "ARM64" ]
+            },
+            {
+              "Name": "net5.0",
+              "TargetCPU": [ "x86", "x64", "ARM32", "ARM64" ]
+            }
+          ],
+          "Description": "Add a comment to explain how to replace the Get method with Items collection.",
+          "Actions": [
+            {
+              "Name": "AddComment",
+              "Type": "Method",
+              "Value": "Please replace Get with Items. Such as (Casting_Type)context.Items[\"String_To_Search_For\"];",
+              "Description": "Add a comment to explain how to replace IOwinContext.Get with HttpContext.Items instead.",
+              "ActionValidation": {
+                "Contains": "Please replace Get with Items. Such as (Casting_Type)context.Items[\"String_To_Search_For\"];",
                 "NotContains": "",
                 "CheckComments": "True"
               }
@@ -618,6 +655,52 @@
               "ActionValidation": {
                 "Contains": "usingMicrosoft.AspNetCore.Http;",
                 "NotContains": ""
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Type": "Class",
+      "Name": "PathString",
+      "Value": "Microsoft.Owin.PathString",
+      "KeyType": "Identifier",
+      "ContainingType": "",
+      "RecommendedActions": [
+        {
+          "Source": "Amazon",
+          "Preferred": "Yes",
+          "TargetFrameworks": [
+            {
+              "Name": "netcoreapp3.1",
+              "TargetCPU": [ "x86", "x64", "ARM32", "ARM64" ]
+            },
+            {
+              "Name": "net5.0",
+              "TargetCPU": [ "x86", "x64", "ARM32", "ARM64" ]
+            }
+          ],
+          "Description": "Add Microsoft.AspNetCore.Http namespace if PathString is being used.",
+          "Actions": [
+            {
+              "Name": "AddDirective",
+              "Type": "Using",
+              "Value": "Microsoft.AspNetCore.Http",
+              "Description": "Add Microsoft.AspNetCore.Http namespace",
+              "ActionValidation": {
+                "Contains": "usingMicrosoft.AspNetCore.Http;",
+                "NotContains": ""
+              }
+            },
+            {
+              "Name": "RemoveDirective",
+              "Type": "Using",
+              "Value": "Microsoft.Owin",
+              "Description": "Remove Microsoft.Owin namespace",
+              "ActionValidation": {
+                "Contains": "",
+                "NotContains": "usingMicrosoft.Owin;"
               }
             }
           ]

@@ -1,6 +1,8 @@
-﻿using CTA.Rules.Config;
+﻿using Codelyzer.Analysis;
+using CTA.Rules.Config;
 using CTA.Rules.Models;
 using CTA.Rules.PortCore;
+using Microsoft.Extensions.Logging.Abstractions;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
@@ -16,6 +18,8 @@ namespace CTA.Rules.Test
     {
         private string tstPath;
         private string srcPath;
+
+        public static string CopyFolder = nameof(CopyFolder);
 
         protected static class TargetFramework
         {
@@ -58,22 +62,23 @@ namespace CTA.Rules.Test
             return Path.Combine(srcPath, path);
         }
 
-        public TestSolutionAnalysis AnalyzeSolution(string solutionName, string tempDir, string downloadLocation, string version, bool skipCopy = false)
-        {
-            TestSolutionAnalysis result = new TestSolutionAnalysis();
-
-            var sourceDir = Directory.GetParent(Directory.EnumerateFiles(downloadLocation, solutionName, SearchOption.AllDirectories).FirstOrDefault());
-            var solutionDir = Path.Combine(tempDir, version);
+        public TestSolutionAnalysis AnalyzeSolution(string solutionName, string tempDir, string downloadLocation, string version, Dictionary<string, List<string>> metaReferences = null, 
+            bool skipCopy = false, bool portCode = true)
+        {         
+            string solutionPath = Directory.EnumerateFiles(tempDir, solutionName, SearchOption.AllDirectories).FirstOrDefault();
 
             if (!skipCopy)
             {
-                CopyDirectory(sourceDir, new DirectoryInfo(solutionDir));
+                solutionPath = CopySolutionFolderToTemp(solutionName, downloadLocation);
             }
-            else
-            {
-                solutionDir = tempDir;
-            }
-            string solutionPath = Directory.EnumerateFiles(solutionDir, solutionName, SearchOption.AllDirectories).FirstOrDefault();
+
+            return AnalyzeSolution(solutionPath, version, metaReferences, true, portCode);
+        }
+
+        public TestSolutionAnalysis AnalyzeSolution(string solutionPath, string version, Dictionary<string, List<string>> metaReferences = null, bool skipCopy = false, bool portCode = true)
+        {
+            TestSolutionAnalysis result = new TestSolutionAnalysis();
+            var solutionDir = Directory.GetParent(solutionPath).FullName;
 
             if (solutionPath != null && solutionPath.Length > 0)
             {
@@ -95,8 +100,14 @@ namespace CTA.Rules.Test
                             ProjectPath = projectFile,
                             UseDefaultRules = true,
                             TargetVersions = new List<string> { version },
-                            PackageReferences = packages
+                            PackageReferences = packages,
+                            PortCode = portCode
                         };
+
+                        if (metaReferences != null)
+                        {
+                            projectConfiguration.MetaReferences = metaReferences.ContainsKey(projectFile) ? metaReferences[projectFile] : null;
+                        }
 
                         //project.CsProjectContent = File.ReadAllText(projectFile);
                         project.ProjectDirectory = Directory.GetParent(projectFile).FullName;
@@ -183,6 +194,83 @@ namespace CTA.Rules.Test
                 DirectoryInfo destinationSub = new DirectoryInfo(Path.Combine(target.FullName, dir.Name));
                 CopyDirectory(dir, destinationSub);
             }
+        }
+
+        protected string CopySolutionFolderToTemp(string solutionName, string tempDir)
+        {
+            string solutionPath = Directory.EnumerateFiles(tempDir, solutionName, SearchOption.AllDirectories).FirstOrDefault(s => !s.Contains(string.Concat(Path.DirectorySeparatorChar, CopyFolder, Path.DirectorySeparatorChar)));
+            string solutionDir = Directory.GetParent(solutionPath).FullName;
+            var newTempDir = Path.Combine(GetTstPath(this.GetType()), CopyFolder, Guid.NewGuid().ToString());
+            CopyDirectory(new DirectoryInfo(solutionDir), new DirectoryInfo(newTempDir));
+
+            solutionPath = Directory.EnumerateFiles(newTempDir, solutionName, SearchOption.AllDirectories).FirstOrDefault();
+            return solutionPath;
+        }
+
+
+        protected List<string> GetSolutionBuildErrors(string solutionPath)
+        {
+            var result = GetBuildResults(solutionPath);
+
+            var allErrors = new List<string>();
+            result.ForEach(r => allErrors.AddRange(r.ProjectBuildResult.BuildErrors));
+            return allErrors;
+        }
+
+        protected List<AnalyzerResult> GetBuildResults(string solutionPath)
+        {
+            AnalyzerConfiguration configuration = new AnalyzerConfiguration(LanguageOptions.CSharp)
+            {
+                ExportSettings =
+                {
+                    GenerateJsonOutput = false,
+                    OutputPath = @"/tmp/UnitTests"
+                },
+
+                MetaDataSettings =
+                {
+                    LiteralExpressions = true,
+                    MethodInvocations = true,
+                    Annotations = true,
+                    DeclarationNodes = true,
+                    LocationData = false,
+                    ReferenceData = true,
+                    LoadBuildData = true,
+                    ElementAccess = true,
+                    MemberAccess = true
+                }
+            };
+            CodeAnalyzer analyzer = CodeAnalyzerFactory.GetAnalyzer(configuration, NullLogger.Instance);
+            var result = analyzer.AnalyzeSolution(solutionPath).Result;
+            return result;
+        }
+
+        protected List<AnalyzerResult> GenerateSolutionAnalysis(string solutionPath)
+        {
+            AnalyzerConfiguration configuration = new AnalyzerConfiguration(LanguageOptions.CSharp)
+            {
+                ExportSettings =
+                {
+                    GenerateJsonOutput = false,
+                    OutputPath = @"/tmp/UnitTests"
+                },
+
+                MetaDataSettings =
+                {
+                    LiteralExpressions = true,
+                    MethodInvocations = true,
+                    Annotations = true,
+                    DeclarationNodes = true,
+                    LocationData = false,
+                    ReferenceData = true,
+                    LoadBuildData = true,
+                    ElementAccess = true,
+                    MemberAccess = true
+                }
+            };
+            CodeAnalyzer analyzer = CodeAnalyzerFactory.GetAnalyzer(configuration, NullLogger.Instance);
+            var result = analyzer.AnalyzeSolution(solutionPath).Result;
+            return result;
         }
     }
 }

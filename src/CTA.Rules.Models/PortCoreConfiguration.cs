@@ -1,4 +1,6 @@
-﻿namespace CTA.Rules.Models
+﻿using System.Collections.Generic;
+
+namespace CTA.Rules.Models
 {
     public class PortCoreConfiguration : ProjectConfiguration
     {
@@ -6,5 +8,6 @@
         {
         }
         public bool UseDefaultRules { get; set; }
+        public List<string> FrameworkMetaReferences;
     }
 }

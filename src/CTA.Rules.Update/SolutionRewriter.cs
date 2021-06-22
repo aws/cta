@@ -115,7 +115,16 @@ namespace CTA.Rules.Update
             var options = new ParallelOptions() { MaxDegreeOfParallelism = Constants.ThreadCount };
             Parallel.ForEach(_rulesRewriters, options, rulesRewriter =>
             {
-                _solutionResult.ProjectResults.Add(rulesRewriter.Run());
+                var projectResult = rulesRewriter.Run();
+                var existingResult = _solutionResult.ProjectResults.FirstOrDefault(p => p.ProjectFile == projectResult.ProjectFile);
+                if (existingResult == null)
+                {
+                    _solutionResult.ProjectResults.Add(projectResult);
+                }
+                else
+                {
+                    existingResult = projectResult;
+                }
             });
             return _solutionResult;
         }

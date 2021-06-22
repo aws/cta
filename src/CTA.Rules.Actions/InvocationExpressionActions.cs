@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using CTA.Rules.Config;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -44,6 +45,29 @@ namespace CTA.Rules.Actions
             //TODO what's the outcome if newMethod doesn't have a valid signature.. are there any options we could provide to parseexpression ?
             InvocationExpressionSyntax ReplaceMethod(SyntaxGenerator syntaxGenerator, InvocationExpressionSyntax node)
             {
+                node = node.WithExpression(SyntaxFactory.ParseExpression(newMethod)).NormalizeWhitespace(); 
+                return node;
+            }
+            return ReplaceMethod;
+        }
+
+        /// <summary>
+        /// This Method replaces the entire expression up to the matching invocation expression. It also adds the type from the typed argument list to the list of arguments
+        /// </summary>
+        /// <param name="newMethod">The new invocation expression including the method to replace with.</param>
+        /// <returns></returns>
+        public Func<SyntaxGenerator, InvocationExpressionSyntax, InvocationExpressionSyntax> GetReplaceMethodWithObjectAddTypeAction(string newMethod)
+        {
+            InvocationExpressionSyntax ReplaceMethod(SyntaxGenerator syntaxGenerator, InvocationExpressionSyntax node)
+            {
+                var typeToAdd = node.Expression.DescendantNodes()?.OfType<GenericNameSyntax>()?.FirstOrDefault()?.TypeArgumentList;
+
+                if(typeToAdd != null)
+                {
+                    var argumentList = SyntaxFactory.ParseArgumentList($"(typeof({typeToAdd.Arguments.ToString()}))");
+                    node = node.WithArgumentList(argumentList);
+                }
+
                 node = node.WithExpression(SyntaxFactory.ParseExpression(newMethod)).NormalizeWhitespace();
                 return node;
             }
