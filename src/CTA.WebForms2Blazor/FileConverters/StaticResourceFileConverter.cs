@@ -8,16 +8,19 @@ using CTA.WebForms2Blazor.FileInformationModel;
 
 namespace CTA.WebForms2Blazor.FileConverters
 {
-    public class StaticFileConverter : FileConverter
+    public class StaticResourceFileConverter : FileConverter
     {
-        public StaticFileConverter(string sourceProjectPath, string fullPath) : base(sourceProjectPath, fullPath)
+        public StaticResourceFileConverter(string sourceProjectPath, string fullPath) : base(sourceProjectPath, fullPath)
         {
 
         }
-        
+
         public override async Task<IEnumerable<FileInformation>> MigrateFileAsync()
         {
-            FileInformation fi = new FileInformation(RelativePath, File.ReadAllBytes(FullPath));
+            var newPath = Path.Combine("wwwroot", RelativePath);
+            var fullPath = Path.Combine(ProjectPath, RelativePath);
+
+            FileInformation fi = new FileInformation(newPath, File.ReadAllBytes(fullPath));
 
             var fileList = new List<FileInformation>();
             fileList.Add(fi);

@@ -23,6 +23,7 @@ namespace CTA.WebForms2Blazor.Tests
 
         private string _testCodeFilePath;
         private string _testWebConfigFilePath;
+        private string _testStaticResourceFilePath;
         private string _testStaticFilePath;
         private string _testViewFilePath;
         private string _testProjectFilePath;
@@ -36,7 +37,8 @@ namespace CTA.WebForms2Blazor.Tests
             _testFilesDirectoryPath = Path.Combine(_testProjectPath, Path.Combine("TestingArea", "TestFiles"));
             _testCodeFilePath = Path.Combine(_testFilesDirectoryPath, "TestClassFile.cs");
             _testWebConfigFilePath = Path.Combine(_testFilesDirectoryPath, "web.config");
-            _testStaticFilePath = Path.Combine(_testFilesDirectoryPath, "SampleStaticFile.png");
+            _testStaticFilePath = Path.Combine(_testFilesDirectoryPath, "SampleStaticFile.csv");
+            _testStaticResourceFilePath = Path.Combine(_testFilesDirectoryPath, "SampleStaticResourceFile.png");
             _testViewFilePath = Path.Combine(_testFilesDirectoryPath, "SampleViewFile.aspx");
             _testProjectFilePath = Path.Combine(_testFilesDirectoryPath, "SampleProjectFile.csproj");
             _testAreaFullPath = Path.Combine(_testProjectPath, _testFilesDirectoryPath);
@@ -49,18 +51,33 @@ namespace CTA.WebForms2Blazor.Tests
         }
 
         [Test]
-        public async Task TestStaticFileConverter()
+        public async Task TestStaticResourceFileConverter()
         {
-            FileConverter fc = new StaticFileConverter(_testProjectPath,  _testStaticFilePath);
+            FileConverter fc = new StaticResourceFileConverter(_testProjectPath,  _testStaticResourceFilePath);
 
             IEnumerable<FileInformation> fileList = await fc.MigrateFileAsync();
             FileInformation fi = fileList.First();
             byte[] bytes = fi.FileBytes;
 
-            string relativePath = Path.GetRelativePath(_testProjectPath, _testStaticFilePath);
+            string relativePath = Path.GetRelativePath(_testProjectPath, _testStaticResourceFilePath);
 
-            Assert.IsTrue(bytes.Length == new FileInfo(_testStaticFilePath).Length);
+            Assert.IsTrue(bytes.Length == new FileInfo(_testStaticResourceFilePath).Length);
             Assert.IsTrue(fi.RelativePath.Equals(Path.Combine("wwwroot", relativePath)));
+        }
+
+        [Test]
+        public async Task TestStaticFileConverter()
+        {
+            FileConverter fc = new StaticFileConverter(_testProjectPath, _testStaticFilePath);
+            
+            IEnumerable<FileInformation> fileList = await fc.MigrateFileAsync();
+            FileInformation fi = fileList.First();
+            byte[] bytes = fi.FileBytes;
+
+            string relativePath = Path.GetRelativePath(_testProjectPath, _testStaticFilePath);
+            
+            Assert.IsTrue(bytes.Length == new FileInfo(_testStaticFilePath).Length);
+            Assert.IsTrue(fi.RelativePath.Equals(relativePath));
         }
 
         [Test]

@@ -117,3 +117,6 @@ publish/
 # Local directories
 .vshistory/
 tst/Projects/
+
+# Rider
+*.idea
