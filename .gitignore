@@ -117,3 +117,4 @@ publish/
 # Local directories
 .vshistory/
 tst/Projects/
+/tst/CopyFolder
