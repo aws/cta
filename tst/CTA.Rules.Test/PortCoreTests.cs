@@ -1,8 +1,5 @@
-using Codelyzer.Analysis;
 using CTA.Rules.PortCore;
-using Microsoft.Extensions.Logging.Abstractions;
 using NUnit.Framework;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -286,11 +283,12 @@ namespace CTA.Rules.Test
             TestSolutionAnalysis results = AnalyzeSolution("AntlrSample.sln", tempDir, downloadLocation, version);
 
             // Verify new .csproj file exists
-            var addsAntlr3RuntimeProjectFile = results.ProjectResults.Where(p => p.CsProjectPath.EndsWith("Adds.Antlr3.Runtime.csproj")).FirstOrDefault();
+            var addsAntlr3RuntimeProjectFile = results.ProjectResults.First(p => p.CsProjectPath.EndsWith("Adds.Antlr3.Runtime.csproj"));
             FileAssert.Exists(addsAntlr3RuntimeProjectFile.CsProjectPath);
 
             // No build errors expected in the ported project
-            Assert.False(results.SolutionRunResult.BuildErrors[addsAntlr3RuntimeProjectFile.CsProjectPath].Any());
+            var buildErrors = GetSolutionBuildErrors(results.SolutionRunResult.SolutionPath);
+            Assert.AreEqual(0, buildErrors.Count);
 
             // Verify the new package has been added
             var csProjectContent = addsAntlr3RuntimeProjectFile.CsProjectContent;
@@ -396,11 +394,12 @@ namespace CTA.Rules.Test
             TestSolutionAnalysis results = AnalyzeSolution("IonicZipSample.sln", tempDir, downloadLocation, version);
 
             // Verify new .csproj file exists
-            var ionicZipProjectFile = results.ProjectResults.Where(p => p.CsProjectPath.EndsWith("IonicZipSample.csproj")).FirstOrDefault();
+            var ionicZipProjectFile = results.ProjectResults.First(p => p.CsProjectPath.EndsWith("IonicZipSample.csproj"));
             FileAssert.Exists(ionicZipProjectFile.CsProjectPath);
 
             // No build errors expected in the ported project
-            Assert.False(results.SolutionRunResult.BuildErrors[ionicZipProjectFile.CsProjectPath].Any());
+            var buildErrors = GetSolutionBuildErrors(results.SolutionRunResult.SolutionPath);
+            Assert.AreEqual(0, buildErrors.Count);
 
             // Verify the new package has been added
             var csProjectContent = ionicZipProjectFile.CsProjectContent;

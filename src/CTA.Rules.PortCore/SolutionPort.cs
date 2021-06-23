@@ -2,10 +2,8 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
-using System.IO.Compression;
 using System.Linq;
 using System.Net.Http;
-using System.Reflection;
 using System.Threading.Tasks;
 using Codelyzer.Analysis;
 using Codelyzer.Analysis.Build;
@@ -32,7 +30,8 @@ namespace CTA.Rules.PortCore
         private readonly MetricsContext _context;
         private Dictionary<string, FeatureDetectionResult> _projectTypeFeatureResults;
         private readonly IDEProjectResult _projectResult;
-        
+        private SolutionResult _solutionAnalysisResult;
+
 
         /// <summary>
         /// Initializes a new instance of Solution Port, analyzing the solution path using the provided config.
@@ -170,12 +169,12 @@ namespace CTA.Rules.PortCore
                         .FirstOrDefault(a => a.ProjectResult?.ProjectFilePath == projectConfiguration.ProjectPath)
                         .ProjectResult;
 
-                    projectResult?.SourceFileResults?.SelectMany(s => s.References)?.Select(r => r.Namespace).Distinct().ToList().ForEach(currentReference=> {
-                            if (currentReference != null && !allReferences.Contains(currentReference))
-                            {
-                                allReferences.Add(currentReference);
-                            }
-                        });
+                    projectResult?.SourceFileResults?.SelectMany(s => s.References)?.Select(r => r.Namespace).Distinct().ToList().ForEach(currentReference=> { 
+                        if (currentReference != null && !allReferences.Contains(currentReference))
+                        {
+                            allReferences.Add(currentReference);
+                        }
+                    });
 
                     projectResult?.SourceFileResults?.SelectMany(s => s.Children.OfType<UsingDirective>())?.Select(u=>u.Identifier).Distinct().ToList().ForEach(currentReference => {
                         if (currentReference != null && !allReferences.Contains(currentReference))
@@ -193,8 +192,14 @@ namespace CTA.Rules.PortCore
         /// </summary>
         public SolutionResult AnalysisRun()
         {
-            var solutionResult = _solutionRewriter.AnalysisRun();
-            _portSolutionResult.AddSolutionResult(solutionResult);
+            // If the solution was already analyzed, don't duplicate the results
+            if (_solutionAnalysisResult != null) 
+            {
+                return _solutionAnalysisResult;
+            }
+
+            _solutionAnalysisResult = _solutionRewriter.AnalysisRun();
+            _portSolutionResult.AddSolutionResult(_solutionAnalysisResult);
             if (!string.IsNullOrEmpty(_solutionPath))
             {
                 PortSolutionResultReportGenerator reportGenerator = new PortSolutionResultReportGenerator(_context, _portSolutionResult, _projectTypeFeatureResults);
@@ -203,7 +208,7 @@ namespace CTA.Rules.PortCore
                 LogHelper.LogInformation("Generating Post-Analysis Report");
                 LogHelper.LogError($"{Constants.MetricsTag}: {reportGenerator.AnalyzeSolutionResultJsonReport}");
             }
-            return solutionResult;
+            return _solutionAnalysisResult;
         }
 
         /// <summary>
@@ -211,7 +216,14 @@ namespace CTA.Rules.PortCore
         /// </summary>
         public PortSolutionResult Run()
         {
-            _portSolutionResult.AddSolutionResult(_solutionRewriter.Run());
+            // Find actions to execute for each project
+            var solutionAnalysisResult = AnalysisRun();
+            var projectActionsMap = solutionAnalysisResult.ProjectResults
+                .ToDictionary(project => project.ProjectFile, project => project.ProjectActions);
+
+            // Pass in the actions found to translate all files in each project
+            var solutionRewriterResult = _solutionRewriter.Run(projectActionsMap);
+            _portSolutionResult.AddSolutionResult(solutionRewriterResult);
             if (!string.IsNullOrEmpty(_solutionPath))
             {
                 PortSolutionResultReportGenerator reportGenerator = new PortSolutionResultReportGenerator(_context, _portSolutionResult);
