@@ -8,6 +8,7 @@ using CTA.WebForms2Blazor.Services;
 using CTA.WebForms2Blazor.FileInformationModel;
 using System.Text;
 using System.Threading.Tasks;
+using CTA.Rules.Config;
 using CTA.WebForms2Blazor.FileConverters;
 
 namespace CTA.WebForms2Blazor.Tests
@@ -42,6 +43,17 @@ namespace CTA.WebForms2Blazor.Tests
             _testViewFilePath = Path.Combine(_testFilesDirectoryPath, "SampleViewFile.aspx");
             _testProjectFilePath = Path.Combine(_testFilesDirectoryPath, "SampleProjectFile.csproj");
             _testAreaFullPath = Path.Combine(_testProjectPath, _testFilesDirectoryPath);
+            
+            Utils.DownloadFilesToFolder(Constants.S3TemplatesBucketUrl, Constants.ResourcesExtractedPath, Constants.TemplateFiles);
+        }
+        
+        [OneTimeTearDown]
+        public void OneTimeTearDown()
+        {
+            if (Directory.Exists(Constants.ResourcesExtractedPath))
+            {
+                Directory.Delete(Constants.ResourcesExtractedPath, true);
+            }
         }
 
         [SetUp]
