@@ -22,5 +22,6 @@ namespace CTA.Rules.Test
         public string CsProjectPath { get; set; }
         public string CsProjectContent { get; set; }
         public string ProjectDirectory { get; set; }
+        public List<string> MetaReferences { get; set; }
     }
 }

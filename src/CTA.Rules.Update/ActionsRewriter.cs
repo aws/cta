@@ -302,7 +302,7 @@ namespace CTA.Rules.Update.Rewriters
                         };
                         try
                         {
-                            newNode = action.MemberAccessActionFunc(_syntaxGenerator, (MemberAccessExpressionSyntax)newNode);
+                            newNode = action.MemberAccessActionFunc(_syntaxGenerator, newNode);
                             LogHelper.LogInformation(string.Format("{0}: {1}", node.SpanStart, action.Description));
                         }
                         catch (Exception ex)

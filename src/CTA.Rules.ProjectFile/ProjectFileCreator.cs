@@ -235,9 +235,12 @@ namespace CTA.Rules.ProjectFile
 
         private void UpdatePackageReferences()
         {
+            //Select existing packages and deduplicate them by package name:
             var existingPackages = _projectFileXml.Descendants()
                 .Where(d => d.Name == "PackageReference")
-                .ToDictionary(p => p.Attributes("Include").First().Value, p => p.Attributes("Version").First().Value);
+                .Select(d => new { Name = d.Attributes("Include").First().Value, Version = d.Attributes("Version").First().Value })
+                .GroupBy(d => d.Name).Select(d => d.FirstOrDefault())
+                .ToDictionary(p => p.Name, p => p.Version);
 
             _packages = _packages.Where(p => existingPackages.Keys?.Contains(p.Key) == false).ToDictionary(d => d.Key, d => d.Value);
 

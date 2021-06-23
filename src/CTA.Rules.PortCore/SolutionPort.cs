@@ -9,6 +9,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Codelyzer.Analysis;
 using Codelyzer.Analysis.Build;
+using Codelyzer.Analysis.Model;
 using CTA.FeatureDetection;
 using CTA.FeatureDetection.Common.Models;
 using CTA.FeatureDetection.ProjectType.Extensions;
@@ -64,7 +65,20 @@ namespace CTA.Rules.PortCore
             };
 
             CodeAnalyzer analyzer = CodeAnalyzerFactory.GetAnalyzer(analyzerConfiguration, LogHelper.Logger);
-            var analyzerResults = analyzer.AnalyzeSolution(solutionFilePath).Result;
+
+            List<AnalyzerResult> analyzerResults = null;
+            //We are building using references
+            if (solutionConfiguration.Any(p => p.MetaReferences?.Any() == true))
+            {
+                var currentReferences = solutionConfiguration.ToDictionary(s => s.ProjectPath, s => s.MetaReferences);
+                var frameworkReferences = solutionConfiguration.ToDictionary(s => s.ProjectPath, s => s.FrameworkMetaReferences);
+                analyzerResults = analyzer.AnalyzeSolution(solutionFilePath, frameworkReferences, currentReferences).Result;
+            }
+            else
+            {
+                analyzerResults = analyzer.AnalyzeSolution(solutionFilePath).Result;
+            }
+
 
             _context = new MetricsContext(solutionFilePath, analyzerResults);
             InitSolutionRewriter(analyzerResults, solutionConfiguration);
@@ -95,13 +109,8 @@ namespace CTA.Rules.PortCore
             _solutionRewriter = new SolutionRewriter(analyzerResults, solutionConfiguration.ToList<ProjectConfiguration>());
         }
 
-        private void DownloadRecommendationFiles(List<AnalyzerResult> analyzerResults)
+        private void DownloadRecommendationFiles(HashSet<string> allReferences)
         {
-            var allReferences = analyzerResults
-                .SelectMany(a => a.ProjectResult?.SourceFileResults?
-                    .SelectMany(s => s.References))?
-                .Select(r => r.Namespace).Distinct().ToList();
-
             allReferences.Add(Constants.ProjectRecommendationFile);
 
             _portSolutionResult.References = allReferences.ToHashSet<string>();
@@ -140,18 +149,44 @@ namespace CTA.Rules.PortCore
         private void InitRules(List<PortCoreConfiguration> solutionConfiguration, List<AnalyzerResult> analyzerResults)
         {
             using var projectTypeFeatureDetector = new FeatureDetector();
+
+            analyzerResults = analyzerResults.Where(a => solutionConfiguration.Select(s => s.ProjectPath).Contains(a.ProjectResult?.ProjectFilePath)).ToList();
             _projectTypeFeatureResults = projectTypeFeatureDetector.DetectFeaturesInProjects(analyzerResults);
 
+            var allReferences = new HashSet<string>();
             foreach (var projectConfiguration in solutionConfiguration)
             {
                 var projectTypeFeatureResult = _projectTypeFeatureResults[projectConfiguration.ProjectPath];
                 projectConfiguration.ProjectType = GetProjectType(projectTypeFeatureResult);
                 if (projectConfiguration.UseDefaultRules)
                 {
-                    DownloadRecommendationFiles(analyzerResults);
+                    //If a rules dir was provided, copy files from that dir into the rules folder
+                    if (!string.IsNullOrEmpty(projectConfiguration.RulesDir))
+                    {
+                        CopyOverrideRules(projectConfiguration.RulesDir);
+                    }
                     projectConfiguration.RulesDir = Constants.RulesDefaultPath;
+                    var projectResult = analyzerResults
+                        .FirstOrDefault(a => a.ProjectResult?.ProjectFilePath == projectConfiguration.ProjectPath)
+                        .ProjectResult;
+
+                    projectResult?.SourceFileResults?.SelectMany(s => s.References)?.Select(r => r.Namespace).Distinct().ToList().ForEach(currentReference=> {
+                            if (currentReference != null && !allReferences.Contains(currentReference))
+                            {
+                                allReferences.Add(currentReference);
+                            }
+                        });
+
+                    projectResult?.SourceFileResults?.SelectMany(s => s.Children.OfType<UsingDirective>())?.Select(u=>u.Identifier).Distinct().ToList().ForEach(currentReference => {
+                        if (currentReference != null && !allReferences.Contains(currentReference))
+                        {
+                            allReferences.Add(currentReference);
+                        }
+                    });
                 }
             }
+            DownloadRecommendationFiles(allReferences);
+
         }
         /// <summary>
         /// Initializes the Solution Port
@@ -209,50 +244,31 @@ namespace CTA.Rules.PortCore
             return _solutionRewriter.RunIncremental(projectRules, new List<string> { updatedFile });
         }
 
-        private void DownloadResources()
+
+
+        private void CopyOverrideRules(string sourceDir)
         {
-            var executingPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            using var httpClient = new HttpClient();
-            try
-            {
-                var zipFile = Utils.DownloadFile(Constants.S3CTAFiles, Constants.ResourcesFile);
-                ZipFile.ExtractToDirectory(zipFile, executingPath, true);
-            }
-            catch (Exception ex)
-            {
-                LogHelper.LogError(ex, string.Format("Unable to download resources from {0}", Constants.S3CTAFiles));
-            }
+            var files = Directory.EnumerateFiles(sourceDir, "*.json").ToList();
+            files.ForEach(file => {
+                File.Copy(file, Path.Combine(Constants.RulesDefaultPath, Path.GetFileName(file)), true);
+            });
         }
 
         private void CheckCache()
         {
-            var recommendationsTime = Directory.GetCreationTime(Constants.RulesDefaultPath);
-            var resourceExtractedTime = Directory.GetCreationTime(Constants.ResourcesExtractedPath);
-
-            bool cleanRecommendations = false;
-            bool cleanResources = false;
-
-            if (recommendationsTime.AddHours(Constants.CacheExpiryHours) < DateTime.Now)
-            {
-                cleanRecommendations = true;
-            }
-            if (resourceExtractedTime.AddDays(Constants.CacheExpiryDays) < DateTime.Now)
-            {
-                cleanResources = true;
-            }
-
-            ResetCache(cleanRecommendations, cleanResources);
-            if (cleanResources)
-            {
-                DownloadResources();
-            }
+            ResetCache();
+            DownloadResourceFiles();            
         }
 
-        public static void ResetCache(bool recommendations, bool resources)
+        public static void ResetCache()
         {
             try
             {
-                if (recommendations)
+                var recommendationsTime = Directory.GetCreationTime(Constants.RulesDefaultPath);
+
+                bool cleanRecommendations = recommendationsTime.AddHours(Constants.CacheExpiryHours) < DateTime.Now;
+
+                if (cleanRecommendations)
                 {
                     if (Directory.Exists(Constants.RulesDefaultPath))
                     {
@@ -260,27 +276,22 @@ namespace CTA.Rules.PortCore
                     }
                     Directory.CreateDirectory(Constants.RulesDefaultPath);
                 }
-                if (resources)
-                {
-                    if (File.Exists(Constants.ResourcesFile))
-                    {
-                        File.Delete(Constants.ResourcesFile);
-                    }
-                    if (File.Exists(Constants.DefaultFeaturesFilePath))
-                    {
-                        File.Delete(Constants.DefaultFeaturesFilePath);
-                    }
-                    if (Directory.Exists(Constants.ResourcesExtractedPath))
-                    {
-                        Directory.Delete(Constants.ResourcesExtractedPath, true);
-                    }
-                }
             }
             catch (Exception ex)
             {
                 LogHelper.LogError(ex, "Error while deleting directory");
             }
         }
+
+
+
+        private void DownloadResourceFiles()
+        {
+            Utils.DownloadFilesToFolder(Constants.S3TemplatesBucketUrl, Constants.ResourcesExtractedPath, Constants.TemplateFiles);
+        }
+
+        
+
 
         private ProjectType GetProjectType(FeatureDetectionResult projectTypeFeatureResult)
         {

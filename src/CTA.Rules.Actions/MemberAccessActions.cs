@@ -13,9 +13,9 @@ namespace CTA.Rules.Update
     /// </summary>
     public class MemberAccessActions
     {
-        public Func<SyntaxGenerator, MemberAccessExpressionSyntax, SyntaxNode> GetAddCommentAction(string comment)
+        public Func<SyntaxGenerator, SyntaxNode, SyntaxNode> GetAddCommentAction(string comment)
         {
-            MemberAccessExpressionSyntax AddComment(SyntaxGenerator syntaxGenerator, MemberAccessExpressionSyntax node)
+            SyntaxNode AddComment(SyntaxGenerator syntaxGenerator, SyntaxNode node)
             {
                 SyntaxTriviaList currentTrivia = node.GetLeadingTrivia();
                 currentTrivia = currentTrivia.Insert(0, SyntaxFactory.SyntaxTrivia(SyntaxKind.MultiLineCommentTrivia, string.Format(Constants.CommentFormat, comment)));
@@ -25,11 +25,15 @@ namespace CTA.Rules.Update
             return AddComment;
         }
 
-        public Func<SyntaxGenerator, MemberAccessExpressionSyntax, SyntaxNode> GetRemoveMemberAccessAction(string _)
+        public Func<SyntaxGenerator, SyntaxNode, SyntaxNode> GetRemoveMemberAccessAction(string _)
         {
-            static SyntaxNode RemoveMemberAccess(SyntaxGenerator syntaxGenerator, MemberAccessExpressionSyntax node)
+            static SyntaxNode RemoveMemberAccess(SyntaxGenerator syntaxGenerator, SyntaxNode node)
             {
-                return node.Expression;
+                if(node is MemberAccessExpressionSyntax)
+                {
+                    return (node as MemberAccessExpressionSyntax).Expression;
+                }
+                return node;
             }
             return RemoveMemberAccess;
         }
