@@ -13,10 +13,11 @@ namespace CTA.WebForms2Blazor.FileConverters
         private readonly WorkspaceManagerService _webFormsWorkspaceManager;
 
         public ProjectFileConverter(
-            string relativePath,
+            string sourceProjectPath,
+            string fullPath,
             WorkspaceManagerService blazorWorkspaceManager,
             WorkspaceManagerService webFormsWorkspaceManager
-            ) : base(relativePath)
+            ) : base(sourceProjectPath, fullPath)
         {
             _blazorWorkspaceManager = blazorWorkspaceManager;
             _webFormsWorkspaceManager = webFormsWorkspaceManager;

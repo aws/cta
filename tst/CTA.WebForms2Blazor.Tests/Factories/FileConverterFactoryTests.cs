@@ -30,7 +30,7 @@ namespace CTA.WebForms2Blazor.Tests.Factories
             _testProjectPath = Directory.GetParent(workingDirectory).Parent.Parent.FullName;
             var testFilesPath = Path.Combine(_testProjectPath, TestFilesDirectoryPath);
             _testCodeFilePath = Path.Combine(testFilesPath, "TestClassFile.cs");
-            _testConfigFilePath = Path.Combine(testFilesPath, "SampleConfigFile.config");
+            _testConfigFilePath = Path.Combine(testFilesPath, "web.config");
             _testStaticFilePath = Path.Combine(testFilesPath, "SampleStaticFile.png");
             _testViewFilePath = Path.Combine(testFilesPath, "SampleViewFile.aspx");
             _testProjectFilePath = Path.Combine(testFilesPath, "SampleProjectFile.csproj");
@@ -59,7 +59,7 @@ namespace CTA.WebForms2Blazor.Tests.Factories
 
             Assert.True(typeof(CodeFileConverter).IsInstanceOfType(codeFileObj));
             Assert.True(typeof(ConfigFileConverter).IsInstanceOfType(configFileObj));
-            Assert.True(typeof(StaticFileConverter).IsInstanceOfType(staticFileObj));
+            Assert.True(typeof(StaticResourceFileConverter).IsInstanceOfType(staticFileObj));
             Assert.True(typeof(ViewFileConverter).IsInstanceOfType(viewFileObj));
             Assert.True(typeof(ProjectFileConverter).IsInstanceOfType(projectFileObj));
 
@@ -78,7 +78,7 @@ namespace CTA.WebForms2Blazor.Tests.Factories
             List<FileConverter> fileObjects = _fileConverterFactory.BuildMany(files).ToList();
             Assert.True(typeof(CodeFileConverter).IsInstanceOfType(fileObjects[0]));
             Assert.True(typeof(ConfigFileConverter).IsInstanceOfType(fileObjects[1]));
-            Assert.True(typeof(StaticFileConverter).IsInstanceOfType(fileObjects[2]));
+            Assert.True(typeof(StaticResourceFileConverter).IsInstanceOfType(fileObjects[2]));
             Assert.True(typeof(ViewFileConverter).IsInstanceOfType(fileObjects[3]));
             Assert.True(typeof(ProjectFileConverter).IsInstanceOfType(fileObjects[4]));
         }

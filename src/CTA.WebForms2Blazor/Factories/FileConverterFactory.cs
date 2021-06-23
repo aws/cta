@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using CTA.WebForms2Blazor.FileConverters;
@@ -13,6 +14,13 @@ namespace CTA.WebForms2Blazor.Factories
         private readonly WorkspaceManagerService _blazorWorkspaceManager;
         private readonly WorkspaceManagerService _webFormsWorkspaceManager;
         private readonly ClassConverterFactory _classConverterFactory;
+        
+        public readonly HashSet<string> StaticResourceExtensions = new HashSet<string>
+        {
+            ".jpeg", ".jpg", ".jif", ".jfif", ".gif", ".tif", ".tiff", ".jp2", ".jpx", ".j2k", ".j2c", ".fpx", ".pcd",
+            ".png", ".pdf", ".ico", ".css", ".map", ".eot", ".otf", ".svg", ".tff", ".woff", ".woff2", ".fnt",".fon",
+            ".ttc", ".pfa", ".fot", ".sfd", ".vlw", ".pfb", ".etx", ".odttf"
+        };
 
         public FileConverterFactory(
             string sourceProjectPath,
@@ -36,25 +44,28 @@ namespace CTA.WebForms2Blazor.Factories
             // object to create, likely using the file type specified
             // in the FileInfo object
 
-            string relativePath = Path.GetRelativePath(_sourceProjectPath, document.FullName);
             string extension = document.Extension;
 
             FileConverter fc;
             if (extension.Equals(".cs"))
             {
-                fc = new CodeFileConverter(relativePath, _blazorWorkspaceManager, _webFormsWorkspaceManager, _classConverterFactory);
+                fc = new CodeFileConverter(_sourceProjectPath, document.FullName, _blazorWorkspaceManager, _webFormsWorkspaceManager, _classConverterFactory);
             } else if (extension.Equals(".config"))
             {
-                fc = new ConfigFileConverter(relativePath);
+                fc = new ConfigFileConverter(_sourceProjectPath, document.FullName);
             } else if (extension.Equals(".aspx") || extension.Equals(".asax") || extension.Equals(".ascx"))
             {
-                fc = new ViewFileConverter(relativePath);
+                fc = new ViewFileConverter(_sourceProjectPath, document.FullName);
             } else if (extension.Equals(".csproj"))
             {
-                fc = new ProjectFileConverter(relativePath, _blazorWorkspaceManager, _webFormsWorkspaceManager);
-            } else
+                fc = new ProjectFileConverter(_sourceProjectPath, document.FullName, _blazorWorkspaceManager, _webFormsWorkspaceManager);
+            } else if (StaticResourceExtensions.Contains(extension))
             {
-                fc = new StaticFileConverter(relativePath);
+                fc = new StaticResourceFileConverter(_sourceProjectPath, document.FullName);
+            }
+            else
+            {
+                fc = new StaticFileConverter(_sourceProjectPath, document.FullName);
             }
 
 
