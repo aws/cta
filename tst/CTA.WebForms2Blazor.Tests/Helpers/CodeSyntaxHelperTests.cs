@@ -18,17 +18,22 @@ namespace CTA.WebForms2Blazor.Tests.Helpers
         private static string ExpectedTestReferencedNamespaceUsing1 => $"using {TestReferencedNamespace1};";
         private static string ExpectedTestReferencedNamespaceUsing2 => $"using {TestReferencedNamespace2};";
         private static string ExpectedTestNamespaceText =>
-@$"namespace {TestNamespaceName}
+$@"namespace {TestNamespaceName}
 {{
     class {TestClassName}
     {{
     }}
 }}";
         private static string ExpectedBlockText =>
-@$"{{
+$@"{{
     {TestStatement1}
     {TestStatement2}
 }}";
+        private static string ExpectedTestFileText =>
+$@"{ExpectedTestReferencedNamespaceUsing1}
+{ExpectedTestReferencedNamespaceUsing2}
+
+{ExpectedTestNamespaceText}";
 
         [Test]
         public void BuildUsingStatement_Correctly_Builds_Single_Using_Statement()
@@ -69,6 +74,16 @@ namespace CTA.WebForms2Blazor.Tests.Helpers
             }).NormalizeWhitespace().ToFullString();
 
             Assert.AreEqual(ExpectedBlockText, actualCodeBlockText);
+        }
+
+        [Test]
+        public void GetFileSyntaxAsString_Properly_Namespace_And_Usings_For_Full_File_Text()
+        {
+            var usingsCollection = CodeSyntaxHelper.BuildUsingStatements(new[] { TestReferencedNamespace1, TestReferencedNamespace2 });
+            var classDeclaration = SyntaxFactory.ClassDeclaration(TestClassName);
+            var namespaceDeclaration = CodeSyntaxHelper.BuildNamespace(TestNamespaceName, classDeclaration);
+
+            Assert.AreEqual(ExpectedTestFileText, CodeSyntaxHelper.GetFileSyntaxAsString(namespaceDeclaration, usingsCollection));
         }
     }
 }

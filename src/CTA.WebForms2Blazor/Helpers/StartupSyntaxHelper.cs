@@ -12,30 +12,43 @@ namespace CTA.WebForms2Blazor.Helpers
         public const string StartupConfigureMethodName = "Configure";
         public const string StartupConfigureServicesMethodName = "ConfigureServices";
 
-        // Required statements in Configure method
+        /// <summary>
+        /// Required statement in Configure method, adds use of wwwroot to Blazor app
+        /// </summary>
         public static string AppUseStaticFilesText => $"{RuntimeInjectable.AppBuilderInjectable.ParamName}.UseStaticFiles();";
+        /// <summary>
+        /// Required statement in Configure method, adds routing capabilities to Blazor app
+        /// </summary>
         public static string AppUseRoutingText => $"{RuntimeInjectable.AppBuilderInjectable.ParamName}.UseRouting();";
 
-        // Required statements in ConfigureServices method
+        /// <summary>
+        /// Required statement in ConfigureServices method, adds use of Razor templated pages
+        /// </summary>
         public static string ServiceAddRazorPagesText => $"{RuntimeInjectable.ServiceCollectionInjectable.ParamName}.AddRazorPages();";
+        /// <summary>
+        /// Required statement in ConfigureServices method, configures Blazor app to be Blazor Server
+        /// </summary>
         public static string ServiceAddServerSideBlazorText => $"{RuntimeInjectable.ServiceCollectionInjectable.ParamName}.AddServerSideBlazor();";
 
-        // A shortcut method to make building the entire class;
-        // more hassle free than assembling each of the components
-        // individually (which is possible if specialized functionality
-        // is needed, but not recommended)
+        /// <summary>
+        /// A shortcut method to make building the entire class;
+        /// more hassle free than assembling each of the components
+        /// individually (which is possible if specialized functionality
+        /// is needed, but not recommended)
+        /// </summary>
+        /// <param name="constructorAdditionalStatements">Statements to put after required statements in constructor</param>
+        /// <param name="configureAdditionalStatements">Statements to put after required statements in configure method</param>
+        /// <param name="configureServicesAdditionalStatements">Statements to put after required statements in configure services method</param>
+        /// <param name="fieldDeclarations">Fields that were used in Global.asax.cs</param>
+        /// <param name="additionalPropertyDeclarations">Properties that were used in Global.asax.cs</param>
+        /// <param name="additionalMethodDeclarations">Methods in addition to the "normal" methods of Global.asax.cs</param>
+        /// <returns>ClassDeclarationSyntax node for new Startup class</returns>
         public static ClassDeclarationSyntax BuildStartupClass(
-            // Statements to put after required statements in constructor
             IEnumerable<StatementSyntax> constructorAdditionalStatements = null,
-            // Statements to put after required statements in configure method
             IEnumerable<StatementSyntax> configureAdditionalStatements = null,
-            // Statements to put after required statements in configure services method
             IEnumerable<StatementSyntax> configureServicesAdditionalStatements = null,
-            // Fields that were used in Global.asax.cs
             IEnumerable<FieldDeclarationSyntax> fieldDeclarations = null,
-            // Properties that were used in Global.asax.cs
             IEnumerable<PropertyDeclarationSyntax> additionalPropertyDeclarations = null,
-            // Methods in addition to the "normal" methods of Global.asax.cs
             IEnumerable<MethodDeclarationSyntax> additionalMethodDeclarations = null)
         {
             var result = SyntaxFactory.ClassDeclaration(StartupClassName).AddModifiers(SyntaxFactory.Token(SyntaxKind.PublicKeyword));

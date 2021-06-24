@@ -22,6 +22,7 @@ namespace CTA.WebForms2Blazor.Helpers
         {
             // Currently limiting files to a single type, but this can be easily modified later
             // to be one or multiple
+            // TODO: Maybe add some kind of "generated file info" comments at top of file?
             return SyntaxFactory.NamespaceDeclaration(SyntaxFactory.ParseName(namespaceName)).AddMembers(containedTypeDeclaration);
         }
 

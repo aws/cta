@@ -17,8 +17,8 @@ namespace CTA.WebForms2Blazor.Tests.Helpers
         private const string ExpectedConstructorConfigAssignment = "Configuration = configuration;";
         private const string ExpectedConstructorEnvAssignment = "Env = env;";
 
-        private const string ExpectedConfigPropertyDeclaration = "public IConfiguration Configuration { get; }";
-        private const string ExpectedEnvPropertyDeclaration = "public IWebHostEnvironment Env { get; }";
+        private const string ExpectedConfigPropertyDeclaration = "public IConfiguration Configuration";
+        private const string ExpectedEnvPropertyDeclaration = "public IWebHostEnvironment Env";
 
         private const string ExpectedConfigureUseStaticFilesCall = "app.UseStaticFiles();";
         private const string ExpectedConfigureUseRoutingCall = "app.UseRouting();";
@@ -26,12 +26,29 @@ namespace CTA.WebForms2Blazor.Tests.Helpers
         private const string ExpectedConfigureServicesAddRazorPagesCall = "services.AddRazorPages();";
         private const string ExpectedConfigureServicesAddServerSideBlazorCall = "services.AddServerSideBlazor();";
 
+        private static string ExpectedConfigPropertyDeclarationFullText =>
+$@"{ExpectedConfigPropertyDeclaration}
+{{
+    get;
+}}";
+        private static string ExpectedEnvPropertyDeclarationFullText =>
+$@"{ExpectedEnvPropertyDeclaration}
+{{
+    get;
+}}";
+
         private static string ExpectedBasicStartupClassText =>
 $@"{ExpectedStartupClassSignature}
 {{
     {ExpectedConfigPropertyDeclaration}
+    {{
+        get;
+    }}
 
     {ExpectedEnvPropertyDeclaration}
+    {{
+        get;
+    }}
 
     {ExpectedBasicStartupConstructorSignature}
     {{
@@ -56,10 +73,19 @@ $@"{ExpectedStartupClassSignature}
 {{
     {SyntaxHelperSetupFixture.AdditionalFieldText}
     {ExpectedConfigPropertyDeclaration}
+    {{
+        get;
+    }}
 
     {ExpectedEnvPropertyDeclaration}
+    {{
+        get;
+    }}
 
     {SyntaxHelperSetupFixture.AdditionalPropertyText}
+    {{
+        get;
+    }}
 
     {ExpectedBasicStartupConstructorSignature}
     {{
@@ -150,7 +176,7 @@ $@"{ExpectedBasicConfigureServicesMethodSignature}
         [Test]
         public void AddStartupProperties_Produces_Expected_Basic_Result()
         {
-            var expectedDeclarationStrings = new[] { ExpectedConfigPropertyDeclaration, ExpectedEnvPropertyDeclaration };
+            var expectedDeclarationStrings = new[] { ExpectedConfigPropertyDeclarationFullText, ExpectedEnvPropertyDeclarationFullText };
             var actualDeclarationStrings = StartupSyntaxHelper.AddStartupProperties().Select(declaration => declaration.NormalizeWhitespace().ToFullString());
 
             Assert.AreEqual(expectedDeclarationStrings, actualDeclarationStrings);
@@ -160,7 +186,12 @@ $@"{ExpectedBasicConfigureServicesMethodSignature}
         public void AddStartupProperties_Produces_Expected_Result_When_Additional_Properties_Present()
         {
             var additionalPropertyDeclarations = new[] { SyntaxHelperSetupFixture.AdditionalPropertyDeclaration };
-            var expectedDeclarationStrings = new[] { ExpectedConfigPropertyDeclaration, ExpectedEnvPropertyDeclaration, SyntaxHelperSetupFixture.AdditionalPropertyText };
+            var expectedDeclarationStrings = new[]
+            {
+                ExpectedConfigPropertyDeclarationFullText,
+                ExpectedEnvPropertyDeclarationFullText,
+                SyntaxHelperSetupFixture.AdditionalPropertyFullText
+            };
             var actualDeclarationStrings = StartupSyntaxHelper.AddStartupProperties(additionalPropertyDeclarations)
                 .Select(declaration => declaration.NormalizeWhitespace().ToFullString());
 

@@ -1,10 +1,13 @@
-﻿using Microsoft.CodeAnalysis.CSharp;
+﻿using System;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace CTA.WebForms2Blazor.Helpers
 {
     public class RuntimeInjectable
     {
+        private const string InjectableNameArgumentError = "InjectableName must have at least 1 character";
+
         // These structures make basic syntax tree component
         // building easier (and more easily interchangeable)
         // for runtime injectable types we know may be used in
@@ -29,9 +32,16 @@ namespace CTA.WebForms2Blazor.Helpers
         public StatementSyntax PublicFieldAssignment => SyntaxFactory.ParseStatement($"{PublicFieldName} = {ParamName};");
         public StatementSyntax PrivateFieldAssignment => SyntaxFactory.ParseStatement($"{PrivateFieldName} = {ParamName};");
 
-        public RuntimeInjectable(string injectableName, string injectableTypeName)
+        private RuntimeInjectable(string injectableName, string injectableTypeName)
         {
+            if (string.IsNullOrEmpty(injectableName))
+            {
+                throw new ArgumentException(InjectableNameArgumentError);
+            }
+
             _nameFirstChar = injectableName.Substring(0, 1);
+            // Substring returns string.Empty if length is 1, this
+            // is ok for our purposes
             _nameRestOfChars = injectableName.Substring(1);
             _typeName = injectableTypeName;
         }

@@ -7,23 +7,40 @@ namespace CTA.WebForms2Blazor.Tests.Helpers
     [TestFixture]
     public class RuntimeInjectableTests
     {
-        private const string TestInjectableNamePascalCase = "TestName";
-        private const string TestInjectableNameCamelCase = "testName";
-        private const string TestInjectableNameCamelCaseUnderscore = "_testName";
-        private const string TestInjectableTypeName = "TestTypeName";
-        private static string TestInjectablePropertyGetter => $"public {TestInjectableTypeName} {TestInjectableNamePascalCase} {{ get; }}";
-        private static string TestInjectablePropertySetter => $"public {TestInjectableTypeName} {TestInjectableNamePascalCase} {{ set; }}";
-        private static string TestInjectablePropertyGetterSetter => $"public {TestInjectableTypeName} {TestInjectableNamePascalCase} {{ get; set; }}";
+        private const string TestInjectableNamePascalCase = "Services";
+        private const string TestInjectableNameCamelCase = "services";
+        private const string TestInjectableNameCamelCaseUnderscore = "_services";
+        private const string TestInjectableTypeName = "IServiceCollection";
+        private static string TestInjectablePropertyGetter => $"public {TestInjectableTypeName} {TestInjectableNamePascalCase}";
+        private static string TestInjectablePropertySetter => $"public {TestInjectableTypeName} {TestInjectableNamePascalCase}";
+        private static string TestInjectablePropertyGetterSetter => $"public {TestInjectableTypeName} {TestInjectableNamePascalCase}";
         private static string TestInjectablePrivateField => $"private {TestInjectableTypeName} {TestInjectableNameCamelCaseUnderscore};";
         private static string TestInjectablePublicField => $"public {TestInjectableTypeName} {TestInjectableNameCamelCase};";
         private static string TestInjectablePublicReadonlyField => $"public readonly {TestInjectableTypeName} {TestInjectableNameCamelCase};";
+
+        private static string TestInjectablePropertyGetterFullText =>
+$@"{TestInjectablePropertyGetter}
+{{
+    get;
+}}";
+        private static string TestInjectablePropertySetterFullText =>
+$@"{TestInjectablePropertyGetter}
+{{
+    set;
+}}";
+        private static string TestInjectablePropertyGetterSetterFullText =>
+$@"{TestInjectablePropertyGetter}
+{{
+    get;
+    set;
+}}";
 
         private RuntimeInjectable _testRuntimeInjectable;
 
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
-            _testRuntimeInjectable = new RuntimeInjectable(TestInjectableNamePascalCase, TestInjectableTypeName);
+            _testRuntimeInjectable = RuntimeInjectable.ServiceCollectionInjectable;
         }
 
         [Test]
@@ -53,19 +70,19 @@ namespace CTA.WebForms2Blazor.Tests.Helpers
         [Test]
         public void GetPropertyDeclaration_Correctly_Builds_Getter()
         {
-            Assert.AreEqual(TestInjectablePropertyGetter, _testRuntimeInjectable.GetPropertyDeclaration(true, false).NormalizeWhitespace().ToFullString());
+            Assert.AreEqual(TestInjectablePropertyGetterFullText, _testRuntimeInjectable.GetPropertyDeclaration(true, false).NormalizeWhitespace().ToFullString());
         }
 
         [Test]
         public void GetPropertyDeclaration_Correctly_Builds_Setter()
         {
-            Assert.AreEqual(TestInjectablePropertySetter, _testRuntimeInjectable.GetPropertyDeclaration(false, true).NormalizeWhitespace().ToFullString());
+            Assert.AreEqual(TestInjectablePropertySetterFullText, _testRuntimeInjectable.GetPropertyDeclaration(false, true).NormalizeWhitespace().ToFullString());
         }
 
         [Test]
         public void GetPropertyDeclaration_Correctly_Builds_Getter_And_Setter_Together()
         {
-            Assert.AreEqual(TestInjectablePropertyGetterSetter, _testRuntimeInjectable.GetPropertyDeclaration(true, true).NormalizeWhitespace().ToFullString());
+            Assert.AreEqual(TestInjectablePropertyGetterSetterFullText, _testRuntimeInjectable.GetPropertyDeclaration(true, true).NormalizeWhitespace().ToFullString());
         }
 
         [Test]

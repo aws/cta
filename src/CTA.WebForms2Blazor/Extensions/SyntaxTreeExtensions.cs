@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.CSharp;
+using System.Text;
 
 namespace CTA.WebForms2Blazor.Extensions
 {
@@ -29,7 +30,7 @@ namespace CTA.WebForms2Blazor.Extensions
         {
             var lines = new List<string>();
             var words = commentText.Split(" ");
-            var currentLine = string.Empty;
+            var currentLine = new StringBuilder();
 
             foreach (var word in words)
             {
@@ -44,16 +45,16 @@ namespace CTA.WebForms2Blazor.Extensions
                 if (currentLine.Length > lineCharacterSoftLimit)
                 {
                     // Cut off extra space at the end
-                    lines.Add(currentLine.Trim());
-                    currentLine = string.Empty;
+                    lines.Add(currentLine.ToString().Trim());
+                    currentLine = new StringBuilder();
                 }
 
-                currentLine += $"{word} ";
+                currentLine.Append($"{word} ");
             }
 
-            if (!string.IsNullOrEmpty(currentLine))
+            if (currentLine.Length > 0)
             {
-                lines.Add(currentLine.Trim());
+                lines.Add(currentLine.ToString().Trim());
             }
 
             return node.AddComment(lines);

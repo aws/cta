@@ -40,6 +40,9 @@ $@"{ExpectedMiddlewareClassSignature}
     {ExpectedDelegateFieldDeclarationText}
     {SyntaxHelperSetupFixture.AdditionalFieldText}
     {SyntaxHelperSetupFixture.AdditionalPropertyText}
+    {{
+        get;
+    }}
 
     {ExpectedMiddlewareConstructorSignature}
     {{

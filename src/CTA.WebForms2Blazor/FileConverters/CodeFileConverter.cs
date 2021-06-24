@@ -1,51 +1,39 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using CTA.WebForms2Blazor.ClassConverters;
 using CTA.WebForms2Blazor.Factories;
 using CTA.WebForms2Blazor.FileInformationModel;
 using CTA.WebForms2Blazor.Services;
+using Microsoft.CodeAnalysis;
 
 namespace CTA.WebForms2Blazor.FileConverters
 {
     public class CodeFileConverter : FileConverter
     {
+        private readonly SemanticModel _fileModel;
         private readonly WorkspaceManagerService _blazorWorkspaceBuilder;
-        private readonly WorkspaceManagerService _webFormsWorkspaceBuilder;
-        private readonly ClassConverterFactory _classConverterFactory;
+        private readonly IEnumerable<ClassConverter> _classConverters;
 
         public CodeFileConverter(
             string sourceProjectPath,
             string fullPath,
             WorkspaceManagerService blazorWorkspaceManager,
-            WorkspaceManagerService webFormsWorkspaceManager,
             ClassConverterFactory classConverterFactory) : base(sourceProjectPath, fullPath)
         {
+            // May not need this anymore but not sure yet
             _blazorWorkspaceBuilder = blazorWorkspaceManager;
-            _webFormsWorkspaceBuilder = webFormsWorkspaceManager;
-            _classConverterFactory = classConverterFactory;
-
-            _webFormsWorkspaceBuilder.NotifyNewExpectedDocument();
+            // TODO: Retrieve the semantic model for the document from codelyzer results and uncomment line below
+            // _classConverters = classConverterFactory.BuildMany(RelativePath, _fileModel);
         }
 
 
-        public override Task<IEnumerable<FileInformation>> MigrateFileAsync()
+        public override async Task<IEnumerable<FileInformation>> MigrateFileAsync()
         {
-            // TODO: Retrieve cancellation token from thread manager service
-            // await _webFormsWorkspaceBuilder.WaitUntilAllProjectsInWorkspace(token);
+            var classMigrationTasks = _classConverters.Select(classConverter => classConverter.MigrateClassAsync());
 
-            // TODO: Get project name, and document text
-            // _webFormsWorkspaceBuilder.AddDocument("{Project Name}", Path.GetFileName(RelativePath), "{Document Text}");
-
-            // TODO: Create class information objects and call
-            // _blazorProjectBuilder.NotifyNewExpectedDocument() in
-            // each one, this is because potentially multiple files
-            // are produced by this file information type
-
-            // TODO: Call migration functions on class information
-            // objects and call _blazorProjectBuilder.AddDocument
-            // at the end of the migration process before returning
-
-            throw new NotImplementedException();
+            return await Task.WhenAll(classMigrationTasks);
         }
     }
 }

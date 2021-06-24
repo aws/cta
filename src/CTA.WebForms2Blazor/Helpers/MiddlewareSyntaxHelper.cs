@@ -13,35 +13,39 @@ namespace CTA.WebForms2Blazor.Helpers
         public const string MiddlewareInvokeMethodReturnType = "Task";
         public const string AppUseMiddlewareTextTemplate = "{0} = {0}.UseMiddleware<{1}>();";
         public const string OriginMiddlewareCommentTemplate = "This middleware was generated from the {0} application lifecycle event";
-        // The line that should be executed to trigger the next middleware
+
+        /// <summary>
+        /// The line that should be executed to trigger the next middleware
+        /// </summary>
         public static string RequestDelegateInvokeText =
             $"await {RuntimeInjectable.RequestDelegateInjectable.PrivateFieldName}.Invoke({RuntimeInjectable.HttpContextInjectable.ParamName});";
 
-        // A shortcut method to make building the entire class;
-        // more hassle free than assembling each of the components
-        // individually (which is possible if specialized functionality
-        // is needed, but not recommended)
+        /// <summary>
+        /// A shortcut method to make building the entire class;
+        /// more hassle free than assembling each of the components
+        /// individually (which is possible if specialized functionality
+        /// is needed, but not recommended)
+        /// </summary>
+        /// <param name="middlewareClassName">The name of the middleware class to be created</param>
+        /// <param name="shouldContinueAfterInvoke">Whether or not this middleware will invoke the next
+        /// if it exists, usually true, but for http handler derived middleware this will be false</param>
+        /// <param name="constructorAdditionalStatements">Statements to put after required statements in constructor</param>
+        /// <param name="preHandleStatements">Statements to put before next() call in invoke method,
+        /// statements here are hooked to a pre-request-handle lifecycle event</param>
+        /// <param name="postHandleStatements">Statements to put before next() call in invoke method,
+        /// statements here are hooked to a post-request-handle lifecycle event</param>
+        /// <param name="additionalFieldDeclarations">Fields that were used in source http handler/module</param>
+        /// <param name="additionalPropertyDeclarations">Properties that were used in source http handler/module</param>
+        /// <param name="additionalMethodDeclarations">Methods in addition to invoke method in source http handler/module</param>
+        /// <returns>ClassDeclarationSyntax node for new middleware class</returns>
         public static ClassDeclarationSyntax BuildMiddlewareClass(
             string middlewareClassName,
-            // Whether or not this middleware will invoke the next
-            // if it exists, usually true, but for http handler
-            // derived middleware this will be false
             bool shouldContinueAfterInvoke = true,
-            // Statements to put after required statements in constructor
             IEnumerable<StatementSyntax> constructorAdditionalStatements = null,
-            // Statements to put before next() call in invoke method,
-            // statements here are hooked to a pre-request-handle lifecycle
-            // event
             IEnumerable<StatementSyntax> preHandleStatements = null,
-            // Statements to put before next() call in invoke method,
-            // statements here are hooked to a post-request-handle lifecycle
-            // event
             IEnumerable<StatementSyntax> postHandleStatements = null,
-            // Fields that were used in source http handler/module
             IEnumerable<FieldDeclarationSyntax> additionalFieldDeclarations = null,
-            // Properties that were used in source http handler/module
             IEnumerable<PropertyDeclarationSyntax> additionalPropertyDeclarations = null,
-            // Methods in addition to invoke method in source http handler/module
             IEnumerable<MethodDeclarationSyntax> additionalMethodDeclarations = null)
         {
             var result = SyntaxFactory.ClassDeclaration(middlewareClassName).AddModifiers(SyntaxFactory.Token(SyntaxKind.PublicKeyword));

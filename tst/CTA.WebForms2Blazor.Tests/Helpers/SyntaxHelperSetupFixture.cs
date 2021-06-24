@@ -13,8 +13,13 @@ namespace CTA.WebForms2Blazor.Tests.Helpers
         public const string AdditionalStatementText = "var x = 10;";
 
         public static string AdditionalMethodSignature => $"void {AdditionalMethodName}()";
-        public static string AdditionalPropertyText => $"public int {AdditionalPropertyName} {{ get; }}";
+        public static string AdditionalPropertyText => $"public int {AdditionalPropertyName}";
         public static string AdditionalFieldText => $"private int {AdditionalFieldName};";
+        public static string AdditionalPropertyFullText =>
+$@"public int {AdditionalPropertyName}
+{{
+    get;
+}}";
 
         public static MethodDeclarationSyntax AdditionalMethodDeclaration => SyntaxFactory
             .MethodDeclaration(SyntaxFactory.PredefinedType(SyntaxFactory.Token(SyntaxKind.VoidKeyword)), AdditionalMethodName)
