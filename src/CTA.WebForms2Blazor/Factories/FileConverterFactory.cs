@@ -49,7 +49,7 @@ namespace CTA.WebForms2Blazor.Factories
             FileConverter fc;
             if (extension.Equals(".cs"))
             {
-                fc = new CodeFileConverter(_sourceProjectPath, document.FullName, _blazorWorkspaceManager, _webFormsWorkspaceManager, _classConverterFactory);
+                fc = new CodeFileConverter(_sourceProjectPath, document.FullName, _blazorWorkspaceManager, _classConverterFactory);
             } else if (extension.Equals(".config"))
             {
                 fc = new ConfigFileConverter(_sourceProjectPath, document.FullName);
