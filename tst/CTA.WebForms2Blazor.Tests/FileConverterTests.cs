@@ -8,8 +8,11 @@ using CTA.WebForms2Blazor.Services;
 using CTA.WebForms2Blazor.FileInformationModel;
 using System.Text;
 using System.Threading.Tasks;
+using Codelyzer.Analysis;
 using CTA.Rules.Config;
 using CTA.WebForms2Blazor.FileConverters;
+using CTA.WebForms2Blazor.ProjectManagement;
+using Microsoft.Extensions.Logging;
 
 namespace CTA.WebForms2Blazor.Tests
 {
@@ -30,6 +33,9 @@ namespace CTA.WebForms2Blazor.Tests
         private string _testProjectFilePath;
         private string _testAreaFullPath;
 
+        private ProjectAnalyzer _webFormsProjectAnalyzer;
+        private WorkspaceManagerService _blazorWorkspaceManager;
+
         [OneTimeSetUp]
         public void OneTimeSetup()
         {
@@ -43,6 +49,13 @@ namespace CTA.WebForms2Blazor.Tests
             _testViewFilePath = Path.Combine(_testFilesDirectoryPath, "SampleViewFile.aspx");
             _testProjectFilePath = Path.Combine(_testFilesDirectoryPath, "SampleProjectFile.csproj");
             _testAreaFullPath = Path.Combine(_testProjectPath, _testFilesDirectoryPath);
+            
+            var codeAnalyzer = CreateDefaultCodeAnalyzer();
+            // Get analyzer results from codelyzer (syntax trees, semantic models, package references, project references, etc)
+            var analyzerResult = codeAnalyzer.AnalyzeProject("/Users/baokalla/Desktop/eShopOnBlazor/src/eShopLegacyWebForms/eShopLegacyWebForms.csproj").Result;
+            
+            _webFormsProjectAnalyzer = new ProjectAnalyzer(_testProjectPath, analyzerResult);
+            _blazorWorkspaceManager = new WorkspaceManagerService();
             
             Utils.DownloadFilesToFolder(Constants.S3TemplatesBucketUrl, Constants.ResourcesExtractedPath, Constants.TemplateFiles);
         }
@@ -110,6 +123,56 @@ namespace CTA.WebForms2Blazor.Tests
             Assert.True(appSettingsContent.Contains("CatalogDBContext"));
             Assert.IsTrue(fi.RelativePath.Equals(relativePath));
 
+        }
+        
+        private CodeAnalyzer CreateDefaultCodeAnalyzer()
+        {
+            // Create a basic logger
+            var loggerFactory = LoggerFactory.Create(builder => builder.SetMinimumLevel(LogLevel.Debug).AddConsole());
+            var logger = loggerFactory.CreateLogger("");
+
+            // Set up analyzer config
+            var configuration = new AnalyzerConfiguration(LanguageOptions.CSharp)
+            {
+                ExportSettings = {GenerateJsonOutput = false},
+                MetaDataSettings =
+                {
+                    ReferenceData = true,
+                    LoadBuildData = true,
+                    GenerateBinFiles = true,
+                    LocationData = false,
+                    MethodInvocations = false,
+                    LiteralExpressions = false,
+                    LambdaMethods = false,
+                    DeclarationNodes = false,
+                    Annotations = false,
+                    InterfaceDeclarations = false,
+                    EnumDeclarations = false,
+                    StructDeclarations = false,
+                    ReturnStatements = false,
+                    InvocationArguments = false,
+                    ElementAccess = false,
+                    MemberAccess = false
+                }
+            };
+
+            return CodeAnalyzerFactory.GetAnalyzer(configuration, logger);
+        }
+
+        [Test]
+        public async Task TestProjectFileConverter()
+        {
+            FileConverter fc = new ProjectFileConverter("/Users/baokalla/Desktop/eShopOnBlazor/src/eShopLegacyWebForms",
+                "/Users/baokalla/Desktop/eShopOnBlazor/src/eShopLegacyWebForms/eShopLegacyWebForms.csproj",
+                _blazorWorkspaceManager, _webFormsProjectAnalyzer);
+
+            IEnumerable<FileInformation> fileList = await fc.MigrateFileAsync();
+            FileInformation fi = fileList.First();
+
+            byte[] bytes = fi.FileBytes;
+            var projectFileContents = Encoding.UTF8.GetString(bytes);
+            
+            
         }
     }
 }

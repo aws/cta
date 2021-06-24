@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using CTA.WebForms2Blazor.Factories;
 using CTA.WebForms2Blazor.FileInformationModel;
+using CTA.WebForms2Blazor.ProjectManagement;
 using CTA.WebForms2Blazor.Services;
 
 namespace CTA.WebForms2Blazor.FileConverters
@@ -10,21 +11,22 @@ namespace CTA.WebForms2Blazor.FileConverters
     public class CodeFileConverter : FileConverter
     {
         private readonly WorkspaceManagerService _blazorWorkspaceBuilder;
-        private readonly WorkspaceManagerService _webFormsWorkspaceBuilder;
+        private readonly ProjectAnalyzer _webFormsProjectAnaylzer;
         private readonly ClassConverterFactory _classConverterFactory;
 
         public CodeFileConverter(
             string sourceProjectPath,
             string fullPath,
             WorkspaceManagerService blazorWorkspaceManager,
-            WorkspaceManagerService webFormsWorkspaceManager,
+            ProjectAnalyzer webFormsProjectAnalyzer,
             ClassConverterFactory classConverterFactory) : base(sourceProjectPath, fullPath)
         {
             _blazorWorkspaceBuilder = blazorWorkspaceManager;
-            _webFormsWorkspaceBuilder = webFormsWorkspaceManager;
+            _webFormsProjectAnaylzer = webFormsProjectAnalyzer;
             _classConverterFactory = classConverterFactory;
-
-            _webFormsWorkspaceBuilder.NotifyNewExpectedDocument();
+            
+            // Not sure if the following is needed
+            //_webFormsProjectAnaylzer.NotifyNewExpectedDocument();
         }
 
 

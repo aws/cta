@@ -6,6 +6,7 @@ using NUnit.Framework;
 using CTA.WebForms2Blazor.Factories;
 using CTA.WebForms2Blazor.Services;
 using CTA.WebForms2Blazor.FileConverters;
+using CTA.WebForms2Blazor.ProjectManagement;
 
 namespace CTA.WebForms2Blazor.Tests.Factories
 {
@@ -39,13 +40,13 @@ namespace CTA.WebForms2Blazor.Tests.Factories
         [SetUp]
         public void Setup()
         {
-            var webFormsWorkspaceManager = new WorkspaceManagerService();
+            var webFormsProjectAnalyzer = new ProjectAnalyzer(_testProjectPath, null);
             var blazorWorkspaceManager = new WorkspaceManagerService();
 
             blazorWorkspaceManager.CreateSolutionFile();
-            webFormsWorkspaceManager.CreateSolutionFile();
+            //webFormsWorkspaceManager.CreateSolutionFile();
 
-            _fileConverterFactory = new FileConverterFactory(_testProjectPath, blazorWorkspaceManager, webFormsWorkspaceManager, new ClassConverterFactory());
+            _fileConverterFactory = new FileConverterFactory(_testProjectPath, blazorWorkspaceManager, webFormsProjectAnalyzer, new ClassConverterFactory());
         }
 
         [Test]

@@ -1,9 +1,11 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
+using Codelyzer.Analysis;
 using CTA.WebForms2Blazor.Services;
 using CTA.WebForms2Blazor.Factories;
 using CTA.WebForms2Blazor.ProjectManagement;
 using CTA.WebForms2Blazor.FileInformationModel;
+using Microsoft.Extensions.Logging;
 
 namespace CTA.WebForms2Blazor
 {
@@ -32,12 +34,14 @@ namespace CTA.WebForms2Blazor
 
         public async Task PerformMigration()
         {
-            SetUpWorkspaceManagers();
+            AnalyzerResult analyzerResult = null; //Replace with CTA analyzerResult later
+            //Can also add CodeAnalyzer from CTA if necessary
 
-            _webFormsProjectAnalyzer = new ProjectAnalyzer(_inputProjectPath);
+            SetUpWorkspaceManagers();
+            _webFormsProjectAnalyzer = new ProjectAnalyzer(_inputProjectPath, analyzerResult);
             _blazorProjectBuilder = new ProjectBuilder(_outputProjectPath);
             _classConverterFactory = new ClassConverterFactory();
-            _fileConverterFactory = new FileConverterFactory(_inputProjectPath, _blazorWorkspaceManager, _webFormsWorkspaceManager, _classConverterFactory);
+            _fileConverterFactory = new FileConverterFactory(_inputProjectPath, _blazorWorkspaceManager, _webFormsProjectAnalyzer, _classConverterFactory);
 
             // Pass workspace build manager to factory constructor
             var fileConverterCollection = _fileConverterFactory.BuildMany(_webFormsProjectAnalyzer.GetProjectFileInfo());
@@ -72,5 +76,7 @@ namespace CTA.WebForms2Blazor
             _blazorWorkspaceManager.CreateSolutionFile();
             _webFormsWorkspaceManager.CreateSolutionFile();
         }
+        
+        
     }
 }
