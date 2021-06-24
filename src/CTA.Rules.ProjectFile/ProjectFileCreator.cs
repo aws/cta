@@ -109,7 +109,7 @@ namespace CTA.Rules.ProjectFile
                 string sdkName = Constants.ClassLibrarySdkName;
                 string csProj = _csCoreProjSyntaxClassLibrary;
 
-                if (_projectType == ProjectType.Mvc || _projectType == ProjectType.WebApi)
+                if (_projectType == ProjectType.Mvc || _projectType == ProjectType.WebApi || _projectType == ProjectType.WebForms)
                 {
                     csProj = _csCoreProjSyntaxWeb;
                     sdkName = Constants.WebSdkName;

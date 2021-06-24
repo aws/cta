@@ -42,7 +42,7 @@ namespace CTA.WebForms2Blazor.FileConverters
             var ctaArgs = new[]
             {
                 "-p", csProjFileName, // can hardcode for local use
-                "-v", "netcoreapp3.1",                // set the Target Framework version
+                "-v", "net5.0",                // set the Target Framework version
                 "-d", "true",                         // use the default rules files (these will get downloaded from S3 and will tell CTA which packages to add to the new .csproj file)
                 "-m", "false",                        // this is the "mock run" flag. Setting it to false means rules will be applied if we do a full port.
             };
@@ -55,6 +55,14 @@ namespace CTA.WebForms2Blazor.FileConverters
                 // Since we're using default rules, we want to specify where to find those rules (once they are downloaded)
                 cli.RulesDir = Constants.RulesDefaultPath;
             }
+            
+            var packageReferences = new Dictionary<string, Tuple<string, string>>
+            {
+                { "Autofac", new Tuple<string, string>("4.9.1.0", "4.9.3")},
+                { "EntityFramework", new Tuple<string, string>("6.0.0.0", "6.4.4")},
+                { "log4net", new Tuple<string, string>("2.0.8.0", "2.0.12")},
+                { "Microsoft.Extensions.Logging.Log4Net.AspNetCore", new Tuple<string, string>("1.0.0", "2.2.12")}
+            };
                 
             // Create a configuration object using the CLI and other arbitrary values
             PortCoreConfiguration projectConfiguration = new PortCoreConfiguration()
@@ -63,7 +71,7 @@ namespace CTA.WebForms2Blazor.FileConverters
                 RulesDir = cli.RulesDir,
                 IsMockRun = cli.IsMockRun,
                 UseDefaultRules = cli.DefaultRules,
-                //PackageReferences = packageReferences,
+                PackageReferences = packageReferences,
                 PortCode = false,
                 PortProject = true,
                 TargetVersions = new List<string> { cli.Version }

@@ -2,17 +2,20 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
+using System.IO.Compression;
 using NUnit.Framework;
 using CTA.WebForms2Blazor.Factories;
 using CTA.WebForms2Blazor.Services;
 using CTA.WebForms2Blazor.FileInformationModel;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Codelyzer.Analysis;
 using CTA.Rules.Config;
 using CTA.WebForms2Blazor.FileConverters;
 using CTA.WebForms2Blazor.ProjectManagement;
 using Microsoft.Extensions.Logging;
+using CTA.Rules.Test;
 
 namespace CTA.WebForms2Blazor.Tests
 {
@@ -35,6 +38,70 @@ namespace CTA.WebForms2Blazor.Tests
 
         private ProjectAnalyzer _webFormsProjectAnalyzer;
         private WorkspaceManagerService _blazorWorkspaceManager;
+        
+        [SetUpFixture]
+        public class WebForms2BlazorTestFixture : AwsRulesBaseTest
+        {
+            public static string TempDir;
+            public static string CopyFolder;
+            public static string DownloadLocation;
+            public static string EShopOnBlazorSolutionPath;
+            public static string EShopOnBlazorSolutionFilePath;
+            public static string EShopLegacyWebFormsProjectPath;
+       
+            [OneTimeSetUp]
+            public void Setup()
+            {
+                Setup(GetType());
+                TempDir = GetTstPath(Path.Combine(new [] { "Projects", "Temp", "W2B" }));
+                DownloadTestProjects();
+       
+                EShopOnBlazorSolutionFilePath = CopySolutionFolderToTemp("eShopOnBlazor.sln", TempDir);
+                EShopOnBlazorSolutionPath = Directory.GetParent(EShopOnBlazorSolutionFilePath).FullName;
+
+                CopyFolder = Directory.GetParent(EShopOnBlazorSolutionPath).FullName;
+                //var tempHelp = Directory.EnumerateFiles(EShopOnBlazorProjectPath, "*.csproj", SearchOption.AllDirectories);
+                
+                EShopLegacyWebFormsProjectPath = Directory
+                    .EnumerateFiles(EShopOnBlazorSolutionPath, "*.csproj", SearchOption.AllDirectories)
+                    .First(filePath =>
+                        filePath.EndsWith("eShopLegacyWebForms.csproj", StringComparison.InvariantCultureIgnoreCase));
+                
+            }
+       
+            private void DownloadTestProjects()
+            {
+                var tempDirectory = Directory.CreateDirectory(TempDir);
+                DownloadLocation = Path.Combine(tempDirectory.FullName, "d");
+       
+                var fileName = Path.Combine(tempDirectory.Parent.FullName, @"TestProjects.zip");
+                Utils.SaveFileFromGitHub(fileName, GithubInfo.TestGithubOwner, GithubInfo.TestGithubRepo, GithubInfo.TestGithubTag);
+                ZipFile.ExtractToDirectory(fileName, DownloadLocation, true);
+            }
+       
+            [OneTimeTearDown]
+            public void Cleanup()
+            {
+                DeleteDir(0);
+            }
+       
+            private void DeleteDir(int retries)
+            {
+                if (retries <= 10)
+                {
+                    try
+                    {
+                        Directory.Delete(TempDir, true);
+                        Directory.Delete(CopyFolder, true);
+                    }
+                    catch (Exception)
+                    {
+                        Thread.Sleep(60000);
+                        DeleteDir(retries + 1);
+                    }
+                }
+            }
+        }
 
         [OneTimeSetUp]
         public void OneTimeSetup()
@@ -52,7 +119,7 @@ namespace CTA.WebForms2Blazor.Tests
             
             var codeAnalyzer = CreateDefaultCodeAnalyzer();
             // Get analyzer results from codelyzer (syntax trees, semantic models, package references, project references, etc)
-            var analyzerResult = codeAnalyzer.AnalyzeProject("/Users/baokalla/Desktop/eShopOnBlazor/src/eShopLegacyWebForms/eShopLegacyWebForms.csproj").Result;
+            var analyzerResult = codeAnalyzer.AnalyzeProject(WebForms2BlazorTestFixture.EShopLegacyWebFormsProjectPath).Result;
             
             _webFormsProjectAnalyzer = new ProjectAnalyzer(_testProjectPath, analyzerResult);
             _blazorWorkspaceManager = new WorkspaceManagerService();
@@ -162,8 +229,8 @@ namespace CTA.WebForms2Blazor.Tests
         [Test]
         public async Task TestProjectFileConverter()
         {
-            FileConverter fc = new ProjectFileConverter("/Users/baokalla/Desktop/eShopOnBlazor/src/eShopLegacyWebForms",
-                "/Users/baokalla/Desktop/eShopOnBlazor/src/eShopLegacyWebForms/eShopLegacyWebForms.csproj",
+            FileConverter fc = new ProjectFileConverter(WebForms2BlazorTestFixture.EShopOnBlazorSolutionPath,
+                WebForms2BlazorTestFixture.EShopLegacyWebFormsProjectPath,
                 _blazorWorkspaceManager, _webFormsProjectAnalyzer);
 
             IEnumerable<FileInformation> fileList = await fc.MigrateFileAsync();
@@ -171,8 +238,14 @@ namespace CTA.WebForms2Blazor.Tests
 
             byte[] bytes = fi.FileBytes;
             var projectFileContents = Encoding.UTF8.GetString(bytes);
+            string relativePath = Path.GetRelativePath(WebForms2BlazorTestFixture.EShopOnBlazorSolutionPath, WebForms2BlazorTestFixture.EShopLegacyWebFormsProjectPath);
             
-            
+            Assert.True(fi.RelativePath.Equals(relativePath));
+            Assert.True(projectFileContents.Contains("PackageReference"));
+            Assert.True(projectFileContents.Contains("EntityFramework"));
+            Assert.True(projectFileContents.Contains("log4net"));
+            Assert.True(projectFileContents.Contains("Microsoft.NET.Sdk.Web"));
+            Assert.True(projectFileContents.Contains("Autofac"));
         }
     }
 }
