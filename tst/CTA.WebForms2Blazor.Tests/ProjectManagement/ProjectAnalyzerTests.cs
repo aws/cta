@@ -1,4 +1,6 @@
 ﻿using System.Linq;
+using Codelyzer.Analysis;
+using CTA.Rules.Models;
 using CTA.WebForms2Blazor.ProjectManagement;
 using NUnit.Framework;
 
@@ -9,7 +11,7 @@ namespace CTA.WebForms2Blazor.Tests.ProjectManagement
         [Test]
         public void GetProjectFileInfo_Retrieves_Files_From_All_Directory_Levels()
         {
-            var projectAnalyzer = new ProjectAnalyzer(PartialProjectSetupFixture.TestStructure1Path);
+            var projectAnalyzer = new ProjectAnalyzer(PartialProjectSetupFixture.TestStructure1Path, new AnalyzerResult(), new PortCoreConfiguration());
             var projectFileInfo = projectAnalyzer.GetProjectFileInfo();
 
             Assert.AreEqual(projectFileInfo.Count(), 3);

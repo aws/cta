@@ -44,8 +44,7 @@ namespace CTA.WebForms2Blazor.FileConverters
                 fi = null;
             }
 
-            var fileList = new List<FileInformation>();
-            fileList.Add(fi);
+            var fileList = new List<FileInformation>() {fi};
 
             return fileList;
         }
