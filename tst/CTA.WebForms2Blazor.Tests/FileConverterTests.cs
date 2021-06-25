@@ -12,6 +12,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Codelyzer.Analysis;
 using CTA.Rules.Config;
+using CTA.Rules.Models;
+using CTA.Rules.PortCore;
 using CTA.WebForms2Blazor.FileConverters;
 using CTA.WebForms2Blazor.ProjectManagement;
 using Microsoft.Extensions.Logging;
@@ -22,8 +24,6 @@ namespace CTA.WebForms2Blazor.Tests
     [TestFixture]
     class FileConverterTests
     {
-        
-
         //These are full paths
         private string _testProjectPath;
         private string _testFilesDirectoryPath;
@@ -38,74 +38,15 @@ namespace CTA.WebForms2Blazor.Tests
 
         private ProjectAnalyzer _webFormsProjectAnalyzer;
         private WorkspaceManagerService _blazorWorkspaceManager;
+        private DownloadTestProjectsFixture WebForms2BlazorTestFixture;
         
-        [SetUpFixture]
-        public class WebForms2BlazorTestFixture : AwsRulesBaseTest
-        {
-            public static string TempDir;
-            public static string CopyFolder;
-            public static string DownloadLocation;
-            public static string EShopOnBlazorSolutionPath;
-            public static string EShopOnBlazorSolutionFilePath;
-            public static string EShopLegacyWebFormsProjectPath;
-       
-            [OneTimeSetUp]
-            public void Setup()
-            {
-                Setup(GetType());
-                TempDir = GetTstPath(Path.Combine(new [] { "Projects", "Temp", "W2B" }));
-                DownloadTestProjects();
-       
-                EShopOnBlazorSolutionFilePath = CopySolutionFolderToTemp("eShopOnBlazor.sln", TempDir);
-                EShopOnBlazorSolutionPath = Directory.GetParent(EShopOnBlazorSolutionFilePath).FullName;
-
-                CopyFolder = Directory.GetParent(EShopOnBlazorSolutionPath).FullName;
-                //var tempHelp = Directory.EnumerateFiles(EShopOnBlazorProjectPath, "*.csproj", SearchOption.AllDirectories);
-                
-                EShopLegacyWebFormsProjectPath = Directory
-                    .EnumerateFiles(EShopOnBlazorSolutionPath, "*.csproj", SearchOption.AllDirectories)
-                    .First(filePath =>
-                        filePath.EndsWith("eShopLegacyWebForms.csproj", StringComparison.InvariantCultureIgnoreCase));
-                
-            }
-       
-            private void DownloadTestProjects()
-            {
-                var tempDirectory = Directory.CreateDirectory(TempDir);
-                DownloadLocation = Path.Combine(tempDirectory.FullName, "d");
-       
-                var fileName = Path.Combine(tempDirectory.Parent.FullName, @"TestProjects.zip");
-                Utils.SaveFileFromGitHub(fileName, GithubInfo.TestGithubOwner, GithubInfo.TestGithubRepo, GithubInfo.TestGithubTag);
-                ZipFile.ExtractToDirectory(fileName, DownloadLocation, true);
-            }
-       
-            [OneTimeTearDown]
-            public void Cleanup()
-            {
-                DeleteDir(0);
-            }
-       
-            private void DeleteDir(int retries)
-            {
-                if (retries <= 10)
-                {
-                    try
-                    {
-                        Directory.Delete(TempDir, true);
-                        Directory.Delete(CopyFolder, true);
-                    }
-                    catch (Exception)
-                    {
-                        Thread.Sleep(60000);
-                        DeleteDir(retries + 1);
-                    }
-                }
-            }
-        }
 
         [OneTimeSetUp]
         public void OneTimeSetup()
         {
+            WebForms2BlazorTestFixture = new DownloadTestProjectsFixture();
+            WebForms2BlazorTestFixture.Setup();
+            
             var workingDirectory = Environment.CurrentDirectory;
             _testProjectPath = Directory.GetParent(workingDirectory).Parent.Parent.FullName;
             _testFilesDirectoryPath = Path.Combine(_testProjectPath, Path.Combine("TestingArea", "TestFiles"));
@@ -121,7 +62,45 @@ namespace CTA.WebForms2Blazor.Tests
             // Get analyzer results from codelyzer (syntax trees, semantic models, package references, project references, etc)
             var analyzerResult = codeAnalyzer.AnalyzeProject(WebForms2BlazorTestFixture.EShopLegacyWebFormsProjectPath).Result;
             
-            _webFormsProjectAnalyzer = new ProjectAnalyzer(_testProjectPath, analyzerResult);
+            var ctaArgs = new[]
+            {
+                "-p", WebForms2BlazorTestFixture.EShopLegacyWebFormsProjectPath, // can hardcode for local use
+                "-v", "net5.0",                // set the Target Framework version
+                "-d", "true",                         // use the default rules files (these will get downloaded from S3 and will tell CTA which packages to add to the new .csproj file)
+                "-m", "false",                        // this is the "mock run" flag. Setting it to false means rules will be applied if we do a full port.
+            };
+
+            // Handle argument assignment
+            PortCoreRulesCli cli = new PortCoreRulesCli();
+            cli.HandleCommand(ctaArgs);
+            if (cli.DefaultRules)
+            {
+                // Since we're using default rules, we want to specify where to find those rules (once they are downloaded)
+                cli.RulesDir = Constants.RulesDefaultPath;
+            }
+            
+            var packageReferences = new Dictionary<string, Tuple<string, string>>
+            {
+                { "Autofac", new Tuple<string, string>("4.9.1.0", "4.9.3")},
+                { "EntityFramework", new Tuple<string, string>("6.0.0.0", "6.4.4")},
+                { "log4net", new Tuple<string, string>("2.0.8.0", "2.0.12")},
+                { "Microsoft.Extensions.Logging.Log4Net.AspNetCore", new Tuple<string, string>("1.0.0", "2.2.12")}
+            };
+                
+            // Create a configuration object using the CLI and other arbitrary values
+            PortCoreConfiguration projectConfiguration = new PortCoreConfiguration()
+            {
+                ProjectPath = cli.FilePath,
+                RulesDir = cli.RulesDir,
+                IsMockRun = cli.IsMockRun,
+                UseDefaultRules = cli.DefaultRules,
+                PackageReferences = packageReferences,
+                PortCode = false,
+                PortProject = true,
+                TargetVersions = new List<string> { cli.Version }
+            };   
+            
+            _webFormsProjectAnalyzer = new ProjectAnalyzer(_testProjectPath, analyzerResult, projectConfiguration);
             _blazorWorkspaceManager = new WorkspaceManagerService();
             
             Utils.DownloadFilesToFolder(Constants.S3TemplatesBucketUrl, Constants.ResourcesExtractedPath, Constants.TemplateFiles);
@@ -148,7 +127,7 @@ namespace CTA.WebForms2Blazor.Tests
             FileConverter fc = new StaticResourceFileConverter(_testProjectPath,  _testStaticResourceFilePath);
 
             IEnumerable<FileInformation> fileList = await fc.MigrateFileAsync();
-            FileInformation fi = fileList.First();
+            FileInformation fi = fileList.Single();
             byte[] bytes = fi.FileBytes;
 
             string relativePath = Path.GetRelativePath(_testProjectPath, _testStaticResourceFilePath);
@@ -163,7 +142,7 @@ namespace CTA.WebForms2Blazor.Tests
             FileConverter fc = new StaticFileConverter(_testProjectPath, _testStaticFilePath);
             
             IEnumerable<FileInformation> fileList = await fc.MigrateFileAsync();
-            FileInformation fi = fileList.First();
+            FileInformation fi = fileList.Single();
             byte[] bytes = fi.FileBytes;
 
             string relativePath = Path.GetRelativePath(_testProjectPath, _testStaticFilePath);
@@ -177,7 +156,7 @@ namespace CTA.WebForms2Blazor.Tests
         {
             FileConverter fc = new ConfigFileConverter(_testProjectPath, _testWebConfigFilePath);
             IEnumerable<FileInformation> fileList = await fc.MigrateFileAsync();
-            FileInformation fi = fileList.First();
+            FileInformation fi = fileList.Single();
             
             byte[] bytes = fi.FileBytes;
             var appSettingsContent = Encoding.UTF8.GetString(bytes);
@@ -234,7 +213,7 @@ namespace CTA.WebForms2Blazor.Tests
                 _blazorWorkspaceManager, _webFormsProjectAnalyzer);
 
             IEnumerable<FileInformation> fileList = await fc.MigrateFileAsync();
-            FileInformation fi = fileList.First();
+            FileInformation fi = fileList.Single();
 
             byte[] bytes = fi.FileBytes;
             var projectFileContents = Encoding.UTF8.GetString(bytes);

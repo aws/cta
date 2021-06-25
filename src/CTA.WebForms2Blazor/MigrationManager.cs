@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
 using Codelyzer.Analysis;
+using CTA.Rules.Models;
 using CTA.WebForms2Blazor.Services;
 using CTA.WebForms2Blazor.Factories;
 using CTA.WebForms2Blazor.ProjectManagement;
@@ -20,25 +21,27 @@ namespace CTA.WebForms2Blazor
         // in for now
         private ProjectAnalyzer _webFormsProjectAnalyzer;
         private ProjectBuilder _blazorProjectBuilder;
+        private PortCoreConfiguration _projectConfiguration;
+        private AnalyzerResult _analyzerResult;
 
         private WorkspaceManagerService _webFormsWorkspaceManager;
         private WorkspaceManagerService _blazorWorkspaceManager;
         private ClassConverterFactory _classConverterFactory;
         private FileConverterFactory _fileConverterFactory;
 
-        public MigrationManager(string inputProjectPath, string outputProjectPath)
+        public MigrationManager(string inputProjectPath, string outputProjectPath, AnalyzerResult analyzerResult,
+            PortCoreConfiguration projectConfiguration)
         {
             _inputProjectPath = inputProjectPath;
             _outputProjectPath = outputProjectPath;
+            _analyzerResult = analyzerResult;
+            _projectConfiguration = projectConfiguration;
         }
 
         public async Task PerformMigration()
         {
-            AnalyzerResult analyzerResult = null; //Replace with CTA analyzerResult later
-            //Can also add CodeAnalyzer from CTA if necessary
-
             SetUpWorkspaceManagers();
-            _webFormsProjectAnalyzer = new ProjectAnalyzer(_inputProjectPath, analyzerResult);
+            _webFormsProjectAnalyzer = new ProjectAnalyzer(_inputProjectPath, _analyzerResult, _projectConfiguration);
             _blazorProjectBuilder = new ProjectBuilder(_outputProjectPath);
             _classConverterFactory = new ClassConverterFactory();
             _fileConverterFactory = new FileConverterFactory(_inputProjectPath, _blazorWorkspaceManager, _webFormsProjectAnalyzer, _classConverterFactory);

@@ -4,6 +4,8 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Codelyzer.Analysis;
+using CTA.Rules.Models;
+using CTA.Rules.Update;
 using Microsoft.Extensions.Logging;
 
 namespace CTA.WebForms2Blazor.ProjectManagement
@@ -11,17 +13,31 @@ namespace CTA.WebForms2Blazor.ProjectManagement
     public class ProjectAnalyzer
     {
         private readonly string _inputProjectPath;
-        private readonly AnalyzerResult _analyzerResult;
+        public AnalyzerResult AnalyzerResult { get; }
+        public PortCoreConfiguration ProjectConfiguration { get; }
+        public ProjectResult ProjectResult { get; }
+        public List<String> ProjectReferences { get; }
+        public List<String> MetaReferences { get; }
         
-        public AnalyzerResult AnalyzerResult { get { return _analyzerResult; } }
+        
 
         public string InputProjectPath { get { return _inputProjectPath; } }
 
-        public ProjectAnalyzer(string inputProjectPath, AnalyzerResult analyzerResult)
+        public ProjectAnalyzer(string inputProjectPath, AnalyzerResult analyzerResult, PortCoreConfiguration projectConfiguration)
         {
             _inputProjectPath = inputProjectPath;
-            _analyzerResult = analyzerResult;
+            AnalyzerResult = analyzerResult;
+            ProjectConfiguration = projectConfiguration;
+            
+            var projectRewriter = new ProjectRewriter(analyzerResult, projectConfiguration);
 
+            // Initialize() will run a rules analysis and identify which porting rules to execute.
+            // This will also detect which packages to add to the new .csproj file
+            ProjectResult = projectRewriter.Initialize();
+
+            // Now we can finally create the ProjectFileCreator and use it
+            ProjectReferences = analyzerResult?.ProjectBuildResult?.ExternalReferences?.ProjectReferences.Select(p => p.AssemblyLocation).ToList();
+            MetaReferences = analyzerResult?.ProjectBuildResult?.Project?.MetadataReferences?.Select(m => m.Display).ToList();
         }
 
         public IEnumerable<FileInfo> GetProjectFileInfo()
