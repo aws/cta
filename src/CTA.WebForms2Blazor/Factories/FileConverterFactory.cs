@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using CTA.WebForms2Blazor.FileConverters;
-using CTA.WebForms2Blazor.FileInformationModel;
+using CTA.WebForms2Blazor.ProjectManagement;
 using CTA.WebForms2Blazor.Services;
 
 namespace CTA.WebForms2Blazor.Factories
@@ -12,7 +11,7 @@ namespace CTA.WebForms2Blazor.Factories
     {
         private readonly string _sourceProjectPath;
         private readonly WorkspaceManagerService _blazorWorkspaceManager;
-        private readonly WorkspaceManagerService _webFormsWorkspaceManager;
+        private readonly ProjectAnalyzer _webFormsProjectAnalyzer;
         private readonly ClassConverterFactory _classConverterFactory;
         
         public readonly HashSet<string> StaticResourceExtensions = new HashSet<string>
@@ -25,12 +24,12 @@ namespace CTA.WebForms2Blazor.Factories
         public FileConverterFactory(
             string sourceProjectPath,
             WorkspaceManagerService blazorWorkspaceManager,
-            WorkspaceManagerService webFormsWorkspaceManager,
+            ProjectAnalyzer webFormsProjectAnalyzer,
             ClassConverterFactory classConverterFactory)
         {
             _sourceProjectPath = sourceProjectPath;
             _blazorWorkspaceManager = blazorWorkspaceManager;
-            _webFormsWorkspaceManager = webFormsWorkspaceManager;
+            _webFormsProjectAnalyzer = webFormsProjectAnalyzer;
             _classConverterFactory = classConverterFactory;
         }
 
@@ -49,20 +48,24 @@ namespace CTA.WebForms2Blazor.Factories
             FileConverter fc;
             if (extension.Equals(Constants.CSharpCodeFileExtension))
             {
-                fc = new CodeFileConverter(_sourceProjectPath, document.FullName, _blazorWorkspaceManager, _classConverterFactory);
-            } else if (extension.Equals(Constants.WebFormsConfigFileExtension))
+                fc = new CodeFileConverter(_sourceProjectPath, document.FullName, _blazorWorkspaceManager, _webFormsProjectAnalyzer, _classConverterFactory);
+            }
+            else if (extension.Equals(Constants.WebFormsConfigFileExtension))
             {
                 fc = new ConfigFileConverter(_sourceProjectPath, document.FullName);
-            } else if (extension.Equals(Constants.WebFormsPageMarkupFileExtension)
+            }
+            else if (extension.Equals(Constants.WebFormsPageMarkupFileExtension)
                 || extension.Equals(Constants.WebFormsControlMarkupFileExtenion)
                 || extension.Equals(Constants.WebFormsMasterPageMarkupFileExtension)
                 || extension.Equals(Constants.WebFormsGlobalMarkupFileExtension))
             {
                 fc = new ViewFileConverter(_sourceProjectPath, document.FullName);
-            } else if (extension.Equals(Constants.CSharpProjectFileExtension))
+            }
+            else if (extension.Equals(Constants.CSharpProjectFileExtension))
             {
-                fc = new ProjectFileConverter(_sourceProjectPath, document.FullName, _blazorWorkspaceManager, _webFormsWorkspaceManager);
-            } else if (StaticResourceExtensions.Contains(extension))
+                fc = new ProjectFileConverter(_sourceProjectPath, document.FullName, _blazorWorkspaceManager, _webFormsProjectAnalyzer);
+            }
+            else if (StaticResourceExtensions.Contains(extension))
             {
                 fc = new StaticResourceFileConverter(_sourceProjectPath, document.FullName);
             }

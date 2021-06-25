@@ -52,7 +52,8 @@ namespace CTA.WebForms2Blazor.ProjectManagement
             string.Format("{0}dlldata.c", Path.DirectorySeparatorChar),
             string.Format("{0}launchSettings.json", Path.DirectorySeparatorChar),
             string.Format("{0}testResult.xml", Path.DirectorySeparatorChar),
-            string.Format("{0}project.lock.json", Path.DirectorySeparatorChar)
+            string.Format("{0}project.lock.json", Path.DirectorySeparatorChar),
+            string.Format("{0}package.config", Path.DirectorySeparatorChar)
         });
 
         public static bool ShouldIgnoreFileAtPath(string relativePath)

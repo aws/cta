@@ -101,18 +101,15 @@ namespace CTA.Rules.ProjectFile
             return Constants.DefaultCoreVersion;
         }
 
-        //TODO Get project references and add to new project
-        /// <summary>
-        /// Replaces the current project file with a new file 
-        /// </summary>
-        public bool Create()
+        public string CreateContents()
         {
+            string csProjContent = String.Empty;
             try
             {
                 string sdkName = Constants.ClassLibrarySdkName;
                 string csProj = _csCoreProjSyntaxClassLibrary;
 
-                if (_projectType == ProjectType.Mvc || _projectType == ProjectType.WebApi)
+                if (_projectType == ProjectType.Mvc || _projectType == ProjectType.WebApi || _projectType == ProjectType.WebForms)
                 {
                     csProj = _csCoreProjSyntaxWeb;
                     sdkName = Constants.WebSdkName;
@@ -133,16 +130,37 @@ namespace CTA.Rules.ProjectFile
                 }
                 else
                 {
-                    string csProjContent = string.Format(csProj, sdkName, GetTargetVersions(), AddItemGroup(packages), AddItemGroup(projects), AddItemGroup(metaReferences, _portingInfoItemGroupTemplate));
-                    File.WriteAllText(_projectFile, csProjContent);
+                    csProjContent = string.Format(csProj, sdkName, GetTargetVersions(), AddItemGroup(packages), AddItemGroup(projects), AddItemGroup(metaReferences, _portingInfoItemGroupTemplate));
                 }
             }
             catch (Exception ex)
             {
                 LogHelper.LogError(ex, "Error while creating project file for {0}", _projectFile);
-                return false;
+                return null;
             }
-            return true;
+
+            return csProjContent;
+        }
+
+        //TODO Get project references and add to new project
+        /// <summary>
+        /// Replaces the current project file with a new file 
+        /// </summary>
+        public bool Create()
+        {
+            string csProjContent = CreateContents();
+            if (!String.IsNullOrEmpty(csProjContent))
+            {
+                File.WriteAllText(_projectFile, csProjContent);
+                return true;
+            }
+
+            if (csProjContent.Equals(String.Empty))
+            {
+                return true;
+            }
+            
+            return false;
         }
 
         private string GetMetaReferencesSection() => String.Join(Environment.NewLine, _metaReferences);
