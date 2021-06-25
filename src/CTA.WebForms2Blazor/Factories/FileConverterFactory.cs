@@ -47,16 +47,19 @@ namespace CTA.WebForms2Blazor.Factories
             string extension = document.Extension;
 
             FileConverter fc;
-            if (extension.Equals(".cs"))
+            if (extension.Equals(Constants.CSharpCodeFileExtension))
             {
                 fc = new CodeFileConverter(_sourceProjectPath, document.FullName, _blazorWorkspaceManager, _classConverterFactory);
-            } else if (extension.Equals(".config"))
+            } else if (extension.Equals(Constants.WebFormsConfigFileExtension))
             {
                 fc = new ConfigFileConverter(_sourceProjectPath, document.FullName);
-            } else if (extension.Equals(".aspx") || extension.Equals(".asax") || extension.Equals(".ascx"))
+            } else if (extension.Equals(Constants.WebFormsPageMarkupFileExtension)
+                || extension.Equals(Constants.WebFormsControlMarkupFileExtenion)
+                || extension.Equals(Constants.WebFormsMasterPageMarkupFileExtension)
+                || extension.Equals(Constants.WebFormsGlobalMarkupFileExtension))
             {
                 fc = new ViewFileConverter(_sourceProjectPath, document.FullName);
-            } else if (extension.Equals(".csproj"))
+            } else if (extension.Equals(Constants.CSharpProjectFileExtension))
             {
                 fc = new ProjectFileConverter(_sourceProjectPath, document.FullName, _blazorWorkspaceManager, _webFormsWorkspaceManager);
             } else if (StaticResourceExtensions.Contains(extension))

@@ -36,7 +36,7 @@ namespace CTA.WebForms2Blazor
 
             _webFormsProjectAnalyzer = new ProjectAnalyzer(_inputProjectPath);
             _blazorProjectBuilder = new ProjectBuilder(_outputProjectPath);
-            _classConverterFactory = new ClassConverterFactory();
+            _classConverterFactory = new ClassConverterFactory(_inputProjectPath);
             _fileConverterFactory = new FileConverterFactory(_inputProjectPath, _blazorWorkspaceManager, _webFormsWorkspaceManager, _classConverterFactory);
 
             // Pass workspace build manager to factory constructor

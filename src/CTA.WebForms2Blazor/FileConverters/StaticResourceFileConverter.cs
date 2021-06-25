@@ -17,7 +17,7 @@ namespace CTA.WebForms2Blazor.FileConverters
 
         public override async Task<IEnumerable<FileInformation>> MigrateFileAsync()
         {
-            var newPath = Path.Combine("wwwroot", RelativePath);
+            var newPath = Path.Combine(Constants.WebRootDirectoryName, RelativePath);
             var fullPath = Path.Combine(ProjectPath, RelativePath);
 
             FileInformation fi = new FileInformation(newPath, File.ReadAllBytes(fullPath));

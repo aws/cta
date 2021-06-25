@@ -45,7 +45,7 @@ namespace CTA.WebForms2Blazor.Tests.Factories
         [SetUp]
         public void SetUp()
         {
-            _classConverterFactory = new ClassConverterFactory();
+            _classConverterFactory = new ClassConverterFactory(string.Empty);
             _workspaceManager = new WorkspaceManagerService();
             _workspaceManager.CreateSolutionFile();
             _workspaceManager.NotifyNewExpectedProject();
