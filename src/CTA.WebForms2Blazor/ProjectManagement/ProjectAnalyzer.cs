@@ -30,12 +30,8 @@ namespace CTA.WebForms2Blazor.ProjectManagement
             ProjectConfiguration = projectConfiguration;
             
             var projectRewriter = new ProjectRewriter(analyzerResult, projectConfiguration);
-
-            // Initialize() will run a rules analysis and identify which porting rules to execute.
-            // This will also detect which packages to add to the new .csproj file
             ProjectResult = projectRewriter.Initialize();
 
-            // Now we can finally create the ProjectFileCreator and use it
             ProjectReferences = analyzerResult?.ProjectBuildResult?.ExternalReferences?.ProjectReferences.Select(p => p.AssemblyLocation).ToList();
             MetaReferences = analyzerResult?.ProjectBuildResult?.Project?.MetadataReferences?.Select(m => m.Display).ToList();
         }

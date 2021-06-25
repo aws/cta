@@ -12,26 +12,29 @@ namespace CTA.WebForms2Blazor.Tests
     [SetUpFixture]
     public class DownloadTestProjectsFixture : AwsRulesBaseTest
     {
-        public string TempDir;
-        public string CopyFolder;
-        public string DownloadLocation;
-        public string EShopOnBlazorSolutionPath;
-        public string EShopOnBlazorSolutionFilePath;
-        public string EShopLegacyWebFormsProjectPath;
+        private string _tempDir;
+        private string _copyFolder;
+        private string _downloadLocation;
+        private static string _eShopOnBlazorSolutionFilePath;
+        private static string _eShopOnBlazorSolutionPath;
+        private static string _eShopLegacyWebFormsProjectPath;
+        public static string EShopOnBlazorSolutionPath { get { return _eShopOnBlazorSolutionPath; } }
+        public static string EShopOnBlazorSolutionFilePath { get { return _eShopOnBlazorSolutionFilePath; } }
+        public static string EShopLegacyWebFormsProjectPath { get { return _eShopLegacyWebFormsProjectPath; } }
 
         [OneTimeSetUp]
         public void Setup()
         {
             Setup(GetType());
-            TempDir = GetTstPath(Path.Combine(new[] {"Projects", "Temp", "W2B"}));
+            _tempDir = GetTstPath(Path.Combine(new[] {"Projects", "Temp", "W2B"}));
             DownloadTestProjects();
 
-            EShopOnBlazorSolutionFilePath = CopySolutionFolderToTemp("eShopOnBlazor.sln", TempDir);
-            EShopOnBlazorSolutionPath = Directory.GetParent(EShopOnBlazorSolutionFilePath).FullName;
+            _eShopOnBlazorSolutionFilePath = CopySolutionFolderToTemp("eShopOnBlazor.sln", _tempDir);
+            _eShopOnBlazorSolutionPath = Directory.GetParent(EShopOnBlazorSolutionFilePath).FullName;
 
-            CopyFolder = Directory.GetParent(EShopOnBlazorSolutionPath).FullName;
+            _copyFolder = Directory.GetParent(EShopOnBlazorSolutionPath).FullName;
 
-            EShopLegacyWebFormsProjectPath = Directory
+            _eShopLegacyWebFormsProjectPath = Directory
                 .EnumerateFiles(EShopOnBlazorSolutionPath, "*.csproj", SearchOption.AllDirectories)
                 .First(filePath =>
                     filePath.EndsWith("eShopLegacyWebForms.csproj", StringComparison.InvariantCultureIgnoreCase));
@@ -40,13 +43,13 @@ namespace CTA.WebForms2Blazor.Tests
 
         private void DownloadTestProjects()
         {
-            var tempDirectory = Directory.CreateDirectory(TempDir);
-            DownloadLocation = Path.Combine(tempDirectory.FullName, "d");
+            var tempDirectory = Directory.CreateDirectory(_tempDir);
+            _downloadLocation = Path.Combine(tempDirectory.FullName, "d");
 
             var fileName = Path.Combine(tempDirectory.Parent.FullName, @"TestProjects.zip");
             Utils.SaveFileFromGitHub(fileName, GithubInfo.TestGithubOwner, GithubInfo.TestGithubRepo,
                 GithubInfo.TestGithubTag);
-            ZipFile.ExtractToDirectory(fileName, DownloadLocation, true);
+            ZipFile.ExtractToDirectory(fileName, _downloadLocation, true);
         }
 
         [OneTimeTearDown]
@@ -61,8 +64,8 @@ namespace CTA.WebForms2Blazor.Tests
             {
                 try
                 {
-                    Directory.Delete(TempDir, true);
-                    Directory.Delete(CopyFolder, true);
+                    Directory.Delete(_tempDir, true);
+                    Directory.Delete(_copyFolder, true);
                 }
                 catch (Exception)
                 {

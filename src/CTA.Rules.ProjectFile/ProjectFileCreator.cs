@@ -103,7 +103,7 @@ namespace CTA.Rules.ProjectFile
 
         public string CreateContents()
         {
-            string csProjContent = null;
+            string csProjContent = String.Empty;
             try
             {
                 string sdkName = Constants.ClassLibrarySdkName;
@@ -154,6 +154,12 @@ namespace CTA.Rules.ProjectFile
                 File.WriteAllText(_projectFile, csProjContent);
                 return true;
             }
+
+            if (csProjContent.Equals(String.Empty))
+            {
+                return true;
+            }
+            
             return false;
         }
 

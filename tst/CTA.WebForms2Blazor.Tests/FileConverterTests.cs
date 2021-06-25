@@ -38,15 +38,10 @@ namespace CTA.WebForms2Blazor.Tests
 
         private ProjectAnalyzer _webFormsProjectAnalyzer;
         private WorkspaceManagerService _blazorWorkspaceManager;
-        private DownloadTestProjectsFixture WebForms2BlazorTestFixture;
-        
 
         [OneTimeSetUp]
         public void OneTimeSetup()
         {
-            WebForms2BlazorTestFixture = new DownloadTestProjectsFixture();
-            WebForms2BlazorTestFixture.Setup();
-            
             var workingDirectory = Environment.CurrentDirectory;
             _testProjectPath = Directory.GetParent(workingDirectory).Parent.Parent.FullName;
             _testFilesDirectoryPath = Path.Combine(_testProjectPath, Path.Combine("TestingArea", "TestFiles"));
@@ -60,11 +55,11 @@ namespace CTA.WebForms2Blazor.Tests
             
             var codeAnalyzer = CreateDefaultCodeAnalyzer();
             // Get analyzer results from codelyzer (syntax trees, semantic models, package references, project references, etc)
-            var analyzerResult = codeAnalyzer.AnalyzeProject(WebForms2BlazorTestFixture.EShopLegacyWebFormsProjectPath).Result;
+            var analyzerResult = codeAnalyzer.AnalyzeProject(DownloadTestProjectsFixture.EShopLegacyWebFormsProjectPath).Result;
             
             var ctaArgs = new[]
             {
-                "-p", WebForms2BlazorTestFixture.EShopLegacyWebFormsProjectPath, // can hardcode for local use
+                "-p", DownloadTestProjectsFixture.EShopLegacyWebFormsProjectPath, // can hardcode for local use
                 "-v", "net5.0",                // set the Target Framework version
                 "-d", "true",                         // use the default rules files (these will get downloaded from S3 and will tell CTA which packages to add to the new .csproj file)
                 "-m", "false",                        // this is the "mock run" flag. Setting it to false means rules will be applied if we do a full port.
@@ -208,8 +203,8 @@ namespace CTA.WebForms2Blazor.Tests
         [Test]
         public async Task TestProjectFileConverter()
         {
-            FileConverter fc = new ProjectFileConverter(WebForms2BlazorTestFixture.EShopOnBlazorSolutionPath,
-                WebForms2BlazorTestFixture.EShopLegacyWebFormsProjectPath,
+            FileConverter fc = new ProjectFileConverter(DownloadTestProjectsFixture.EShopOnBlazorSolutionPath,
+                DownloadTestProjectsFixture.EShopLegacyWebFormsProjectPath,
                 _blazorWorkspaceManager, _webFormsProjectAnalyzer);
 
             IEnumerable<FileInformation> fileList = await fc.MigrateFileAsync();
@@ -217,7 +212,7 @@ namespace CTA.WebForms2Blazor.Tests
 
             byte[] bytes = fi.FileBytes;
             var projectFileContents = Encoding.UTF8.GetString(bytes);
-            string relativePath = Path.GetRelativePath(WebForms2BlazorTestFixture.EShopOnBlazorSolutionPath, WebForms2BlazorTestFixture.EShopLegacyWebFormsProjectPath);
+            string relativePath = Path.GetRelativePath(DownloadTestProjectsFixture.EShopOnBlazorSolutionPath, DownloadTestProjectsFixture.EShopLegacyWebFormsProjectPath);
             
             Assert.True(fi.RelativePath.Equals(relativePath));
             Assert.True(projectFileContents.Contains("PackageReference"));
