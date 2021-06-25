@@ -53,7 +53,9 @@ namespace CTA.WebForms2Blazor.Extensions
             // to as references within the same namespace are already accessible
             namespaceSymbols.Remove(classTypeSymbol.ContainingNamespace);
 
-            return namespaceSymbols;
+            // TODO: Find out why null namespaces occur and maybe
+            // replace with Codelyzer usage
+            return namespaceSymbols.Where(namespaceSymbol => namespaceSymbol != null);
         }
 
         public static IEnumerable<INamedTypeSymbol> GetAllInheritedBaseTypes(this INamedTypeSymbol typeSymbol)

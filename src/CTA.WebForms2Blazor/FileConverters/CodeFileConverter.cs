@@ -42,7 +42,7 @@ namespace CTA.WebForms2Blazor.FileConverters
             // This code is set up to not break unit tests but still work for the demo
             // use code above after demo and just fix unit tests
             _fileModel = _webFormsProjectAnaylzer.AnalyzerResult.ProjectBuildResult?.SourceFileBuildResults?
-                .Single(r => r.SourceFilePath.EndsWith(Path.GetFileName(RelativePath)))?.SemanticModel;
+                .Single(r => r.SourceFilePath.EndsWith(RelativePath))?.SemanticModel;
 
             if (_fileModel != null)
             {
