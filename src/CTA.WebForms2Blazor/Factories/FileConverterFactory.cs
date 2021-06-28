@@ -14,6 +14,9 @@ namespace CTA.WebForms2Blazor.Factories
         private readonly ProjectAnalyzer _webFormsProjectAnalyzer;
         private readonly ClassConverterFactory _classConverterFactory;
         
+        // TODO: Organize these into "types" and force
+        // content separation in file system if it doesn't
+        // already exist
         public readonly HashSet<string> StaticResourceExtensions = new HashSet<string>
         {
             ".jpeg", ".jpg", ".jif", ".jfif", ".gif", ".tif", ".tiff", ".jp2", ".jpx", ".j2k", ".j2c", ".fpx", ".pcd",

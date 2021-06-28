@@ -32,14 +32,11 @@ namespace CTA.WebForms2Blazor.ClassConverters
             // modify using statements in other files, determing all namespace
             // changes before re-assembling new using statement collection will
             // make this possible
-            var requiredNamespaces = _sourceFileSemanticModel.GetNamespacesReferencedByType(_originalDeclarationSyntax);
-            var usingStatements = CodeSyntaxHelper.BuildUsingStatements(requiredNamespaces.Select(namespaceSymbol => namespaceSymbol.Name));
-            var namespaceNode = CodeSyntaxHelper.BuildNamespace(_originalClassSymbol.ContainingNamespace.Name, _originalDeclarationSyntax);
-            var fileText = CodeSyntaxHelper.GetFileSyntaxAsString(namespaceNode, usingStatements);
+            var sourceClassComponents = GetSourceClassComponents();
 
             // Http modules are turned into middleware and so we use a new middleware directory
             // TODO: Potentially remove certain folders from beginning of relative path
-            return new FileInformation(Path.Combine(Constants.MiddlewareDirectoryName, _relativePath), Encoding.UTF8.GetBytes(fileText));
+            return new FileInformation(Path.Combine(Constants.MiddlewareDirectoryName, _relativePath), Encoding.UTF8.GetBytes(sourceClassComponents.FileText));
         }
     }
 }

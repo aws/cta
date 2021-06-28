@@ -32,13 +32,10 @@ namespace CTA.WebForms2Blazor.ClassConverters
             // modify using statements in other files, determing all namespace
             // changes before re-assembling new using statement collection will
             // make this possible
-            var requiredNamespaces = _sourceFileSemanticModel.GetNamespacesReferencedByType(_originalDeclarationSyntax);
-            var usingStatements = CodeSyntaxHelper.BuildUsingStatements(requiredNamespaces.Select(namespaceSymbol => namespaceSymbol.Name));
-            var namespaceNode = CodeSyntaxHelper.BuildNamespace(_originalClassSymbol.ContainingNamespace.Name, _originalDeclarationSyntax);
-            var fileText = CodeSyntaxHelper.GetFileSyntaxAsString(namespaceNode, usingStatements);
+            var sourceClassComponents = GetSourceClassComponents();
 
             // Global.asax.cs turns into Startup.cs
-            return new FileInformation(Path.Combine(Path.GetDirectoryName(_relativePath), Constants.StartupFileName), Encoding.UTF8.GetBytes(fileText));
+            return new FileInformation(Path.Combine(Path.GetDirectoryName(_relativePath), Constants.StartupFileName), Encoding.UTF8.GetBytes(sourceClassComponents.FileText));
         }
     }
 }

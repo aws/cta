@@ -28,12 +28,9 @@ namespace CTA.WebForms2Blazor.ClassConverters
             // that but instead I opted to "rebuild" the type in case we wanted to add comments
             // or something else to these undefined code files, most likely though we may still
             // want to scan parts of these files and remove/alter/take note of certain lines/info
-            var requiredNamespaces = _sourceFileSemanticModel.GetNamespacesReferencedByType(_originalDeclarationSyntax);
-            var usingStatements = CodeSyntaxHelper.BuildUsingStatements(requiredNamespaces.Select(namespaceSymbol => namespaceSymbol.Name));
-            var namespaceNode = CodeSyntaxHelper.BuildNamespace(_originalClassSymbol.ContainingNamespace.Name, _originalDeclarationSyntax);
-            var fileText = CodeSyntaxHelper.GetFileSyntaxAsString(namespaceNode, usingStatements);
+            var sourceClassComponents = GetSourceClassComponents();
 
-            return new FileInformation(_relativePath, Encoding.UTF8.GetBytes(fileText));
+            return new FileInformation(_relativePath, Encoding.UTF8.GetBytes(sourceClassComponents.FileText));
         }
     }
 }
