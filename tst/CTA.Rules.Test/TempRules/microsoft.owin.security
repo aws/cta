@@ -126,6 +126,52 @@
       ]
     },
     {
+      "Type": "Class",
+      "Name": "IAuthenticationManager",
+      "Value": "Microsoft.Owin.Security.IAuthenticationManager",
+      "KeyType": "Identifier",
+      "ContainingType": "",
+      "RecommendedActions": [
+        {
+          "Source": "Amazon",
+          "Preferred": "Yes",
+          "TargetFrameworks": [
+            {
+              "Name": "netcoreapp3.1",
+              "TargetCPU": [ "x86", "x64", "ARM32", "ARM64" ]
+            },
+            {
+              "Name": "net5.0",
+              "TargetCPU": [ "x86", "x64", "ARM32", "ARM64" ]
+            }
+          ],
+          "Description": "Add Microsoft.AspNetCore.Authentication namespace if AuthenticationProperties is being used and remove Microsoft.Owin.Security.",
+          "Actions": [
+            {
+              "Name": "ReplaceIdentifier",
+              "Type": "Identifier",
+              "Value": "HttpContext",
+              "Description": "Replace IAuthenticationManager with HttpContext",
+              "ActionValidation": {
+                "Contains": "HttpContext",
+                "NotContains": "IAuthenticationManager"
+              }
+            },
+            {
+              "Name": "AddDirective",
+              "Type": "Using",
+              "Value": "Microsoft.AspNetCore.Http",
+              "Description": "Add Microsoft.AspNetCore.Http namespace",
+              "ActionValidation": {
+                "Contains": "using Microsoft.AspNetCore.Http;",
+                "NotContains": ""
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
       "Type": "Method",
       "Name": "Microsoft.Owin.Security.IAuthenticationManager.AuthenticateAsync(string[])",
       "Value": "Microsoft.Owin.Security.IAuthenticationManager.AuthenticateAsync(string[])",
