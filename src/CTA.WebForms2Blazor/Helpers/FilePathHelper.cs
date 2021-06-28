@@ -1,13 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
 
 namespace CTA.WebForms2Blazor.Helpers
 {
     public static class FilePathHelper
     {
-        private const string FileNameDoesNotContainExtensionError = "Cannot alter file name, file name {0} does not contain extension {1}";
+        private const string FileNameDoesNotContainExtensionError = "Cannot alter file name, file name {0} does not end with extension {1}";
 
         public static string AlterFileName(string oldFilePath, string newFileName = null, string oldExtension = null, string newExtension = null)
         {
@@ -15,7 +13,7 @@ namespace CTA.WebForms2Blazor.Helpers
             var oldFileDirectory = Path.GetDirectoryName(oldFilePath);
             var oldFileName = Path.GetFileName(oldFilePath);
 
-            if (!oldFileName.Contains(actualOldExtension))
+            if (!oldFileName.EndsWith(actualOldExtension, StringComparison.InvariantCultureIgnoreCase))
             {
                 throw new ArgumentException(string.Format(FileNameDoesNotContainExtensionError, oldFileName, actualOldExtension));
             }
