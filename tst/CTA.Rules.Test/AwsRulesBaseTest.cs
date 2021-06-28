@@ -155,12 +155,15 @@ namespace CTA.Rules.Test
         private void CopyTestRules()
         {
             var tempRulesDir = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "TempRules");
-            var files = Directory.EnumerateFiles(tempRulesDir, "*.json");
-
-            foreach(var file in files)
+            if (Directory.Exists(tempRulesDir))
             {
-                string targetFile = Path.Combine(Constants.RulesDefaultPath, Path.GetFileName(file));
-                File.Copy(file, targetFile, true);
+                var files = Directory.EnumerateFiles(tempRulesDir, "*.json");
+
+                foreach (var file in files)
+                {
+                    string targetFile = Path.Combine(Constants.RulesDefaultPath, Path.GetFileName(file));
+                    File.Copy(file, targetFile, true);
+                }
             }
         }
 
