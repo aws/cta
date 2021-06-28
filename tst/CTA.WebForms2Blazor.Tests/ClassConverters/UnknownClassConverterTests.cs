@@ -25,9 +25,10 @@ namespace CTA.WebForms2Blazor.Tests.ClassConverters
         public async Task MigrateClassAsync_Maps_New_Relative_Path_To_Correct_Location()
         {
             var fileInfo = await _converter.MigrateClassAsync();
+            var expectedOutputPath = $"{Path.Combine(ClassConverterSetupFixture.TestProjectNestedDirectoryName, ClassConverterSetupFixture.TestClassName)}.cs";
 
             // Relative path should stay the same
-            Assert.AreEqual(InputRelativePath, fileInfo.RelativePath);
+            Assert.AreEqual(expectedOutputPath, fileInfo.RelativePath);
         }
     }
 }

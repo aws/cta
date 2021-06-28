@@ -29,8 +29,9 @@ namespace CTA.WebForms2Blazor.ClassConverters
             // or something else to these undefined code files, most likely though we may still
             // want to scan parts of these files and remove/alter/take note of certain lines/info
             var sourceClassComponents = GetSourceClassComponents();
+            var newRelativePath = FilePathHelper.AlterFileName(_relativePath, newFileName: _originalClassSymbol.Name);
 
-            return new FileInformation(_relativePath, Encoding.UTF8.GetBytes(sourceClassComponents.FileText));
+            return new FileInformation(newRelativePath, Encoding.UTF8.GetBytes(sourceClassComponents.FileText));
         }
     }
 }
