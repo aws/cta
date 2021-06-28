@@ -37,7 +37,7 @@ namespace CTA.WebForms2Blazor.ClassConverters
             // TODO: Potentially remove certain folders from beginning of relative path
             var newRelativePath = FilePathHelper.AlterFileName(_relativePath,
                 oldExtension: Constants.ControlCodeBehindExtension,
-                newExtension: Constants.RazorFileExtension);
+                newExtension: Constants.RazorCodeBehindFileExtension);
             
             return Path.Combine(Constants.RazorComponentDirectoryName, newRelativePath);
         }

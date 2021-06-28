@@ -15,7 +15,7 @@ namespace CTA.WebForms2Blazor.Helpers
             var oldFileDirectory = Path.GetDirectoryName(oldFilePath);
             var oldFileName = Path.GetFileName(oldFilePath);
 
-            if (!oldFileName.Contains(actualOldExtension))
+            if (!oldFileName.EndsWith(actualOldExtension, StringComparison.InvariantCultureIgnoreCase))
             {
                 throw new ArgumentException(string.Format(FileNameDoesNotContainExtensionError, oldFileName, actualOldExtension));
             }

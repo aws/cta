@@ -21,6 +21,7 @@ namespace CTA.WebForms2Blazor
         public const string ControlCodeBehindExtension = ".ascx.cs";
         public const string MasterPageCodeBehindExtension = ".Master.cs";
         public const string RazorFileExtension = ".razor";
+        public const string RazorCodeBehindFileExtension = ".razor.cs";
         public const string CSharpCodeFileExtension = ".cs";
         public const string CSharpProjectFileExtension = ".csproj";
         public const string SolutionFileExtension = ".sln";
