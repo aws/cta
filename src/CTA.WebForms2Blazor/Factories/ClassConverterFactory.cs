@@ -11,19 +11,11 @@ namespace CTA.WebForms2Blazor.Factories
 {
     public class ClassConverterFactory
     {
-        private const string ExpectedGlobalBaseClass = "HttpApplication";
-        private const string ExpectedPageBaseClass = "Page";
-        private const string ExpectedControlBaseClass = "UserControl";
-        private const string ExpectedMasterPageBaseClass = "MasterPage";
-        private const string ExpectedGlobalFileName = "Global.asax.cs";
-        private const string HttpHandlerInterface = "IHttpHandler";
-        private const string HttpModuleInterface = "IHttpModule";
-        private const string PageCodeBehindExtension = ".aspx.cs";
-        private const string ControlCodeBehindExtension = ".ascx.cs";
-        private const string MasterPageCodeBehindExtension = ".Master.cs";
+        private readonly string _sourceProjectPath;
 
-        public ClassConverterFactory()
+        public ClassConverterFactory(string sourceProjectPath)
         {
+            _sourceProjectPath = sourceProjectPath;
             // TODO: Receive services required for ClassConverters
             // via constructor parameters
         }
@@ -35,39 +27,39 @@ namespace CTA.WebForms2Blazor.Factories
 
             var symbol = model.GetDeclaredSymbol(typeDeclarationNode);
 
-            if (symbol.GetAllInheritedBaseTypes().Any(typeSymbol => typeSymbol.Name.Equals(ExpectedGlobalBaseClass))
-                && sourceFileRelativePath.EndsWith(ExpectedGlobalFileName, StringComparison.InvariantCultureIgnoreCase))
+            if (symbol.GetAllInheritedBaseTypes().Any(typeSymbol => typeSymbol.Name.Equals(Constants.ExpectedGlobalBaseClass))
+                && sourceFileRelativePath.EndsWith(Constants.ExpectedGlobalFileName, StringComparison.InvariantCultureIgnoreCase))
             {
-                return new GlobalClassConverter(sourceFileRelativePath, model, symbol);
+                return new GlobalClassConverter(sourceFileRelativePath, _sourceProjectPath, model, typeDeclarationNode, symbol);
             }
             // NOTE: The order is important from this point on, mainly because
             // Page-derived classes are also IHttpHandler derived
-            else if (symbol.GetAllInheritedBaseTypes().Any(typeSymbol => typeSymbol.Name.Equals(ExpectedPageBaseClass))
-                && sourceFileRelativePath.EndsWith(PageCodeBehindExtension, StringComparison.InvariantCultureIgnoreCase))
+            else if (symbol.GetAllInheritedBaseTypes().Any(typeSymbol => typeSymbol.Name.Equals(Constants.ExpectedPageBaseClass))
+                && sourceFileRelativePath.EndsWith(Constants.PageCodeBehindExtension, StringComparison.InvariantCultureIgnoreCase))
             {
-                return new PageCodeBehindClassConverter(sourceFileRelativePath, model, symbol);
+                return new PageCodeBehindClassConverter(sourceFileRelativePath, _sourceProjectPath, model, typeDeclarationNode, symbol);
             }
-            else if (symbol.GetAllInheritedBaseTypes().Any(typeSymbol => typeSymbol.Name.Equals(ExpectedControlBaseClass))
-                && sourceFileRelativePath.EndsWith(ControlCodeBehindExtension, StringComparison.InvariantCultureIgnoreCase))
+            else if (symbol.GetAllInheritedBaseTypes().Any(typeSymbol => typeSymbol.Name.Equals(Constants.ExpectedControlBaseClass))
+                && sourceFileRelativePath.EndsWith(Constants.ControlCodeBehindExtension, StringComparison.InvariantCultureIgnoreCase))
             {
-                return new ControlCodeBehindClassConverter(sourceFileRelativePath, model, symbol);
+                return new ControlCodeBehindClassConverter(sourceFileRelativePath, _sourceProjectPath, model, typeDeclarationNode, symbol);
             }
-            else if (symbol.GetAllInheritedBaseTypes().Any(typeSymbol => typeSymbol.Name.Equals(ExpectedMasterPageBaseClass))
-                && sourceFileRelativePath.EndsWith(MasterPageCodeBehindExtension, StringComparison.InvariantCultureIgnoreCase))
+            else if (symbol.GetAllInheritedBaseTypes().Any(typeSymbol => typeSymbol.Name.Equals(Constants.ExpectedMasterPageBaseClass))
+                && sourceFileRelativePath.EndsWith(Constants.MasterPageCodeBehindExtension, StringComparison.InvariantCultureIgnoreCase))
             {
-                return new MasterPageCodeBehindClassConverter(sourceFileRelativePath, model, symbol);
+                return new MasterPageCodeBehindClassConverter(sourceFileRelativePath, _sourceProjectPath, model, typeDeclarationNode, symbol);
             }
-            else if (symbol.AllInterfaces.Any(interfaceSymbol => interfaceSymbol.Name.Equals(HttpHandlerInterface)))
+            else if (symbol.AllInterfaces.Any(interfaceSymbol => interfaceSymbol.Name.Equals(Constants.HttpHandlerInterface)))
             {
-                return new HttpHandlerClassConverter(sourceFileRelativePath, model, symbol);
+                return new HttpHandlerClassConverter(sourceFileRelativePath, _sourceProjectPath, model, typeDeclarationNode, symbol);
             }
-            else if (symbol.AllInterfaces.Any(interfaceSymbol => interfaceSymbol.Name.Equals(HttpModuleInterface)))
+            else if (symbol.AllInterfaces.Any(interfaceSymbol => interfaceSymbol.Name.Equals(Constants.HttpModuleInterface)))
             {
-                return new HttpModuleClassConverter(sourceFileRelativePath, model, symbol);
+                return new HttpModuleClassConverter(sourceFileRelativePath, _sourceProjectPath, model, typeDeclarationNode, symbol);
             }
             else
             {
-                return new UnknownClassConverter(sourceFileRelativePath, model, symbol);
+                return new UnknownClassConverter(sourceFileRelativePath, _sourceProjectPath, model, typeDeclarationNode, symbol);
             }
         }
 

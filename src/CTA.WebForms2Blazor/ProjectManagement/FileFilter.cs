@@ -48,7 +48,7 @@ namespace CTA.WebForms2Blazor.ProjectManagement
             ".userosscache", ".userprefs", ".suo", ".user", ".ilk", ".meta", ".obj", ".pch", ".pdb", ".pgc",
             ".pgd", ".rsp", ".sbr", ".tlb", "tli", ".tlh", ".tmp", ".tmp_proj", ".log", ".vspscc", "vssscc",
             ".builds", ".pidb", ".svclog", ".scc", ".nupkg", ".cache", ".sln.docstates", ".visualState.xml",
-            "_i.c", "_p.c", "_i.h",
+            "_i.c", "_p.c", "_i.h", ".designer.cs", ".designer",
             string.Format("{0}dlldata.c", Path.DirectorySeparatorChar),
             string.Format("{0}launchSettings.json", Path.DirectorySeparatorChar),
             string.Format("{0}testResult.xml", Path.DirectorySeparatorChar),

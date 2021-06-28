@@ -29,7 +29,7 @@ namespace CTA.WebForms2Blazor.FileConverters
         public override async Task<IEnumerable<FileInformation>> MigrateFileAsync()
         {
             string filename = Path.GetFileName(RelativePath);
-            FileInformation fi;
+            var fileList = new List<FileInformation>();
 
             if (filename.Equals(WebConfigFile, StringComparison.InvariantCultureIgnoreCase))
             {
@@ -38,13 +38,8 @@ namespace CTA.WebForms2Blazor.FileConverters
                 var migratedString = configMigrate.WebformsWebConfigMigrateHelper();
 
                 string newPath = Path.Combine(_relativeDirectory, "appsettings.json");
-                fi = new FileInformation(newPath, Encoding.UTF8.GetBytes(migratedString));
-            } else
-            {
-                fi = null;
+                fileList.Add(new FileInformation(newPath, Encoding.UTF8.GetBytes(migratedString)));
             }
-
-            var fileList = new List<FileInformation>() {fi};
 
             return fileList;
         }

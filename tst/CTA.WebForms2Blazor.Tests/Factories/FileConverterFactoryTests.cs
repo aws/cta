@@ -47,7 +47,7 @@ namespace CTA.WebForms2Blazor.Tests.Factories
 
             blazorWorkspaceManager.CreateSolutionFile();
 
-            _fileConverterFactory = new FileConverterFactory(_testProjectPath, blazorWorkspaceManager, webFormsProjectAnalyzer, new ClassConverterFactory());
+            _fileConverterFactory = new FileConverterFactory(_testProjectPath, blazorWorkspaceManager, webFormsProjectAnalyzer, new ClassConverterFactory(string.Empty));
         }
 
         [Test]

@@ -17,6 +17,7 @@ namespace CTA.WebForms2Blazor
             string inputProjectDir = args[0];
             string outputProjectDir = args[1];
             string csProjFilePath = args[2];
+            string slnPath = args[3];
             
             var ctaArgs = new[]
             {
@@ -29,11 +30,6 @@ namespace CTA.WebForms2Blazor
             // Handle argument assignment
             PortCoreRulesCli cli = new PortCoreRulesCli();
             cli.HandleCommand(ctaArgs);
-            if (cli.DefaultRules)
-            {
-                // Since we're using default rules, we want to specify where to find those rules (once they are downloaded)
-                cli.RulesDir = Constants.RulesDefaultPath;
-            }
             
             var packageReferences = new Dictionary<string, Tuple<string, string>>
             {
@@ -59,8 +55,9 @@ namespace CTA.WebForms2Blazor
             var codeAnalyzer = CreateDefaultCodeAnalyzer();
             var analyzerResult = codeAnalyzer.AnalyzeProject(csProjFilePath).Result;
 
-            MigrationManager migrationManager =
-                new MigrationManager(inputProjectDir, outputProjectDir, analyzerResult, projectConfiguration);
+            var solutionPort = new SolutionPort(slnPath, new List<AnalyzerResult>() { analyzerResult }, new List<PortCoreConfiguration>() { projectConfiguration });
+
+            MigrationManager migrationManager = new MigrationManager(inputProjectDir, outputProjectDir, analyzerResult, projectConfiguration);
 
             await migrationManager.PerformMigration();
         }
