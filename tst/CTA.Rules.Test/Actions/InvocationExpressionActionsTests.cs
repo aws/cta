@@ -50,6 +50,19 @@ namespace CTA.Rules.Test.Actions
         }
 
         [Test]
+        public void GetReplaceMethodWithObjectAddTypeAction()
+        {
+            _node = SyntaxFactory.ParseExpression("DependencyResolver.Current.GetService<object>()") as InvocationExpressionSyntax;
+            const string newMethod = "DependencyResolver.Current.GetService";
+            var appendMethodFunc =
+                _invocationExpressionActions.GetReplaceMethodWithObjectAddTypeAction(newMethod);
+            var newNode = appendMethodFunc(_syntaxGenerator, _node);
+
+            var expectedResult = "DependencyResolver.Current.GetService(typeof(object))";
+            Assert.AreEqual(expectedResult, newNode.ToFullString());
+        }
+
+        [Test]
         public void GetReplaceMethodAndParametersAction()
         {
             const string newMethod = "Floor";
@@ -71,6 +84,18 @@ namespace CTA.Rules.Test.Actions
             var newNode = appendMethodFunc(_syntaxGenerator, _node);
 
             var expectedResult = "Math.Floor(-1)";
+            Assert.AreEqual(expectedResult, newNode.ToFullString());
+        }
+
+        [Test]
+        public void GetReplaceParameterOnlyAction()
+        {
+            const string newParam = "(8)";
+            var appendMethodFunc =
+                _invocationExpressionActions.GetReplaceParametersOnlyAction(newParam);
+            var newNode = appendMethodFunc(_syntaxGenerator, _node);
+
+            var expectedResult = "Math.Abs(8)";
             Assert.AreEqual(expectedResult, newNode.ToFullString());
         }
 

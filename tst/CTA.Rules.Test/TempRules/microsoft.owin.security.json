@@ -10,8 +10,8 @@
   "Recommendations": [
     {
       "Type": "Namespace",
-      "Name": "Microsoft.OwinSecurity",
-      "Value": "Microsoft.OwinSecurity",
+      "Name": "Microsoft.Owin.Security",
+      "Value": "Microsoft.Owin.Security",
       "KeyType": "Name",
       "ContainingType": "",
       "RecommendedActions": [
@@ -200,6 +200,16 @@
               "Description": "Add Microsoft.AspNetCore.Authentication namespace",
               "ActionValidation": {
                 "Contains": "using Microsoft.AspNetCore.Authentication;",
+                "NotContains": ""
+              }
+            },
+            {
+              "Name": "ReplaceParametersOnly",
+              "Type": "Method",
+              "Value": "()",
+              "Description": "Remove parameters of AuthenticateAsync.",
+              "ActionValidation": {
+                "Contains": "",
                 "NotContains": ""
               }
             }
