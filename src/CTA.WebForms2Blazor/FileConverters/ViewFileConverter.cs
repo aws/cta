@@ -1,46 +1,39 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using CTA.WebForms2Blazor.ControlConverters;
 using CTA.WebForms2Blazor.FileInformationModel;
 using CTA.WebForms2Blazor.Helpers;
+using CTA.WebForms2Blazor.Helpers.ControlHelpers;
 using HtmlAgilityPack;
 
 namespace CTA.WebForms2Blazor.FileConverters
 {
     public class ViewFileConverter : FileConverter
     {
-        private Dictionary<String, ControlConverter> ControlRulesMap; //From constructor or service
-        //Tuple contains node to be converted, parent node, and instructions to convert node in that order
-        private List<(HtmlNode Node, HtmlNode Parent, ControlConverter Rules)> NodesToBeConverted;
+        private List<ControlConversionAction> ControlActions;
         private string _relativeDirectory;
 
-        public ViewFileConverter(string sourceProjectPath, string fullPath, Dictionary<String, ControlConverter> dict) 
+        public ViewFileConverter(string sourceProjectPath, string fullPath) 
             : base(sourceProjectPath, fullPath)
         {
-            // TODO: Register file with necessary services
             _relativeDirectory = Path.GetDirectoryName(RelativePath);
-            NodesToBeConverted = new List<(HtmlNode Node, HtmlNode Parent, ControlConverter Rules)>();
-            ControlRulesMap = dict;
+            ControlActions = new List<ControlConversionAction>();
         }
 
         private HtmlDocument GetRazorContents()
         {
             var htmlDoc = new HtmlDocument();
             htmlDoc.Load(FullPath);
-            DfsPostorderWalker(htmlDoc.DocumentNode, null);
+            FindConversionActions(htmlDoc.DocumentNode, null);
             
-            //This will either return string contents or modified HtmlDocument
-            //that will then be changed to a file information object
-            
+            //This will modify the HtmlDocument nodes that will then be changed to a file information object
             ConvertNodes();
             return htmlDoc;
         }
 
-        private void DfsPostorderWalker(HtmlNode node, HtmlNode parent)
+        //Performs a DFS traversal of the HTML tree, adding nodes to be converted in postorder
+        private void FindConversionActions(HtmlNode node, HtmlNode parent)
         {
             if (node == null)
             {
@@ -49,24 +42,24 @@ namespace CTA.WebForms2Blazor.FileConverters
 
             foreach (HtmlNode child in node.ChildNodes)
             {
-                DfsPostorderWalker(child, node);
+                FindConversionActions(child, node);
             }
 
-            GetRules(node, parent);
+            GetActions(node, parent);
         }
 
-        private void GetRules(HtmlNode node, HtmlNode parent)
+        private void GetActions(HtmlNode node, HtmlNode parent)
         {
-            if (ControlRulesMap.ContainsKey(node.Name))
+            if (SupportedControls.ControlRulesMap.ContainsKey(node.Name))
             {
-                var conversionTuple = (node, parent, ControlRulesMap[node.Name]);
-                NodesToBeConverted.Add(conversionTuple);
+                var conversionAction = new ControlConversionAction(node, parent, SupportedControls.ControlRulesMap[node.Name]);
+                ControlActions.Add(conversionAction);
             }
         }
 
         private void ConvertNodes()
         {
-            foreach (var package in NodesToBeConverted)
+            foreach (var package in ControlActions)
             {
                 HtmlNode convertedNode = package.Rules.Convert2Blazor(package.Node);
                 package.Parent.ReplaceChild(convertedNode, package.Node);
@@ -81,11 +74,12 @@ namespace CTA.WebForms2Blazor.FileConverters
             // only view layer, code behind will be created in another file
             HtmlDocument migratedDocument = GetRazorContents();
             string contents = migratedDocument.DocumentNode.WriteTo();
-
-            string newFileName = "testing.razor"; //new file name depends, add later
-            string newPath = Path.Combine(_relativeDirectory, newFileName);
             
-            var fileList = new List<FileInformation>() {new FileInformation(newPath, Encoding.UTF8.GetBytes(contents))};
+            //Currently just changing extension to .razor, keeping filename and directory the same
+            //but Razor files are renamed and moved around, can't always use same filename/directory in the future
+            string newFileName = FilePathHelper.AlterFileName(RelativePath, oldExtension:".aspx", newExtension: ".razor");
+            
+            var fileList = new List<FileInformation>() {new FileInformation(newFileName, Encoding.UTF8.GetBytes(contents))};
 
             return fileList;
         }

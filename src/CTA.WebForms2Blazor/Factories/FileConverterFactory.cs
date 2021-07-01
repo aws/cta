@@ -64,7 +64,7 @@ namespace CTA.WebForms2Blazor.Factories
                 || extension.Equals(Constants.WebFormsMasterPageMarkupFileExtension)
                 || extension.Equals(Constants.WebFormsGlobalMarkupFileExtension))
             {
-                fc = new ViewFileConverter(_sourceProjectPath, document.FullName, new Dictionary<string, ControlConverter>());
+                fc = new ViewFileConverter(_sourceProjectPath, document.FullName);
             }
             else if (extension.Equals(Constants.CSharpProjectFileExtension))
             {

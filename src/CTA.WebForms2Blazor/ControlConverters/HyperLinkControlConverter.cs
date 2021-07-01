@@ -6,10 +6,19 @@ namespace CTA.WebForms2Blazor.ControlConverters
 {
     public class HyperLinkControlConverter : ControlConverter
     {
-        private Dictionary<String, String> _hyperLinkControlsMap = new Dictionary<string, string>() 
-            {["navigateurl"] = "href", ["cssclass"] = "class"};
-        private readonly string _name = "a";
-        
+        protected override Dictionary<string, string> AttributeMap { 
+            get 
+            { 
+                return new Dictionary<string, string>()
+                {
+                    ["navigateurl"] = "href", 
+                    ["cssclass"] = "class"
+                };
+                
+            } 
+        }
+        protected override string BlazorName { get { return "a"; } }
+
         public HyperLinkControlConverter() : base()
         {
             
@@ -20,9 +29,9 @@ namespace CTA.WebForms2Blazor.ControlConverters
             string newAttributes = "";   
             foreach (HtmlAttribute attr in node.Attributes)
             {
-                if (_hyperLinkControlsMap.ContainsKey(attr.Name))
+                if (AttributeMap.ContainsKey(attr.Name))
                 {
-                    string newAttr = _hyperLinkControlsMap[attr.Name] + "=" + attr.Value + " ";
+                    string newAttr = AttributeMap[attr.Name] + "=" + attr.Value + " ";
                     newAttributes += newAttr;
                 }
             }
@@ -32,7 +41,7 @@ namespace CTA.WebForms2Blazor.ControlConverters
             string template = 
                 @"<{0} {1}>{2}</{0}>";
             
-            string newContent = String.Format(template, _name, newAttributes, node.InnerHtml);
+            string newContent = String.Format(template, BlazorName, newAttributes, node.InnerHtml);
             HtmlNode newNode = HtmlNode.CreateNode(newContent);
             return newNode;
         }

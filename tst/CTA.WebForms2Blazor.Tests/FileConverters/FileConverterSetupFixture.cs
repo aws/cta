@@ -18,6 +18,7 @@ namespace CTA.WebForms2Blazor.Tests.FileConverters
         public static string TestStaticResourceFilePath;
         public static string TestStaticFilePath;
         public static string TestViewFilePath;
+        public static string TestHyperLinkControlFilePath;
         public static string TestAreaFullPath;
 
         private WorkspaceManagerService _blazorWorkspaceManager;
@@ -33,6 +34,7 @@ namespace CTA.WebForms2Blazor.Tests.FileConverters
             TestStaticFilePath = Path.Combine(TestFilesDirectoryPath, "SampleStaticFile.csv");
             TestStaticResourceFilePath = Path.Combine(TestFilesDirectoryPath, "SampleStaticResourceFile.png");
             TestViewFilePath = Path.Combine(TestFilesDirectoryPath, "SampleViewFile.aspx");
+            TestHyperLinkControlFilePath = Path.Combine(TestFilesDirectoryPath, "HyperLinkControlOnly.aspx");
             TestAreaFullPath = Path.Combine(TestProjectPath, TestFilesDirectoryPath);
             
             _blazorWorkspaceManager = new WorkspaceManagerService();
