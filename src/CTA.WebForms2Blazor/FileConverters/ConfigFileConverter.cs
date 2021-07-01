@@ -31,6 +31,7 @@ namespace CTA.WebForms2Blazor.FileConverters
             string filename = Path.GetFileName(RelativePath);
             var fileList = new List<FileInformation>();
 
+            //Currently only handles web.config, package.config handled by ProjectFileConverter, others not handled
             if (filename.Equals(WebConfigFile, StringComparison.InvariantCultureIgnoreCase))
             {
                 //ProjectType WebForms doesn't really exist yet, but can be added for more specific configuration

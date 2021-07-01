@@ -7,7 +7,7 @@ using CTA.Rules.Config;
 using CTA.Rules.Test;
 using NUnit.Framework;
 
-namespace CTA.WebForms2Blazor.Tests
+namespace CTA.WebForms2Blazor.Tests.FileConverters.DownloadRequired
 {
     [SetUpFixture]
     public class DownloadTestProjectsFixture : AwsRulesBaseTest
@@ -18,6 +18,7 @@ namespace CTA.WebForms2Blazor.Tests
         private static string _eShopOnBlazorSolutionFilePath;
         private static string _eShopOnBlazorSolutionPath;
         private static string _eShopLegacyWebFormsProjectPath;
+        
         public static string EShopOnBlazorSolutionPath { get { return _eShopOnBlazorSolutionPath; } }
         public static string EShopOnBlazorSolutionFilePath { get { return _eShopOnBlazorSolutionFilePath; } }
         public static string EShopLegacyWebFormsProjectPath { get { return _eShopLegacyWebFormsProjectPath; } }
@@ -41,6 +42,12 @@ namespace CTA.WebForms2Blazor.Tests
 
         }
 
+        [OneTimeTearDown]
+        public void Cleanup()
+        {
+            DeleteDir(0);
+        }
+
         private void DownloadTestProjects()
         {
             var tempDirectory = Directory.CreateDirectory(_tempDir);
@@ -51,13 +58,7 @@ namespace CTA.WebForms2Blazor.Tests
                 GithubInfo.TestGithubTag);
             ZipFile.ExtractToDirectory(fileName, _downloadLocation, true);
         }
-
-        [OneTimeTearDown]
-        public void Cleanup()
-        {
-            DeleteDir(0);
-        }
-
+        
         private void DeleteDir(int retries)
         {
             if (retries <= 10)

@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using CTA.WebForms2Blazor.ControlConverters;
 using CTA.WebForms2Blazor.FileConverters;
+using CTA.WebForms2Blazor.Helpers;
 using CTA.WebForms2Blazor.ProjectManagement;
 using CTA.WebForms2Blazor.Services;
 
@@ -62,7 +64,7 @@ namespace CTA.WebForms2Blazor.Factories
                 || extension.Equals(Constants.WebFormsMasterPageMarkupFileExtension)
                 || extension.Equals(Constants.WebFormsGlobalMarkupFileExtension))
             {
-                fc = new ViewFileConverter(_sourceProjectPath, document.FullName);
+                fc = new ViewFileConverter(_sourceProjectPath, document.FullName, new Dictionary<string, ControlConverter>());
             }
             else if (extension.Equals(Constants.CSharpProjectFileExtension))
             {
