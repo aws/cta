@@ -40,5 +40,6 @@ namespace CTA.WebForms2Blazor
         public const string RazorComponentDirectoryName = "Components";
         public const string RazorLayoutDirectoryName = "Layouts";
         public const string MiddlewareDirectoryName = "Middleware";
+        
     }
 }
