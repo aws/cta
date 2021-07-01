@@ -1,10 +1,7 @@
 ﻿using CTA.WebForms2Blazor.Helpers;
 using Microsoft.CodeAnalysis;
 using NUnit.Framework;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace CTA.WebForms2Blazor.Tests.Helpers
 {
@@ -19,7 +16,18 @@ namespace CTA.WebForms2Blazor.Tests.Helpers
         private const string ExpectedDelegateInvokeCallText = "await _next.Invoke(context);";
         private const string ExpectedDelegateFieldDeclarationText = "private readonly RequestDelegate _next;";
 
-        private static string ExpectedMiddlwareRegistrationString => $"app = app.UseMiddleware<{MiddlewareClassName}>();";
+        private const string ExpectedMiddlwareLambdaText =
+@"async (context, next) =>
+{
+    await next();
+}";
+        private static string ExpectedMiddlewareLambdaRegistrationString =>
+@"app.Use(async (context, next) =>
+{
+    await next();
+});";
+
+        private static string ExpectedMiddlewareRegistrationString => $"app.UseMiddleware<{MiddlewareClassName}>();";
         private static string ExpectedBasicMiddlewareClassText =>
 $@"{ExpectedMiddlewareClassSignature}
 {{
@@ -171,7 +179,21 @@ $@"{ExpectedMiddlewareInvokeSignature}
         [Test]
         public void BuildMiddlewareRegistrationSyntax_Produces_Expected_Basic_Result()
         {
-            Assert.AreEqual(ExpectedMiddlwareRegistrationString, MiddlewareSyntaxHelper.BuildMiddlewareRegistrationSyntax(MiddlewareClassName).NormalizeWhitespace().ToFullString());
+            Assert.AreEqual(ExpectedMiddlewareRegistrationString, MiddlewareSyntaxHelper.BuildMiddlewareRegistrationSyntax(MiddlewareClassName).NormalizeWhitespace().ToFullString());
+        }
+
+        [Test]
+        public void BuildMiddlewareLambda_Correctly_Builds_Basic_Lambda()
+        {
+            Assert.AreEqual(ExpectedMiddlwareLambdaText, MiddlewareSyntaxHelper.BuildMiddlewareLambda().NormalizeWhitespace().ToFullString());
+        }
+
+        [Test]
+        public void BuildMiddlewareLambdaRegistrationSyntax_Correctly_Builds_Basic_Lambda_Registration()
+        {
+            var registration = MiddlewareSyntaxHelper.BuildMiddlewareLambdaRegistrationSyntax(MiddlewareSyntaxHelper.BuildMiddlewareLambda());
+
+            Assert.AreEqual(ExpectedMiddlewareLambdaRegistrationString, registration.NormalizeWhitespace().ToFullString());
         }
     }
 }

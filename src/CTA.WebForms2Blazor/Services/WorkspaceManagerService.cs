@@ -89,7 +89,8 @@ namespace CTA.WebForms2Blazor.Services
             {
                 _allProjectsInWorkspaceTaskSources.ForEach(source =>
                 {
-                    if (!source.Task.IsCanceled && !source.Task.IsCompleted)
+                    // A cancelled task also counts as completed
+                    if (!source.Task.IsCompleted)
                     {
                         source.SetResult(true);
                     }
@@ -144,7 +145,8 @@ namespace CTA.WebForms2Blazor.Services
             {
                 _allDocumentsInWorkspaceTaskSources.ForEach(source =>
                 {
-                    if (!source.Task.IsCanceled && !source.Task.IsCompleted)
+                    // A cancelled task also counts as completed
+                    if (!source.Task.IsCompleted)
                     {
                         source.SetResult(true);
                     }

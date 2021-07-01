@@ -20,8 +20,13 @@ namespace CTA.WebForms2Blazor.Tests.Extensions
                 }
             }";
         private const string TestStatementText = "var x = 10;";
-        private const string TestCommentPrependChars = "// ";
         private const string TestStatementCommentShort = "This is a short comment";
+        private const string TestMethodName = "TestMethod";
+        private const string TestMethodWrongName = "TestMethodWrong";
+        private const string EventHandlerObjectParamType = "object";
+        private const string EventHandlerObjectParamName = "sender";
+        private const string EventHandlerEventArgsParamType = "EventArgs";
+        private const string EventHandlerEventArgsParamName = "e";
 
         private WorkspaceManagerService _workspaceManager;
 
@@ -89,36 +94,6 @@ namespace CTA.WebForms2Blazor.Tests.Extensions
         }
 
         [Test]
-        public void AddComment_Prepends_Text_To_Node_With_Double_Slash()
-        {
-            var expectedOutput = $"{TestCommentPrependChars}{TestStatementCommentShort}\r\n{TestStatementText}";
-            var statement = SyntaxFactory.ParseStatement(TestStatementText);
-            statement = statement.AddComment(new [] { TestStatementCommentShort });
-
-            Assert.AreEqual(expectedOutput, statement.NormalizeWhitespace().ToFullString());
-        }
-
-        [TestCase("Single", 10, new[] { "Single" })]
-        [TestCase("Double Double", 6, new[] { "Double", "Double" })]
-        [TestCase("Four Four Four Four", 8, new[] { "Four Four", "Four Four" })]
-        [TestCase("  This     is a long,   long, long,  long    comment ", 9, new[] { "This is a", "long, long,", "long, long", "comment" })]
-        public void AddComment_Splits_Text_Before_Prepending_With_Double_Slash(string comment, int splitSize, IEnumerable<string> commentParts)
-        {
-            string expectedComment = string.Empty;
-            foreach (var commentPart in commentParts)
-            {
-                expectedComment += $"{TestCommentPrependChars}{commentPart}\r\n";
-            }
-
-            var expectedOutput = expectedComment + TestStatementText;
-            var statement = SyntaxFactory.ParseStatement(TestStatementText);
-            // Set soft character limit to over length of test statement to prevent line breaking
-            statement = statement.AddComment(comment, splitSize);
-
-            Assert.AreEqual(expectedOutput, statement.NormalizeWhitespace().ToFullString());
-        }
-
-        [Test]
         public void UnionSyntaxNodeCollections_Counts_Duplicates_Regardless_Of_Trivia()
         {
             var statement1 = SyntaxFactory.ParseStatement(TestStatementText);
@@ -129,5 +104,85 @@ namespace CTA.WebForms2Blazor.Tests.Extensions
 
             Assert.AreEqual(statement1, statementCollection1.UnionSyntaxNodeCollections(statementCollection2).Single());
         }
+
+        [Test]
+        public void IsEventHandler_Returns_True_For_Correct_Event_Handler()
+        {
+            var methodType = SyntaxFactory.PredefinedType(SyntaxFactory.Token(SyntaxKind.VoidKeyword));
+            var methodName = SyntaxFactory.Identifier(TestMethodName);
+
+            var param1 = SyntaxFactory.Parameter(SyntaxFactory.Identifier(EventHandlerObjectParamName))
+                .WithType(SyntaxFactory.ParseTypeName(EventHandlerObjectParamType));
+            var param2 = SyntaxFactory.Parameter(SyntaxFactory.Identifier(EventHandlerEventArgsParamName))
+                .WithType(SyntaxFactory.ParseTypeName(EventHandlerEventArgsParamType));
+
+            var method = SyntaxFactory.MethodDeclaration(methodType, methodName)
+                .AddParameterListParameters(param1, param2);
+
+            Assert.True(method.IsEventHandler(TestMethodName));
+        }
+
+        [Test]
+        public void IsEventHandler_Returns_False_For_Mismatched_Handler_Name()
+        {
+            var methodType = SyntaxFactory.PredefinedType(SyntaxFactory.Token(SyntaxKind.VoidKeyword));
+            var methodName = SyntaxFactory.Identifier(TestMethodWrongName);
+
+            var param1 = SyntaxFactory.Parameter(SyntaxFactory.Identifier(EventHandlerObjectParamName))
+                .WithType(SyntaxFactory.ParseTypeName(EventHandlerObjectParamType));
+            var param2 = SyntaxFactory.Parameter(SyntaxFactory.Identifier(EventHandlerEventArgsParamName))
+                .WithType(SyntaxFactory.ParseTypeName(EventHandlerEventArgsParamType));
+
+            var method = SyntaxFactory.MethodDeclaration(methodType, methodName)
+                .AddParameterListParameters(param1, param2);
+
+            Assert.False(method.IsEventHandler(TestMethodName));
+        }
+
+        [Test]
+        public void IsEventHandler_Returns_False_For_Incorrect_Parameters()
+        {
+            var methodType = SyntaxFactory.PredefinedType(SyntaxFactory.Token(SyntaxKind.VoidKeyword));
+            var methodName = SyntaxFactory.Identifier(TestMethodName);
+
+            var method = SyntaxFactory.MethodDeclaration(methodType, methodName);
+
+            Assert.False(method.IsEventHandler(TestMethodName));
+        }
+
+        [Test]
+        public void HasEventHandlerParameters_Returns_True_For_Correct_Params()
+        {
+            var methodType = SyntaxFactory.PredefinedType(SyntaxFactory.Token(SyntaxKind.VoidKeyword));
+            var methodName = SyntaxFactory.Identifier(TestMethodName);
+
+            var param1 = SyntaxFactory.Parameter(SyntaxFactory.Identifier(EventHandlerObjectParamName))
+                .WithType(SyntaxFactory.ParseTypeName(EventHandlerObjectParamType));
+            var param2 = SyntaxFactory.Parameter(SyntaxFactory.Identifier(EventHandlerEventArgsParamName))
+                .WithType(SyntaxFactory.ParseTypeName(EventHandlerEventArgsParamType));
+
+            var method = SyntaxFactory.MethodDeclaration(methodType, methodName)
+                .AddParameterListParameters(param1, param2);
+
+            Assert.True(method.HasEventHandlerParameters());
+        }
+
+        [Test]
+        public void HasEventHandlerParameters_Returns_False_For_Incorrect_Params()
+        {
+            var methodType = SyntaxFactory.PredefinedType(SyntaxFactory.Token(SyntaxKind.VoidKeyword));
+            var methodName = SyntaxFactory.Identifier(TestMethodName);
+
+            var param1 = SyntaxFactory.Parameter(SyntaxFactory.Identifier(EventHandlerObjectParamName))
+                .WithType(SyntaxFactory.PredefinedType(SyntaxFactory.Token(SyntaxKind.IntKeyword)));
+            var param2 = SyntaxFactory.Parameter(SyntaxFactory.Identifier(EventHandlerEventArgsParamName))
+                .WithType(SyntaxFactory.PredefinedType(SyntaxFactory.Token(SyntaxKind.IntKeyword)));
+
+            var method = SyntaxFactory.MethodDeclaration(methodType, methodName)
+                .AddParameterListParameters(param1, param2);
+
+            Assert.False(method.HasEventHandlerParameters());
+        }
+
     }
 }
