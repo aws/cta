@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -44,6 +45,16 @@ namespace CTA.WebForms2Blazor.Helpers
                 SyntaxFactory.Token(SyntaxKind.OpenBraceToken),
                 SyntaxFactory.List(statements),
                 SyntaxFactory.Token(SyntaxKind.CloseBraceToken));
+        }
+
+        public static EmptyStatementSyntax GetBlankLine()
+        {
+            return SyntaxFactory.EmptyStatement()
+                // Remove extra semicolon from empty statement
+                .WithSemicolonToken(SyntaxFactory.MissingToken(SyntaxKind.SemicolonToken))
+                // Without the newline the whitespace gets absorbed by other
+                // lines for some reason
+                .WithLeadingTrivia(SyntaxFactory.Whitespace(Environment.NewLine));
         }
     }
 }

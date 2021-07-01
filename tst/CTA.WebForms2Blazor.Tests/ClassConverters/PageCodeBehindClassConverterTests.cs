@@ -8,7 +8,7 @@ namespace CTA.WebForms2Blazor.Tests.ClassConverters
     public class PageCodeBehindClassConverterTests
     {
         private static string InputRelativePath => Path.Combine(ClassConverterSetupFixture.TestProjectNestedDirectoryName, "CodeBehind.aspx.cs");
-        private static string ExpectedOutputPath => Path.Combine("Pages", ClassConverterSetupFixture.TestProjectNestedDirectoryName, "CodeBehind.razor");
+        private static string ExpectedOutputPath => Path.Combine("Pages", ClassConverterSetupFixture.TestProjectNestedDirectoryName, "CodeBehind.razor.cs");
 
         private PageCodeBehindClassConverter _converter;
 

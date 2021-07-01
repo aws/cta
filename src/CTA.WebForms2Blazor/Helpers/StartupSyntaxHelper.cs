@@ -39,7 +39,7 @@ namespace CTA.WebForms2Blazor.Helpers
         /// <param name="constructorAdditionalStatements">Statements to put after required statements in constructor</param>
         /// <param name="configureAdditionalStatements">Statements to put after required statements in configure method</param>
         /// <param name="configureServicesAdditionalStatements">Statements to put after required statements in configure services method</param>
-        /// <param name="fieldDeclarations">Fields that were used in Global.asax.cs</param>
+        /// <param name="additionalFieldDeclarations">Fields that were used in Global.asax.cs</param>
         /// <param name="additionalPropertyDeclarations">Properties that were used in Global.asax.cs</param>
         /// <param name="additionalMethodDeclarations">Methods in addition to the "normal" methods of Global.asax.cs</param>
         /// <returns>ClassDeclarationSyntax node for new Startup class</returns>
@@ -47,15 +47,15 @@ namespace CTA.WebForms2Blazor.Helpers
             IEnumerable<StatementSyntax> constructorAdditionalStatements = null,
             IEnumerable<StatementSyntax> configureAdditionalStatements = null,
             IEnumerable<StatementSyntax> configureServicesAdditionalStatements = null,
-            IEnumerable<FieldDeclarationSyntax> fieldDeclarations = null,
+            IEnumerable<FieldDeclarationSyntax> additionalFieldDeclarations = null,
             IEnumerable<PropertyDeclarationSyntax> additionalPropertyDeclarations = null,
             IEnumerable<MethodDeclarationSyntax> additionalMethodDeclarations = null)
         {
             var result = SyntaxFactory.ClassDeclaration(StartupClassName).AddModifiers(SyntaxFactory.Token(SyntaxKind.PublicKeyword));
 
-            if (fieldDeclarations != null)
+            if (additionalFieldDeclarations != null)
             {
-                result = result.AddMembers(fieldDeclarations.ToArray());
+                result = result.AddMembers(additionalFieldDeclarations.ToArray());
             }
 
             result = result.AddMembers(AddStartupProperties(additionalPropertyDeclarations).ToArray());
