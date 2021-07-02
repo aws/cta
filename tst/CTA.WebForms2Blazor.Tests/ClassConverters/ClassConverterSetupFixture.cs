@@ -28,6 +28,7 @@ namespace CTA.WebForms2Blazor.Tests.ClassConverters
         {
             TestProjectDirectoryPath = Path.Combine(PartialProjectSetupFixture.TestFilesPath, TestProjectDirectoryName);
             TestProjectNestedDirectoryPath = Path.Combine(TestProjectDirectoryPath, TestProjectNestedDirectoryName);
+
             TestClassDec = SyntaxFactory.ClassDeclaration(TestClassName).AddMembers(SyntaxFactory.ConstructorDeclaration(TestClassName));
             TestSyntaxTree = SyntaxFactory.CompilationUnit()
                 .AddMembers(SyntaxFactory.NamespaceDeclaration(SyntaxFactory.ParseName(TestNamespaceName)).AddMembers(TestClassDec)).SyntaxTree;
@@ -35,7 +36,6 @@ namespace CTA.WebForms2Blazor.Tests.ClassConverters
             // Fetch updated class dec node
             TestClassDec = TestSyntaxTree.GetRoot().DescendantNodes().OfType<ClassDeclarationSyntax>().Single();
             TestTypeSymbol = TestSemanticModel.GetDeclaredSymbol(TestClassDec);
-            
         }
     }
 }

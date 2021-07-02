@@ -15,17 +15,16 @@ namespace CTA.WebForms2Blazor
         private readonly string _inputProjectPath;
         private readonly string _outputProjectPath;
 
-        // At the moment these are only being used in the
-        // PerformMigration method, but they are likely to
-        // be used in other places later on. Leaving them
-        // in for now
-        private ProjectAnalyzer _webFormsProjectAnalyzer;
-        private ProjectBuilder _blazorProjectBuilder;
         private PortCoreConfiguration _projectConfiguration;
         private AnalyzerResult _analyzerResult;
 
-        private WorkspaceManagerService _webFormsWorkspaceManager;
+        private ProjectAnalyzer _webFormsProjectAnalyzer;
+        private ProjectBuilder _blazorProjectBuilder;
+
+        private TaskManagerService _taskManager;
+        private LifecycleManagerService _lifecycleManager;
         private WorkspaceManagerService _blazorWorkspaceManager;
+
         private ClassConverterFactory _classConverterFactory;
         private FileConverterFactory _fileConverterFactory;
 
@@ -40,11 +39,10 @@ namespace CTA.WebForms2Blazor
 
         public async Task PerformMigration()
         {
-            SetUpWorkspaceManagers();
-            _webFormsProjectAnalyzer = new ProjectAnalyzer(_inputProjectPath, _analyzerResult, _projectConfiguration);
-            _blazorProjectBuilder = new ProjectBuilder(_outputProjectPath);
-            _classConverterFactory = new ClassConverterFactory(_inputProjectPath);
-            _fileConverterFactory = new FileConverterFactory(_inputProjectPath, _blazorWorkspaceManager, _webFormsProjectAnalyzer, _classConverterFactory);
+            // Order is important here
+            InitializeProjectManagementStructures();
+            InitializeServices();
+            InitializeFactories();
 
             // Pass workspace build manager to factory constructor
             var fileConverterCollection = _fileConverterFactory.BuildMany(_webFormsProjectAnalyzer.GetProjectFileInfo());
@@ -69,15 +67,28 @@ namespace CTA.WebForms2Blazor
             await Task.WhenAll(migrationTasks);
 
             // TODO: Any necessary cleanup or last checks on new project
+            // TODO: Maybe add any new files that don't directly correspond
+            // to existing files in Web Forms i.e. _Imports.razor
         }
 
-        private void SetUpWorkspaceManagers()
+        private void InitializeProjectManagementStructures()
         {
-            _webFormsWorkspaceManager = new WorkspaceManagerService();
-            _blazorWorkspaceManager = new WorkspaceManagerService();
+            _webFormsProjectAnalyzer = new ProjectAnalyzer(_inputProjectPath, _analyzerResult, _projectConfiguration);
+            _blazorProjectBuilder = new ProjectBuilder(_outputProjectPath);
+        }
 
+        private void InitializeServices()
+        {
+            _taskManager = new TaskManagerService();
+            _lifecycleManager = new LifecycleManagerService();
+            _blazorWorkspaceManager = new WorkspaceManagerService();
             _blazorWorkspaceManager.CreateSolutionFile();
-            _webFormsWorkspaceManager.CreateSolutionFile();
+        }
+
+        private void InitializeFactories()
+        {
+            _classConverterFactory = new ClassConverterFactory(_inputProjectPath, _lifecycleManager, _taskManager);
+            _fileConverterFactory = new FileConverterFactory(_inputProjectPath, _blazorWorkspaceManager, _webFormsProjectAnalyzer, _classConverterFactory);
         }
     }
 }

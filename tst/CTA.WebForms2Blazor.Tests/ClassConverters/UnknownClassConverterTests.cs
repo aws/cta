@@ -1,4 +1,5 @@
 ﻿using CTA.WebForms2Blazor.ClassConverters;
+using CTA.WebForms2Blazor.Services;
 using NUnit.Framework;
 using System.IO;
 using System.Threading.Tasks;
@@ -18,7 +19,8 @@ namespace CTA.WebForms2Blazor.Tests.ClassConverters
                 ClassConverterSetupFixture.TestProjectDirectoryPath,
                 ClassConverterSetupFixture.TestSemanticModel,
                 ClassConverterSetupFixture.TestClassDec,
-                ClassConverterSetupFixture.TestTypeSymbol);
+                ClassConverterSetupFixture.TestTypeSymbol,
+                new TaskManagerService());
         }
 
         [Test]

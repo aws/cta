@@ -1,4 +1,5 @@
 ﻿using CTA.WebForms2Blazor.ClassConverters;
+using CTA.WebForms2Blazor.Services;
 using NUnit.Framework;
 using System.IO;
 using System.Threading.Tasks;
@@ -8,7 +9,7 @@ namespace CTA.WebForms2Blazor.Tests.ClassConverters
     public class MasterPageCodeBehindClassConverterTests
     {
         private static string InputRelativePath => Path.Combine(ClassConverterSetupFixture.TestProjectNestedDirectoryName, "CodeBehind.Master.cs");
-        private static string ExpectedOutputPath => Path.Combine("Layouts", ClassConverterSetupFixture.TestProjectNestedDirectoryName, "CodeBehind.razor");
+        private static string ExpectedOutputPath => Path.Combine("Layouts", ClassConverterSetupFixture.TestProjectNestedDirectoryName, "CodeBehind.razor.cs");
 
         private MasterPageCodeBehindClassConverter _converter;
 
@@ -19,7 +20,8 @@ namespace CTA.WebForms2Blazor.Tests.ClassConverters
                 ClassConverterSetupFixture.TestProjectDirectoryPath,
                 ClassConverterSetupFixture.TestSemanticModel,
                 ClassConverterSetupFixture.TestClassDec,
-                ClassConverterSetupFixture.TestTypeSymbol);
+                ClassConverterSetupFixture.TestTypeSymbol,
+                new TaskManagerService());
         }
 
         [Test]

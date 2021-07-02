@@ -8,7 +8,7 @@ namespace CTA.WebForms2Blazor.Tests.ClassConverters
     public class ControlCodeBehindClassConverterTests
     {
         private static string InputRelativePath => Path.Combine(ClassConverterSetupFixture.TestProjectNestedDirectoryName, "CodeBehind.ascx.cs");
-        private static string ExpectedOutputPath => Path.Combine("Components", ClassConverterSetupFixture.TestProjectNestedDirectoryName, "CodeBehind.razor");
+        private static string ExpectedOutputPath => Path.Combine("Components", ClassConverterSetupFixture.TestProjectNestedDirectoryName, "CodeBehind.razor.cs");
 
         private ControlCodeBehindClassConverter _converter;
 
@@ -19,7 +19,8 @@ namespace CTA.WebForms2Blazor.Tests.ClassConverters
                 ClassConverterSetupFixture.TestProjectDirectoryPath,
                 ClassConverterSetupFixture.TestSemanticModel,
                 ClassConverterSetupFixture.TestClassDec,
-                ClassConverterSetupFixture.TestTypeSymbol);
+                ClassConverterSetupFixture.TestTypeSymbol,
+                new WebForms2Blazor.Services.TaskManagerService());
         }
 
         [Test]
