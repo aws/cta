@@ -8,16 +8,22 @@ namespace CTA.WebForms2Blazor
     {
         // Notable Events
         public const WebFormsAppLifecycleEvent FirstPostHandleEvent = WebFormsAppLifecycleEvent.PostRequestHandlerExecute;
+        public const WebFormsPageLifecycleEvent FirstOnInitializedEvent = WebFormsPageLifecycleEvent.InitComplete;
+        public const WebFormsPageLifecycleEvent FirstOnParametersSetEvent = WebFormsPageLifecycleEvent.SaveStateComplete;
+        public const WebFormsPageLifecycleEvent FirstOnAfterRenderEvent = WebFormsPageLifecycleEvent.Render;
+        public const WebFormsPageLifecycleEvent FirstDisposeEvent = WebFormsPageLifecycleEvent.Unload;
 
         // Notable Base Classes
         public const string ExpectedGlobalBaseClass = "HttpApplication";
         public const string ExpectedPageBaseClass = "Page";
         public const string ExpectedControlBaseClass = "UserControl";
         public const string ExpectedMasterPageBaseClass = "MasterPage";
+        public const string ComponentBaseClass = "ComponentBase";
 
         // Notable Interfaces
         public const string HttpHandlerInterface = "IHttpHandler";
         public const string HttpModuleInterface = "IHttpModule";
+        public const string DisposableInterface = "IDisposable";
 
         // Notable Extensions
         public const string PageCodeBehindExtension = ".aspx.cs";
@@ -46,9 +52,9 @@ namespace CTA.WebForms2Blazor
         public const string MiddlewareDirectoryName = "Middleware";
 
         // Comment Formatting Constants
-        public const string TabAsSpaces = "    ";
         public const string DefaultCommentStartToken = "// ";
         public const int DefaultCommentLineCharacterLimit = 40;
+        public const int SpacesPerCommentTab = 4;
 
         // Event Handling Constants
         public const string SenderParamTypeName = "object";

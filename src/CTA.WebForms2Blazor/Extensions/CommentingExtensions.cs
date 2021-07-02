@@ -164,7 +164,7 @@ namespace CTA.WebForms2Blazor.Extensions
                         // For some reason roslyn insists on
                         // only using spaces so we use normal
                         // spaces to keep form
-                        sb.Append(Constants.TabAsSpaces);
+                        sb.Insert(sb.Length, " ", Constants.SpacesPerCommentTab);
                     }
 
                     sb.Append(Constants.DefaultCommentStartToken + commentLine);

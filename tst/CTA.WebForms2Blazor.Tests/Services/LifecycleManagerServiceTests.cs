@@ -23,6 +23,7 @@ namespace CTA.WebForms2Blazor.Tests.Services
         private const string TestMiddlewareName1 = "Middleware1";
         private const string TestMiddlewareName2 = "Middleware2";
         private const string BeginRequestMethodName = "Application_BeginRequest";
+        private const string InitMethodName = "Page_Init";
         private const string IncorrectMethodName = "App_Begin";
         private const string SenderParamName = "sender";
         private const string SenderParamType = "object";
@@ -133,7 +134,7 @@ namespace CTA.WebForms2Blazor.Tests.Services
 
             var result = LifecycleManagerService.CheckMethodApplicationLifecycleHook(methodDeclaration);
 
-            Assert.AreEqual(result, WebFormsAppLifecycleEvent.BeginRequest);
+            Assert.AreEqual(WebFormsAppLifecycleEvent.BeginRequest, result);
         }
 
         [Test]
@@ -162,6 +163,83 @@ namespace CTA.WebForms2Blazor.Tests.Services
             var result = LifecycleManagerService.CheckMethodApplicationLifecycleHook(methodDeclaration);
 
             Assert.IsNull(result);
+        }
+
+        [Test]
+        public void CheckMethodPageLifecycleHook_Returns_Correct_Lifecycle_Hook()
+        {
+            var methodDeclaration = SyntaxFactory
+                .MethodDeclaration(
+                    SyntaxFactory.PredefinedType(SyntaxFactory.Token(SyntaxKind.VoidKeyword)),
+                    SyntaxFactory.Identifier(InitMethodName))
+                .AddParameterListParameters(
+                    SyntaxFactory.Parameter(SyntaxFactory.Identifier(SenderParamName)).WithType(SyntaxFactory.ParseTypeName(SenderParamType)),
+                    SyntaxFactory.Parameter(SyntaxFactory.Identifier(EventArgsParamName)).WithType(SyntaxFactory.ParseTypeName(EventArgsParamType)));
+
+            var result = LifecycleManagerService.CheckMethodPageLifecycleHook(methodDeclaration);
+
+            Assert.AreEqual(WebFormsPageLifecycleEvent.Init, result);
+        }
+
+        [Test]
+        public void CheckMethodPageLifecycleHook_Returns_Null_For_Incorrect_Params()
+        {
+            var methodDeclaration = SyntaxFactory
+                .MethodDeclaration(
+                    SyntaxFactory.PredefinedType(SyntaxFactory.Token(SyntaxKind.VoidKeyword)),
+                    SyntaxFactory.Identifier(InitMethodName));
+
+            var result = LifecycleManagerService.CheckMethodPageLifecycleHook(methodDeclaration);
+
+            Assert.IsNull(result);
+        }
+
+        [Test]
+        public void CheckMethodPageLifecycleHook_Returns_Null_For_Incorrect_Name()
+        {
+            var methodDeclaration = SyntaxFactory
+                .MethodDeclaration(
+                    SyntaxFactory.PredefinedType(SyntaxFactory.Token(SyntaxKind.VoidKeyword)),
+                    SyntaxFactory.Identifier(IncorrectMethodName))
+                .AddParameterListParameters(
+                    SyntaxFactory.Parameter(SyntaxFactory.Identifier(SenderParamName)).WithType(SyntaxFactory.ParseTypeName(SenderParamType)),
+                    SyntaxFactory.Parameter(SyntaxFactory.Identifier(EventArgsParamName)).WithType(SyntaxFactory.ParseTypeName(EventArgsParamType)));
+
+            var result = LifecycleManagerService.CheckMethodPageLifecycleHook(methodDeclaration);
+
+            Assert.IsNull(result);
+        }
+
+        [Test]
+        public void GetEquivalentComponentLifecycleEvent_Returns_Correct_SetParametersAsync_Events()
+        {
+            Assert.AreEqual(BlazorComponentLifecycleEvent.SetParametersAsync, LifecycleManagerService.GetEquivalentComponentLifecycleEvent(WebFormsPageLifecycleEvent.PreInit));
+            Assert.AreEqual(BlazorComponentLifecycleEvent.SetParametersAsync, LifecycleManagerService.GetEquivalentComponentLifecycleEvent(WebFormsPageLifecycleEvent.Init));
+        }
+
+        [Test]
+        public void GetEquivalentComponentLifecycleEvent_Returns_Correct_OnInitialized_Events()
+        {
+            Assert.AreEqual(BlazorComponentLifecycleEvent.OnInitialized, LifecycleManagerService.GetEquivalentComponentLifecycleEvent(WebFormsPageLifecycleEvent.InitComplete));
+            Assert.AreEqual(BlazorComponentLifecycleEvent.OnInitialized, LifecycleManagerService.GetEquivalentComponentLifecycleEvent(WebFormsPageLifecycleEvent.PreRenderComplete));
+        }
+
+        [Test]
+        public void GetEquivalentComponentLifecycleEvent_Returns_Correct_OnParametersSet_Events()
+        {
+            Assert.AreEqual(BlazorComponentLifecycleEvent.OnParametersSet, LifecycleManagerService.GetEquivalentComponentLifecycleEvent(WebFormsPageLifecycleEvent.SaveStateComplete));
+        }
+
+        [Test]
+        public void GetEquivalentComponentLifecycleEvent_Returns_Correct_OnAfterRender_Events()
+        {
+            Assert.AreEqual(BlazorComponentLifecycleEvent.OnAfterRender, LifecycleManagerService.GetEquivalentComponentLifecycleEvent(WebFormsPageLifecycleEvent.Render));
+        }
+
+        [Test]
+        public void GetEquivalentComponentLifecycleEvent_Returns_Correct_Dispose_Events()
+        {
+            Assert.AreEqual(BlazorComponentLifecycleEvent.Dispose, LifecycleManagerService.GetEquivalentComponentLifecycleEvent(WebFormsPageLifecycleEvent.Unload));
         }
     }
 }

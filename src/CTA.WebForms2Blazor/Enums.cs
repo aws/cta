@@ -30,7 +30,8 @@ namespace CTA.WebForms2Blazor
         PreSendRequestContent
     }
 
-    public enum WebFormsPageLifecycleEvent {
+    public enum WebFormsPageLifecycleEvent
+    {
         PreInit,
         Init,
         InitComplete,
@@ -42,5 +43,14 @@ namespace CTA.WebForms2Blazor
         SaveStateComplete,
         Render,
         Unload
+    }
+
+    public enum BlazorComponentLifecycleEvent
+    {
+        SetParametersAsync,
+        OnInitialized,
+        OnParametersSet,
+        OnAfterRender,
+        Dispose
     }
 }

@@ -27,8 +27,6 @@ namespace CTA.WebForms2Blazor.ClassConverters
         private const string MigrateServiceLayerOperation = "migrate service layer and configure depenency inejction in ConfigureServices()";
 
         private LifecycleManagerService _lifecycleManager;
-        private TaskManagerService _taskManager;
-        private int _taskId;
 
         private IEnumerable<StatementSyntax> _configureMethodStatements;
         private IEnumerable<MethodDeclarationSyntax> _keepableMethods;
@@ -42,12 +40,10 @@ namespace CTA.WebForms2Blazor.ClassConverters
             INamedTypeSymbol originalClassSymbol,
             LifecycleManagerService lifecycleManager,
             TaskManagerService taskManager)
-            : base(relativePath, sourceProjectPath, sourceFileSemanticModel, originalDeclarationSyntax, originalClassSymbol)
+            : base(relativePath, sourceProjectPath, sourceFileSemanticModel, originalDeclarationSyntax, originalClassSymbol, taskManager)
         {
             _lifecycleManager = lifecycleManager;
-            _taskManager = taskManager;
             _lifecycleManager.NotifyExpectedMiddlewareSource();
-            _taskId = taskManager.RegisterNewTask();
 
             _configureMethodStatements = new List<StatementSyntax>();
             _keepableMethods = new List<MethodDeclarationSyntax>();
@@ -82,6 +78,8 @@ namespace CTA.WebForms2Blazor.ClassConverters
 
             var containingNamespace = CodeSyntaxHelper.BuildNamespace(_originalClassSymbol.ContainingNamespace.Name, startupClassDeclaration);
             var fileText = CodeSyntaxHelper.GetFileSyntaxAsString(containingNamespace, await GetAllUsingStatements());
+
+            DoCleanUp();
 
             // Global.asax.cs turns into Startup.cs
             return new FileInformation(Path.Combine(Path.GetDirectoryName(_relativePath), Constants.StartupFileName), Encoding.UTF8.GetBytes(fileText));
@@ -158,7 +156,7 @@ namespace CTA.WebForms2Blazor.ClassConverters
             // Get the method as a series of strings and give the reason it was removed
             var newComments = methodDeclaration.AsStringsByLine().Prepend(Constants.UnusableCodeComment);
 
-            if (_endOfClassComments.Count() > 0)
+            if (_endOfClassComments.Any())
             {
                 // Prepend an extra space to get separation from last commented method
                 newComments = newComments.Prepend(string.Empty);

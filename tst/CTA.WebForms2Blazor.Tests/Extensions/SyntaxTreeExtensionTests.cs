@@ -21,12 +21,24 @@ namespace CTA.WebForms2Blazor.Tests.Extensions
             }";
         private const string TestStatementText = "var x = 10;";
         private const string TestStatementCommentShort = "This is a short comment";
+        private const string TestClassName = "TestClass";
+        private const string TestBaseClassName1 = "TestBaseClass1";
+        private const string TestBaseClassName2 = "TestBaseClass2";
         private const string TestMethodName = "TestMethod";
         private const string TestMethodWrongName = "TestMethodWrong";
         private const string EventHandlerObjectParamType = "object";
         private const string EventHandlerObjectParamName = "sender";
         private const string EventHandlerEventArgsParamType = "EventArgs";
         private const string EventHandlerEventArgsParamName = "e";
+
+        private const string ClassWith1BaseType =
+@"class TestClass : TestBaseClass1
+{
+}";
+        private const string ClassWith2BaseTypes =
+@"class TestClass : TestBaseClass1, TestBaseClass2
+{
+}";
 
         private WorkspaceManagerService _workspaceManager;
 
@@ -184,5 +196,27 @@ namespace CTA.WebForms2Blazor.Tests.Extensions
             Assert.False(method.HasEventHandlerParameters());
         }
 
+        [Test]
+        public void AddBaseType_Correctly_Adds_New_Base_Type()
+        {
+            var actualClassText = SyntaxFactory
+                .ClassDeclaration(TestClassName)
+                .AddBaseType(TestBaseClassName1)
+                .NormalizeWhitespace().ToFullString();
+
+            Assert.AreEqual(ClassWith1BaseType, actualClassText);
+        }
+
+        [Test]
+        public void AddBaseType_Does_Not_Override_Existing_Base_Types()
+        {
+            var actualClassText = SyntaxFactory
+                .ClassDeclaration(TestClassName)
+                .AddBaseType(TestBaseClassName1)
+                .AddBaseType(TestBaseClassName2)
+                .NormalizeWhitespace().ToFullString();
+
+            Assert.AreEqual(ClassWith2BaseTypes, actualClassText);
+        }
     }
 }

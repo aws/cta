@@ -16,6 +16,7 @@ namespace CTA.WebForms2Blazor.Services
     {
         private const string TooManyMiddlewareSourcesError = "Attempted to mark a middleware source processed, but the expected number of these operations has been reached";
         private const string ApplicationLifecycleHookMethodPrefix = "Application_";
+        private const string PageLifecycleHookMethodPrefix = "Page_";
 
         // I chose to use lists here so that we can use Add()
         private List<IRegisteredMiddleware> _registeredMiddleware;
@@ -106,6 +107,52 @@ namespace CTA.WebForms2Blazor.Services
             }
 
             return null;
+        }
+
+        public static WebFormsPageLifecycleEvent? CheckMethodPageLifecycleHook(MethodDeclarationSyntax methodDeclaration)
+        {
+            if (methodDeclaration.HasEventHandlerParameters())
+            {
+                var methodName = methodDeclaration.Identifier.ToString();
+
+                foreach (int value in Enum.GetValues(typeof(WebFormsPageLifecycleEvent)))
+                {
+                    var currentEvent = (WebFormsPageLifecycleEvent)value;
+
+                    if (methodName.Equals(PageLifecycleHookMethodPrefix + currentEvent.ToString()))
+                    {
+                        return currentEvent;
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        public static BlazorComponentLifecycleEvent GetEquivalentComponentLifecycleEvent(WebFormsPageLifecycleEvent lcEvent)
+        {
+            var lcEventIndex = (int)lcEvent;
+
+            if (lcEventIndex < (int)Constants.FirstOnInitializedEvent)
+            {
+                return BlazorComponentLifecycleEvent.SetParametersAsync;
+            }
+            else if (lcEventIndex < (int)Constants.FirstOnParametersSetEvent)
+            {
+                return BlazorComponentLifecycleEvent.OnInitialized;
+            }
+            else if (lcEventIndex < (int)Constants.FirstOnAfterRenderEvent)
+            {
+                return BlazorComponentLifecycleEvent.OnParametersSet;
+            }
+            else if (lcEventIndex < (int)Constants.FirstDisposeEvent)
+            {
+                return BlazorComponentLifecycleEvent.OnAfterRender;
+            }
+            else
+            {
+                return BlazorComponentLifecycleEvent.Dispose;
+            }
         }
 
         private Task<bool> WaitForAllMiddlewareRegistered(CancellationToken token)

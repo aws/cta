@@ -60,8 +60,12 @@ namespace CTA.WebForms2Blazor.Extensions
 
         public static IEnumerable<string> AsStringsByLine(this SyntaxNode node)
         {
-            // Make sure we don't split on escaped newlines
             return node.NormalizeWhitespace().ToFullString().Split(Environment.NewLine);
+        }
+
+        public static ClassDeclarationSyntax AddBaseType(this ClassDeclarationSyntax classDeclaration, string baseTypeName)
+        {
+            return classDeclaration.AddBaseListTypes(SyntaxFactory.SimpleBaseType(SyntaxFactory.IdentifierName(baseTypeName)));
         }
     }
 }

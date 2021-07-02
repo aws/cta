@@ -19,7 +19,8 @@ namespace CTA.WebForms2Blazor.Tests.ClassConverters
                 ClassConverterSetupFixture.TestProjectDirectoryPath,
                 ClassConverterSetupFixture.TestSemanticModel,
                 ClassConverterSetupFixture.TestClassDec,
-                ClassConverterSetupFixture.TestTypeSymbol);
+                ClassConverterSetupFixture.TestTypeSymbol,
+                new WebForms2Blazor.Services.TaskManagerService());
         }
 
         [Test]

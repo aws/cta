@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using CTA.WebForms2Blazor.Extensions;
 using CTA.WebForms2Blazor.FileInformationModel;
 using CTA.WebForms2Blazor.Helpers;
+using CTA.WebForms2Blazor.Services;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -20,13 +19,16 @@ namespace CTA.WebForms2Blazor.ClassConverters
         private protected readonly SemanticModel _sourceFileSemanticModel;
         private protected readonly TypeDeclarationSyntax _originalDeclarationSyntax;
         private protected readonly INamedTypeSymbol _originalClassSymbol;
+        private protected readonly TaskManagerService _taskManager;
+        private protected int _taskId;
 
         protected ClassConverter(
             string relativePath,
             string sourceProjectPath,
             SemanticModel sourceFileSemanticModel,
             TypeDeclarationSyntax originalDeclarationSyntax,
-            INamedTypeSymbol originalClassSymbol)
+            INamedTypeSymbol originalClassSymbol,
+            TaskManagerService taskManager)
         {
             _relativePath = relativePath;
             _sourceProjectPath = sourceProjectPath;
@@ -34,6 +36,12 @@ namespace CTA.WebForms2Blazor.ClassConverters
             _sourceFileSemanticModel = sourceFileSemanticModel;
             _originalDeclarationSyntax = originalDeclarationSyntax;
             _originalClassSymbol = originalClassSymbol;
+            _taskManager = taskManager;
+
+            // We want to force the use of the task manager even if each class doesn't
+            // necessarily have to do any managed runs, this is because they may end up
+            // unblocking other processes by simply running normally
+            _taskId = _taskManager.RegisterNewTask();
         }
 
         public abstract Task<FileInformation> MigrateClassAsync();
@@ -46,6 +54,13 @@ namespace CTA.WebForms2Blazor.ClassConverters
             var fileText = CodeSyntaxHelper.GetFileSyntaxAsString(namespaceNode, usingStatements);
 
             return new SourceClassComponents(requiredNamespaces, usingStatements, namespaceNode, fileText);
+        }
+
+        private protected void DoCleanUp()
+        {
+            // TODO: Put other general clean up
+            // tasks here as they come up
+            _taskManager.RetireTask(_taskId);
         }
 
         private protected class SourceClassComponents
