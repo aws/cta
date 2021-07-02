@@ -179,7 +179,7 @@ class MyClass
         public void ClassDeclarationEquals()
         {
             var classAction = new ClassDeclarationAction() { Key = "Test", Value = "Test2", ClassDeclarationActionFunc = _classActions.GetAddAttributeAction("Test") };
-            var cloned = classAction.Clone();
+            var cloned = classAction.Clone<ClassDeclarationAction>();
             Assert.True(classAction.Equals(cloned));
 
             cloned.Value = "DifferentValue";

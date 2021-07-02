@@ -9,6 +9,7 @@ namespace CTA.Rules.Models
     public class MemberAccessAction : GenericAction
     {
         public Func<SyntaxGenerator, SyntaxNode, SyntaxNode> MemberAccessActionFunc { get; set; }
+
         public override bool Equals(object obj)
         {
             var action = (MemberAccessAction)obj;

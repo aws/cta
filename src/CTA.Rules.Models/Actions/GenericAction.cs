@@ -17,6 +17,6 @@ namespace CTA.Rules.Models
         public TextSpan TextSpan { get; set; }
         public ActionValidation ActionValidation { get; set; }
 
-        public GenericAction Clone() => (GenericAction)this.MemberwiseClone();
+        public T Clone<T>() => (T)this.MemberwiseClone();
     }
 }

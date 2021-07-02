@@ -8,6 +8,7 @@ namespace CTA.Rules.Models
     public class NamespaceAction : GenericAction
     {
         public Func<SyntaxGenerator, NamespaceDeclarationSyntax, NamespaceDeclarationSyntax> NamespaceActionFunc { get; set; }
+
         public override bool Equals(object obj)
         {
             var action = (NamespaceAction)obj;

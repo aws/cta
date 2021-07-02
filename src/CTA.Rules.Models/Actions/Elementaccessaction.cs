@@ -8,6 +8,7 @@ namespace CTA.Rules.Models
     public class ElementAccessAction : GenericAction
     {
         public Func<SyntaxGenerator, ElementAccessExpressionSyntax, ElementAccessExpressionSyntax> ElementAccessExpressionActionFunc { get; set; }
+
         public override bool Equals(object obj)
         {
             var action = (ElementAccessAction)obj;

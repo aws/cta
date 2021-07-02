@@ -8,6 +8,13 @@ namespace CTA.Rules.Models
         public string NewText { get; set; }
         public FileLinePositionSpan FileLinePositionSpan { get; set; }
 
+        public TextChange Clone() 
+        { 
+            TextChange cloned = (TextChange)this.MemberwiseClone();
+            cloned.FileLinePositionSpan = new FileLinePositionSpan(cloned.FileLinePositionSpan.Path, cloned.FileLinePositionSpan.Span);
+            return cloned;
+        }
+
         public bool Equals(TextChange textChange)
         {
             if (textChange == null) return false;

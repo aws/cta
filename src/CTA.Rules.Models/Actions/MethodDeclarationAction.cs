@@ -8,6 +8,7 @@ namespace CTA.Rules.Models
     public class MethodDeclarationAction : GenericAction
     {
         public Func<SyntaxGenerator, MethodDeclarationSyntax, MethodDeclarationSyntax> MethodDeclarationActionFunc { get; set; }
+
         public override bool Equals(object obj)
         {
             var action = (MethodDeclarationAction)obj;

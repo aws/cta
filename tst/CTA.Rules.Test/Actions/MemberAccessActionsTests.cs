@@ -44,7 +44,7 @@ namespace CTA.Rules.Test.Actions
                 MemberAccessActionFunc = _memberAccessActions.GetAddCommentAction("NewAttribute")
             };
 
-            var cloned = memberAccessAction.Clone();
+            var cloned = memberAccessAction.Clone<MemberAccessAction>();
 
             Assert.True(memberAccessAction.Equals(cloned));
             cloned.Value = "DifferentValue";
