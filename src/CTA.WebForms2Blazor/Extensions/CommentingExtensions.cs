@@ -159,13 +159,10 @@ namespace CTA.WebForms2Blazor.Extensions
                 {
                     var sb = new StringBuilder();
 
-                    for (int i = 0; i < extraTabs; i++)
-                    {
-                        // For some reason roslyn insists on
-                        // only using spaces so we use normal
-                        // spaces to keep form
-                        sb.Insert(sb.Length, " ", Constants.SpacesPerCommentTab);
-                    }
+                    // For some reason roslyn insists on
+                    // only using spaces so we use normal
+                    // spaces to keep form
+                    sb.Insert(sb.Length, " ", Constants.SpacesPerCommentTab * extraTabs);
 
                     sb.Append(Constants.DefaultCommentStartToken + commentLine);
                     return SyntaxFactory.Comment(sb.ToString());
