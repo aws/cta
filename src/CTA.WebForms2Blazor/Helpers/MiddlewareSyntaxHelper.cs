@@ -159,12 +159,16 @@ namespace CTA.WebForms2Blazor.Helpers
             return CodeSyntaxHelper.GetStatementsAsBlock(statements);
         }
 
-        public static StatementSyntax BuildMiddlewareRegistrationSyntax(string middlewareName, string originLifecycleHook = null, string partialOriginClass = null, bool isHandler = false)
+        public static StatementSyntax BuildMiddlewareRegistrationSyntax(string middlewareName, string originLifecycleHook = null, string partialOriginClass = null)
         {
             var statement = SyntaxFactory.ParseStatement(string.Format(AppUseMiddlewareTextTemplate, RuntimeInjectable.AppBuilderInjectable.ParamName, middlewareName));
             var comments = new List<string>();
 
-            if (originLifecycleHook != null)
+            if (originLifecycleHook == WebFormsAppLifecycleEvent.RequestHandlerExecute.ToString())
+            {
+                comments.Add(FromHandlerComment);
+            }
+            else if (originLifecycleHook != null)
             {
                 comments.Add(string.Format(Constants.NewEventRepresentationCommentTemplate, originLifecycleHook));
             }
@@ -172,11 +176,6 @@ namespace CTA.WebForms2Blazor.Helpers
             if (partialOriginClass != null)
             {
                 comments.Add(string.Format(Constants.ClassSplitCommentTemplate, partialOriginClass));
-            }
-
-            if (isHandler)
-            {
-                comments.Add(FromHandlerComment);
             }
 
             // Use re-wrapping to wrap each comment line but keep a newline between each comment

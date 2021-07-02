@@ -69,6 +69,7 @@ namespace CTA.WebForms2Blazor.ClassConverters
             await InsertRequestPipelineMiddlewareRegistrations();
 
             var startupClassDeclaration = StartupSyntaxHelper.BuildStartupClass(
+                constructorAdditionalStatements: originalDescendantNodes.OfType<ConstructorDeclarationSyntax>().FirstOrDefault()?.Body?.Statements,
                 configureAdditionalStatements: _configureMethodStatements,
                 configureServicesAdditionalStatements: configureServicesLines,
                 additionalFieldDeclarations: originalDescendantNodes.OfType<FieldDeclarationSyntax>(),

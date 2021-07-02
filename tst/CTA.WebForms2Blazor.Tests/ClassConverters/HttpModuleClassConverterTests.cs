@@ -11,12 +11,12 @@ namespace CTA.WebForms2Blazor.Tests.ClassConverters
         private static string InputRelativePath => Path.Combine(ClassConverterSetupFixture.TestProjectNestedDirectoryName, "HttpModule.cs");
         private static string ExpectedOutputPath => Path.Combine("Middleware", ClassConverterSetupFixture.TestProjectNestedDirectoryName, "HttpModule.cs");
 
-        private HttpHandlerClassConverter _converter;
+        private HttpModuleClassConverter _converter;
 
         [SetUp]
         public void SetUp()
         {
-            _converter = new HttpHandlerClassConverter(InputRelativePath,
+            _converter = new HttpModuleClassConverter(InputRelativePath,
                 ClassConverterSetupFixture.TestProjectDirectoryPath,
                 ClassConverterSetupFixture.TestSemanticModel,
                 ClassConverterSetupFixture.TestClassDec,
