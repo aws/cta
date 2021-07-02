@@ -8,11 +8,15 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using CTA.WebForms2Blazor.Services;
+using System.Collections.Generic;
+using System;
 
 namespace CTA.WebForms2Blazor.ClassConverters
 {
     public class PageCodeBehindClassConverter : ClassConverter
     {
+        private IDictionary<BlazorComponentLifecycleEvent, IEnumerable<StatementSyntax>> _newLifecycleLines;
+
         public PageCodeBehindClassConverter(
             string relativePath,
             string sourceProjectPath,
@@ -22,32 +26,68 @@ namespace CTA.WebForms2Blazor.ClassConverters
             TaskManagerService taskManager)
             : base(relativePath, sourceProjectPath, sourceFileSemanticModel, originalDeclarationSyntax, originalClassSymbol, taskManager)
         {
-            // TODO: Register with the necessary services
+            _newLifecycleLines = new Dictionary<BlazorComponentLifecycleEvent, IEnumerable<StatementSyntax>>();
         }
 
         public override async Task<FileInformation> MigrateClassAsync()
         {
-            // NOTE: For now we make no code modifications, just to be
-            // ready for the demo and produces files
-            // TODO: Modify namespace according to new relative path? Will,
-            // need to track a change like that in the reference manager and
-            // modify using statements in other files, determing all namespace
-            // changes before re-assembling new using statement collection will
-            // make this possible
-            var sourceClassComponents = GetSourceClassComponents();
+            var requiredNamespaceNames = _sourceFileSemanticModel
+                .GetNamespacesReferencedByType(_originalDeclarationSyntax)
+                .Select(namespaceSymbol => namespaceSymbol.ToDisplayString())
+                // This is so we can use ComponentBase base class
+                .Append(Constants.BlazorComponentsNamespace);
 
-            // Retrieve methods that are event handlers
-            // Extract statements and add to component lifecycle
+            var allMethods = _originalDeclarationSyntax.DescendantNodes().OfType<MethodDeclarationSyntax>();
+            var currentClassDeclaration = ((ClassDeclarationSyntax)_originalDeclarationSyntax)
+                // Need to track methods so modifications can be made one after another
+                .TrackNodes(allMethods)
+                // ComponentBase base class is required to use lifecycle events
+                .AddBaseType(Constants.ComponentBaseClass);
 
-            // _originalDeclarationSyntax
-            // remove node
-            // add members
-            // Add componentbase class
-            // Add Disposable if needed
+            var orderedMethods = allMethods
+                .Select(method => (method, LifecycleManagerService.CheckMethodPageLifecycleHook(method)))
+                // Filter out non-lifecycle methods
+                .Where(methodTuple => methodTuple.Item2 != null)
+                // Order matters within new events so we order before processing
+                .OrderBy(methodTuple =>
+                {
+                    return (int)methodTuple.Item2;
+                });
+
+            // Remove old lifecycle methods, sort, and record their content
+            foreach (var methodTuple in orderedMethods)
+            {
+                // This records the statements in the proper collection
+                ProcessLifecycleEventMethod(methodTuple.Item1, (WebFormsPageLifecycleEvent)methodTuple.Item2);
+                // Refresh node before removing
+                var currentMethodNode = currentClassDeclaration.GetCurrentNode(methodTuple.Item1);
+                currentClassDeclaration = currentClassDeclaration.RemoveNode(currentMethodNode, SyntaxRemoveOptions.AddElasticMarker);
+            }
+
+            // Construct new lifecycle methods and add them to the class
+            foreach (var newLifecycleEventKvp in _newLifecycleLines)
+            {
+                var newLifecycleEvent = newLifecycleEventKvp.Key;
+                var newLifecycleEventStatements = newLifecycleEventKvp.Value;
+
+                var newMethodDeclaration = ComponentSyntaxHelper.BuildComponentLifecycleMethod(newLifecycleEvent, newLifecycleEventStatements);
+                currentClassDeclaration = currentClassDeclaration.AddMembers(newMethodDeclaration);
+            }
+
+            // If we need to make use of the dispose method, add the IDisposable
+            // interface to the class, usings are fine as is because this come from
+            // the System namespace
+            if (_newLifecycleLines.ContainsKey(BlazorComponentLifecycleEvent.Dispose))
+            {
+                currentClassDeclaration = currentClassDeclaration.AddBaseType(Constants.DisposableInterface);
+            }
+
+            var namespaceNode = CodeSyntaxHelper.BuildNamespace(_originalClassSymbol.ContainingNamespace.ToDisplayString(), currentClassDeclaration);
+            var fileText = CodeSyntaxHelper.GetFileSyntaxAsString(namespaceNode, CodeSyntaxHelper.BuildUsingStatements(requiredNamespaceNames));
 
             DoCleanUp();
 
-            return new FileInformation(GetNewRelativePath(), Encoding.UTF8.GetBytes(sourceClassComponents.FileText));
+            return new FileInformation(GetNewRelativePath(), Encoding.UTF8.GetBytes(fileText));
         }
 
         private string GetNewRelativePath()
@@ -58,6 +98,30 @@ namespace CTA.WebForms2Blazor.ClassConverters
                 newExtension: Constants.RazorCodeBehindFileExtension);
 
             return Path.Combine(Constants.RazorPageDirectoryName, newRelativePath);
+        }
+
+        private void ProcessLifecycleEventMethod(MethodDeclarationSyntax methodDeclaration, WebFormsPageLifecycleEvent lifecycleEvent)
+        {
+            var statements = (IEnumerable<StatementSyntax>)methodDeclaration.Body.Statements;
+
+            // Dont do anything if the method is empty, no reason to move over nothing
+            if (statements.Any())
+            {
+                statements = statements.AddComment(string.Format(Constants.NewEventRepresentationCommentTemplate, lifecycleEvent.ToString()));
+
+                var blazorLifecycleEvent = LifecycleManagerService.GetEquivalentComponentLifecycleEvent(lifecycleEvent);
+
+                if (_newLifecycleLines.ContainsKey(blazorLifecycleEvent))
+                {
+                    // Add spacing between last added method
+                    statements = statements.Prepend(CodeSyntaxHelper.GetBlankLine());
+                    _newLifecycleLines[blazorLifecycleEvent] = _newLifecycleLines[blazorLifecycleEvent].Concat(statements);
+                }
+                else
+                {
+                    _newLifecycleLines.Add(blazorLifecycleEvent, statements);
+                }
+            }
         }
     }
 }

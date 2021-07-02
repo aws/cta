@@ -99,6 +99,15 @@ namespace CTA.WebForms2Blazor.Services
                 {
                     var currentEvent = (WebFormsAppLifecycleEvent)value;
 
+                    if (currentEvent == WebFormsAppLifecycleEvent.RequestHandlerExecute)
+                    {
+                        // RequestHandlerExecute is a special event that
+                        // technically isn't a part of the lifecycle but is
+                        // used to represent new http handler middleware,
+                        // don't use this loop to identify it
+                        continue;
+                    }
+
                     if (methodName.Equals(ApplicationLifecycleHookMethodPrefix + currentEvent.ToString()))
                     {
                         return currentEvent;
@@ -106,7 +115,18 @@ namespace CTA.WebForms2Blazor.Services
                 }
             }
 
+            // Finally check that it's not a request handler
+            if (IsProcessRequestMethod(methodDeclaration))
+            {
+                return WebFormsAppLifecycleEvent.RequestHandlerExecute;
+            }
+
             return null;
+        }
+
+        public static bool IsProcessRequestMethod(MethodDeclarationSyntax methodDeclaration)
+        {
+            return false;
         }
 
         public static WebFormsPageLifecycleEvent? CheckMethodPageLifecycleHook(MethodDeclarationSyntax methodDeclaration)

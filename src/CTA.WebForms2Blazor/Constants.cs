@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace CTA.WebForms2Blazor
+﻿namespace CTA.WebForms2Blazor
 {
     internal class Constants
     {
@@ -24,6 +20,9 @@ namespace CTA.WebForms2Blazor
         public const string HttpHandlerInterface = "IHttpHandler";
         public const string HttpModuleInterface = "IHttpModule";
         public const string DisposableInterface = "IDisposable";
+
+        // Notable Namespaces
+        public const string BlazorComponentsNamespace = "Microsoft.AspNetCore.Components";
 
         // Notable Extensions
         public const string PageCodeBehindExtension = ".aspx.cs";
@@ -67,6 +66,7 @@ namespace CTA.WebForms2Blazor
         public const string OperationUnattemptedCommentTemplate = "Did not attempt to {0}, this must be done manually";
         public const string ClassSplitCommentTemplate = "This class was generated using a portion of {0}, modifications may be necessary";
         public const string NewEventRepresentationCommentTemplate = "This code replaces the original handling of the {0} event";
+        public const string IdentificationFailureCommentTemplate = "Could not identify {0}, dependant {1} operation must be done manually";
 
         public const string UnusableCodeComment = "Unable to migrate the following code, as a result it was removed";
     }

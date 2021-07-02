@@ -24,7 +24,7 @@ namespace CTA.WebForms2Blazor.ClassConverters
 
         private const string AddMiddlewareUsingsOperation = "retrieve and add usings for middleware namespaces";
         private const string ConfigureRequestPipelineOperation = "configure request pipeline";
-        private const string MigrateServiceLayerOperation = "migrate service layer and configure depenency inejction in ConfigureServices()";
+        private const string MigrateServiceLayerOperation = "migrate service layer and configure depenency injection in ConfigureServices()";
 
         private LifecycleManagerService _lifecycleManager;
 
@@ -69,6 +69,7 @@ namespace CTA.WebForms2Blazor.ClassConverters
             await InsertRequestPipelineMiddlewareRegistrations();
 
             var startupClassDeclaration = StartupSyntaxHelper.BuildStartupClass(
+                constructorAdditionalStatements: originalDescendantNodes.OfType<ConstructorDeclarationSyntax>().FirstOrDefault()?.Body?.Statements,
                 configureAdditionalStatements: _configureMethodStatements,
                 configureServicesAdditionalStatements: configureServicesLines,
                 additionalFieldDeclarations: originalDescendantNodes.OfType<FieldDeclarationSyntax>(),
@@ -179,7 +180,7 @@ namespace CTA.WebForms2Blazor.ClassConverters
 
                 var failureComment = string.Format(Constants.OperationFailedCommentTemplate, ConfigureRequestPipelineOperation);
 
-                if (_configureMethodStatements.Count() < 0)
+                if (!_configureMethodStatements.Any())
                 {
                     // If we don't have any extra statements for configure() add a blank
                     // one to attach our comment to

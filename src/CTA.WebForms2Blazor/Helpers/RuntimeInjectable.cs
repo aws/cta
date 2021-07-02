@@ -18,6 +18,7 @@ namespace CTA.WebForms2Blazor.Helpers
         public static RuntimeInjectable AppBuilderInjectable => new RuntimeInjectable("App", "IApplicationBuilder");
         public static RuntimeInjectable RequestDelegateInjectable => new RuntimeInjectable("Next", "RequestDelegate");
         public static RuntimeInjectable HttpContextInjectable => new RuntimeInjectable("Context", "HttpContext");
+        public static RuntimeInjectable ParameterViewInjectable => new RuntimeInjectable("Parameters", "ParameterView");
 
         private readonly string _nameFirstChar;
         private readonly string _nameRestOfChars;

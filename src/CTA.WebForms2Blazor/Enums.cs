@@ -18,6 +18,7 @@ namespace CTA.WebForms2Blazor
         AcquireRequestState,
         PostAcquireRequestState,
         PreRequestHandlerExecute,
+        RequestHandlerExecute,
         PostRequestHandlerExecute,
         ReleaseRequestState,
         PostReleaseRequestState,
