@@ -8,7 +8,6 @@ namespace CTA.Rules.Models
     {
         public Func<SyntaxGenerator, InterfaceDeclarationSyntax, InterfaceDeclarationSyntax> InterfaceDeclarationActionFunc { get; set; }
 
-        public new InterfaceDeclarationAction Clone() => (InterfaceDeclarationAction)this.MemberwiseClone();
         public override bool Equals(object obj)
         {
             var action = (InterfaceDeclarationAction)obj;

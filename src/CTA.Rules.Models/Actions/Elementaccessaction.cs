@@ -9,7 +9,6 @@ namespace CTA.Rules.Models
     {
         public Func<SyntaxGenerator, ElementAccessExpressionSyntax, ElementAccessExpressionSyntax> ElementAccessExpressionActionFunc { get; set; }
 
-        public new ElementAccessAction Clone() => (ElementAccessAction)this.MemberwiseClone();
         public override bool Equals(object obj)
         {
             var action = (ElementAccessAction)obj;

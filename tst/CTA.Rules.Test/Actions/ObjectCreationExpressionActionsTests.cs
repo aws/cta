@@ -51,7 +51,7 @@ namespace CTA.Rules.Test.Actions
         public void ObjectCreationExpressionActionEquals()
         {
             var objectCreationExpressionAction = new ObjectCreationExpressionAction() { Key = "Test", Value = "Test2", ObjectCreationExpressionGenericActionFunc = _objectCreationExpressionActions.GetReplaceObjectinitializationAction("Test") };
-            var cloned = objectCreationExpressionAction.Clone();
+            var cloned = objectCreationExpressionAction.Clone<ObjectCreationExpressionAction>();
             Assert.True(objectCreationExpressionAction.Equals(cloned));
 
             cloned.Value = "DifferentValue";
@@ -145,7 +145,7 @@ namespace CTA.Rules.Test.Actions
         public void ObjectCreationExpressionEquals()
         {
             var objectCreationExpressionAction = new ObjectCreationExpressionAction() { Key = "Test", Value = "Test2", ObjectCreationExpressionGenericActionFunc = _objectCreationExpressionActions.GetAddCommentAction("Test") };
-            var cloned = objectCreationExpressionAction.Clone();
+            var cloned = objectCreationExpressionAction.Clone<ObjectCreationExpressionAction>();
             Assert.True(objectCreationExpressionAction.Equals(cloned));
 
             cloned.Value = "DifferentValue";

@@ -57,7 +57,7 @@ interface ISomeInterface
         public void InterfaceDeclarationEquals()
         {
             var interfaceAction = new InterfaceDeclarationAction() { Key = "Test", Value = "Test2", InterfaceDeclarationActionFunc = _interfaceActions.GetAddAttributeAction("Test") };
-            var cloned = interfaceAction.Clone();
+            var cloned = interfaceAction.Clone<InterfaceDeclarationAction>();
             Assert.True(interfaceAction.Equals(cloned));
 
             cloned.Value = "DifferentValue";

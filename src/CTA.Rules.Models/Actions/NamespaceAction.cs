@@ -9,7 +9,6 @@ namespace CTA.Rules.Models
     {
         public Func<SyntaxGenerator, NamespaceDeclarationSyntax, NamespaceDeclarationSyntax> NamespaceActionFunc { get; set; }
 
-        public new NamespaceAction Clone() => (NamespaceAction)this.MemberwiseClone();
         public override bool Equals(object obj)
         {
             var action = (NamespaceAction)obj;

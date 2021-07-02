@@ -61,7 +61,7 @@ namespace CTA.Rules.Test.Actions
                 MethodDeclarationActionFunc = _methodDeclarationActions.GetAddCommentAction("NewAttribute")
             };
 
-            var cloned = methodDeclarationAction.Clone();
+            var cloned = methodDeclarationAction.Clone<MethodDeclarationAction>();
 
             Assert.True(methodDeclarationAction.Equals(cloned));
             cloned.Value = "DifferentValue";

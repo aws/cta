@@ -91,7 +91,7 @@ namespace CTA.Rules.Test.Actions
         public void InvocationExpressionEquals()
         {
             var invocationExpressionAction = new InvocationExpressionAction() { Key = "Test", Value = "Test2", InvocationExpressionActionFunc = _invocationExpressionActions.GetAddCommentAction("Test") };
-            var cloned = invocationExpressionAction.Clone();
+            var cloned = invocationExpressionAction.Clone<InvocationExpressionAction>();
             Assert.True(invocationExpressionAction.Equals(cloned));
 
             cloned.Value = "DifferentValue";

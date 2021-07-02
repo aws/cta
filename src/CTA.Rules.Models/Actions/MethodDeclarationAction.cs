@@ -9,7 +9,6 @@ namespace CTA.Rules.Models
     {
         public Func<SyntaxGenerator, MethodDeclarationSyntax, MethodDeclarationSyntax> MethodDeclarationActionFunc { get; set; }
 
-        public new MethodDeclarationAction Clone() => (MethodDeclarationAction)this.MemberwiseClone();
         public override bool Equals(object obj)
         {
             var action = (MethodDeclarationAction)obj;
