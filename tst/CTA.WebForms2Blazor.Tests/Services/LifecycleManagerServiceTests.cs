@@ -29,6 +29,9 @@ namespace CTA.WebForms2Blazor.Tests.Services
         private const string SenderParamType = "object";
         private const string EventArgsParamName = "eventArgs";
         private const string EventArgsParamType = "EventArgs";
+        private const string ProcessRequestMethodName = "ProcessRequest";
+        private const string ProcessRequestParamType = "HttpContext";
+        private const string ProcessRequestParamName = "context";
 
         private LifecycleManagerService _lcManager;
         private CancellationToken _token;
@@ -67,9 +70,9 @@ namespace CTA.WebForms2Blazor.Tests.Services
             // Should be the second registration in the sequence
             _lcManager.RegisterMiddlewareLambda(WebFormsAppLifecycleEvent.PostAcquireRequestState, testLambda);
             // Should be the first registration in the sequence
-            _lcManager.RegisterMiddlewareClass(WebFormsAppLifecycleEvent.BeginRequest, TestMiddlewareName1, TestMiddlewareNamespace, TestOriginClassName, false, false);
+            _lcManager.RegisterMiddlewareClass(WebFormsAppLifecycleEvent.BeginRequest, TestMiddlewareName1, TestMiddlewareNamespace, TestOriginClassName, false);
             // Should be the third registration in the sequence
-            _lcManager.RegisterMiddlewareClass(WebFormsAppLifecycleEvent.EndRequest, TestMiddlewareName2, TestMiddlewareNamespace, TestOriginClassName, false, false);
+            _lcManager.RegisterMiddlewareClass(WebFormsAppLifecycleEvent.EndRequest, TestMiddlewareName2, TestMiddlewareNamespace, TestOriginClassName, false);
 
             var expectedResults = new[]
             {
@@ -89,8 +92,8 @@ namespace CTA.WebForms2Blazor.Tests.Services
         [Test]
         public async Task GetMiddlewareNamespaces_Does_Not_Return_Duplicates()
         {
-            _lcManager.RegisterMiddlewareClass(WebFormsAppLifecycleEvent.BeginRequest, TestMiddlewareName1, TestMiddlewareNamespace, TestOriginClassName, false, false);
-            _lcManager.RegisterMiddlewareClass(WebFormsAppLifecycleEvent.EndRequest, TestMiddlewareName2, TestMiddlewareNamespace, TestOriginClassName, false, false);
+            _lcManager.RegisterMiddlewareClass(WebFormsAppLifecycleEvent.BeginRequest, TestMiddlewareName1, TestMiddlewareNamespace, TestOriginClassName, false);
+            _lcManager.RegisterMiddlewareClass(WebFormsAppLifecycleEvent.EndRequest, TestMiddlewareName2, TestMiddlewareNamespace, TestOriginClassName, false);
 
             var results = await _lcManager.GetMiddlewareNamespaces(_token);
 
@@ -240,6 +243,36 @@ namespace CTA.WebForms2Blazor.Tests.Services
         public void GetEquivalentComponentLifecycleEvent_Returns_Correct_Dispose_Events()
         {
             Assert.AreEqual(BlazorComponentLifecycleEvent.Dispose, LifecycleManagerService.GetEquivalentComponentLifecycleEvent(WebFormsPageLifecycleEvent.Unload));
+        }
+
+        [Test]
+        public void IsProcessRequestMethod_Returns_True_For_ProcessRequest_Method()
+        {
+            var methodDeclaration = SyntaxFactory
+                .MethodDeclaration(
+                    SyntaxFactory.PredefinedType(SyntaxFactory.Token(SyntaxKind.VoidKeyword)),
+                    SyntaxFactory.Identifier(ProcessRequestMethodName))
+                .AddParameterListParameters(
+                    SyntaxFactory.Parameter(SyntaxFactory.Identifier(ProcessRequestParamName)).WithType(SyntaxFactory.ParseTypeName(ProcessRequestParamType)));
+
+            var result = LifecycleManagerService.IsProcessRequestMethod(methodDeclaration);
+
+            Assert.True(result);
+        }
+
+        [Test]
+        public void IsProcessRequestMethod_Returns_False_For_Incorrect_Method_Name()
+        {
+            var methodDeclaration = SyntaxFactory
+                .MethodDeclaration(
+                    SyntaxFactory.PredefinedType(SyntaxFactory.Token(SyntaxKind.VoidKeyword)),
+                    SyntaxFactory.Identifier(IncorrectMethodName))
+                .AddParameterListParameters(
+                    SyntaxFactory.Parameter(SyntaxFactory.Identifier(ProcessRequestParamName)).WithType(SyntaxFactory.ParseTypeName(ProcessRequestParamType)));
+
+            var result = LifecycleManagerService.IsProcessRequestMethod(methodDeclaration);
+
+            Assert.False(result);
         }
     }
 }

@@ -3,7 +3,6 @@ using CTA.WebForms2Blazor.Services;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using NUnit.Framework;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -99,7 +98,7 @@ namespace ProjectNamespace
             services.AddRazorPages();
             services.AddServerSideBlazor();
              // Did not attempt to migrate service layer
-            // and configure depenency inejction in ConfigureServices(),
+            // and configure depenency injection in ConfigureServices(),
             // this must be done manually
         }
 

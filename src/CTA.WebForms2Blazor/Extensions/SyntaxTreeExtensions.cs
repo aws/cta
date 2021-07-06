@@ -35,14 +35,7 @@ namespace CTA.WebForms2Blazor.Extensions
 
         public static bool IsEventHandler(this MethodDeclarationSyntax methodDeclaration, string eventHandlerName)
         {
-            var paramList = methodDeclaration.ParameterList.Parameters;
-            var firstParam = paramList.FirstOrDefault();
-            var lastParam = paramList.LastOrDefault();
-
-            return paramList.Count() == 2
-                // Only check the types, don't need to check names as those can change and remember to check synonymous Object type alongside object
-                && (firstParam.Type.ToString().Equals(Constants.SenderParamTypeName) || firstParam.Type.ToString().Equals(Constants.SenderParamTypeNameAlternate))
-                && lastParam.Type.ToString().Equals(Constants.EventArgsParamTypeName)
+            return methodDeclaration.HasEventHandlerParameters()
                 && methodDeclaration.Identifier.ToString().Equals(eventHandlerName);
         }
 

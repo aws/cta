@@ -39,7 +39,7 @@ namespace CTA.WebForms2Blazor.Helpers
         /// <param name="additionalPropertyDeclarations">Properties that were used in source http handler/module</param>
         /// <param name="additionalMethodDeclarations">Methods in addition to invoke method in source http handler/module</param>
         /// <returns>ClassDeclarationSyntax node for new middleware class</returns>
-        public static ClassDeclarationSyntax BuildMiddlewareClass(
+        public static ClassDeclarationSyntax ConstructMiddlewareClass(
             string middlewareClassName,
             bool shouldContinueAfterInvoke = true,
             IEnumerable<StatementSyntax> constructorAdditionalStatements = null,
@@ -59,8 +59,8 @@ namespace CTA.WebForms2Blazor.Helpers
             }
 
             result = result.AddMembers(
-                    BuildMiddlewareConstructor(middlewareClassName, constructorAdditionalStatements),
-                    BuildMiddlewareInvokeMethod(shouldContinueAfterInvoke, preHandleStatements, postHandleStatements));
+                    ConstructMiddlewareConstructor(middlewareClassName, constructorAdditionalStatements),
+                    ConstructMiddlewareInvokeMethod(shouldContinueAfterInvoke, preHandleStatements, postHandleStatements));
 
             if (additionalMethodDeclarations != null)
             {
@@ -86,7 +86,7 @@ namespace CTA.WebForms2Blazor.Helpers
             return newFields.UnionSyntaxNodeCollections(additionalDeclarations);
         }
 
-        public static ConstructorDeclarationSyntax BuildMiddlewareConstructor(
+        public static ConstructorDeclarationSyntax ConstructMiddlewareConstructor(
             string middlewareClassName,
             IEnumerable<StatementSyntax> additionalStatements = null)
         {
@@ -108,7 +108,7 @@ namespace CTA.WebForms2Blazor.Helpers
                 .WithBody(CodeSyntaxHelper.GetStatementsAsBlock(statements));
         }
 
-        public static MethodDeclarationSyntax BuildMiddlewareInvokeMethod(
+        public static MethodDeclarationSyntax ConstructMiddlewareInvokeMethod(
             bool shouldContinue = true,
             IEnumerable<StatementSyntax> preHandleStatements = null,
             IEnumerable<StatementSyntax> postHandleStatements = null)
@@ -117,10 +117,10 @@ namespace CTA.WebForms2Blazor.Helpers
                 .AddModifiers(SyntaxFactory.Token(SyntaxKind.PublicKeyword), SyntaxFactory.Token(SyntaxKind.AsyncKeyword))
                 // Accept runtime injected http context parameter
                 .AddParameterListParameters(RuntimeInjectable.HttpContextInjectable.AsParameter)
-                .WithBody(BuildMiddlewareMainContentBlock(RequestDelegateInvokeText, shouldContinue, preHandleStatements, postHandleStatements));
+                .WithBody(ConstructMiddlewareMainContentBlock(RequestDelegateInvokeText, shouldContinue, preHandleStatements, postHandleStatements));
         }
 
-        public static LambdaExpressionSyntax BuildMiddlewareLambda(
+        public static LambdaExpressionSyntax ConstructMiddlewareLambda(
             IEnumerable<StatementSyntax> preHandleStatements = null,
             IEnumerable<StatementSyntax> postHandleStatements = null) {
 
@@ -128,13 +128,13 @@ namespace CTA.WebForms2Blazor.Helpers
                 .AddParameterListParameters(
                     SyntaxFactory.Parameter(SyntaxFactory.Identifier(RuntimeInjectable.HttpContextInjectable.ParamName)),
                     SyntaxFactory.Parameter(SyntaxFactory.Identifier(RuntimeInjectable.RequestDelegateInjectable.ParamName)))
-                .WithBlock(BuildMiddlewareMainContentBlock(
+                .WithBlock(ConstructMiddlewareMainContentBlock(
                     string.Format(MiddlewareLambdaNextCallTemplate, RuntimeInjectable.RequestDelegateInjectable.ParamName),
                     true, preHandleStatements, postHandleStatements))
                 .AddModifiers(SyntaxFactory.Token(SyntaxKind.AsyncKeyword));
         }
 
-        public static BlockSyntax BuildMiddlewareMainContentBlock(
+        public static BlockSyntax ConstructMiddlewareMainContentBlock(
             string nextCallText,
             bool shouldContinue = true,
             IEnumerable<StatementSyntax> preHandleStatements = null,
@@ -159,12 +159,16 @@ namespace CTA.WebForms2Blazor.Helpers
             return CodeSyntaxHelper.GetStatementsAsBlock(statements);
         }
 
-        public static StatementSyntax BuildMiddlewareRegistrationSyntax(string middlewareName, string originLifecycleHook = null, string partialOriginClass = null, bool isHandler = false)
+        public static StatementSyntax ConstructMiddlewareRegistrationSyntax(string middlewareName, string originLifecycleHook = null, string partialOriginClass = null)
         {
             var statement = SyntaxFactory.ParseStatement(string.Format(AppUseMiddlewareTextTemplate, RuntimeInjectable.AppBuilderInjectable.ParamName, middlewareName));
             var comments = new List<string>();
 
-            if (originLifecycleHook != null)
+            if (originLifecycleHook == WebFormsAppLifecycleEvent.RequestHandlerExecute.ToString())
+            {
+                comments.Add(FromHandlerComment);
+            }
+            else if (originLifecycleHook != null)
             {
                 comments.Add(string.Format(Constants.NewEventRepresentationCommentTemplate, originLifecycleHook));
             }
@@ -174,16 +178,11 @@ namespace CTA.WebForms2Blazor.Helpers
                 comments.Add(string.Format(Constants.ClassSplitCommentTemplate, partialOriginClass));
             }
 
-            if (isHandler)
-            {
-                comments.Add(FromHandlerComment);
-            }
-
             // Use re-wrapping to wrap each comment line but keep a newline between each comment
             return comments.Count() > 0 ? statement.AddComment(comments, true, Constants.DefaultCommentLineCharacterLimit) : statement;
         }
 
-        public static StatementSyntax BuildMiddlewareLambdaRegistrationSyntax(LambdaExpressionSyntax middlewareLambda, string originLifecycleHook = null)
+        public static StatementSyntax ConstructMiddlewareLambdaRegistrationSyntax(LambdaExpressionSyntax middlewareLambda, string originLifecycleHook = null)
         {
             var argument = SyntaxFactory.Argument(middlewareLambda);
             var expression = SyntaxFactory.InvocationExpression(SyntaxFactory.MemberAccessExpression(
