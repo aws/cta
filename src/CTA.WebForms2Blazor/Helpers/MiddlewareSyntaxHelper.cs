@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using CTA.WebForms2Blazor.Extensions;
 using Microsoft.CodeAnalysis.CSharp;
@@ -11,8 +10,10 @@ namespace CTA.WebForms2Blazor.Helpers
     {
         public const string MiddlewareInvokeMethodName = "Invoke";
         public const string MiddlewareInvokeMethodReturnType = "Task";
-        public const string AppUseMiddlewareTextTemplate = "{0} = {0}.UseMiddleware<{1}>();";
-        public const string OriginMiddlewareCommentTemplate = "This middleware was generated from the {0} application lifecycle event";
+        public const string MiddlewareLambdaRegistrationMethodName = "Use";
+        public const string MiddlewareLambdaNextCallTemplate = "await {0}();";
+        public const string AppUseMiddlewareTextTemplate = "{0}.UseMiddleware<{1}>();";
+        public const string FromHandlerComment = "This middleware was originally an http handler, use conditions must be added manually";
 
         /// <summary>
         /// The line that should be executed to trigger the next middleware
@@ -112,18 +113,42 @@ namespace CTA.WebForms2Blazor.Helpers
             IEnumerable<StatementSyntax> preHandleStatements = null,
             IEnumerable<StatementSyntax> postHandleStatements = null)
         {
+            return SyntaxFactory.MethodDeclaration(SyntaxFactory.ParseTypeName(MiddlewareInvokeMethodReturnType), MiddlewareInvokeMethodName)
+                .AddModifiers(SyntaxFactory.Token(SyntaxKind.PublicKeyword), SyntaxFactory.Token(SyntaxKind.AsyncKeyword))
+                // Accept runtime injected http context parameter
+                .AddParameterListParameters(RuntimeInjectable.HttpContextInjectable.AsParameter)
+                .WithBody(BuildMiddlewareMainContentBlock(RequestDelegateInvokeText, shouldContinue, preHandleStatements, postHandleStatements));
+        }
+
+        public static LambdaExpressionSyntax BuildMiddlewareLambda(
+            IEnumerable<StatementSyntax> preHandleStatements = null,
+            IEnumerable<StatementSyntax> postHandleStatements = null) {
+
+            return SyntaxFactory.ParenthesizedLambdaExpression()
+                .AddParameterListParameters(
+                    SyntaxFactory.Parameter(SyntaxFactory.Identifier(RuntimeInjectable.HttpContextInjectable.ParamName)),
+                    SyntaxFactory.Parameter(SyntaxFactory.Identifier(RuntimeInjectable.RequestDelegateInjectable.ParamName)))
+                .WithBlock(BuildMiddlewareMainContentBlock(
+                    string.Format(MiddlewareLambdaNextCallTemplate, RuntimeInjectable.RequestDelegateInjectable.ParamName),
+                    true, preHandleStatements, postHandleStatements))
+                .AddModifiers(SyntaxFactory.Token(SyntaxKind.AsyncKeyword));
+        }
+
+        public static BlockSyntax BuildMiddlewareMainContentBlock(
+            string nextCallText,
+            bool shouldContinue = true,
+            IEnumerable<StatementSyntax> preHandleStatements = null,
+            IEnumerable<StatementSyntax> postHandleStatements = null)
+        {
             IEnumerable<StatementSyntax> statements = preHandleStatements ?? new List<StatementSyntax>();
 
-            // In most cases, shouldContinue will be true, but if
-            // the middleware was generated from an http handler,
-            // then this will not be the case
+            // In most cases, shouldContinue will be true, but if the middleware was generated from
+            // an http handler, then this will not be the case
             if (shouldContinue)
             {
-                // Ensure that call to next occurs between
-                // pre-handle statements and post-handle
-                // statements if any exist (usually exactly
-                // one will)
-                statements = statements.Append(SyntaxFactory.ParseStatement(RequestDelegateInvokeText));
+                // Ensure that call to next occurs between pre-handle statements and post-handle
+                // statements if any exist (usually exactly one will)
+                statements = statements.Append(SyntaxFactory.ParseStatement(nextCallText));
             }
 
             if (postHandleStatements != null)
@@ -131,20 +156,46 @@ namespace CTA.WebForms2Blazor.Helpers
                 statements = statements.Concat(postHandleStatements);
             }
 
-            return SyntaxFactory.MethodDeclaration(SyntaxFactory.ParseTypeName(MiddlewareInvokeMethodReturnType), MiddlewareInvokeMethodName)
-                .AddModifiers(SyntaxFactory.Token(SyntaxKind.PublicKeyword), SyntaxFactory.Token(SyntaxKind.AsyncKeyword))
-                // Accept runtime injected http context parameter
-                .AddParameterListParameters(RuntimeInjectable.HttpContextInjectable.AsParameter)
-                .WithBody(CodeSyntaxHelper.GetStatementsAsBlock(statements));
+            return CodeSyntaxHelper.GetStatementsAsBlock(statements);
         }
 
-        public static StatementSyntax BuildMiddlewareRegistrationSyntax(string middlewareName, string originLifecycleHook = null)
+        public static StatementSyntax BuildMiddlewareRegistrationSyntax(string middlewareName, string originLifecycleHook = null, string partialOriginClass = null, bool isHandler = false)
         {
             var statement = SyntaxFactory.ParseStatement(string.Format(AppUseMiddlewareTextTemplate, RuntimeInjectable.AppBuilderInjectable.ParamName, middlewareName));
+            var comments = new List<string>();
 
             if (originLifecycleHook != null)
             {
-                statement = statement.AddComment(string.Format(OriginMiddlewareCommentTemplate, originLifecycleHook));
+                comments.Add(string.Format(Constants.NewEventRepresentationCommentTemplate, originLifecycleHook));
+            }
+
+            if (partialOriginClass != null)
+            {
+                comments.Add(string.Format(Constants.ClassSplitCommentTemplate, partialOriginClass));
+            }
+
+            if (isHandler)
+            {
+                comments.Add(FromHandlerComment);
+            }
+
+            // Use re-wrapping to wrap each comment line but keep a newline between each comment
+            return comments.Count() > 0 ? statement.AddComment(comments, true, Constants.DefaultCommentLineCharacterLimit) : statement;
+        }
+
+        public static StatementSyntax BuildMiddlewareLambdaRegistrationSyntax(LambdaExpressionSyntax middlewareLambda, string originLifecycleHook = null)
+        {
+            var argument = SyntaxFactory.Argument(middlewareLambda);
+            var expression = SyntaxFactory.InvocationExpression(SyntaxFactory.MemberAccessExpression(
+                    SyntaxKind.SimpleMemberAccessExpression,
+                    SyntaxFactory.IdentifierName(RuntimeInjectable.AppBuilderInjectable.ParamName),
+                    SyntaxFactory.IdentifierName(MiddlewareLambdaRegistrationMethodName)))
+                .AddArgumentListArguments(argument);
+            var statement = SyntaxFactory.ExpressionStatement(expression);
+
+            if (originLifecycleHook != null)
+            {
+                return statement.AddComment(string.Format(Constants.NewEventRepresentationCommentTemplate, originLifecycleHook));
             }
 
             return statement;

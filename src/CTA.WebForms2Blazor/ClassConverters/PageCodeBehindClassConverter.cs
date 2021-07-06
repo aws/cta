@@ -7,6 +7,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Linq;
 using System.Text;
 using System.IO;
+using CTA.WebForms2Blazor.Services;
 
 namespace CTA.WebForms2Blazor.ClassConverters
 {
@@ -17,8 +18,9 @@ namespace CTA.WebForms2Blazor.ClassConverters
             string sourceProjectPath,
             SemanticModel sourceFileSemanticModel,
             TypeDeclarationSyntax originalDeclarationSyntax,
-            INamedTypeSymbol originalClassSymbol)
-            : base(relativePath, sourceProjectPath, sourceFileSemanticModel, originalDeclarationSyntax, originalClassSymbol)
+            INamedTypeSymbol originalClassSymbol,
+            TaskManagerService taskManager)
+            : base(relativePath, sourceProjectPath, sourceFileSemanticModel, originalDeclarationSyntax, originalClassSymbol, taskManager)
         {
             // TODO: Register with the necessary services
         }
@@ -34,6 +36,17 @@ namespace CTA.WebForms2Blazor.ClassConverters
             // make this possible
             var sourceClassComponents = GetSourceClassComponents();
 
+            // Retrieve methods that are event handlers
+            // Extract statements and add to component lifecycle
+
+            // _originalDeclarationSyntax
+            // remove node
+            // add members
+            // Add componentbase class
+            // Add Disposable if needed
+
+            DoCleanUp();
+
             return new FileInformation(GetNewRelativePath(), Encoding.UTF8.GetBytes(sourceClassComponents.FileText));
         }
 
@@ -42,7 +55,7 @@ namespace CTA.WebForms2Blazor.ClassConverters
             // TODO: Potentially remove certain folders from beginning of relative path
             var newRelativePath = FilePathHelper.AlterFileName(_relativePath,
                 oldExtension: Constants.PageCodeBehindExtension,
-                newExtension: Constants.RazorFileExtension);
+                newExtension: Constants.RazorCodeBehindFileExtension);
 
             return Path.Combine(Constants.RazorPageDirectoryName, newRelativePath);
         }

@@ -166,7 +166,7 @@ $@"{ExpectedBasicConfigureServicesMethodSignature}
                 constructorAdditionalStatements: additionalStatements,
                 configureAdditionalStatements: additionalStatements,
                 configureServicesAdditionalStatements: additionalStatements,
-                fieldDeclarations: new[] { SyntaxHelperSetupFixture.AdditionalFieldDeclaration },
+                additionalFieldDeclarations: new[] { SyntaxHelperSetupFixture.AdditionalFieldDeclaration },
                 additionalPropertyDeclarations: new[] { SyntaxHelperSetupFixture.AdditionalPropertyDeclaration },
                 additionalMethodDeclarations: new[] { SyntaxHelperSetupFixture.AdditionalMethodDeclaration });
 

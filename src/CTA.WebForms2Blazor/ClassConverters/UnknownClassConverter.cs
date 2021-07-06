@@ -1,11 +1,10 @@
-﻿using System.Threading.Tasks;
+﻿using System.Text;
+using System.Threading.Tasks;
 using CTA.WebForms2Blazor.FileInformationModel;
 using CTA.WebForms2Blazor.Helpers;
-using CTA.WebForms2Blazor.Extensions;
+using CTA.WebForms2Blazor.Services;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using System.Linq;
-using System.Text;
 
 namespace CTA.WebForms2Blazor.ClassConverters
 {
@@ -16,8 +15,9 @@ namespace CTA.WebForms2Blazor.ClassConverters
             string sourceProjectPath,
             SemanticModel sourceFileSemanticModel,
             TypeDeclarationSyntax originalDeclarationSyntax,
-            INamedTypeSymbol originalClassSymbol)
-            : base(relativePath, sourceProjectPath, sourceFileSemanticModel, originalDeclarationSyntax, originalClassSymbol)
+            INamedTypeSymbol originalClassSymbol,
+            TaskManagerService taskManager)
+            : base(relativePath, sourceProjectPath, sourceFileSemanticModel, originalDeclarationSyntax, originalClassSymbol, taskManager)
         {
             // TODO: Register with the necessary services
         }
@@ -30,6 +30,8 @@ namespace CTA.WebForms2Blazor.ClassConverters
             // want to scan parts of these files and remove/alter/take note of certain lines/info
             var sourceClassComponents = GetSourceClassComponents();
             var newRelativePath = FilePathHelper.AlterFileName(_relativePath, newFileName: _originalClassSymbol.Name);
+
+            DoCleanUp();
 
             return new FileInformation(newRelativePath, Encoding.UTF8.GetBytes(sourceClassComponents.FileText));
         }
