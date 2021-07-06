@@ -153,16 +153,16 @@ $@"{ExpectedBasicConfigureServicesMethodSignature}
 }}";
 
         [Test]
-        public void BuildStartupClass_Produces_Expected_Basic_Result()
+        public void ConstructStartupClass_Produces_Expected_Basic_Result()
         {
-            Assert.AreEqual(ExpectedBasicStartupClassText, StartupSyntaxHelper.BuildStartupClass().NormalizeWhitespace().ToFullString());
+            Assert.AreEqual(ExpectedBasicStartupClassText, StartupSyntaxHelper.ConstructStartupClass().NormalizeWhitespace().ToFullString());
         }
 
         [Test]
-        public void BuildStartupClass_Produces_Expected_Fully_Modified_Result()
+        public void ConstructStartupClass_Produces_Expected_Fully_Modified_Result()
         {
             var additionalStatements = new[] { SyntaxHelperSetupFixture.AdditionalStatement };
-            var modifiedStartupClass = StartupSyntaxHelper.BuildStartupClass(
+            var modifiedStartupClass = StartupSyntaxHelper.ConstructStartupClass(
                 constructorAdditionalStatements: additionalStatements,
                 configureAdditionalStatements: additionalStatements,
                 configureServicesAdditionalStatements: additionalStatements,
@@ -199,42 +199,42 @@ $@"{ExpectedBasicConfigureServicesMethodSignature}
         }
 
         [Test]
-        public void BuildStartupConstructor_Produces_Expected_Basic_Result()
+        public void ConstructStartupConstructor_Produces_Expected_Basic_Result()
         {
-            Assert.AreEqual(ExpectedBasicStartupConstructorText, StartupSyntaxHelper.BuildStartupConstructor().NormalizeWhitespace().ToFullString());
+            Assert.AreEqual(ExpectedBasicStartupConstructorText, StartupSyntaxHelper.ConstructStartupConstructor().NormalizeWhitespace().ToFullString());
         }
 
         [Test]
-        public void BuildStartupConstructor_Produces_Expected_Result_When_Additional_Statements_Present()
+        public void ConstructStartupConstructor_Produces_Expected_Result_When_Additional_Statements_Present()
         {
             var additionalStatements = new[] { SyntaxHelperSetupFixture.AdditionalStatement };
-            Assert.AreEqual(ExpectedModifiedStartupConstructorText, StartupSyntaxHelper.BuildStartupConstructor(additionalStatements).NormalizeWhitespace().ToFullString());
+            Assert.AreEqual(ExpectedModifiedStartupConstructorText, StartupSyntaxHelper.ConstructStartupConstructor(additionalStatements).NormalizeWhitespace().ToFullString());
         }
 
         [Test]
-        public void BuildStartupConfigureMethod_Produces_Expected_Basic_Result()
+        public void ConstructStartupConfigureMethod_Produces_Expected_Basic_Result()
         {
-            Assert.AreEqual(ExpectedBasicConfigureText, StartupSyntaxHelper.BuildStartupConfigureMethod().NormalizeWhitespace().ToFullString());
+            Assert.AreEqual(ExpectedBasicConfigureText, StartupSyntaxHelper.ConstructStartupConfigureMethod().NormalizeWhitespace().ToFullString());
         }
 
         [Test]
-        public void BuildStartupConfigureMethod_Produces_Expected_Result_When_Additional_Statements_Present()
-        {
-            var additionalStatements = new[] { SyntaxHelperSetupFixture.AdditionalStatement };
-            Assert.AreEqual(ExpectedModifiedConfigureText, StartupSyntaxHelper.BuildStartupConfigureMethod(additionalStatements).NormalizeWhitespace().ToFullString());
-        }
-
-        [Test]
-        public void BuildStartupConfigureServicesMethod_Produces_Expected_Result()
-        {
-            Assert.AreEqual(ExpectedBasicConfigureServicesText, StartupSyntaxHelper.BuildStartupConfigureServicesMethod().NormalizeWhitespace().ToFullString());
-        }
-
-        [Test]
-        public void BuildStartupConfigureServicesMethod_Produces_Expected_Result_When_Additional_Statements_Present()
+        public void ConstructStartupConfigureMethod_Produces_Expected_Result_When_Additional_Statements_Present()
         {
             var additionalStatements = new[] { SyntaxHelperSetupFixture.AdditionalStatement };
-            Assert.AreEqual(ExpectedModifiedConfigureServicesText, StartupSyntaxHelper.BuildStartupConfigureServicesMethod(additionalStatements).NormalizeWhitespace().ToFullString());
+            Assert.AreEqual(ExpectedModifiedConfigureText, StartupSyntaxHelper.ConstructStartupConfigureMethod(additionalStatements).NormalizeWhitespace().ToFullString());
+        }
+
+        [Test]
+        public void ConstructStartupConfigureServicesMethod_Produces_Expected_Result()
+        {
+            Assert.AreEqual(ExpectedBasicConfigureServicesText, StartupSyntaxHelper.ConstructStartupConfigureServicesMethod().NormalizeWhitespace().ToFullString());
+        }
+
+        [Test]
+        public void ConstructStartupConfigureServicesMethod_Produces_Expected_Result_When_Additional_Statements_Present()
+        {
+            var additionalStatements = new[] { SyntaxHelperSetupFixture.AdditionalStatement };
+            Assert.AreEqual(ExpectedModifiedConfigureServicesText, StartupSyntaxHelper.ConstructStartupConfigureServicesMethod(additionalStatements).NormalizeWhitespace().ToFullString());
         }
     }
 }

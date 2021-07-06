@@ -70,7 +70,7 @@ namespace CTA.WebForms2Blazor.ClassConverters
                 var newLifecycleEvent = newLifecycleEventKvp.Key;
                 var newLifecycleEventStatements = newLifecycleEventKvp.Value;
 
-                var newMethodDeclaration = ComponentSyntaxHelper.BuildComponentLifecycleMethod(newLifecycleEvent, newLifecycleEventStatements);
+                var newMethodDeclaration = ComponentSyntaxHelper.ConstructComponentLifecycleMethod(newLifecycleEvent, newLifecycleEventStatements);
                 currentClassDeclaration = currentClassDeclaration.AddMembers(newMethodDeclaration);
             }
 

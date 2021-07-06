@@ -68,7 +68,7 @@ namespace CTA.WebForms2Blazor.ClassConverters
             // before we have all statements required to build startup class
             await InsertRequestPipelineMiddlewareRegistrations();
 
-            var startupClassDeclaration = StartupSyntaxHelper.BuildStartupClass(
+            var startupClassDeclaration = StartupSyntaxHelper.ConstructStartupClass(
                 constructorAdditionalStatements: originalDescendantNodes.OfType<ConstructorDeclarationSyntax>().FirstOrDefault()?.Body?.Statements,
                 configureAdditionalStatements: _configureMethodStatements,
                 configureServicesAdditionalStatements: configureServicesLines,
@@ -146,8 +146,8 @@ namespace CTA.WebForms2Blazor.ClassConverters
         {
             var statements = methodDeclaration.Body.Statements;
             var lambdaExpression = LifecycleManagerService.ContentIsPreHandle(lifecycleEvent) ?
-                MiddlewareSyntaxHelper.BuildMiddlewareLambda(preHandleStatements: statements) :
-                MiddlewareSyntaxHelper.BuildMiddlewareLambda(postHandleStatements: statements);
+                MiddlewareSyntaxHelper.ConstructMiddlewareLambda(preHandleStatements: statements) :
+                MiddlewareSyntaxHelper.ConstructMiddlewareLambda(postHandleStatements: statements);
 
             _lifecycleManager.RegisterMiddlewareLambda(lifecycleEvent, lambdaExpression);
         }

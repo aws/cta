@@ -65,7 +65,7 @@ namespace CTA.WebForms2Blazor.ClassConverters
             // We have completed any possible registration by this point
             _lifecycleManager.NotifyMiddlewareSourceProcessed();
 
-            var middlewareClassDeclaration = MiddlewareSyntaxHelper.BuildMiddlewareClass(
+            var middlewareClassDeclaration = MiddlewareSyntaxHelper.ConstructMiddlewareClass(
                 middlewareClassName: className,
                 shouldContinueAfterInvoke: false,
                 constructorAdditionalStatements: originalDescendantNodes.OfType<ConstructorDeclarationSyntax>().FirstOrDefault()?.Body?.Statements,

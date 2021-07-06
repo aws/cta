@@ -220,10 +220,10 @@ namespace CTA.WebForms2Blazor.Services
             {
                 if (WasSplit)
                 {
-                    return MiddlewareSyntaxHelper.BuildMiddlewareRegistrationSyntax(NewClassName, LifecycleEvent.ToString(), OriginClassName);
+                    return MiddlewareSyntaxHelper.ConstructMiddlewareRegistrationSyntax(NewClassName, LifecycleEvent.ToString(), OriginClassName);
                 }
 
-                return MiddlewareSyntaxHelper.BuildMiddlewareRegistrationSyntax(NewClassName, LifecycleEvent.ToString());
+                return MiddlewareSyntaxHelper.ConstructMiddlewareRegistrationSyntax(NewClassName, LifecycleEvent.ToString());
             }
         }
 
@@ -240,7 +240,7 @@ namespace CTA.WebForms2Blazor.Services
 
             public StatementSyntax GetPipelineAdditionStatement()
             {
-                return MiddlewareSyntaxHelper.BuildMiddlewareLambdaRegistrationSyntax(MiddlewareLambda, LifecycleEvent.ToString());
+                return MiddlewareSyntaxHelper.ConstructMiddlewareLambdaRegistrationSyntax(MiddlewareLambda, LifecycleEvent.ToString());
             }
         }
     }

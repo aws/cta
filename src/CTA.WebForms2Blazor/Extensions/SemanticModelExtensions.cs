@@ -54,7 +54,7 @@ namespace CTA.WebForms2Blazor.Extensions
             namespaceSymbols.Remove(classTypeSymbol.ContainingNamespace);
 
             // TODO: Find out why null namespaces occur and maybe replace with Codelyzer usage
-            // We need to remove occurrences of the global namespace, it seomtimes gets added
+            // We need to remove occurrences of the global namespace, it sometimes gets added
             // when a required namespace was not found
             return namespaceSymbols.Where(namespaceSymbol => namespaceSymbol != null && !namespaceSymbol.ToDisplayString().Equals(Constants.GlobalNamespace));
         }

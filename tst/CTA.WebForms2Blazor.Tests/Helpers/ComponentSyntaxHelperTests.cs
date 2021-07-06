@@ -21,9 +21,9 @@ namespace CTA.WebForms2Blazor.Tests.Helpers
         private static IEnumerable<StatementSyntax> InputStatements => new[] { SyntaxFactory.ParseStatement(TestStatementText) };
 
         [Test]
-        public void BuildSetParametersAsyncMethod_Adds_Base_Call_After_Statements()
+        public void ConstructSetParametersAsyncMethod_Adds_Base_Call_After_Statements()
         {
-            var method = ComponentSyntaxHelper.BuildSetParametersAsyncMethod(InputStatements);
+            var method = ComponentSyntaxHelper.ConstructSetParametersAsyncMethod(InputStatements);
 
             // We check at index 4 because we expect the following setup:
             // 0: <<Method Signature>>
@@ -36,41 +36,41 @@ namespace CTA.WebForms2Blazor.Tests.Helpers
         }
 
         [Test]
-        public void BuildSetParametersAsyncMethod_Creates_Correct_Method_Signature()
+        public void ConstructSetParametersAsyncMethod_Creates_Correct_Method_Signature()
         {
-            var method = ComponentSyntaxHelper.BuildSetParametersAsyncMethod(InputStatements);
+            var method = ComponentSyntaxHelper.ConstructSetParametersAsyncMethod(InputStatements);
 
             Assert.AreEqual(ExpectedSetParametersAsyncMethodSignature, method.AsStringsByLine().First());
         }
         
         [Test]
-        public void BuildOnInitializedMethod_Creates_Correct_Method_Signature()
+        public void ConstructOnInitializedMethod_Creates_Correct_Method_Signature()
         {
-            var method = ComponentSyntaxHelper.BuildOnInitializedMethod(InputStatements);
+            var method = ComponentSyntaxHelper.ConstructOnInitializedMethod(InputStatements);
 
             Assert.AreEqual(ExpectedOnInitializedMethodSignature, method.AsStringsByLine().First());
         }
 
         [Test]
-        public void BuildOnParametersSetMethod_Creates_Correct_Method_Signature()
+        public void ConstructOnParametersSetMethod_Creates_Correct_Method_Signature()
         {
-            var method = ComponentSyntaxHelper.BuildOnParametersSetMethod(InputStatements);
+            var method = ComponentSyntaxHelper.ConstructOnParametersSetMethod(InputStatements);
 
             Assert.AreEqual(ExpectedOnParametersSetMethodSignature, method.AsStringsByLine().First());
         }
 
         [Test]
-        public void BuildOnAfterRenderMethod_Creates_Correct_Method_Signature()
+        public void ConstructOnAfterRenderMethod_Creates_Correct_Method_Signature()
         {
-            var method = ComponentSyntaxHelper.BuildOnAfterRenderMethod(InputStatements);
+            var method = ComponentSyntaxHelper.ConstructOnAfterRenderMethod(InputStatements);
 
             Assert.AreEqual(ExpectedOnAfterRenderMethodSignature, method.AsStringsByLine().First());
         }
 
         [Test]
-        public void BuildDisposeMethod_Creates_Correct_Method_Signature()
+        public void ConstructDisposeMethod_Creates_Correct_Method_Signature()
         {
-            var method = ComponentSyntaxHelper.BuildDisposeMethod(InputStatements);
+            var method = ComponentSyntaxHelper.ConstructDisposeMethod(InputStatements);
 
             Assert.AreEqual(ExpectedDisposeMethodSignature, method.AsStringsByLine().First());
         }

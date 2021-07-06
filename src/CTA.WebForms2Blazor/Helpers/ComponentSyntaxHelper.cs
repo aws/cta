@@ -11,24 +11,24 @@ namespace CTA.WebForms2Blazor.Helpers
         public const string SetParametersBaseCallTemplate = "await base.SetParametersAsync({0});";
         public const string ComponentOnAfterRenderParamName = "firstRender";
 
-        public static MethodDeclarationSyntax BuildComponentLifecycleMethod(BlazorComponentLifecycleEvent lcEvent, IEnumerable<StatementSyntax> statements)
+        public static MethodDeclarationSyntax ConstructComponentLifecycleMethod(BlazorComponentLifecycleEvent lcEvent, IEnumerable<StatementSyntax> statements)
         {
             switch (lcEvent)
             {
                 case BlazorComponentLifecycleEvent.SetParametersAsync:
-                    return BuildSetParametersAsyncMethod(statements);
+                    return ConstructSetParametersAsyncMethod(statements);
                 case BlazorComponentLifecycleEvent.OnParametersSet:
-                    return BuildOnParametersSetMethod(statements);
+                    return ConstructOnParametersSetMethod(statements);
                 case BlazorComponentLifecycleEvent.OnAfterRender:
-                    return BuildOnAfterRenderMethod(statements);
+                    return ConstructOnAfterRenderMethod(statements);
                 case BlazorComponentLifecycleEvent.Dispose:
-                    return BuildDisposeMethod(statements);
+                    return ConstructDisposeMethod(statements);
                 default:
-                    return BuildOnInitializedMethod(statements);
+                    return ConstructOnInitializedMethod(statements);
             }
         }
 
-        public static MethodDeclarationSyntax BuildSetParametersAsyncMethod(IEnumerable<StatementSyntax> statements)
+        public static MethodDeclarationSyntax ConstructSetParametersAsyncMethod(IEnumerable<StatementSyntax> statements)
         {
             var method = SyntaxFactory.MethodDeclaration(
                 SyntaxFactory.ParseTypeName(typeof(Task).Name),
@@ -51,7 +51,7 @@ namespace CTA.WebForms2Blazor.Helpers
             return method;
         }
 
-        public static MethodDeclarationSyntax BuildOnInitializedMethod(IEnumerable<StatementSyntax> statements)
+        public static MethodDeclarationSyntax ConstructOnInitializedMethod(IEnumerable<StatementSyntax> statements)
         {
             var method = SyntaxFactory.MethodDeclaration(
                 SyntaxFactory.PredefinedType(SyntaxFactory.Token(SyntaxKind.VoidKeyword)),
@@ -67,7 +67,7 @@ namespace CTA.WebForms2Blazor.Helpers
             return method;
         }
 
-        public static MethodDeclarationSyntax BuildOnParametersSetMethod(IEnumerable<StatementSyntax> statements)
+        public static MethodDeclarationSyntax ConstructOnParametersSetMethod(IEnumerable<StatementSyntax> statements)
         {
             var method = SyntaxFactory.MethodDeclaration(
                 SyntaxFactory.PredefinedType(SyntaxFactory.Token(SyntaxKind.VoidKeyword)),
@@ -83,7 +83,7 @@ namespace CTA.WebForms2Blazor.Helpers
             return method;
         }
 
-        public static MethodDeclarationSyntax BuildOnAfterRenderMethod(IEnumerable<StatementSyntax> statements)
+        public static MethodDeclarationSyntax ConstructOnAfterRenderMethod(IEnumerable<StatementSyntax> statements)
         {
             var method = SyntaxFactory.MethodDeclaration(
                 SyntaxFactory.PredefinedType(SyntaxFactory.Token(SyntaxKind.VoidKeyword)),
@@ -102,7 +102,7 @@ namespace CTA.WebForms2Blazor.Helpers
             return method;
         }
 
-        public static MethodDeclarationSyntax BuildDisposeMethod(IEnumerable<StatementSyntax> statements)
+        public static MethodDeclarationSyntax ConstructDisposeMethod(IEnumerable<StatementSyntax> statements)
         {
             var method = SyntaxFactory.MethodDeclaration(
                 SyntaxFactory.PredefinedType(SyntaxFactory.Token(SyntaxKind.VoidKeyword)),
