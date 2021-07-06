@@ -74,5 +74,9 @@
         public const string IdentificationFailureCommentTemplate = "Could not identify {0}, dependant {1} operation must be done manually";
 
         public const string UnusableCodeComment = "Unable to migrate the following code, as a result it was removed";
+
+        // Common Errors and Templates
+        public const string TooManyOperationsError = "Attempted {0} operation, but the expected number of operations has already been reached";
+        public const string InvalidStateError = "Attempted {0} operation, but the {1} state was invalid";
     }
 }

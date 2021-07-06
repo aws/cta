@@ -11,7 +11,10 @@ namespace CTA.WebForms2Blazor.Services
 {
     public class LifecycleManagerService
     {
-        private const string TooManyMiddlewareSourcesError = "Attempted to mark a middleware source processed, but the expected number of these operations has been reached";
+        private const string MarkMiddlewareProcessedOperation = "mark middleware processsed";
+        private const string WaitForMiddlewareProcessingOperation = "wait for all middleware sources to be processed";
+        private const string MiddlewareProcessingState = "middleware source processing";
+
         private const string ApplicationLifecycleHookMethodPrefix = "Application_";
         private const string PageLifecycleHookMethodPrefix = "Page_";
 
@@ -50,7 +53,7 @@ namespace CTA.WebForms2Blazor.Services
             }
             else if (_numMiddlewareSourcesProcessed > _expectedMiddlewareSources)
             {
-                throw new InvalidOperationException(TooManyMiddlewareSourcesError);
+                throw new InvalidOperationException(string.Format(Constants.TooManyOperationsError, MarkMiddlewareProcessedOperation));
             }
         }
 
@@ -180,9 +183,13 @@ namespace CTA.WebForms2Blazor.Services
         {
             var source = new TaskCompletionSource<bool>();
 
-            if (_numMiddlewareSourcesProcessed >= _expectedMiddlewareSources)
+            if (_numMiddlewareSourcesProcessed == _expectedMiddlewareSources)
             {
                 source.SetResult(true);
+            }
+            else if (_numMiddlewareSourcesProcessed > _expectedMiddlewareSources)
+            {
+                throw new InvalidOperationException(string.Format(Constants.InvalidStateError, WaitForMiddlewareProcessingOperation, MiddlewareProcessingState));
             }
             else
             {
