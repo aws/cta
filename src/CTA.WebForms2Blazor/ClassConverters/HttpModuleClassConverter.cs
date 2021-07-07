@@ -65,7 +65,7 @@ namespace CTA.WebForms2Blazor.ClassConverters
 
             // These shared features will be a part of all middleware classes generated because there's no
             // easy way to share scope between them or split up what each one requires while maintaining functionality,
-            // best to let the customer handle this
+            // best to let the developer handle this
             // NOTE: We want to remove the init method here as it is no longer used, in the future we want to scan this
             // for true application lifecycle event handlers rather than relying on convention
             _sharedMethods = classifiedMethods.Where(methodTuple => methodTuple.Item2 == null && !IsInitMethod(methodTuple.Item1))
@@ -132,7 +132,7 @@ namespace CTA.WebForms2Blazor.ClassConverters
                 invokeStatements = methodDeclaration.Body.Statements;
             }
 
-            var classDeclaration = MiddlewareSyntaxHelper.BuildMiddlewareClass(
+            var classDeclaration = MiddlewareSyntaxHelper.ConstructMiddlewareClass(
                 middlewareClassName: middlewareName,
                 constructorAdditionalStatements: _constructorStatements,
                 preHandleStatements: isPreHandle ? invokeStatements : null,
@@ -143,7 +143,7 @@ namespace CTA.WebForms2Blazor.ClassConverters
 
             if (!string.IsNullOrEmpty(originClass))
             {
-                // A split http module likely requires heavy customer modification,
+                // A split http module likely requires heavy manual modification,
                 // make sure they are aware of this and where the code came from
                 classDeclaration = classDeclaration.AddComment(new[] {
                     Constants.HeavyModificationNecessaryComment,
