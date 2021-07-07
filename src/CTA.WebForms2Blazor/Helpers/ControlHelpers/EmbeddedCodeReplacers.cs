@@ -20,8 +20,9 @@ namespace CTA.WebForms2Blazor.Helpers.ControlHelpers
         
         public static string ReplaceSingleExpr(Match m)
         {
+            //Same as Databind for now but can add features later
             var expr = m.Groups["expr"].Value;
-            var newValue = "@" + expr;
+            var newValue = "@(" + expr + ")";
             return newValue;
         }
         

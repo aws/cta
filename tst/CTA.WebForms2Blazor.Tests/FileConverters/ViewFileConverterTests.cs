@@ -267,7 +267,7 @@ namespace CTA.WebForms2Blazor.Tests.FileConverters
     <div class=""container"">
         <article class=""esh-pager-wrapper row"">
             <nav>
-                <span class=""esh-pager-item"">Showing @Model.ItemsPerPage of @Model.TotalItems products - Page @(Model.ActualPage + 1) - @Model.TotalPages
+                <span class=""esh-pager-item"">Showing @(Model.ItemsPerPage) of @(Model.TotalItems) products - Page @((Model.ActualPage + 1)) - @(Model.TotalPages)
                 </span>
             </nav>
         </article>

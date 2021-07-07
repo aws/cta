@@ -21,16 +21,8 @@ namespace CTA.WebForms2Blazor.ControlConverters
 
         public override HtmlNode Convert2Blazor(HtmlNode node)
         {
-            string buttonText = "";
-            try
-            {
-                var textAttr = node.Attributes.AttributesWithName("text").Single();
-                buttonText = textAttr.Value;
-            }
-            catch (InvalidOperationException ex)
-            {
-                // Todo: Throw warning about button with no text
-            }
+            var textAttr = node.Attributes.AttributesWithName("text").FirstOrDefault();
+            var buttonText = textAttr?.Value ?? string.Empty;
             
             return Convert2BlazorFromParts(NodeTemplate, BlazorName, ConvertAttributes(node.Attributes), buttonText);
         }

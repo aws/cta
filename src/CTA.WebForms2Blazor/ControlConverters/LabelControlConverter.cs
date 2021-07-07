@@ -18,23 +18,12 @@ namespace CTA.WebForms2Blazor.ControlConverters
             } 
         }
         protected override string BlazorName { get { return "label"; } }
-
-        //protected override string NodeTemplate { get { return @"{2}"; } }
-
+        
         public override HtmlNode Convert2Blazor(HtmlNode node)
         {
-            var labelText = "";
-            try
-            {
-                var textAttr = node.Attributes.AttributesWithName("text").Single();
-                labelText = textAttr.Value;
-            }
-            catch (InvalidOperationException ex)
-            {
-                //Todo: Throw warning about label with no text
-            }
-            
-            //Not sure if this needs to be handled and if this is expected behavior
+            var textAttr = node.Attributes.AttributesWithName("text").FirstOrDefault();
+            var labelText = textAttr?.Value ?? string.Empty;
+
             return Convert2BlazorFromParts(NodeTemplate, BlazorName, ConvertAttributes(node.Attributes), labelText);
         }
     }

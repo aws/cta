@@ -60,6 +60,8 @@ namespace CTA.WebForms2Blazor.ControlConverters
             
             htmlString = EmbeddedCodeReplacers.DataBindRegex.Replace(htmlString, dataBindEval);
             htmlString = EmbeddedCodeReplacers.SingleExpRegex.Replace(htmlString, singleExprEval);
+            
+            //Not implemented/used yet
             //htmlString = EmbeddedCodeReplacers.DirectiveRegex.Replace(htmlString, directiveEval);
             //htmlString = EmbeddedCodeReplacers.AspExpRegex.Replace(htmlString, aspExprEval);
 
