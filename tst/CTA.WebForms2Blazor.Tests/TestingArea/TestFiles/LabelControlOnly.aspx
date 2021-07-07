@@ -52,7 +52,7 @@
         </dt>
 
         <dd>
-            <asp:Label runat="server" Text='<%#product.RestockThreshold%>' />
+            <asp:Label runat="server" />
         </dd>
 
         <dt>Max stock

@@ -35,24 +35,24 @@ namespace CTA.WebForms2Blazor.Tests.FileConverters
     <div class=""container"">
         <article class=""esh-pager-wrapper row"">
             <nav>
-                <a class='esh-pager-item esh-pager-item--navigable'>
+                <a class=""esh-pager-item esh-pager-item--navigable"">
                     Previous
                 </a>
 
-                <a class='esh-pager-item esh-pager-item--navigable'>
+                <a class=""esh-pager-item esh-pager-item--navigable"">
                     Next
                 </a>
             </nav>
             <td>
-                <a href='@(GetRouteUrl(""EditProductRoute"", new {id =Item.Id}) )' class='esh-table-link'>
+                <a href='@(GetRouteUrl(""EditProductRoute"", new {id =Item.Id}) )' class=""esh-table-link"">
                     Edit
                 </a>
                 |
-                <a href='@(GetRouteUrl(""ProductDetailsRoute"", new {id =Item.Id}) )' class='esh-table-link'>
+                <a href='@(GetRouteUrl(""ProductDetailsRoute"", new {id =Item.Id}) )' class=""esh-table-link"">
                     Details
                 </a>
                 |
-                <a href='@(GetRouteUrl(""DeleteProductRoute"", new {id =Item.Id}) )' class='esh-table-link'>
+                <a href='@(GetRouteUrl(""DeleteProductRoute"", new {id =Item.Id}) )' class=""esh-table-link"">
                     Delete
                 </a>
             </td>
@@ -89,7 +89,8 @@ namespace CTA.WebForms2Blazor.Tests.FileConverters
         <dd class=""text-right esh-button-actions"">
             <a runat=""server"" href=""~"" class=""btn esh-button esh-button-secondary"">[ Cancel ]
             </a>
-            <button class='btn esh-button esh-button-primary' @onclick='Delete_Click'>[ Delete ]</button>
+            <button class=""btn esh-button esh-button-primary"" @onclick=""Delete_Click"">[ Delete ]</button>
+            <button class=""btn test no-text"" @onclick=""Do_Something""></button>
         </dd>
     </dl>
 </div>";
@@ -125,62 +126,62 @@ namespace CTA.WebForms2Blazor.Tests.FileConverters
         </dt>
 
         <dd>
-            @(product.Name)
+            <label>@(product.Name)</label>
         </dd>
 
         <dt>Description
         </dt>
 
         <dd>
-            @(product.Description)
+            <label>@(product.Description)</label>
         </dd>
 
         <dt>Brand
         </dt>
 
         <dd>
-            @(product.CatalogBrand.Brand)
+            <label>@(product.CatalogBrand.Brand)</label>
         </dd>
 
         <dt>Type
         </dt>
 
         <dd>
-            @(product.CatalogType.Type)
+            <label>@(product.CatalogType.Type)</label>
         </dd>
         <dt>Price
         </dt>
 
         <dd>
-            @(product.Price)
+            <label>@(product.Price)</label>
         </dd>
 
         <dt>Picture name
         </dt>
 
         <dd>
-            @(product.PictureFileName)
+            <label>@(product.PictureFileName)</label>
         </dd>
 
         <dt>Stock
         </dt>
 
         <dd>
-            @(product.AvailableStock)
+            <label>@(product.AvailableStock)</label>
         </dd>
 
         <dt>Restock
         </dt>
 
         <dd>
-            @(product.RestockThreshold)
+            <label></label>
         </dd>
 
         <dt>Max stock
         </dt>
 
         <dd>
-            <label for='label1'>@(product.MaxStockThreshold)</label>
+            <label id=""label1"">@(product.MaxStockThreshold)</label>
         </dd>
 
     </dl>
@@ -188,10 +189,8 @@ namespace CTA.WebForms2Blazor.Tests.FileConverters
             
             Assert.AreEqual(expectedContents, fileContents);
             Assert.True(fileContents.Contains("<label"));
-            Assert.True(fileContents.Contains("for="));
             Assert.True(fileContents.Contains("</label>"));
             Assert.False(fileContents.Contains("asp:Label"));
-            Assert.False(fileContents.Contains("id"));
             Assert.False(fileContents.Contains("Text"));
             Assert.IsTrue(fi.RelativePath.Equals(relativePath));
         }

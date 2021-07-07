@@ -13,26 +13,29 @@ namespace CTA.WebForms2Blazor.ControlConverters
             {
                 return new Dictionary<string, string>()
                 {
-                    ["id"] = "for"
+                    ["id"] = "id"
                 };
             } 
         }
         protected override string BlazorName { get { return "label"; } }
 
-        protected override string NodeTemplate { get { return @"{2}"; } }
+        //protected override string NodeTemplate { get { return @"{2}"; } }
 
         public override HtmlNode Convert2Blazor(HtmlNode node)
         {
-            var textAttr = node.Attributes.AttributesWithName("text").Single();
-            var labelText = textAttr.Value;
-
-            //Not sure if this needs to be handled and if this is expected behavior
-            if (node.Attributes.Contains("id"))
+            var labelText = "";
+            try
             {
-                return Convert2BlazorFromParts(base.NodeTemplate, BlazorName, ConvertAttributes(node.Attributes), labelText);
+                var textAttr = node.Attributes.AttributesWithName("text").Single();
+                labelText = textAttr.Value;
             }
-
-            return Convert2BlazorFromParts(NodeTemplate, null, null, labelText);
+            catch (InvalidOperationException ex)
+            {
+                //Todo: Throw warning about label with no text
+            }
+            
+            //Not sure if this needs to be handled and if this is expected behavior
+            return Convert2BlazorFromParts(NodeTemplate, BlazorName, ConvertAttributes(node.Attributes), labelText);
         }
     }
 }
