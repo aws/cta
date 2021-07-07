@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Codelyzer.Analysis.Model;
-using CTA.WebForms2Blazor.Helpers;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using CTA.WebForms2Blazor.Extensions;
+using CTA.WebForms2Blazor.Helpers;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace CTA.WebForms2Blazor.Services
 {
@@ -57,9 +54,9 @@ namespace CTA.WebForms2Blazor.Services
             }
         }
 
-        public void RegisterMiddlewareClass(WebFormsAppLifecycleEvent lcEvent, string newClassName, string namespaceName, string originClassName, bool wasSplit, bool isHandler)
+        public void RegisterMiddlewareClass(WebFormsAppLifecycleEvent lcEvent, string newClassName, string namespaceName, string originClassName, bool wasSplit)
         {
-            var newMiddleware = new RegisteredMiddlewareClass(lcEvent, newClassName, namespaceName, originClassName, wasSplit, isHandler);
+            var newMiddleware = new RegisteredMiddlewareClass(lcEvent, newClassName, namespaceName, originClassName, wasSplit);
             _registeredMiddleware.Add(newMiddleware);
         }
 
@@ -99,6 +96,15 @@ namespace CTA.WebForms2Blazor.Services
                 {
                     var currentEvent = (WebFormsAppLifecycleEvent)value;
 
+                    if (currentEvent == WebFormsAppLifecycleEvent.RequestHandlerExecute)
+                    {
+                        // RequestHandlerExecute is a special event that
+                        // technically isn't a part of the lifecycle but is
+                        // used to represent new http handler middleware,
+                        // don't use this loop to identify it
+                        continue;
+                    }
+
                     if (methodName.Equals(ApplicationLifecycleHookMethodPrefix + currentEvent.ToString()))
                     {
                         return currentEvent;
@@ -106,7 +112,22 @@ namespace CTA.WebForms2Blazor.Services
                 }
             }
 
+            // Finally check that it's not a request handler
+            if (IsProcessRequestMethod(methodDeclaration))
+            {
+                return WebFormsAppLifecycleEvent.RequestHandlerExecute;
+            }
+
             return null;
+        }
+
+        public static bool IsProcessRequestMethod(MethodDeclarationSyntax methodDeclaration)
+        {
+            var paramList = methodDeclaration.ParameterList.Parameters;
+            var firstParam = paramList.FirstOrDefault();
+
+            return paramList.Count() == 1 && firstParam.Type.ToString().Equals(Constants.HttpContextParamTypeName)
+                && methodDeclaration.Identifier.ToString().Equals(Constants.ProcessRequestMethodName);
         }
 
         public static WebFormsPageLifecycleEvent? CheckMethodPageLifecycleHook(MethodDeclarationSyntax methodDeclaration)
@@ -185,26 +206,24 @@ namespace CTA.WebForms2Blazor.Services
             public string NamespaceName { get; }
             public string OriginClassName { get; }
             public bool WasSplit { get; }
-            public bool IsHandler { get; }
 
-            public RegisteredMiddlewareClass(WebFormsAppLifecycleEvent lcEvent, string newClassName, string namespaceName, string originClassName, bool wasSplit, bool isHandler)
+            public RegisteredMiddlewareClass(WebFormsAppLifecycleEvent lcEvent, string newClassName, string namespaceName, string originClassName, bool wasSplit)
             {
                 LifecycleEvent = lcEvent;
                 NewClassName = newClassName;
                 NamespaceName = namespaceName;
                 OriginClassName = originClassName;
                 WasSplit = wasSplit;
-                IsHandler = isHandler;
             }
 
             public StatementSyntax GetPipelineAdditionStatement()
             {
                 if (WasSplit)
                 {
-                    return MiddlewareSyntaxHelper.BuildMiddlewareRegistrationSyntax(NewClassName, LifecycleEvent.ToString(), OriginClassName);
+                    return MiddlewareSyntaxHelper.ConstructMiddlewareRegistrationSyntax(NewClassName, LifecycleEvent.ToString(), OriginClassName);
                 }
 
-                return MiddlewareSyntaxHelper.BuildMiddlewareRegistrationSyntax(NewClassName, LifecycleEvent.ToString());
+                return MiddlewareSyntaxHelper.ConstructMiddlewareRegistrationSyntax(NewClassName, LifecycleEvent.ToString());
             }
         }
 
@@ -221,7 +240,7 @@ namespace CTA.WebForms2Blazor.Services
 
             public StatementSyntax GetPipelineAdditionStatement()
             {
-                return MiddlewareSyntaxHelper.BuildMiddlewareLambdaRegistrationSyntax(MiddlewareLambda, LifecycleEvent.ToString());
+                return MiddlewareSyntaxHelper.ConstructMiddlewareLambdaRegistrationSyntax(MiddlewareLambda, LifecycleEvent.ToString());
             }
         }
     }

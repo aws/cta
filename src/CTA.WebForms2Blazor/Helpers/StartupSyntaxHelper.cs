@@ -43,7 +43,7 @@ namespace CTA.WebForms2Blazor.Helpers
         /// <param name="additionalPropertyDeclarations">Properties that were used in Global.asax.cs</param>
         /// <param name="additionalMethodDeclarations">Methods in addition to the "normal" methods of Global.asax.cs</param>
         /// <returns>ClassDeclarationSyntax node for new Startup class</returns>
-        public static ClassDeclarationSyntax BuildStartupClass(
+        public static ClassDeclarationSyntax ConstructStartupClass(
             IEnumerable<StatementSyntax> constructorAdditionalStatements = null,
             IEnumerable<StatementSyntax> configureAdditionalStatements = null,
             IEnumerable<StatementSyntax> configureServicesAdditionalStatements = null,
@@ -61,9 +61,9 @@ namespace CTA.WebForms2Blazor.Helpers
             result = result.AddMembers(AddStartupProperties(additionalPropertyDeclarations).ToArray());
 
             result = result.AddMembers(
-                    BuildStartupConstructor(constructorAdditionalStatements),
-                    BuildStartupConfigureMethod(configureAdditionalStatements),
-                    BuildStartupConfigureServicesMethod(configureServicesAdditionalStatements));
+                    ConstructStartupConstructor(constructorAdditionalStatements),
+                    ConstructStartupConfigureMethod(configureAdditionalStatements),
+                    ConstructStartupConfigureServicesMethod(configureServicesAdditionalStatements));
 
             if (additionalMethodDeclarations != null)
             {
@@ -90,7 +90,7 @@ namespace CTA.WebForms2Blazor.Helpers
             return newProperties.UnionSyntaxNodeCollections(additionalDeclarations);
         }
 
-        public static ConstructorDeclarationSyntax BuildStartupConstructor(IEnumerable<StatementSyntax> additonalStatements = null)
+        public static ConstructorDeclarationSyntax ConstructStartupConstructor(IEnumerable<StatementSyntax> additonalStatements = null)
         {
             var statements = new List<StatementSyntax>()
             {
@@ -112,7 +112,7 @@ namespace CTA.WebForms2Blazor.Helpers
                 .WithBody(CodeSyntaxHelper.GetStatementsAsBlock(statements));
         }
 
-        public static MethodDeclarationSyntax BuildStartupConfigureMethod(IEnumerable<StatementSyntax> additonalStatements = null)
+        public static MethodDeclarationSyntax ConstructStartupConfigureMethod(IEnumerable<StatementSyntax> additonalStatements = null)
         {
             var statements = new List<StatementSyntax>()
             {
@@ -133,7 +133,7 @@ namespace CTA.WebForms2Blazor.Helpers
                 .WithBody(CodeSyntaxHelper.GetStatementsAsBlock(statements));
         }
 
-        public static MethodDeclarationSyntax BuildStartupConfigureServicesMethod(IEnumerable<StatementSyntax> additonalStatements = null)
+        public static MethodDeclarationSyntax ConstructStartupConfigureServicesMethod(IEnumerable<StatementSyntax> additonalStatements = null)
         {
             var statements = new List<StatementSyntax>()
             {

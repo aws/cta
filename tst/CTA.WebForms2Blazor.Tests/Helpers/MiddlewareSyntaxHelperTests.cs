@@ -99,16 +99,16 @@ $@"{ExpectedMiddlewareInvokeSignature}
 }}";
 
         [Test]
-        public void BuildMiddlewareClass_Produces_Expected_Basic_Result()
+        public void ConstructMiddlewareClass_Produces_Expected_Basic_Result()
         {
-            Assert.AreEqual(ExpectedBasicMiddlewareClassText, MiddlewareSyntaxHelper.BuildMiddlewareClass(MiddlewareClassName).NormalizeWhitespace().ToFullString());
+            Assert.AreEqual(ExpectedBasicMiddlewareClassText, MiddlewareSyntaxHelper.ConstructMiddlewareClass(MiddlewareClassName).NormalizeWhitespace().ToFullString());
         }
 
         [Test]
-        public void BuildMiddlewareClass_Produces_Expected_Fully_Modified_Result()
+        public void ConstructMiddlewareClass_Produces_Expected_Fully_Modified_Result()
         {
             var additionalStatements = new[] { SyntaxHelperSetupFixture.AdditionalStatement };
-            var modifiedStartupClass = MiddlewareSyntaxHelper.BuildMiddlewareClass(
+            var modifiedStartupClass = MiddlewareSyntaxHelper.ConstructMiddlewareClass(
                 middlewareClassName: MiddlewareClassName,
                 constructorAdditionalStatements: additionalStatements,
                 preHandleStatements: additionalStatements,
@@ -141,57 +141,57 @@ $@"{ExpectedMiddlewareInvokeSignature}
         }
 
         [Test]
-        public void BuildMiddlewareConstructor_Produces_Expected_Basic_Result()
+        public void ConstructMiddlewareConstructor_Produces_Expected_Basic_Result()
         {
-            Assert.AreEqual(ExpectedBasicMiddlewareConstructorText, MiddlewareSyntaxHelper.BuildMiddlewareConstructor(MiddlewareClassName).NormalizeWhitespace().ToFullString());
+            Assert.AreEqual(ExpectedBasicMiddlewareConstructorText, MiddlewareSyntaxHelper.ConstructMiddlewareConstructor(MiddlewareClassName).NormalizeWhitespace().ToFullString());
         }
 
         [Test]
-        public void BuildMiddlewareConstructor_Produces_Expected_Result_When_Additonal_Statements_Present()
+        public void ConstructMiddlewareConstructor_Produces_Expected_Result_When_Additonal_Statements_Present()
         {
             var additionalStatements = new[] { SyntaxHelperSetupFixture.AdditionalStatement };
-            var actualConstructorText = MiddlewareSyntaxHelper.BuildMiddlewareConstructor(MiddlewareClassName, additionalStatements).NormalizeWhitespace().ToFullString();
+            var actualConstructorText = MiddlewareSyntaxHelper.ConstructMiddlewareConstructor(MiddlewareClassName, additionalStatements).NormalizeWhitespace().ToFullString();
             Assert.AreEqual(ExpectedModifiedMiddlewareConstructorText, actualConstructorText);
         }
 
         [Test]
-        public void BuildMiddlewareInvokeMethod_Producers_Expected_Basic_Result()
+        public void ConstructMiddlewareInvokeMethod_Producers_Expected_Basic_Result()
         {
-            Assert.AreEqual(ExpectedBasicInvokeText, MiddlewareSyntaxHelper.BuildMiddlewareInvokeMethod().NormalizeWhitespace().ToFullString());
+            Assert.AreEqual(ExpectedBasicInvokeText, MiddlewareSyntaxHelper.ConstructMiddlewareInvokeMethod().NormalizeWhitespace().ToFullString());
         }
 
         [Test]
-        public void BuildMiddlewareInvokeMethod_Producers_Expected_Result_When_Pre_Handle_Statements_Present()
+        public void ConstructMiddlewareInvokeMethod_Producers_Expected_Result_When_Pre_Handle_Statements_Present()
         {
             var additionalStatements = new[] { SyntaxHelperSetupFixture.AdditionalStatement };
-            var actualInvokeText = MiddlewareSyntaxHelper.BuildMiddlewareInvokeMethod(preHandleStatements: additionalStatements).NormalizeWhitespace().ToFullString();
+            var actualInvokeText = MiddlewareSyntaxHelper.ConstructMiddlewareInvokeMethod(preHandleStatements: additionalStatements).NormalizeWhitespace().ToFullString();
             Assert.AreEqual(ExpectedPreHandledInvokeText, actualInvokeText);
         }
 
         [Test]
-        public void BuildMiddlewareInvokeMethod_Producers_Expected_Result_When_Post_Handle_Statements_Present()
+        public void ConstructMiddlewareInvokeMethod_Producers_Expected_Result_When_Post_Handle_Statements_Present()
         {
             var additionalStatements = new[] { SyntaxHelperSetupFixture.AdditionalStatement };
-            var actualInvokeText = MiddlewareSyntaxHelper.BuildMiddlewareInvokeMethod(postHandleStatements: additionalStatements).NormalizeWhitespace().ToFullString();
+            var actualInvokeText = MiddlewareSyntaxHelper.ConstructMiddlewareInvokeMethod(postHandleStatements: additionalStatements).NormalizeWhitespace().ToFullString();
             Assert.AreEqual(ExpectedPostHandledInvokeText, actualInvokeText);
         }
 
         [Test]
-        public void BuildMiddlewareRegistrationSyntax_Produces_Expected_Basic_Result()
+        public void ConstructMiddlewareRegistrationSyntax_Produces_Expected_Basic_Result()
         {
-            Assert.AreEqual(ExpectedMiddlewareRegistrationString, MiddlewareSyntaxHelper.BuildMiddlewareRegistrationSyntax(MiddlewareClassName).NormalizeWhitespace().ToFullString());
+            Assert.AreEqual(ExpectedMiddlewareRegistrationString, MiddlewareSyntaxHelper.ConstructMiddlewareRegistrationSyntax(MiddlewareClassName).NormalizeWhitespace().ToFullString());
         }
 
         [Test]
-        public void BuildMiddlewareLambda_Correctly_Builds_Basic_Lambda()
+        public void ConstructMiddlewareLambda_Correctly_Builds_Basic_Lambda()
         {
-            Assert.AreEqual(ExpectedMiddlwareLambdaText, MiddlewareSyntaxHelper.BuildMiddlewareLambda().NormalizeWhitespace().ToFullString());
+            Assert.AreEqual(ExpectedMiddlwareLambdaText, MiddlewareSyntaxHelper.ConstructMiddlewareLambda().NormalizeWhitespace().ToFullString());
         }
 
         [Test]
-        public void BuildMiddlewareLambdaRegistrationSyntax_Correctly_Builds_Basic_Lambda_Registration()
+        public void ConstructMiddlewareLambdaRegistrationSyntax_Correctly_Builds_Basic_Lambda_Registration()
         {
-            var registration = MiddlewareSyntaxHelper.BuildMiddlewareLambdaRegistrationSyntax(MiddlewareSyntaxHelper.BuildMiddlewareLambda());
+            var registration = MiddlewareSyntaxHelper.ConstructMiddlewareLambdaRegistrationSyntax(MiddlewareSyntaxHelper.ConstructMiddlewareLambda());
 
             Assert.AreEqual(ExpectedMiddlewareLambdaRegistrationString, registration.NormalizeWhitespace().ToFullString());
         }
