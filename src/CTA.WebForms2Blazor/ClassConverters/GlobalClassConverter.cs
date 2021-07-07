@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CTA.Rules.Config;
 using CTA.WebForms2Blazor.Extensions;
 using CTA.WebForms2Blazor.FileInformationModel;
 using CTA.WebForms2Blazor.Helpers;
@@ -15,6 +16,9 @@ namespace CTA.WebForms2Blazor.ClassConverters
 {
     public class GlobalClassConverter : ClassConverter
     {
+        private const string GetMiddlewareNamespacesLogCall = "GetMiddlewareNamespaces()";
+        private const string GetMiddlewarePipelineAdditionsLogCall = "GetMiddlewarePiplineAdditions()";
+
         // These are special events that are fired only a couple of times independently
         // of request pipeline events, they need to be handled specially
         private const string ApplicationStartMethodName = "Application_Start";
@@ -50,8 +54,10 @@ namespace CTA.WebForms2Blazor.ClassConverters
             _endOfClassComments = new List<string>();
         }
 
-        public override async Task<FileInformation> MigrateClassAsync()
+        public override async Task<IEnumerable<FileInformation>> MigrateClassAsync()
         {
+            LogStart();
+
             // Make this call once now so we don't have to keep doing it later
             var originalDescendantNodes = _originalDeclarationSyntax.DescendantNodes();
 
@@ -81,9 +87,10 @@ namespace CTA.WebForms2Blazor.ClassConverters
             var fileText = CodeSyntaxHelper.GetFileSyntaxAsString(containingNamespace, await GetAllUsingStatements());
 
             DoCleanUp();
+            LogEnd();
 
             // Global.asax.cs turns into Startup.cs
-            return new FileInformation(Path.Combine(Path.GetDirectoryName(_relativePath), Constants.StartupFileName), Encoding.UTF8.GetBytes(fileText));
+            return new[] { new FileInformation(Path.Combine(Path.GetDirectoryName(_relativePath), Constants.StartupFileName), Encoding.UTF8.GetBytes(fileText)) };
         }
 
         private void ProcessMethods(IEnumerable<MethodDeclarationSyntax> orignalMethods)
@@ -135,7 +142,11 @@ namespace CTA.WebForms2Blazor.ClassConverters
             }
             catch (OperationCanceledException e)
             {
-                // TODO: Log this failure
+                LogHelper.LogError(e, string.Format(
+                    Constants.CaneledServiceCallLogTemplate,
+                    GetType().Name,
+                    typeof(LifecycleManagerService).Name,
+                    GetMiddlewareNamespacesLogCall));
 
                 return CodeSyntaxHelper.BuildUsingStatements(typeRequiredNamespaceNames)
                     .AddComment(string.Format(Constants.OperationFailedCommentTemplate, AddMiddlewareUsingsOperation));
@@ -176,7 +187,11 @@ namespace CTA.WebForms2Blazor.ClassConverters
             }
             catch (OperationCanceledException e)
             {
-                // TODO: Log this failure
+                LogHelper.LogError(e, string.Format(
+                    Constants.CaneledServiceCallLogTemplate,
+                    GetType().Name,
+                    typeof(LifecycleManagerService).Name,
+                    GetMiddlewarePipelineAdditionsLogCall));
 
                 var failureComment = string.Format(Constants.OperationFailedCommentTemplate, ConfigureRequestPipelineOperation);
 

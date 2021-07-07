@@ -52,6 +52,8 @@ namespace CTA.WebForms2Blazor.FileConverters
 
         public override async Task<IEnumerable<FileInformation>> MigrateFileAsync()
         {
+            LogStart();
+
             // TODO: Extract info from project files and
             // call _blazorWorkspaceManager.CreateProjectFile
             // and _webFormsWorkspaceManager.CreateProjectFile
@@ -69,6 +71,8 @@ namespace CTA.WebForms2Blazor.FileConverters
             FileInformation fi = new FileInformation(RelativePath, Encoding.UTF8.GetBytes(newCsProjContent));
 
             var fileList = new List<FileInformation>() { fi };
+
+            LogEnd();
 
             return fileList;
         }

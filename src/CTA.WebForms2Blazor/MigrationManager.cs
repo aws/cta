@@ -6,12 +6,15 @@ using CTA.WebForms2Blazor.Services;
 using CTA.WebForms2Blazor.Factories;
 using CTA.WebForms2Blazor.ProjectManagement;
 using CTA.WebForms2Blazor.FileInformationModel;
-using Microsoft.Extensions.Logging;
+using CTA.Rules.Config;
+using System;
 
 namespace CTA.WebForms2Blazor
 {
     public class MigrationManager
     {
+        private const string MigrationTasksCompletedLogAction = "Migration Tasks Completed";
+
         private readonly string _inputProjectPath;
         private readonly string _outputProjectPath;
 
@@ -39,6 +42,13 @@ namespace CTA.WebForms2Blazor
 
         public async Task PerformMigration()
         {
+            LogHelper.LogInformation(string.Format(
+                Constants.StartedFromToLogTemplate,
+                GetType().Name,
+                Constants.ProjectMigrationLogAction,
+                _inputProjectPath,
+                _outputProjectPath));
+
             // Order is important here
             InitializeProjectManagementStructures();
             InitializeServices();
@@ -52,13 +62,20 @@ namespace CTA.WebForms2Blazor
                 // in this case it sends each generated file to the project builder
                 fileConverter.MigrateFileAsync().ContinueWith(generatedFiles =>
                 {
-                    // It's ok to use Task.Result here because the lambda within
-                    // the ContinueWith block only executes once the original task
-                    // is complete. Task.Result is also preferred because await
-                    // would force our lambda expression to be async
-                    foreach (FileInformation generatedFile in generatedFiles.Result)
+                    try
                     {
-                        _blazorProjectBuilder.WriteFileInformationToProject(generatedFile);
+                        // It's ok to use Task.Result here because the lambda within
+                        // the ContinueWith block only executes once the original task
+                        // is complete. Task.Result is also preferred because await
+                        // would force our lambda expression to be async
+                        foreach (FileInformation generatedFile in generatedFiles.Result)
+                        {
+                            _blazorProjectBuilder.WriteFileInformationToProject(generatedFile);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        LogHelper.LogError(e, string.Format(Constants.OperationFailedLogTemplate, GetType().Name, Constants.FileMigrationLogAction));
                     }
                 }
             ));
@@ -66,9 +83,18 @@ namespace CTA.WebForms2Blazor
             // Combines migration tasks into a single task we can await
             await Task.WhenAll(migrationTasks);
 
+            LogHelper.LogInformation(string.Format(Constants.GenericInformationLogTemplate, GetType().Name, MigrationTasksCompletedLogAction));
+
             // TODO: Any necessary cleanup or last checks on new project
             // TODO: Maybe add any new files that don't directly correspond
             // to existing files in Web Forms i.e. _Imports.razor
+
+            LogHelper.LogInformation(string.Format(
+                Constants.EndedFromToLogTemplate,
+                GetType().Name,
+                Constants.ProjectMigrationLogAction,
+                _inputProjectPath,
+                _outputProjectPath));
         }
 
         private void InitializeProjectManagementStructures()

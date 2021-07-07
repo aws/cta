@@ -11,6 +11,7 @@
 
         // Notable Methods
         public const string ProcessRequestMethodName = "ProcessRequest";
+        public const string InitMethodName = "Init";
 
         // Notable Base Classes
         public const string ExpectedGlobalBaseClass = "HttpApplication";
@@ -69,10 +70,36 @@
         public const string CodeOriginCommentTemplate = "The following lines were extracted from {0}";
         public const string OperationFailedCommentTemplate = "Attempted to {0} but failed, this must be done manually";
         public const string OperationUnattemptedCommentTemplate = "Did not attempt to {0}, this must be done manually";
-        public const string ClassSplitCommentTemplate = "This class was generated using a portion of {0}, modifications may be necessary";
+        public const string ClassSplitCommentTemplate = "This class was generated using a portion of {0}";
         public const string NewEventRepresentationCommentTemplate = "This code replaces the original handling of the {0} event";
         public const string IdentificationFailureCommentTemplate = "Could not identify {0}, dependant {1} operation must be done manually";
 
         public const string UnusableCodeComment = "Unable to migrate the following code, as a result it was removed";
+        public const string HeavyModificationNecessaryComment = "Heavy modifications likely necessary, please review";
+
+        // Common Errors and Templates
+        public const string TooManyOperationsError = "Attempted {0} operation, but the expected number of operations has already been reached";
+        public const string InvalidStateError = "Attempted {0} operation, but the {1} state was invalid";
+
+        // Logging Templates
+        public const string GenericInformationLogTemplate = "{0}: {1}";
+        public const string RegisteredAsTaskLogTemplate = "{0}: Registered {1} at {2} as Task {3}";
+        public const string CaneledServiceCallLogTemplate = "{0}: {1} {2} Call Canceled";
+        public const string OperationFailedLogTemplate = "{0}: {1} Operation Failed";
+        public const string StartedLogTemplate = "{0}: Started {1}";
+        public const string StartedAtLogTemplate = "{0}: Started {1} at {2}";
+        public const string StartedForLogTemplate = "{0}: Started {1} for {2}";
+        public const string StartedForAtLogTemplate = "{0}: Started {1} for {2} at {3}";
+        public const string StartedFromToLogTemplate = "{0}: Started {1} from {2} to {3}";
+        public const string EndedLogTemplate = "{0}: Ended {1}";
+        public const string EndedAtLogTemplate = "{0}: Ended {1} at {2}";
+        public const string EndedForLogTemplate = "{0}: Ended {1} for {2}";
+        public const string EndedForAtLogTemplate = "{0}: Ended {1} for {2} at {3}";
+        public const string EndedFromToLogTemplate = "{0}: Ended {1} from {2} to {3}";
+
+        // Logging Actions
+        public const string ProjectMigrationLogAction = "Project Migration";
+        public const string FileMigrationLogAction = "File Migration";
+        public const string ClassMigrationLogAction = "Class Migration";
     }
 }

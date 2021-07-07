@@ -53,9 +53,14 @@ namespace CTA.WebForms2Blazor.FileConverters
 
         public override async Task<IEnumerable<FileInformation>> MigrateFileAsync()
         {
-            var classMigrationTasks = _classConverters.Select(classConverter => classConverter.MigrateClassAsync());
+            LogStart();
 
-            return await Task.WhenAll(classMigrationTasks);
+            var classMigrationTasks = _classConverters.Select(classConverter => classConverter.MigrateClassAsync());
+            var result = (await Task.WhenAll(classMigrationTasks)).SelectMany(newFileInformation => newFileInformation);
+
+            LogEnd();
+
+            return result;
         }
     }
 }

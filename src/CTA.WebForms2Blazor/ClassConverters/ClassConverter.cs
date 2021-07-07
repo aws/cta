@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using CTA.Rules.Config;
 using CTA.WebForms2Blazor.Extensions;
 using CTA.WebForms2Blazor.FileInformationModel;
 using CTA.WebForms2Blazor.Helpers;
@@ -42,9 +43,15 @@ namespace CTA.WebForms2Blazor.ClassConverters
             // necessarily have to do any managed runs, this is because they may end up
             // unblocking other processes by simply running normally
             _taskId = _taskManager.RegisterNewTask();
+            LogHelper.LogInformation(string.Format(
+                Constants.RegisteredAsTaskLogTemplate,
+                GetType().Name,
+                _originalDeclarationSyntax.Identifier.ToString(),
+                _fullPath,
+                _taskId));
         }
 
-        public abstract Task<FileInformation> MigrateClassAsync();
+        public abstract Task<IEnumerable<FileInformation>> MigrateClassAsync();
 
         private protected SourceClassComponents GetSourceClassComponents()
         {
@@ -61,6 +68,26 @@ namespace CTA.WebForms2Blazor.ClassConverters
             // TODO: Put other general clean up
             // tasks here as they come up
             _taskManager.RetireTask(_taskId);
+        }
+
+        private protected void LogStart()
+        {
+            LogHelper.LogInformation(string.Format(
+                Constants.StartedForAtLogTemplate,
+                GetType().Name,
+                Constants.ClassMigrationLogAction,
+                _originalDeclarationSyntax.Identifier.ToString(),
+                _fullPath));
+        }
+
+        private protected void LogEnd()
+        {
+            LogHelper.LogInformation(string.Format(
+                Constants.EndedForAtLogTemplate,
+                GetType().Name,
+                Constants.ClassMigrationLogAction,
+                _originalDeclarationSyntax.Identifier.ToString(),
+                _fullPath));
         }
 
         private protected class SourceClassComponents
