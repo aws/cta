@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
 using HtmlAgilityPack;
 
 namespace CTA.WebForms2Blazor.ControlConverters
@@ -9,19 +11,20 @@ namespace CTA.WebForms2Blazor.ControlConverters
         protected override Dictionary<string, string> AttributeMap { 
             get
             {
-                throw new NotImplementedException();
+                return new Dictionary<string, string>()
+                {
+                    ["id"] = "id"
+                };
             } 
         }
-        protected override string BlazorName { get { throw new NotImplementedException(); } }
+        protected override string BlazorName { get { return "label"; } }
         
-        public LabelControlConverter() : base()
-        {
-            
-        }
-
         public override HtmlNode Convert2Blazor(HtmlNode node)
         {
-            throw new NotImplementedException();
+            var textAttr = node.Attributes.AttributesWithName("text").FirstOrDefault();
+            var labelText = textAttr?.Value ?? string.Empty;
+
+            return Convert2BlazorFromParts(NodeTemplate, BlazorName, ConvertAttributes(node.Attributes), labelText);
         }
     }
 }

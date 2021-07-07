@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
+using CTA.WebForms2Blazor.Helpers.ControlHelpers;
 using HtmlAgilityPack;
 
 namespace CTA.WebForms2Blazor.ControlConverters
@@ -10,7 +12,7 @@ namespace CTA.WebForms2Blazor.ControlConverters
         protected abstract Dictionary<String, String> AttributeMap { get; }
         protected abstract string BlazorName { get; }
         protected virtual string NodeTemplate { get { return @"<{0} {1}>{2}</{0}>"; } }
-        
+
         protected ControlConverter()
         {
             //Constructor might not be needed
@@ -21,22 +23,51 @@ namespace CTA.WebForms2Blazor.ControlConverters
             return Convert2BlazorFromParts(NodeTemplate, BlazorName, ConvertAttributes(node.Attributes), node.InnerHtml);
         }
 
-        private string ConvertAttributes(HtmlAttributeCollection attributeCollection)
+        protected string ConvertAttributes(HtmlAttributeCollection attributeCollection)
         {
             var convertedAttributes = attributeCollection
                 .Where(attr => AttributeMap.ContainsKey(attr.Name))
-                .Select(attr => $"{AttributeMap[attr.Name]}={attr.Value}");
-            
+                .Select(attr =>
+                {
+                    if (attr.QuoteType == AttributeValueQuote.DoubleQuote)
+                    {
+                        return $"{AttributeMap[attr.Name]}=\"{attr.Value}\"";
+                    }
+                    return $"{AttributeMap[attr.Name]}='{attr.Value}'";
+                });
+
             var convertedAttributesString = string.Join(" ", convertedAttributes);
             
             return convertedAttributesString;
         }
 
-        private HtmlNode Convert2BlazorFromParts(string template, string name, string attributes, string body)
+        protected HtmlNode Convert2BlazorFromParts(string template, string name, string attributes, string body)
         {
             string newContent = String.Format(template, name, attributes, body);
             HtmlNode newNode = HtmlNode.CreateNode(newContent);
             return newNode;
+        }
+        
+        public static HtmlDocument ConvertEmbeddedCode(HtmlDocument document)
+        {
+            var documentNode = document.DocumentNode;
+            var htmlString = documentNode.WriteTo();
+
+            MatchEvaluator dataBindEval = new MatchEvaluator(EmbeddedCodeReplacers.ReplaceDataBind);
+            MatchEvaluator singleExprEval = new MatchEvaluator(EmbeddedCodeReplacers.ReplaceSingleExpr);
+            MatchEvaluator directiveEval = new MatchEvaluator(EmbeddedCodeReplacers.ReplaceDirective);
+            MatchEvaluator aspExprEval = new MatchEvaluator(EmbeddedCodeReplacers.ReplaceAspExpr);
+            
+            htmlString = EmbeddedCodeReplacers.DataBindRegex.Replace(htmlString, dataBindEval);
+            htmlString = EmbeddedCodeReplacers.SingleExpRegex.Replace(htmlString, singleExprEval);
+            
+            //Not implemented/used yet
+            //htmlString = EmbeddedCodeReplacers.DirectiveRegex.Replace(htmlString, directiveEval);
+            //htmlString = EmbeddedCodeReplacers.AspExpRegex.Replace(htmlString, aspExprEval);
+
+            var res = new HtmlDocument();
+            res.LoadHtml(htmlString);
+            return res;
         }
     }
 }
