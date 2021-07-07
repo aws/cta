@@ -33,8 +33,10 @@ namespace CTA.WebForms2Blazor.ClassConverters
             _lifecycleManager.NotifyExpectedMiddlewareSource();
         }
 
-        public override async Task<FileInformation> MigrateClassAsync()
+        public override async Task<IEnumerable<FileInformation>> MigrateClassAsync()
         {
+            LogStart();
+
             var className = _originalDeclarationSyntax.Identifier.ToString();
             var namespaceName = _originalClassSymbol.ContainingNamespace.ToDisplayString();
             var requiredNamespaceNames = _sourceFileSemanticModel
@@ -78,10 +80,12 @@ namespace CTA.WebForms2Blazor.ClassConverters
             var fileText = CodeSyntaxHelper.GetFileSyntaxAsString(namespaceNode, CodeSyntaxHelper.BuildUsingStatements(requiredNamespaceNames));
 
             DoCleanUp();
+            LogEnd();
 
             // Http modules are turned into middleware and so we use a new middleware directory
+            var newRelativePath = Path.Combine(Constants.MiddlewareDirectoryName, FilePathHelper.AlterFileName(_relativePath, newFileName: className));
             // TODO: Potentially remove certain folders from beginning of relative path
-            return new FileInformation(Path.Combine(Constants.MiddlewareDirectoryName, _relativePath), Encoding.UTF8.GetBytes(fileText));
+            return new[] { new FileInformation(newRelativePath, Encoding.UTF8.GetBytes(fileText)) };
         }
     }
 }

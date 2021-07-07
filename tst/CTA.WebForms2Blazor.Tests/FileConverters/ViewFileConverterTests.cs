@@ -28,7 +28,7 @@ namespace CTA.WebForms2Blazor.Tests.FileConverters
             var fileContents = Encoding.UTF8.GetString(bytes);
             
             string newPath = Path.Combine(FileConverterSetupFixture.TestFilesDirectoryPath, "HyperLinkControlOnly.razor");
-            string relativePath = Path.GetRelativePath(FileConverterSetupFixture.TestProjectPath, newPath);
+            string relativePath = Path.Combine("Pages", Path.GetRelativePath(FileConverterSetupFixture.TestProjectPath, newPath));
 
             string expectedContents = @"
 <div class=""esh-pager"">
@@ -70,7 +70,7 @@ namespace CTA.WebForms2Blazor.Tests.FileConverters
             Assert.False(fileContents.Contains("asp:HyperLink"));
             Assert.False(fileContents.Contains("CssClass"));
             Assert.False(fileContents.Contains("NavigateUrl"));
-            Assert.IsTrue(fi.RelativePath.Equals(relativePath));
+            Assert.AreEqual(relativePath, fi.RelativePath);
         }
     }
 }

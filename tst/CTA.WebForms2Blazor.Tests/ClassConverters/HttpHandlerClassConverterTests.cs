@@ -80,7 +80,10 @@ namespace CTA.WebForms2Blazor.Tests.ClassConverters
 }";
 
         private static string InputRelativePath => Path.Combine(ClassConverterSetupFixture.TestProjectNestedDirectoryName, "HttpHandler.cs");
-        private static string ExpectedOutputPath => Path.Combine("Middleware", ClassConverterSetupFixture.TestProjectNestedDirectoryName, "HttpHandler.cs");
+        private static string ExpectedOutputPath => Path.Combine(
+            "Middleware",
+            ClassConverterSetupFixture.TestProjectNestedDirectoryName,
+            $"{ClassConverterSetupFixture.TestClassName}.cs");
 
         private HttpHandlerClassConverter _converter;
 
@@ -99,7 +102,7 @@ namespace CTA.WebForms2Blazor.Tests.ClassConverters
         [Test]
         public async Task MigrateClassAsync_Maps_New_Relative_Path_To_Correct_Location()
         {
-            var fileInfo = await _converter.MigrateClassAsync();
+            var fileInfo = (await _converter.MigrateClassAsync()).Single();
 
             Assert.AreEqual(ExpectedOutputPath, fileInfo.RelativePath);
         }
@@ -121,7 +124,7 @@ namespace CTA.WebForms2Blazor.Tests.ClassConverters
                 new LifecycleManagerService(),
                 new TaskManagerService());
 
-            var fileInfo = await complexConverter.MigrateClassAsync();
+            var fileInfo = (await complexConverter.MigrateClassAsync()).Single();
             var fileText = Encoding.UTF8.GetString(fileInfo.FileBytes);
 
             Assert.AreEqual(ExpectedOutputComplexClassText, fileText);

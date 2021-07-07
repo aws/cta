@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using CTA.WebForms2Blazor.FileInformationModel;
 using System.IO;
+using CTA.Rules.Config;
 
 namespace CTA.WebForms2Blazor.FileConverters
 {
@@ -26,5 +27,22 @@ namespace CTA.WebForms2Blazor.FileConverters
 
         public abstract Task<IEnumerable<FileInformation>> MigrateFileAsync();
 
+        private protected void LogStart()
+        {
+            LogHelper.LogInformation(string.Format(
+                Constants.StartedAtLogTemplate,
+                GetType().Name,
+                Constants.FileMigrationLogAction,
+                _fullPath));
+        }
+
+        private protected void LogEnd()
+        {
+            LogHelper.LogInformation(string.Format(
+                Constants.EndedAtLogTemplate,
+                GetType().Name,
+                Constants.FileMigrationLogAction,
+                _fullPath));
+        }
     }
 }

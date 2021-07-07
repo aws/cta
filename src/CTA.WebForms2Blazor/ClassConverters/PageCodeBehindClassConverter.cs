@@ -29,8 +29,10 @@ namespace CTA.WebForms2Blazor.ClassConverters
             _newLifecycleLines = new Dictionary<BlazorComponentLifecycleEvent, IEnumerable<StatementSyntax>>();
         }
 
-        public override async Task<FileInformation> MigrateClassAsync()
+        public override async Task<IEnumerable<FileInformation>> MigrateClassAsync()
         {
+            LogStart();
+
             var requiredNamespaceNames = _sourceFileSemanticModel
                 .GetNamespacesReferencedByType(_originalDeclarationSyntax)
                 .Select(namespaceSymbol => namespaceSymbol.ToDisplayString())
@@ -86,8 +88,9 @@ namespace CTA.WebForms2Blazor.ClassConverters
             var fileText = CodeSyntaxHelper.GetFileSyntaxAsString(namespaceNode, CodeSyntaxHelper.BuildUsingStatements(requiredNamespaceNames));
 
             DoCleanUp();
+            LogEnd();
 
-            return new FileInformation(GetNewRelativePath(), Encoding.UTF8.GetBytes(fileText));
+            return new[] { new FileInformation(GetNewRelativePath(), Encoding.UTF8.GetBytes(fileText)) };
         }
 
         private string GetNewRelativePath()

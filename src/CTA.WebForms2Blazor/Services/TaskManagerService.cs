@@ -3,11 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using CTA.Rules.Config;
 
 namespace CTA.WebForms2Blazor.Services
 {
     public class TaskManagerService
     {
+        private const string TaskStatusUpdateLogTemplate = "{0}: Task {1} {2}";
+        private const string EnterManagedRunLogAction = "Entering Managed Run";
+        private const string ExitManagedRunLogAction = "Exiting Managed Run";
+        private const string RetiredLogAction = "Retired";
+        private const string StalledLogAction = "Entered Stall";
+        private const string UnstalledLogAction = "Exited Stall";
+
         public enum TaskState { Active, Waiting }
         public enum TaskStallTimeout { None = 0, Short = 100, Medium = 1000, Long = 10000 }
 
@@ -34,6 +42,8 @@ namespace CTA.WebForms2Blazor.Services
 
         public async Task<TResult> ManagedRun<TResult>(int taskId, Func<CancellationToken, Task<TResult>> func)
         {
+            LogHelper.LogInformation(string.Format(TaskStatusUpdateLogTemplate, GetType().Name, taskId, EnterManagedRunLogAction));
+
             TResult result;
             var managedTask = _managedTasks[taskId];
             var token = managedTask.SetWaiting();
@@ -49,12 +59,15 @@ namespace CTA.WebForms2Blazor.Services
                 UpdateStallState();
             }
 
+            LogHelper.LogInformation(string.Format(TaskStatusUpdateLogTemplate, GetType().Name, taskId, ExitManagedRunLogAction));
+
             return result;
         }
 
         public void RetireTask(int taskId)
         {
             _managedTasks.Remove(taskId);
+            LogHelper.LogInformation(string.Format(TaskStatusUpdateLogTemplate, GetType().Name, taskId, RetiredLogAction));
             UpdateStallState();
         }
 
@@ -67,12 +80,14 @@ namespace CTA.WebForms2Blazor.Services
             if (shouldBeStalled && !_stalled)
             {
                 _stalled = true;
+                LogHelper.LogInformation(string.Format(Constants.GenericInformationLogTemplate, GetType().Name, StalledLogAction));
                 _stallOccurrenceNumber += 1;
                 TryResolveStall();
             }
-            else if (!shouldBeStalled)
+            else if (!shouldBeStalled && _stalled)
             {
                 _stalled = false;
+                LogHelper.LogInformation(string.Format(Constants.GenericInformationLogTemplate, GetType().Name, UnstalledLogAction));
             }
             // If service is already stalled and still should be
             // then we do nothing
@@ -96,6 +111,7 @@ namespace CTA.WebForms2Blazor.Services
             {
                 oldestTask.CancelTask();
                 _stalled = false;
+                LogHelper.LogInformation(string.Format(Constants.GenericInformationLogTemplate, GetType().Name, UnstalledLogAction));
             }
             // }
         }
