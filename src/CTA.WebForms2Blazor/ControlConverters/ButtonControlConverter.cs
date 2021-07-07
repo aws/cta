@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using HtmlAgilityPack;
 
 namespace CTA.WebForms2Blazor.ControlConverters
@@ -9,19 +10,21 @@ namespace CTA.WebForms2Blazor.ControlConverters
         protected override Dictionary<string, string> AttributeMap { 
             get
             {
-                throw new NotImplementedException();
+                return new Dictionary<string, string>()
+                {
+                    ["onclick"] = "@onclick", 
+                    ["cssclass"] = "class"
+                };
             } 
         }
-        protected override string BlazorName { get { throw new NotImplementedException(); } }
-        
-        public ButtonControlConverter() : base()
-        {
-            
-        }
+        protected override string BlazorName { get { return "button"; } }
 
         public override HtmlNode Convert2Blazor(HtmlNode node)
         {
-            throw new NotImplementedException();
+            var textAttr = node.Attributes.AttributesWithName("text").FirstOrDefault();
+            var buttonText = textAttr?.Value ?? string.Empty;
+            
+            return Convert2BlazorFromParts(NodeTemplate, BlazorName, ConvertAttributes(node.Attributes), buttonText);
         }
     }
 }

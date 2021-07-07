@@ -6,9 +6,6 @@
                     Previous
                 </asp:HyperLink>
 
-                <span class="esh-pager-item">Showing <%: Model.ItemsPerPage%> of <%: Model.TotalItems%> products - Page <%: (Model.ActualPage + 1)%> - <%: Model.TotalPages%>
-                </span>
-
                 <asp:HyperLink ID="PaginationNext" runat="server" CssClass="esh-pager-item esh-pager-item--navigable">
                     Next
                 </asp:HyperLink>

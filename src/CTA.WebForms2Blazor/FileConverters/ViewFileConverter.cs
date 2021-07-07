@@ -4,10 +4,12 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CTA.WebForms2Blazor.ControlConverters;
 using CTA.WebForms2Blazor.FileInformationModel;
 using CTA.WebForms2Blazor.Helpers;
 using CTA.WebForms2Blazor.Helpers.ControlHelpers;
 using HtmlAgilityPack;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace CTA.WebForms2Blazor.FileConverters
 {
@@ -27,6 +29,8 @@ namespace CTA.WebForms2Blazor.FileConverters
         {
             var htmlDoc = new HtmlDocument();
             htmlDoc.Load(FullPath);
+            htmlDoc = ControlConverter.ConvertEmbeddedCode(htmlDoc);
+            
             FindConversionActions(htmlDoc.DocumentNode, null);
             
             //This will modify the HtmlDocument nodes that will then be changed to a file information object
