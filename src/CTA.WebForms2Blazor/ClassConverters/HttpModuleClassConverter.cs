@@ -56,7 +56,7 @@ namespace CTA.WebForms2Blazor.ClassConverters
             var originalDescendantNodes = _originalDeclarationSyntax.DescendantNodes();
             // Classify methods and store results as tuple so we don't have to keep recalculating it
             var classifiedMethods = originalDescendantNodes.OfType<MethodDeclarationSyntax>()
-                // NOTE: This is not the proper way to check application lifecycle hooks in htt modules,
+                // NOTE: This is not the proper way to check application lifecycle hooks in http modules,
                 // in reality modules must manually add their methods to the application builder Init method
                 // parameter as event handlers, parsing this extracting the event the methods correspond to
                 // would be costly time-wise so instead we rely on the assumption that they follow proper
