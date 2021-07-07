@@ -216,6 +216,148 @@
           ]
         }
       ]
+    },
+    {
+      "Type": "Method",
+      "Name": "Microsoft.Owin.Security.IAuthenticationManager.Challenge(params string[])",
+      "Value": "Microsoft.Owin.Security.IAuthenticationManager.Challenge(params string[])",
+      "KeyType": "",
+      "ContainingType": "IAuthenticationManager",
+      "RecommendedActions": [
+        {
+          "Source": "Amazon",
+          "Preferred": "Yes",
+          "TargetFrameworks": [
+            {
+              "Name": "netcoreapp3.1",
+              "TargetCPU": [ "x86", "x64", "ARM32", "ARM64" ]
+            },
+            {
+              "Name": "net5.0",
+              "TargetCPU": [ "x86", "x64", "ARM32", "ARM64" ]
+            }
+          ],
+          "Description": "For Challenge(params string[]) add Microsoft.AspNetCore.Authentication namespace replace Challenge api with ChallengeAsync, remove all parameters and add an await operator. Also adds a comment to explain how to include AuthenticationProperties object and scheme.",
+          "Actions": [
+            {
+              "Name": "AddDirective",
+              "Type": "Using",
+              "Value": "Microsoft.AspNetCore.Authentication",
+              "Description": "Add Microsoft.AspNetCore.Authentication namespace",
+              "ActionValidation": {
+                "Contains": "using Microsoft.AspNetCore.Authentication;",
+                "NotContains": ""
+              }
+            },
+            {
+              "Name": "ReplaceMethodAndParameters",
+              "Type": "Method",
+              "Value": {
+                "oldMethod": "Challenge",
+                "newMethod": "ChallengeAsync",
+                "newParameters": "()"
+              },
+              "Description": "Replace method name from Challenge to ChallengeAsync and remove all parameters.",
+              "ActionValidation": {
+                "Contains": "ChallengeAsync",
+                "NotContains": ""
+              }
+            },
+            {
+              "Name": "AddAwaitOperator",
+              "Type": "Method",
+              "Value": "",
+              "Description": "Add the await operator to ChallengeAsync.",
+              "ActionValidation": {
+                "Contains": "await",
+                "NotContains": ""
+              }
+            },
+            {
+              "Name": "AddComment",
+              "Type": "Method",
+              "Value": "Please use your AuthenticationProperties object with this ChallengeAsync api if needed. You can also include a scheme.",
+              "Description": "Add a comment to explain how to use the parameters for the ChallengeAsync api.",
+              "ActionValidation": {
+                "Contains": "Please use your AuthenticationProperties object with this ChallengeAsync api if needed. You can also include a scheme.",
+                "NotContains": "",
+                "CheckComments": "True"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Type": "Method",
+      "Name": "Microsoft.Owin.Security.IAuthenticationManager.Challenge(Microsoft.Owin.Security.AuthenticationProperties, params string[])",
+      "Value": "Microsoft.Owin.Security.IAuthenticationManager.Challenge(Microsoft.Owin.Security.AuthenticationProperties, params string[])",
+      "KeyType": "",
+      "ContainingType": "IAuthenticationManager",
+      "RecommendedActions": [
+        {
+          "Source": "Amazon",
+          "Preferred": "Yes",
+          "TargetFrameworks": [
+            {
+              "Name": "netcoreapp3.1",
+              "TargetCPU": [ "x86", "x64", "ARM32", "ARM64" ]
+            },
+            {
+              "Name": "net5.0",
+              "TargetCPU": [ "x86", "x64", "ARM32", "ARM64" ]
+            }
+          ],
+          "Description": "For Challenge(Microsoft.Owin.Security.AuthenticationProperties, params string[]) add Microsoft.AspNetCore.Authentication namespace replace Challenge api with ChallengeAsync, remove all parameters and add an await operator.. Also adds a comment to explain how to include AuthenticationProperties object and scheme.",
+          "Actions": [
+            {
+              "Name": "AddDirective",
+              "Type": "Using",
+              "Value": "Microsoft.AspNetCore.Authentication",
+              "Description": "Add Microsoft.AspNetCore.Authentication namespace",
+              "ActionValidation": {
+                "Contains": "using Microsoft.AspNetCore.Authentication;",
+                "NotContains": ""
+              }
+            },
+            {
+              "Name": "ReplaceMethodAndParameters",
+              "Type": "Method",
+              "Value": {
+                "oldMethod": "Challenge",
+                "newMethod": "ChallengeAsync",
+                "newParameters": "()"
+              },
+              "Description": "Replace method name from Challenge to ChallengeAsync and remove all parameters.",
+              "ActionValidation": {
+                "Contains": "ChallengeAsync",
+                "NotContains": ""
+              }
+            },
+            {
+              "Name": "AddAwaitOperator",
+              "Type": "Method",
+              "Value": "",
+              "Description": "Add the await operator to ChallengeAsync.",
+              "ActionValidation": {
+                "Contains": "await",
+                "NotContains": ""
+              }
+            },
+            {
+              "Name": "AddComment",
+              "Type": "Method",
+              "Value": "Please use your AuthenticationProperties object with this ChallengeAsync api if needed. You can also include a scheme.",
+              "Description": "Add a comment to explain how to use the parameters for the ChallengeAsync api.",
+              "ActionValidation": {
+                "Contains": "Please use your AuthenticationProperties object with this ChallengeAsync api if needed. You can also include a scheme.",
+                "NotContains": "",
+                "CheckComments": "True"
+              }
+            }
+          ]
+        }
+      ]
     }
   ]
 }
