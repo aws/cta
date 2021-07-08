@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CTA.WebForms2Blazor.ControlConverters;
@@ -72,20 +74,42 @@ namespace CTA.WebForms2Blazor.FileConverters
 
         public override async Task<IEnumerable<FileInformation>> MigrateFileAsync()
         {
+            LogStart();
+
             // TODO: Store UI information in necessary services
 
             // View file converters will return razor file contents with
             // only view layer, code behind will be created in another file
             HtmlDocument migratedDocument = GetRazorContents();
             string contents = migratedDocument.DocumentNode.WriteTo();
-            
-            //Currently just changing extension to .razor, keeping filename and directory the same
-            //but Razor files are renamed and moved around, can't always use same filename/directory in the future
-            string newFileName = FilePathHelper.AlterFileName(RelativePath, oldExtension:".aspx", newExtension: ".razor");
-            
-            var fileList = new List<FileInformation>() {new FileInformation(newFileName, Encoding.UTF8.GetBytes(contents))};
 
-            return fileList;
+            // Currently just changing extension to .razor, keeping filename and directory the same
+            // but Razor files are renamed and moved around, can't always use same filename/directory in the future
+            string newRelativePath = FilePathHelper.AlterFileName(RelativePath, newExtension: ".razor");
+
+            if (RelativePath.EndsWith(Constants.WebFormsPageMarkupFileExtension, StringComparison.InvariantCultureIgnoreCase))
+            {
+                newRelativePath = Path.Combine(Constants.RazorPageDirectoryName, newRelativePath);
+            }
+            else if (RelativePath.EndsWith(Constants.WebFormsMasterPageMarkupFileExtension, StringComparison.InvariantCultureIgnoreCase))
+            {
+                newRelativePath = Path.Combine(Constants.RazorLayoutDirectoryName, newRelativePath);
+            }
+            else if (RelativePath.EndsWith(Constants.WebFormsControlMarkupFileExtenion, StringComparison.InvariantCultureIgnoreCase))
+            {
+                newRelativePath = Path.Combine(Constants.RazorComponentDirectoryName, newRelativePath);
+            }
+            else
+            {
+                LogEnd();
+
+                // Stuff like Global.asax shouldn't create a Global.razor file
+                return Enumerable.Empty<FileInformation>();
+            }
+
+            LogEnd();
+
+            return new List<FileInformation>() { new FileInformation(newRelativePath, Encoding.UTF8.GetBytes(contents)) };
         }
     }
 }

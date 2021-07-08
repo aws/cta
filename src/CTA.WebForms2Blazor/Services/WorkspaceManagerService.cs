@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
@@ -12,7 +11,6 @@ namespace CTA.WebForms2Blazor.Services
     {
         private const string WorkspaceDuplicateError = "Attempted to create a new Blazor workspace when one already exists";
         private const string WorkspaceMissingeErrorTemplate = "Attempted {0} operation, but no workspace exists";
-        private const string WorkspaceTooManyOperationsError = "Attempted {0} operation, but the expected number of these operations has been reached";
         private const string ProjectMissingErrorTemplate = "Attempted {0} operation, but required project [id:{1}] does not exist";
         private const string DocumentMissingErrorTemplate = "Attempted {0} operation, but required document [id:{1}] does not exist";
         private const string WorkspaceUpdateFailedErrorTemplate = "Workspace {0} operation attempted, but workspace failed to apply changes";
@@ -23,6 +21,11 @@ namespace CTA.WebForms2Blazor.Services
         private const string AddProjectOperation = "add project";
         private const string GetSyntaxTreeOperation = "get syntax tree";
         private const string GetSemanticModelOperation = "get semantic model";
+        private const string WaitForDocumentProcessingOperation = "wait for all documents to be processed";
+        private const string WaitForProjectProcessingOperation = "wait for all projects to be processed";
+
+        private const string DocumentProcessingState = "document processing";
+        private const string ProjectProcessingState = "project processing";
 
         // We track number of projects and documents explicitly because the number of
         // documents in the workspace only equates to code files, and also for use by
@@ -98,7 +101,7 @@ namespace CTA.WebForms2Blazor.Services
             }
             else if (_numProjects > _expectedProjects)
             {
-                throw new InvalidOperationException(string.Format(WorkspaceTooManyOperationsError, AddProjectOperation));
+                throw new InvalidOperationException(string.Format(Constants.TooManyOperationsError, AddProjectOperation));
             }
 
             return project.Id;
@@ -154,7 +157,7 @@ namespace CTA.WebForms2Blazor.Services
             }
             else if (_numDocuments > _expectedDocuments)
             {
-                throw new InvalidOperationException(string.Format(WorkspaceTooManyOperationsError, AddDocumentOperation));
+                throw new InvalidOperationException(string.Format(Constants.TooManyOperationsError, AddDocumentOperation));
             }
 
             return document.Id;
@@ -174,9 +177,13 @@ namespace CTA.WebForms2Blazor.Services
         {
             var source = new TaskCompletionSource<bool>();
 
-            if (_numProjects >= _expectedProjects)
+            if (_numProjects == _expectedProjects)
             {
                 source.SetResult(true);
+            }
+            else if (_numProjects > _expectedProjects)
+            {
+                throw new InvalidOperationException(string.Format(Constants.InvalidStateError, WaitForProjectProcessingOperation, ProjectProcessingState));
             }
             else
             {
@@ -191,9 +198,13 @@ namespace CTA.WebForms2Blazor.Services
         {
             var source = new TaskCompletionSource<bool>();
 
-            if (_numDocuments >= _expectedDocuments)
+            if (_numDocuments == _expectedDocuments)
             {
                 source.SetResult(true);
+            }
+            else if (_numProjects > _expectedProjects)
+            {
+                throw new InvalidOperationException(string.Format(Constants.InvalidStateError, WaitForDocumentProcessingOperation, DocumentProcessingState));
             }
             else
             {

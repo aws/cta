@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Collections.Generic;
+using System.Text;
 using System.Threading.Tasks;
 using CTA.WebForms2Blazor.FileInformationModel;
 using CTA.WebForms2Blazor.Helpers;
@@ -22,8 +23,10 @@ namespace CTA.WebForms2Blazor.ClassConverters
             // TODO: Register with the necessary services
         }
 
-        public override async Task<FileInformation> MigrateClassAsync()
+        public override async Task<IEnumerable<FileInformation>> MigrateClassAsync()
         {
+            LogStart();
+
             // NOTE: We could just read the file from the disk and retrieve the bytes like
             // that but instead I opted to "rebuild" the type in case we wanted to add comments
             // or something else to these undefined code files, most likely though we may still
@@ -32,8 +35,9 @@ namespace CTA.WebForms2Blazor.ClassConverters
             var newRelativePath = FilePathHelper.AlterFileName(_relativePath, newFileName: _originalClassSymbol.Name);
 
             DoCleanUp();
+            LogEnd();
 
-            return new FileInformation(newRelativePath, Encoding.UTF8.GetBytes(sourceClassComponents.FileText));
+            return new[] { new FileInformation(newRelativePath, Encoding.UTF8.GetBytes(sourceClassComponents.FileText)) };
         }
     }
 }

@@ -22,12 +22,12 @@ namespace CTA.WebForms2Blazor.FileConverters
         public ConfigFileConverter(string sourceProjectPath, string fullPath) : base(sourceProjectPath, fullPath)
         {
             _relativeDirectory = Path.GetDirectoryName(RelativePath);
-
         }
-
 
         public override async Task<IEnumerable<FileInformation>> MigrateFileAsync()
         {
+            LogStart();
+
             string filename = Path.GetFileName(RelativePath);
             var fileList = new List<FileInformation>();
 
@@ -41,6 +41,8 @@ namespace CTA.WebForms2Blazor.FileConverters
                 string newPath = Path.Combine(_relativeDirectory, "appsettings.json");
                 fileList.Add(new FileInformation(newPath, Encoding.UTF8.GetBytes(migratedString)));
             }
+
+            LogEnd();
 
             return fileList;
         }

@@ -68,6 +68,7 @@ namespace CTA.WebForms2Blazor
             // Create a basic logger
             var loggerFactory = LoggerFactory.Create(builder => builder.SetMinimumLevel(LogLevel.Debug).AddConsole());
             var logger = loggerFactory.CreateLogger("");
+            LogHelper.Logger = logger;
 
             // Set up analyzer config
             var configuration = new AnalyzerConfiguration(LanguageOptions.CSharp)
