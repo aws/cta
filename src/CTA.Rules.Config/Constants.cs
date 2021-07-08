@@ -69,6 +69,7 @@ namespace CTA.Rules.Config
         public const string CompilationUnitActions = "CompilationUnitActions";
         public const string IdentifierNameActions = "IdentifierNameActions";
         public const string InvocationExpressionActions = "InvocationExpressionActions";
+        public const string ExpressionActions = "ExpressionActions";
         public const string MethodDeclarationActions = "MethodDeclarationActions";
         public const string MemberAccessActions = "MemberAccessActions";
         public const string ElementAccessActions = "ElementAccessActions";

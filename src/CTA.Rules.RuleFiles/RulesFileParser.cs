@@ -156,9 +156,18 @@ namespace CTA.Rules.RuleFiles
                     {
                         if (method.Actions != null && method.Actions.Count > 0)
                         {
-                            var token = new InvocationExpressionToken() { Key = method.Key, Namespace = @namespace.@namespace, FullKey = method.FullKey, Type = @class.Key };
-                            if (!_rootNodes.Invocationexpressiontokens.Contains(token)) { _rootNodes.Invocationexpressiontokens.Add(token); }
-                            ParseActions(token, method.Actions);
+                            if (@class.KeyType == CTA.Rules.Config.Constants.InvocationExpressionActions)
+                            {
+                                var token = new InvocationExpressionToken() { Key = method.Key, Namespace = @namespace.@namespace, FullKey = method.FullKey, Type = @class.Key };
+                                if (!_rootNodes.Invocationexpressiontokens.Contains(token)) { _rootNodes.Invocationexpressiontokens.Add(token); }
+                                ParseActions(token, method.Actions);
+                            }
+                            if (@class.KeyType == CTA.Rules.Config.Constants.ExpressionActions)
+                            {
+                                var token = new ExpressionToken() { Key = method.Key, Namespace = @namespace.@namespace, FullKey = method.FullKey, Type = @class.Key };
+                                if (!_rootNodes.Expressiontokens.Contains(token)) { _rootNodes.Expressiontokens.Add(token); }
+                                ParseActions(token, method.Actions);
+                            }
                         }
                     }
 
@@ -389,6 +398,24 @@ namespace CTA.Rules.RuleFiles
                                         Name = action.Name,
                                         Type = action.Type,
                                         InvocationExpressionActionFunc = actionFunc
+                                    });
+                                }
+                                break;
+                            }
+                        case ActionTypes.Statement:
+                            {
+                                var actionFunc = actionsLoader.GetExpressionAction(action.Name, action.Value);
+                                if (actionFunc != null)
+                                {
+                                    nodeToken.ExpressionActions.Add(new ExpressionAction()
+                                    {
+                                        Key = nodeToken.Key,
+                                        Value = GetActionValue(action.Value),
+                                        Description = action.Description,
+                                        ActionValidation = action.ActionValidation,
+                                        Name = action.Name,
+                                        Type = action.Type,
+                                        ExpressionActionFunc = actionFunc
                                     });
                                 }
                                 break;
