@@ -264,16 +264,6 @@
               }
             },
             {
-              "Name": "AddAwaitOperator",
-              "Type": "Method",
-              "Value": "",
-              "Description": "Add the await operator to ChallengeAsync.",
-              "ActionValidation": {
-                "Contains": "await",
-                "NotContains": ""
-              }
-            },
-            {
               "Name": "AddComment",
               "Type": "Method",
               "Value": "Please use your AuthenticationProperties object with this ChallengeAsync api if needed. You can also include a scheme.",
@@ -282,6 +272,16 @@
                 "Contains": "Please use your AuthenticationProperties object with this ChallengeAsync api if needed. You can also include a scheme.",
                 "NotContains": "",
                 "CheckComments": "True"
+              }
+            },
+            {
+              "Name": "AddAwaitOperator",
+              "Type": "Statement",
+              "Value": "",
+              "Description": "Add the await operator to ChallengeAsync.",
+              "ActionValidation": {
+                "Contains": "await",
+                "NotContains": ""
               }
             }
           ]
@@ -335,16 +335,6 @@
               }
             },
             {
-              "Name": "AddAwaitOperator",
-              "Type": "Method",
-              "Value": "",
-              "Description": "Add the await operator to ChallengeAsync.",
-              "ActionValidation": {
-                "Contains": "await",
-                "NotContains": ""
-              }
-            },
-            {
               "Name": "AddComment",
               "Type": "Method",
               "Value": "Please use your AuthenticationProperties object with this ChallengeAsync api if needed. You can also include a scheme.",
@@ -353,6 +343,16 @@
                 "Contains": "Please use your AuthenticationProperties object with this ChallengeAsync api if needed. You can also include a scheme.",
                 "NotContains": "",
                 "CheckComments": "True"
+              }
+            },
+            {
+              "Name": "AddAwaitOperator",
+              "Type": "Statement",
+              "Value": "",
+              "Description": "Add the await operator to ChallengeAsync.",
+              "ActionValidation": {
+                "Contains": "await",
+                "NotContains": ""
               }
             }
           ]

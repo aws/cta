@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Editing;
 
@@ -6,7 +7,7 @@ namespace CTA.Rules.Models
 {
     public class ExpressionAction : GenericAction
     {
-        public Func<SyntaxGenerator, ExpressionSyntax, ExpressionSyntax> ExpressionActionFunc { get; set; }
+        public Func<SyntaxGenerator, SyntaxNode, SyntaxNode> ExpressionActionFunc { get; set; }
         public override bool Equals(object obj)
         {
             var action = (ExpressionAction)obj;
