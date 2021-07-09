@@ -54,4 +54,10 @@ namespace CTA.WebForms2Blazor
         OnAfterRender,
         Dispose
     }
+
+    public enum DirectiveMigrationResultType {
+        Directive,
+        Comment,
+        HTMLNode
+    }
 }

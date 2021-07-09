@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using CTA.WebForms2Blazor.ControlConverters;
+using CTA.WebForms2Blazor.DirectiveConverters;
 
 namespace CTA.WebForms2Blazor.Helpers.ControlHelpers
 {
@@ -15,5 +16,14 @@ namespace CTA.WebForms2Blazor.Helpers.ControlHelpers
             // ["asp:listview"] = new ListViewControlConverter(),
             // ["asp:gridview"] = new GridViewControlConverter()
         };
+
+        // NOTE: Directive names appear to be case-insensitive
+        public static readonly Dictionary<string, DirectiveConverter> DirectiveRulesMap = new Dictionary<string, DirectiveConverter>(StringComparer.InvariantCultureIgnoreCase)
+        {
+            ["Master"] = new MasterDirectiveConverter(),
+            ["Page"] = new PageDirectiveConverter()
+        };
+
+        public static readonly DirectiveConverter DefaultDirectiveConverter = new DirectiveConverter();
     }
 }
