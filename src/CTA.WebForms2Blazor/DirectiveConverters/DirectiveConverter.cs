@@ -13,6 +13,11 @@ namespace CTA.WebForms2Blazor.DirectiveConverters
         private const string AttributeMigrationNotSupportedTemplate = "<!-- Conversion of {0} attribute (value: {1}) for {2} directive not currently supported -->";
         private const string DirectiveMigrationNotSupportedTemplate = "<!-- General conversion for {0} directive not currently supported -->";
 
+        /// <summary>
+        /// Each match of this regular expression represents an attribute of the Web Forms directive it is being
+        /// applied to, the first named capture group, AttributeName, is the name of the attribute while the second,
+        /// AttributeValue, is the value
+        /// </summary>
         private static Regex AttributeSplitRegex { get { return new Regex(@"(?<AttributeName>[^\s=]+)\s*=\s*(?<AttributeValue>\S+)"); } }
 
         private protected virtual IEnumerable<string> AttributeAllowList { get { return Enumerable.Empty<string>(); } }
