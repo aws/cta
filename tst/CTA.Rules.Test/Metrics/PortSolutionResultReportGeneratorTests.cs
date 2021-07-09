@@ -73,9 +73,9 @@ namespace CTA.Rules.Test.Metrics
             {
                 "project.all.json"
             };
-            var projectResults = new BlockingCollection<Models.ProjectResult>
+            var projectResults = new BlockingCollection<CTA.Rules.Models.ProjectResult>
             {
-                new Models.ProjectResult
+                new CTA.Rules.Models.ProjectResult
                 {
                     ProjectFile = projectPath1,
                     TargetVersions = new List<string>() {Constants.DefaultCoreVersion},
