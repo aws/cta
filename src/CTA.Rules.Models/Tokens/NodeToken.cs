@@ -69,6 +69,7 @@ namespace CTA.Rules.Models.Tokens
             cloned.UsingActions = cloned.UsingActions.Select(action => action.Clone<UsingAction>()).ToList();
             cloned.IdentifierNameActions = cloned.IdentifierNameActions.Select(action => action.Clone<IdentifierNameAction>()).ToList();
             cloned.InvocationExpressionActions = cloned.InvocationExpressionActions.Select(action => action.Clone<InvocationExpressionAction>()).ToList();
+            cloned.ExpressionActions = cloned.ExpressionActions.Select(action => action.Clone<ExpressionAction>()).ToList();
             cloned.NamespaceActions = cloned.NamespaceActions.Select(action => action.Clone<NamespaceAction>()).ToList();
             cloned.ObjectCreationExpressionActions = cloned.ObjectCreationExpressionActions.Select(action => action.Clone<ObjectCreationExpressionAction>()).ToList();
             cloned.PackageActions = cloned.PackageActions.Select(action => action.Clone()).ToList();
