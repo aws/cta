@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using CTA.WebForms2Blazor.Extensions;
 
 namespace CTA.WebForms2Blazor.DirectiveConverters
@@ -17,7 +16,7 @@ namespace CTA.WebForms2Blazor.DirectiveConverters
         public const string LanguageAttr = "Language";
 
         // Decided to use a universal attribute map because many of the attributes seem to be shared between
-        // directives and using attribute whitelists by directive seemed like a better solution
+        // directives and using attribute allow lists by directive seemed like a better solution
         public static IDictionary<string, Func<string, IEnumerable<DirectiveMigrationResult>>> AttributeMap
         {
             get

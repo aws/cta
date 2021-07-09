@@ -10,12 +10,12 @@ namespace CTA.WebForms2Blazor.DirectiveConverters
     {
         private const string AttributeNameRegexGroupName = "AttributeName";
         private const string AttributeValueRegexGroupName = "AttributeValue";
-        private const string DefaultAttributeMigrationTemplate = "<!-- Conversion of {0} attribute (value: {1}) for {2} directive not currently supported -->";
-        private const string DefaultDirectiveMigrationTemplate = "<!-- General conversion for {0} directive not currently supported -->";
+        private const string AttributeMigrationNotSupportedTemplate = "<!-- Conversion of {0} attribute (value: {1}) for {2} directive not currently supported -->";
+        private const string DirectiveMigrationNotSupportedTemplate = "<!-- General conversion for {0} directive not currently supported -->";
 
         private static Regex AttributeSplitRegex { get { return new Regex(@"(?<AttributeName>[^\s=]+)\s*=\s*(?<AttributeValue>\S+)"); } }
 
-        private protected virtual IEnumerable<string> AttributeWhitelist { get { return Enumerable.Empty<string>(); } }
+        private protected virtual IEnumerable<string> AttributeAllowList { get { return Enumerable.Empty<string>(); } }
 
         public string ConvertDirective(string directiveName, string directiveString)
         {
@@ -35,7 +35,7 @@ namespace CTA.WebForms2Blazor.DirectiveConverters
         // perform the conversion, similar to the reasoning behind using Func<> in the attribute map
         private protected virtual DirectiveMigrationResult GetMigratedDirective(string directiveName)
         {
-            return new DirectiveMigrationResult(DirectiveMigrationResultType.Comment, string.Format(DefaultDirectiveMigrationTemplate, directiveName));
+            return new DirectiveMigrationResult(DirectiveMigrationResultType.Comment, string.Format(DirectiveMigrationNotSupportedTemplate, directiveName));
         }
 
         private IEnumerable<DirectiveMigrationResult> GetMigratedAttributes(string directiveString, string directiveName)
@@ -46,11 +46,11 @@ namespace CTA.WebForms2Blazor.DirectiveConverters
                     var attrName = match.Groups[AttributeNameRegexGroupName].Value;
                     var attrValue = match.Groups[AttributeValueRegexGroupName].Value;
 
-                    return AttributeWhitelist.Contains(attrName, StringComparer.InvariantCultureIgnoreCase)
+                    return AttributeAllowList.Contains(attrName, StringComparer.InvariantCultureIgnoreCase)
                         ? UniversalDirectiveAttributeMap.AttributeMap[attrName](attrValue)
                         : new[] { new DirectiveMigrationResult(
                             DirectiveMigrationResultType.Comment,
-                            string.Format(DefaultAttributeMigrationTemplate, attrName, attrValue, directiveName)) };
+                            string.Format(AttributeMigrationNotSupportedTemplate, attrName, attrValue, directiveName)) };
                 })
                 // Keep the order of results as Directives -> Comments -> New HTML nodes
                 .OrderBy(migrationResult => (int)migrationResult.MigrationResultType)

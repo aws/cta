@@ -7,7 +7,7 @@ namespace CTA.WebForms2Blazor.DirectiveConverters
 {
     public class MasterDirectiveConverter : DirectiveConverter
     {
-        private protected override IEnumerable<string> AttributeWhitelist
+        private protected override IEnumerable<string> AttributeAllowList
         {
             get
             {

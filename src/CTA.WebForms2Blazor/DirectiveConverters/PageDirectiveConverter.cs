@@ -9,7 +9,7 @@ namespace CTA.WebForms2Blazor.DirectiveConverters
     {
         private const string UnknownPagePlaceHolderText = "Unkown_page_route";
 
-        private protected override IEnumerable<string> AttributeWhitelist
+        private protected override IEnumerable<string> AttributeAllowList
         {
             get
             {
