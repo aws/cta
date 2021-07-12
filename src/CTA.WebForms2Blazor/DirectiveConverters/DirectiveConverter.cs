@@ -18,7 +18,7 @@ namespace CTA.WebForms2Blazor.DirectiveConverters
         /// applied to, the first named capture group, AttributeName, is the name of the attribute while the second,
         /// AttributeValue, is the value
         /// </summary>
-        private static Regex AttributeSplitRegex { get { return new Regex(@"(?<AttributeName>[^\s=]+)\s*=\s*(?<AttributeValue>\S+)"); } }
+        private static Regex AttributeSplitRegex { get { return new Regex(@"(?<AttributeName>[^\s=]+)\s*=\s*(?<AttributeValue>[""'][^""']*[""'])"); } }
 
         private protected virtual IEnumerable<string> AttributeAllowList { get { return Enumerable.Empty<string>(); } }
 
@@ -28,12 +28,16 @@ namespace CTA.WebForms2Blazor.DirectiveConverters
             // inherits, etc.) Need to find a better way to detect and deal with those or perhaps
             // just leave it up the the developer given that detecting which layout or base class
             // to choose is difficult
-            var migrationResultsContent = GetMigratedAttributes(directiveString, directiveName)
-                // Want to ensure that the general directive conversion stays at the front if it exists
-                .Prepend(GetMigratedDirective(directiveName))
-                .Select(migrationResult => migrationResult.Content);
+            var migrationResults = GetMigratedAttributes(directiveString, directiveName);
 
-            return string.Join(Environment.NewLine, migrationResultsContent);
+            // Want to ensure that the general directive conversion stays at the front if it exists
+            var migratedDirective = GetMigratedDirective(directiveName);
+            if (migratedDirective != null)
+            {
+                migrationResults = migrationResults.Prepend(migratedDirective);
+            }
+
+            return string.Join(Environment.NewLine, migrationResults.Select(migrationResult => migrationResult.Content));
         }
 
         // We want to allow this to be overridden in case some specialized functionality is required to

@@ -25,7 +25,7 @@ namespace CTA.WebForms2Blazor.DirectiveConverters
 
         private protected override DirectiveMigrationResult GetMigratedDirective(string directiveName)
         {
-            return new DirectiveMigrationResult(DirectiveMigrationResultType.Directive, "@inherits LayoutComponentBase");
+            return null;
         }
     }
 }

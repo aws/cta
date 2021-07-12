@@ -19,6 +19,7 @@
         public const string ExpectedControlBaseClass = "UserControl";
         public const string ExpectedMasterPageBaseClass = "MasterPage";
         public const string ComponentBaseClass = "ComponentBase";
+        public const string LayoutComponentBaseClass = "LayoutComponentBase";
 
         // Notable Interfaces
         public const string HttpHandlerInterface = "IHttpHandler";
