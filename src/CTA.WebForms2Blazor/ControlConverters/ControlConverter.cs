@@ -10,6 +10,10 @@ namespace CTA.WebForms2Blazor.ControlConverters
     public abstract class ControlConverter
     {
         protected abstract Dictionary<String, String> AttributeMap { get; }
+        protected virtual IEnumerable<String> NewAttributes
+        {
+            get { return null; }
+        }
         protected abstract string BlazorName { get; }
         protected virtual string NodeTemplate { get { return @"<{0} {1}>{2}</{0}>"; } }
 
@@ -20,10 +24,21 @@ namespace CTA.WebForms2Blazor.ControlConverters
         
         public virtual HtmlNode Convert2Blazor(HtmlNode node)
         {
-            return Convert2BlazorFromParts(NodeTemplate, BlazorName, ConvertAttributes(node.Attributes), node.InnerHtml);
+            return Convert2BlazorFromParts(NodeTemplate, BlazorName, GetNewAttributes(node.Attributes, NewAttributes), node.InnerHtml);
         }
 
-        protected string ConvertAttributes(HtmlAttributeCollection attributeCollection)
+        protected virtual string GetNewAttributes(HtmlAttributeCollection oldAttributes,
+            IEnumerable<String> additionalAttributes)
+        {
+            additionalAttributes ??= new List<String>();
+            var convertedAttributes = ConvertAttributes(oldAttributes);
+            var combinedAttributes = convertedAttributes.Concat(additionalAttributes);
+            
+            var combinedAttributesString = string.Join(" ", combinedAttributes);
+            return combinedAttributesString;
+        }
+
+        protected IEnumerable<String> ConvertAttributes(HtmlAttributeCollection attributeCollection)
         {
             var convertedAttributes = attributeCollection
                 .Where(attr => AttributeMap.ContainsKey(attr.Name))
@@ -35,10 +50,8 @@ namespace CTA.WebForms2Blazor.ControlConverters
                     }
                     return $"{AttributeMap[attr.Name]}='{attr.Value}'";
                 });
-
-            var convertedAttributesString = string.Join(" ", convertedAttributes);
             
-            return convertedAttributesString;
+            return convertedAttributes;
         }
 
         protected HtmlNode Convert2BlazorFromParts(string template, string name, string attributes, string body)
@@ -48,10 +61,10 @@ namespace CTA.WebForms2Blazor.ControlConverters
             return newNode;
         }
         
-        public static HtmlDocument ConvertEmbeddedCode(HtmlDocument document)
+        public static string ConvertEmbeddedCode(string htmlString)
         {
-            var documentNode = document.DocumentNode;
-            var htmlString = documentNode.WriteTo();
+            // var documentNode = document;
+            // var htmlString = documentNode.WriteTo();
 
             MatchEvaluator dataBindEval = new MatchEvaluator(EmbeddedCodeReplacers.ReplaceDataBind);
             MatchEvaluator singleExprEval = new MatchEvaluator(EmbeddedCodeReplacers.ReplaceSingleExpr);
@@ -65,9 +78,9 @@ namespace CTA.WebForms2Blazor.ControlConverters
             //Not implemented/used yet
             //htmlString = EmbeddedCodeReplacers.AspExpRegex.Replace(htmlString, aspExprEval);
 
-            var res = new HtmlDocument();
-            res.LoadHtml(htmlString);
-            return res;
+            // var res = new HtmlDocument();
+            // res.LoadHtml(htmlString);
+            return htmlString;
         }
     }
 }
