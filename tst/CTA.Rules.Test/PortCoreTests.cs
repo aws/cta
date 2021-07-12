@@ -1,8 +1,12 @@
+using Codelyzer.Analysis;
+using CTA.Rules.Models;
 using CTA.Rules.PortCore;
+using Microsoft.Extensions.Logging.Abstractions;
 using NUnit.Framework;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace CTA.Rules.Test
 {
@@ -126,7 +130,66 @@ namespace CTA.Rules.Test
         {
             var solutionPath = CopySolutionFolderToTemp("WebApiWithReferences.sln", tempDir);
             TestSolutionAnalysis results = AnalyzeSolution(solutionPath, version);
+
+            ValidateWebApiWithReferences(results);
+        }
+
+        [TestCase(TargetFramework.DotnetCoreApp31)]
+        public async Task TestWebApiWithReferencesUsingGenerator(string version)
+        {
+            var solutionPath = CopySolutionFolderToTemp("WebApiWithReferences.sln", tempDir);
+
+            AnalyzerConfiguration configuration = new AnalyzerConfiguration(LanguageOptions.CSharp)
+            {
+                ExportSettings =
+                {
+                    GenerateJsonOutput = false,
+                    OutputPath = @"/tmp/UnitTests"
+                },
+
+                MetaDataSettings =
+                {
+                    LiteralExpressions = true,
+                    MethodInvocations = true,
+                    Annotations = true,
+                    DeclarationNodes = true,
+                    LocationData = false,
+                    ReferenceData = true,
+                    LoadBuildData = true,
+                    ElementAccess = true,
+                    MemberAccess = true
+                }
+            };
+
+            CodeAnalyzer analyzer = CodeAnalyzerFactory.GetAnalyzer(configuration, NullLogger.Instance);
+            SolutionPort solutionPort = new SolutionPort(solutionPath);
             
+            var resultEnumerator = analyzer.AnalyzeSolutionGeneratorAsync(solutionPath).GetAsyncEnumerator();
+
+            while (await resultEnumerator.MoveNextAsync())
+            {
+                using var result = resultEnumerator.Current;
+                PortCoreConfiguration projectConfiguration = new PortCoreConfiguration()
+                {
+                    ProjectPath = result.ProjectResult.ProjectFilePath,
+                    IsMockRun = false,
+                    UseDefaultRules = true,
+                    PortCode = true,
+                    PortProject = true,
+                    TargetVersions = new List<string> { version }
+                };
+
+                solutionPort.RunProject(result, projectConfiguration);
+            }
+            var portSolutionResult = solutionPort.GenerateResults();
+            var testSolutionResult = GenerateSolutionResult(Path.GetDirectoryName(solutionPath), solutionPort.GetAnalysisResult(), portSolutionResult);
+
+            ValidateWebApiWithReferences(testSolutionResult);
+        }
+
+        private void ValidateWebApiWithReferences(TestSolutionAnalysis results)
+        {
+
             StringAssert.Contains("IActionResult", results.SolutionAnalysisResult);
             StringAssert.Contains("Startup", results.SolutionAnalysisResult);
 

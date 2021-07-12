@@ -102,8 +102,6 @@ namespace CTA.Rules.Test
                 {
                     foreach (string projectFile in projectFiles)
                     {
-                        ProjectResult project = new ProjectResult();
-
                         Dictionary<string, Tuple<string, string>> packages = new Dictionary<string, Tuple<string, string>>
                         {
                             { "Newtonsoft.Json", new Tuple<string, string>("9.0.0", "*") }
@@ -123,12 +121,6 @@ namespace CTA.Rules.Test
                             projectConfiguration.MetaReferences = metaReferences.ContainsKey(projectFile) ? metaReferences[projectFile] : null;
                         }
 
-                        //project.CsProjectContent = File.ReadAllText(projectFile);
-                        project.ProjectDirectory = Directory.GetParent(projectFile).FullName;
-                        project.CsProjectPath = projectFile;
-
-                        result.ProjectResults.Add(project);
-
                         solutionPortConfiguration.Add(projectConfiguration);
                     }
 
@@ -140,29 +132,41 @@ namespace CTA.Rules.Test
                     {
                         Assert.IsTrue(projectResult.ProjectActions.ToSummaryString()?.Length > 0);
                     }
-
-                    StringBuilder str = new StringBuilder();
-                    foreach (var projectResult in analysisRunResult.ProjectResults)
-                    {
-                        StringBuilder projectResults = new StringBuilder();
-                        projectResults.AppendLine(projectResult.ProjectFile);
-                        projectResults.AppendLine(projectResult.ProjectActions.ToString());
-                        result.ProjectResults.Where(p => p.CsProjectPath == projectResult.ProjectFile).FirstOrDefault().ProjectAnalysisResult = projectResults.ToString();
-
-                        str.Append(projectResults);
-                    }
-
-                    result.SolutionAnalysisResult = str.ToString();
-
                     var runResult = solutionPort.Run();
-                    result.SolutionRunResult = runResult;
-
-                    foreach (var project in result.ProjectResults)
-                    {
-                        project.CsProjectContent = File.ReadAllText(project.CsProjectPath);
-                    }
+                    result = GenerateSolutionResult(solutionDir, analysisRunResult, runResult);
                 }
             }
+            return result;
+        }
+
+        internal TestSolutionAnalysis GenerateSolutionResult(string solutionDir, SolutionResult analysisRunResult, PortSolutionResult solutionRunResult)
+        {
+            var result = new TestSolutionAnalysis();
+
+            var projectFiles = Directory.EnumerateFiles(solutionDir, "*.csproj", SearchOption.AllDirectories).ToList();
+            projectFiles.ForEach(projectFile => {
+                result.ProjectResults.Add(new ProjectResult()
+                {
+                    CsProjectPath = projectFile,
+                    ProjectDirectory = Directory.GetParent(projectFile).FullName,
+                    CsProjectContent = File.ReadAllText(projectFile)
+                });
+            });
+
+            StringBuilder str = new StringBuilder();
+            foreach (var projectResult in analysisRunResult.ProjectResults)
+            {
+                StringBuilder projectResults = new StringBuilder();
+                projectResults.AppendLine(projectResult.ProjectFile);
+                projectResults.AppendLine(projectResult.ProjectActions.ToString());
+                result.ProjectResults.Where(p => p.CsProjectPath == projectResult.ProjectFile).FirstOrDefault().ProjectAnalysisResult = projectResults.ToString();
+
+                str.Append(projectResults);
+            }
+
+            result.SolutionAnalysisResult = str.ToString();
+            result.SolutionRunResult = solutionRunResult;
+
             return result;
         }
 
