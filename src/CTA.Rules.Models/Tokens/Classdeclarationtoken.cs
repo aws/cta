@@ -9,11 +9,11 @@ namespace CTA.Rules.Models
         public override bool Equals(object obj)
         {
             var token = (ClassDeclarationToken)obj;
-            return token.FullKey == this.FullKey;
+            return token?.FullKey == this.FullKey;
         }
         public override int GetHashCode()
         {
-            return HashCode.Combine(FullKey);
+            return HashCode.Combine(FullKey?.GetHashCode() ?? 0);
         }
     }
 }

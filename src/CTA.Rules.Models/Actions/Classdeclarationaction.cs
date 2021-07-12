@@ -12,16 +12,16 @@ namespace CTA.Rules.Models
         public override bool Equals(object obj)
         {
             var action = (ClassDeclarationAction)obj;
-            return action.Key == this.Key
-                && action.Value == this.Value
-                && action.ClassDeclarationActionFunc.Method.Name == this.ClassDeclarationActionFunc.Method.Name;
+            return action?.Key == this.Key
+                && action?.Value == this.Value
+                && action?.ClassDeclarationActionFunc.Method.Name == this.ClassDeclarationActionFunc.Method.Name;
         }
 
         public override int GetHashCode()
         {
-            return Key.GetHashCode()
-                + 3 * Value.GetHashCode()
-                + 5 * (ClassDeclarationActionFunc != null ? ClassDeclarationActionFunc.Method.Name.GetHashCode() : 0);
+            return HashCode.Combine(Key?.GetHashCode() ?? 0, 
+                3 * Value?.GetHashCode() ?? 0, 
+                5 * ClassDeclarationActionFunc?.Method.Name.GetHashCode() ?? 0);
         }
     }
 }

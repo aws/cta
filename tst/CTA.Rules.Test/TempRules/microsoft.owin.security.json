@@ -346,7 +346,7 @@
             },
             {
               "Name": "AddAwaitOperator",
-              "Type": "Statement",
+              "Type": "Expression",
               "Value": "",
               "Description": "Add the await operator to ChallengeAsync.",
               "ActionValidation": {
@@ -417,7 +417,7 @@
             },
             {
               "Name": "AddAwaitOperator",
-              "Type": "Statement",
+              "Type": "Expression",
               "Value": "",
               "Description": "Add the await operator to ChallengeAsync.",
               "ActionValidation": {
@@ -524,7 +524,7 @@
             },
             {
               "Name": "AddAwaitOperator",
-              "Type": "Statement",
+              "Type": "Expression",
               "Value": "",
               "Description": "Add the await operator to SignInAsync.",
               "ActionValidation": {
@@ -594,7 +594,7 @@
             },
             {
               "Name": "AddAwaitOperator",
-              "Type": "Statement",
+              "Type": "Expression",
               "Value": "",
               "Description": "Add the await operator to SignInAsync.",
               "ActionValidation": {
@@ -665,7 +665,7 @@
             },
             {
               "Name": "AddAwaitOperator",
-              "Type": "Statement",
+              "Type": "Expression",
               "Value": "",
               "Description": "Add the await operator to SignOutAsync.",
               "ActionValidation": {
@@ -736,7 +736,7 @@
             },
             {
               "Name": "AddAwaitOperator",
-              "Type": "Statement",
+              "Type": "Expression",
               "Value": "",
               "Description": "Add the await operator to SignOutAsync.",
               "ActionValidation": {

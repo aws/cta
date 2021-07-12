@@ -18,12 +18,7 @@ namespace CTA.Rules.Config
 
         public static int GenerateHashCode(int prime, string str)
         {
-            int hash = 0;
-            if (!string.IsNullOrEmpty(str))
-            {
-                hash = prime * str.GetHashCode();
-            }
-            return hash;
+            return HashCode.Combine(!string.IsNullOrEmpty(str) ? prime * str.GetHashCode() : 0);
         }
 
         public static byte[] DownloadFromGitHub(string owner, string repo, string tag)

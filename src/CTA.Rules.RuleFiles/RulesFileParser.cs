@@ -402,7 +402,7 @@ namespace CTA.Rules.RuleFiles
                                 }
                                 break;
                             }
-                        case ActionTypes.Statement:
+                        case ActionTypes.Expression:
                             {
                                 var actionFunc = actionsLoader.GetExpressionAction(action.Name, action.Value);
                                 if (actionFunc != null)

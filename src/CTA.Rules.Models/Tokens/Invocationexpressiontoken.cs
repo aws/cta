@@ -1,4 +1,5 @@
-﻿using CTA.Rules.Config;
+﻿using System;
+using CTA.Rules.Config;
 
 namespace CTA.Rules.Models.Tokens
 {
@@ -7,11 +8,13 @@ namespace CTA.Rules.Models.Tokens
         public override bool Equals(object obj)
         {
             var token = (InvocationExpressionToken)obj;
-            return token.Key == this.Key && token.Namespace == this.Namespace && token.Type == this.Type;
+            return token?.Key == this.Key && token?.Namespace == this.Namespace && token?.Type == this.Type;
         }
         public override int GetHashCode()
         {
-            return 3 * Key.GetHashCode() + Utils.GenerateHashCode(11, this.Namespace) + Utils.GenerateHashCode(13, Type);
+            return HashCode.Combine(3 * Key?.GetHashCode() ?? 0, 
+                Utils.GenerateHashCode(11, this.Namespace), 
+                Utils.GenerateHashCode(13, Type));
         }
     }
 }
