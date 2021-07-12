@@ -128,13 +128,14 @@ namespace CTA.Rules.PortCore
             _solutionRewriter = new SolutionRewriter(analyzerResults, solutionConfiguration.ToList<ProjectConfiguration>());
         }
 
-        public void RunProject(AnalyzerResult analyzerResult, PortCoreConfiguration portCoreConfiguration)
+        public ProjectResult RunProject(AnalyzerResult analyzerResult, PortCoreConfiguration portCoreConfiguration)
         {
             var projectPort = new ProjectPort(analyzerResult, portCoreConfiguration, this);
             var projectAnalysisResult = projectPort.AnalysisRun();
             var projectResult = projectPort.Run();
             _portSolutionResult.References.UnionWith(projectPort.ProjectReferences);
             AppendProjectResult(projectAnalysisResult, projectResult, analyzerResult, projectPort.ProjectTypeFeatureResults);
+            return projectResult;
         }
 
         private void AppendProjectResult(ProjectResult projectAnalysisResult, ProjectResult projectResult, AnalyzerResult analyzerResult, FeatureDetectionResult featureDetectionResult)
