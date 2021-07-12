@@ -12,7 +12,7 @@ namespace CTA.WebForms2Blazor.Helpers.ControlHelpers
             ["asp:hyperlink"] = new HyperLinkControlConverter(),
             ["asp:button"] = new ButtonControlConverter(),
             ["asp:label"] = new LabelControlConverter(),
-            // ["asp:listview"] = new ListViewControlConverter(),
+            ["asp:listview"] = new ListViewControlConverter(),
             // ["asp:gridview"] = new GridViewControlConverter()
         };
     }
