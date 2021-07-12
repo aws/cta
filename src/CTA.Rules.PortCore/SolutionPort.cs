@@ -110,6 +110,7 @@ namespace CTA.Rules.PortCore
                 LogHelper.Logger = logger;
             }
             _portSolutionResult = new PortSolutionResult(solutionFilePath);
+            SkipDownloadFiles = new ConcurrentDictionary<string, bool>();
             _solutionPath = solutionFilePath;
             _context = new MetricsContext(solutionFilePath, analyzerResults);
             InitSolutionRewriter(analyzerResults, solutionConfiguration);
@@ -118,6 +119,7 @@ namespace CTA.Rules.PortCore
         public SolutionPort(string solutionFilePath, IDEProjectResult projectResult, List<PortCoreConfiguration> solutionConfiguration)
         {
             _solutionPath = solutionFilePath;
+            SkipDownloadFiles = new ConcurrentDictionary<string, bool>();
             _projectResult = projectResult;
             _solutionRewriter = new SolutionRewriter(projectResult, solutionConfiguration.ToList<ProjectConfiguration>());
         }
@@ -128,13 +130,14 @@ namespace CTA.Rules.PortCore
             _solutionRewriter = new SolutionRewriter(analyzerResults, solutionConfiguration.ToList<ProjectConfiguration>());
         }
 
-        public void RunProject(AnalyzerResult analyzerResult, PortCoreConfiguration portCoreConfiguration)
+        public ProjectResult RunProject(AnalyzerResult analyzerResult, PortCoreConfiguration portCoreConfiguration)
         {
             var projectPort = new ProjectPort(analyzerResult, portCoreConfiguration, this);
             var projectAnalysisResult = projectPort.AnalysisRun();
             var projectResult = projectPort.Run();
             _portSolutionResult.References.UnionWith(projectPort.ProjectReferences);
             AppendProjectResult(projectAnalysisResult, projectResult, analyzerResult, projectPort.ProjectTypeFeatureResults);
+            return projectResult;
         }
 
         private void AppendProjectResult(ProjectResult projectAnalysisResult, ProjectResult projectResult, AnalyzerResult analyzerResult, FeatureDetectionResult featureDetectionResult)
