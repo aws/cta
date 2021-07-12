@@ -17,10 +17,14 @@ namespace CTA.WebForms2Blazor.FileConverters
         
         public override async Task<IEnumerable<FileInformation>> MigrateFileAsync()
         {
+            LogStart();
+
             FileInformation fi = new FileInformation(RelativePath, File.ReadAllBytes(FullPath));
 
             var fileList = new List<FileInformation>();
             fileList.Add(fi);
+
+            LogEnd();
 
             return fileList;
         }

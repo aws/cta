@@ -63,7 +63,7 @@ namespace CTA.WebForms2Blazor.Factories
             }
             else if (symbol.AllInterfaces.Any(interfaceSymbol => interfaceSymbol.Name.Equals(Constants.HttpModuleInterface)))
             {
-                return new HttpModuleClassConverter(sourceFileRelativePath, _sourceProjectPath, model, typeDeclarationNode, symbol, _taskManager);
+                return new HttpModuleClassConverter(sourceFileRelativePath, _sourceProjectPath, model, typeDeclarationNode, symbol, _lifecycleManager, _taskManager);
             }
             else
             {

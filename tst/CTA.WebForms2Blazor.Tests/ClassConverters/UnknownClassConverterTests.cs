@@ -2,6 +2,7 @@
 using CTA.WebForms2Blazor.Services;
 using NUnit.Framework;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace CTA.WebForms2Blazor.Tests.ClassConverters
@@ -26,7 +27,7 @@ namespace CTA.WebForms2Blazor.Tests.ClassConverters
         [Test]
         public async Task MigrateClassAsync_Maps_New_Relative_Path_To_Correct_Location()
         {
-            var fileInfo = await _converter.MigrateClassAsync();
+            var fileInfo = (await _converter.MigrateClassAsync()).Single();
             var expectedOutputPath = $"{Path.Combine(ClassConverterSetupFixture.TestProjectNestedDirectoryName, ClassConverterSetupFixture.TestClassName)}.cs";
 
             // Relative path should stay the same

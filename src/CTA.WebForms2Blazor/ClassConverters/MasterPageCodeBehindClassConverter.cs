@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using CTA.WebForms2Blazor.FileInformationModel;
@@ -23,15 +24,18 @@ namespace CTA.WebForms2Blazor.ClassConverters
             // TODO: Register with the necessary services
         }
 
-        public override async Task<FileInformation> MigrateClassAsync()
+        public override async Task<IEnumerable<FileInformation>> MigrateClassAsync()
         {
+            LogStart();
+
             // NOTE: For now we make no code modifications, just to be
             // ready for the demo and produces files
             var sourceClassComponents = GetSourceClassComponents();
 
             DoCleanUp();
+            LogEnd();
 
-            return new FileInformation(GetNewRelativePath(), Encoding.UTF8.GetBytes(sourceClassComponents.FileText));
+            return new[] { new FileInformation(GetNewRelativePath(), Encoding.UTF8.GetBytes(sourceClassComponents.FileText)) };
         }
 
         private string GetNewRelativePath()
