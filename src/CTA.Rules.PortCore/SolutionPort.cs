@@ -110,6 +110,7 @@ namespace CTA.Rules.PortCore
                 LogHelper.Logger = logger;
             }
             _portSolutionResult = new PortSolutionResult(solutionFilePath);
+            SkipDownloadFiles = new ConcurrentDictionary<string, bool>();
             _solutionPath = solutionFilePath;
             _context = new MetricsContext(solutionFilePath, analyzerResults);
             InitSolutionRewriter(analyzerResults, solutionConfiguration);
@@ -118,6 +119,7 @@ namespace CTA.Rules.PortCore
         public SolutionPort(string solutionFilePath, IDEProjectResult projectResult, List<PortCoreConfiguration> solutionConfiguration)
         {
             _solutionPath = solutionFilePath;
+            SkipDownloadFiles = new ConcurrentDictionary<string, bool>();
             _projectResult = projectResult;
             _solutionRewriter = new SolutionRewriter(projectResult, solutionConfiguration.ToList<ProjectConfiguration>());
         }
