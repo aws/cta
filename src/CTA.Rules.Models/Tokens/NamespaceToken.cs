@@ -12,7 +12,7 @@ namespace CTA.Rules.Models.Tokens
         }
         public override int GetHashCode()
         {
-            return HashCode.Combine(23 * Key?.GetHashCode() ?? 0);
+            return HashCode.Combine(Key);
         }
     }
 }

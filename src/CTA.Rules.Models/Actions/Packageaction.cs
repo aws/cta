@@ -21,8 +21,7 @@ namespace CTA.Rules.Models
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(Name?.GetHashCode() ?? 0,
-                3 * (!string.IsNullOrEmpty(Version) ? Version.GetHashCode() : 0));
+            return HashCode.Combine(Name, Version);
         }
     }
 }

@@ -14,8 +14,7 @@ namespace CTA.Rules.Models
         }
         public override int GetHashCode()
         {
-            return HashCode.Combine(11 * Key?.GetHashCode() ?? 0, 
-                Utils.GenerateHashCode(17, this.Namespace));
+            return HashCode.Combine(Key, Namespace);
         }
     }
 }

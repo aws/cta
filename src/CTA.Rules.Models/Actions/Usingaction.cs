@@ -18,8 +18,7 @@ namespace CTA.Rules.Models
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(3 * Value?.GetHashCode() ?? 0,
-                5 * UsingActionFunc?.Method.Name.GetHashCode() ?? 0);
+            return HashCode.Combine(Value, UsingActionFunc?.Method.Name);
         }
     }
 }

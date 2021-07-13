@@ -24,10 +24,7 @@ namespace CTA.Rules.Models
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(Key?.GetHashCode() ?? 0, 
-                3 * Value?.GetHashCode() ?? 0, 
-                5 * AttributeActionFunc?.Method.Name.GetHashCode() ?? 0, 
-                7 * AttributeListActionFunc?.Method.Name.GetHashCode() ?? 0);
+            return HashCode.Combine(Key, Value, AttributeActionFunc?.Method.Name, AttributeListActionFunc?.Method.Name);
         }
     }
 }

@@ -13,7 +13,7 @@ namespace CTA.Rules.Models
         }
         public override int GetHashCode()
         {
-            return HashCode.Combine(5 * FullKey?.GetHashCode() ?? 0);
+            return HashCode.Combine(FullKey);
         }
     }
 }

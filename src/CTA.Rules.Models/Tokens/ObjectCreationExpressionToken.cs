@@ -13,9 +13,7 @@ namespace CTA.Rules.Models.Tokens
         }
         public override int GetHashCode()
         {
-            return HashCode.Combine(3 * this.Key?.GetHashCode() ?? 0, 
-                Utils.GenerateHashCode(5, this.Namespace), 
-                Utils.GenerateHashCode(7, this.Type));
+            return HashCode.Combine(Key, Namespace, Type);
         }
     }
 }
