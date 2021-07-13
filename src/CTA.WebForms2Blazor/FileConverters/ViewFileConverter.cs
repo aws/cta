@@ -81,7 +81,7 @@ namespace CTA.WebForms2Blazor.FileConverters
             // View file converters will return razor file contents with
             // only view layer, code behind will be created in another file
             HtmlDocument migratedDocument = GetRazorContents();
-            string contents = migratedDocument.DocumentNode.WriteTo();
+            string contents = migratedDocument.Text;
 
             // Currently just changing extension to .razor, keeping filename and directory the same
             // but Razor files are renamed and moved around, can't always use same filename/directory in the future
