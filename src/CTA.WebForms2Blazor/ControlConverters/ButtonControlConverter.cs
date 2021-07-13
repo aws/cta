@@ -24,7 +24,7 @@ namespace CTA.WebForms2Blazor.ControlConverters
             var textAttr = node.Attributes.AttributesWithName("text").FirstOrDefault();
             var buttonText = textAttr?.Value ?? string.Empty;
             
-            return Convert2BlazorFromParts(NodeTemplate, BlazorName, ConvertAttributes(node.Attributes), buttonText);
+            return Convert2BlazorFromParts(NodeTemplate, BlazorName, GetNewAttributes(node.Attributes, NewAttributes), buttonText);
         }
     }
 }
