@@ -26,6 +26,7 @@ namespace CTA.WebForms2Blazor
 
         private TaskManagerService _taskManager;
         private LifecycleManagerService _lifecycleManager;
+        private ViewImportService _viewImportService;
         private WorkspaceManagerService _blazorWorkspaceManager;
 
         private ClassConverterFactory _classConverterFactory;
@@ -107,6 +108,7 @@ namespace CTA.WebForms2Blazor
         {
             _taskManager = new TaskManagerService();
             _lifecycleManager = new LifecycleManagerService();
+            _viewImportService = new ViewImportService();
             _blazorWorkspaceManager = new WorkspaceManagerService();
             _blazorWorkspaceManager.CreateSolutionFile();
         }
@@ -114,7 +116,7 @@ namespace CTA.WebForms2Blazor
         private void InitializeFactories()
         {
             _classConverterFactory = new ClassConverterFactory(_inputProjectPath, _lifecycleManager, _taskManager);
-            _fileConverterFactory = new FileConverterFactory(_inputProjectPath, _blazorWorkspaceManager, _webFormsProjectAnalyzer, _classConverterFactory);
+            _fileConverterFactory = new FileConverterFactory(_inputProjectPath, _blazorWorkspaceManager, _webFormsProjectAnalyzer, _viewImportService, _classConverterFactory);
         }
     }
 }

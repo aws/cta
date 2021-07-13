@@ -31,13 +31,13 @@ namespace CTA.WebForms2Blazor.DirectiveConverters
                         // and so building redundant retrieval may be more effort than its worth at the moment
                         var layoutClassName = Path.GetFileNameWithoutExtension(attrValue.RemoveOuterQuotes());
 
-                        return new[] { new DirectiveMigrationResult(DirectiveMigrationResultType.Directive, $"@layout {layoutClassName}") };
+                        return new[] { new DirectiveMigrationResult(DirectiveMigrationResultType.GeneralDirective, $"@layout {layoutClassName}") };
                     },
                     [InheritsAttr] = attrValue =>
                     {
                         // TODO: Verify if inherited base class is still a valid base class (using CTA/Codelyzer?) and
                         // return Enumerable.Empty<DirectiveMigrationResult>() if it is no longer valid
-                        return new[] { new DirectiveMigrationResult(DirectiveMigrationResultType.Directive, $"@inherits {attrValue.RemoveOuterQuotes()}") };
+                        return new[] { new DirectiveMigrationResult(DirectiveMigrationResultType.GeneralDirective, $"@inherits {attrValue.RemoveOuterQuotes()}") };
                     },
                     [TitleAttr] = attrValue =>
                     {
@@ -46,7 +46,7 @@ namespace CTA.WebForms2Blazor.DirectiveConverters
 
                         return new[]
                         {
-                            new DirectiveMigrationResult(DirectiveMigrationResultType.Directive, usingDirective),
+                            new DirectiveMigrationResult(DirectiveMigrationResultType.UsingDirective, usingDirective),
                             new DirectiveMigrationResult(DirectiveMigrationResultType.HTMLNode, titleTag)
                         };
                     },

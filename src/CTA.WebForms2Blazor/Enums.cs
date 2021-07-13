@@ -56,7 +56,8 @@ namespace CTA.WebForms2Blazor
     }
 
     public enum DirectiveMigrationResultType {
-        Directive,
+        UsingDirective,
+        GeneralDirective,
         Comment,
         HTMLNode
     }

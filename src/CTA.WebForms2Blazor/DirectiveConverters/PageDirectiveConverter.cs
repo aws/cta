@@ -31,7 +31,7 @@ namespace CTA.WebForms2Blazor.DirectiveConverters
 
             // TODO: Retrieve page route from routing service and use it populate pageRoute
 
-            return new DirectiveMigrationResult(DirectiveMigrationResultType.Directive, $"@page \"{pageRoute}\"");
+            return new DirectiveMigrationResult(DirectiveMigrationResultType.GeneralDirective, $"@page \"{pageRoute}\"");
         }
     }
 }

@@ -8,6 +8,7 @@ using CTA.WebForms2Blazor.ControlConverters;
 using CTA.WebForms2Blazor.FileInformationModel;
 using CTA.WebForms2Blazor.Helpers;
 using CTA.WebForms2Blazor.Helpers.ControlHelpers;
+using CTA.WebForms2Blazor.Services;
 using HtmlAgilityPack;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -15,12 +16,14 @@ namespace CTA.WebForms2Blazor.FileConverters
 {
     public class ViewFileConverter : FileConverter
     {
+        private ViewImportService _viewImportService;
         private List<ControlConversionAction> ControlActions;
         private string _relativeDirectory;
 
-        public ViewFileConverter(string sourceProjectPath, string fullPath) 
+        public ViewFileConverter(string sourceProjectPath, string fullPath, ViewImportService viewImportService) 
             : base(sourceProjectPath, fullPath)
         {
+            _viewImportService = viewImportService;
             _relativeDirectory = Path.GetDirectoryName(RelativePath);
             ControlActions = new List<ControlConversionAction>();
         }
