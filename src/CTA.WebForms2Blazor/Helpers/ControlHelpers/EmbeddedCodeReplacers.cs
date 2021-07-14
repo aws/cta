@@ -9,11 +9,31 @@ namespace CTA.WebForms2Blazor.Helpers.ControlHelpers
         public const string DirectiveNameRegexGroupName = "DirectiveName";
 
         //DataBind regex might have issue of taking front parentheses
+        /// <summary>
+        /// Regular expression to identify data binding syntax, matches start and end
+        /// tags (<%# and %>) with content that does not contain the end tag
+        /// </summary>
         public static Regex DataBindRegex = new Regex("<%#\\W*(?<expr>[^%>]*)\\s*%>");
+        /// <summary>
+        /// Regular expression to identify expression syntax, matches start and end
+        /// tags (<%: and %>) with content that does not contain the end tag
+        /// </summary>
         public static Regex SingleExpRegex = new Regex("<%:\\s*(?<expr>[^%>]*)\\s*%>");
+        /// <summary>
+        /// Regular expression to identify directive syntax, matches start and end
+        /// tags (<%@ and %>) with content that does not contain the end tag
+        /// </summary>
         public static Regex DirectiveRegex = new Regex("<%@\\s*(?<expr>[^%>]*)\\s*%>");
+        /// <summary>
+        /// Regular expression to identify asp expression syntax, matches start and end
+        /// tags (<%$ and %>) with content that does not contain the end tag
+        /// </summary>
         public static Regex AspExpRegex = new Regex("<%\\$\\s*(?<expr>[^%>]*)\\s*%>");
 
+        /// <summary>
+        /// Regular expression to identify directive name within directive syntax content,
+        /// maps directive name attribute to the first string of consecutive non-space characters
+        /// </summary>
         public static Regex DirectiveNameRegex = new Regex(@"(?<DirectiveName>[\S]+)");
 
         public static string ReplaceDataBind(Match m)
