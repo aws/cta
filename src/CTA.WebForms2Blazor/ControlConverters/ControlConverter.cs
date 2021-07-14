@@ -24,6 +24,7 @@ namespace CTA.WebForms2Blazor.ControlConverters
         
         public virtual HtmlNode Convert2Blazor(HtmlNode node)
         {
+            node.OwnerDocument.OptionOutputOriginalCase = true;
             return Convert2BlazorFromParts(NodeTemplate, BlazorName, GetNewAttributes(node.Attributes, NewAttributes), node.InnerHtml);
         }
 
@@ -53,11 +54,14 @@ namespace CTA.WebForms2Blazor.ControlConverters
             
             return convertedAttributes;
         }
+        
+        //private 
 
         protected HtmlNode Convert2BlazorFromParts(string template, string name, string attributes, string body)
         {
             string newContent = String.Format(template, name, attributes, body);
             HtmlNode newNode = HtmlNode.CreateNode(newContent);
+            newNode.OwnerDocument.OptionOutputOriginalCase = true;
             return newNode;
         }
         
@@ -81,6 +85,46 @@ namespace CTA.WebForms2Blazor.ControlConverters
             // var res = new HtmlDocument();
             // res.LoadHtml(htmlString);
             return htmlString;
+        }
+        
+        //This function only updates the first child node that matches the name,
+        //but for current purposes there should only be one matching node
+        protected bool UpdateInnerHtmlNode(HtmlNode outerNode, string targetName, 
+            string template = null, 
+            string newName = null, 
+            IEnumerable<String> newAttributes = null, 
+            string newBody = null)
+        {
+            var lowerName = targetName.ToLower();
+
+            //Ideally use .SelectSingleNode, but doesnt work with names with ':' character and is less flexible
+            //var selectedNode = node.SelectSingleNode(lowerName);
+            
+            var selectedNodes = outerNode.Descendants().Where(child =>
+            {
+                return child.Name.ToLower() == lowerName;
+            }).ToList();
+
+            if (selectedNodes.Count > 0)
+            {
+                template??= NodeTemplate;
+                newName??= targetName;
+                newAttributes??= new List<String>();
+                for (int i = 0; i < selectedNodes.Count; i++)
+                {
+                    var selectedNode = selectedNodes[i];
+                
+                
+                    var parent = selectedNode.ParentNode;
+                    var newNode = Convert2BlazorFromParts(template, newName, 
+                        GetNewAttributes(selectedNode.Attributes, newAttributes), newBody ?? selectedNode.InnerHtml);
+                    parent.ReplaceChild(newNode, selectedNode);
+                }
+
+                return true;
+            }
+
+            return false;
         }
     }
 }

@@ -35,8 +35,7 @@ namespace CTA.WebForms2Blazor.FileConverters
             
             //This will modify the HtmlDocument nodes that will then be changed to a file information object
             ConvertNodes();
-            
-            
+
             return htmlDoc;
         }
 
@@ -84,6 +83,8 @@ namespace CTA.WebForms2Blazor.FileConverters
             // only view layer, code behind will be created in another file
 
             HtmlDocument migratedDocument = GetRazorContents();
+            var nodes = migratedDocument.DocumentNode.Descendants();
+
             string contents = migratedDocument.DocumentNode.WriteTo();
             contents = ControlConverter.ConvertEmbeddedCode(contents);
 

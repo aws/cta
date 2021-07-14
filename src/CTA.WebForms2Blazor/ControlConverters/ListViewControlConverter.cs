@@ -13,7 +13,7 @@ namespace CTA.WebForms2Blazor.ControlConverters
                 return new Dictionary<string, string>()
                 {
                     ["id"] = "@ref",
-                    ["itemtype"] = "itemtype",
+                    ["itemtype"] = "ItemType",
                 };
             } 
         }
@@ -32,45 +32,11 @@ namespace CTA.WebForms2Blazor.ControlConverters
         {
             
         }
-        
-        //This function only updates the first child node that matches the name,
-        //but for current purposes there should only be one matching node
-        private bool UpdateInnerHtmlNode(HtmlNode node, string name, 
-            string template = null, 
-            string newName = null, 
-            IEnumerable<String> newAttributes = null, 
-            string newBody = null)
-        {
-            var lowerName = name.ToLower();
-
-            //Ideally use .SelectSingleNode, but doesnt work with names with ':' character and is less flexible
-            //var selectedNode = node.SelectSingleNode(lowerName);
-            
-            var selectedNodes = node.Descendants().Where(child =>
-            {
-                return child.Name.ToLower() == lowerName || child.Id.ToLower() == lowerName;
-            });
-            var selectedNode = selectedNodes.FirstOrDefault();
-
-            if (selectedNode != null)
-            {
-                template??= NodeTemplate;
-                newName??= name;
-                newAttributes??= new List<String>();
-                newBody ??= selectedNode.InnerHtml;
-                
-                var parent = selectedNode.ParentNode;
-                var newNode = Convert2BlazorFromParts(template, newName, 
-                    GetNewAttributes(selectedNode.Attributes, newAttributes), newBody);
-                parent.ReplaceChild(newNode, selectedNode);
-                return true;
-            }
-
-            return false;
-        }
 
         public override HtmlNode Convert2Blazor(HtmlNode node)
         {
+            node.OwnerDocument.OptionOutputOriginalCase = true;
+
             var itemPlaceHolderIdAttr = node.Attributes.AttributesWithName("itemplaceholderid").FirstOrDefault();
             var itemPlaceHolder = itemPlaceHolderIdAttr?.Value ?? string.Empty;
 
@@ -84,7 +50,9 @@ namespace CTA.WebForms2Blazor.ControlConverters
                 var success = UpdateInnerHtmlNode(node, "LayoutTemplate", newAttributes: layoutContextAttr);
                 if (success)
                 {
-                    UpdateInnerHtmlNode(node, itemPlaceHolder, template: "@{2}", newBody: itemPlaceHolder);
+                    //Could accidentally replace placeholders for other stuff with different IDs,
+                    //might need to add ID identifier as well
+                    UpdateInnerHtmlNode(node, "asp:PlaceHolder", template: "@{2}", newBody: itemPlaceHolder);
                 }
             }
             

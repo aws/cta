@@ -292,6 +292,7 @@ namespace CTA.WebForms2Blazor.Tests.FileConverters
             
             string newPath = Path.Combine(FileConverterSetupFixture.TestFilesDirectoryPath, "ListViewControlOnly.razor");
             string relativePath = Path.GetRelativePath(FileConverterSetupFixture.TestProjectPath, newPath);
+            relativePath = Path.Combine("Pages", relativePath);
 
             string expectedContents = @"<div class=""esh-table"">
     <ListView @ref=""productList"" ItemType=""eShopLegacyWebForms.Models.CatalogItem"" Context=""Item"">
@@ -328,12 +329,28 @@ namespace CTA.WebForms2Blazor.Tests.FileConverters
     </ListView>
 </div>";
             
-            //Assert.AreEqual(expectedContents, fileContents);
-            Assert.True(fileContents.Contains("listview"));
-            Assert.True(fileContents.Contains(@"context=""itemPlaceHolder"""));
+            Assert.AreEqual(expectedContents, fileContents);
+            Assert.True(fileContents.Contains("ListView"));
+            Assert.True(fileContents.Contains(@"Context=""itemPlaceHolder"""));
             Assert.False(fileContents.Contains("asp:ListView"));
             Assert.False(fileContents.Contains("asp:PlaceHolder"));
             Assert.IsTrue(fi.RelativePath.Equals(relativePath));
+        }
+
+        [Test]
+        public async Task TestViewFileConverter_Returns_GridView_Node()
+        {
+            FileConverter fc = new ViewFileConverter(FileConverterSetupFixture.TestProjectPath, 
+                FileConverterSetupFixture.TestGridViewControlFilePath);
+            
+            IEnumerable<FileInformation> fileList = await fc.MigrateFileAsync();
+            FileInformation fi = fileList.Single();
+            
+            byte[] bytes = fi.FileBytes;
+            var fileContents = Encoding.UTF8.GetString(bytes);
+            
+            string newPath = Path.Combine(FileConverterSetupFixture.TestFilesDirectoryPath, "GridViewControlOnly.razor");
+            string relativePath = Path.GetRelativePath(FileConverterSetupFixture.TestProjectPath, newPath);
         }
 
         [Test]
