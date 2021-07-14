@@ -83,8 +83,6 @@ namespace CTA.WebForms2Blazor.FileConverters
             // only view layer, code behind will be created in another file
 
             HtmlDocument migratedDocument = GetRazorContents();
-            var nodes = migratedDocument.DocumentNode.Descendants();
-
             string contents = migratedDocument.DocumentNode.WriteTo();
             contents = ControlConverter.ConvertEmbeddedCode(contents);
 

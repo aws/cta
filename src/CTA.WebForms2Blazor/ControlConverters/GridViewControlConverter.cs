@@ -45,6 +45,8 @@ namespace CTA.WebForms2Blazor.ControlConverters
                     ["NavigateUrl"]="NavigateUrl",
                     ["Target"]="Target",
                     ["Text"]="Text",
+                    ["ButtonType"]="ButtonType",
+                    ["CommandName"]="CommandName",
                 };
             } 
         }
@@ -73,24 +75,29 @@ namespace CTA.WebForms2Blazor.ControlConverters
             node.OwnerDocument.OptionOutputOriginalCase = true;
             
             var itemTypeAttr = node.Attributes.AttributesWithName("itemtype").FirstOrDefault();
+            bool hasItemType = itemTypeAttr != null;
             var itemType  = itemTypeAttr?.Value ?? "PleaseReplaceWithItemTypeHere";
 
-            IEnumerable<String> newItemTypeAttr = new List<String>()
+            IEnumerable<Attribute> newItemTypeAttr = new List<Attribute>()
             {
-                "ItemType=" + itemType
+                new Attribute("ItemType", itemType)
+                //"ItemType=" + itemType
             };
             foreach (string subControl in SubControls)
             {
+                //Todo: make sure not adding itemtype if already exists
                 UpdateInnerHtmlNode(node, "asp:" + subControl, newName: subControl, newAttributes: newItemTypeAttr);
             }
 
-            IEnumerable<String> itemTemplateContextAttr = new List<String>()
+            IEnumerable<Attribute> itemTemplateContextAttr = new List<Attribute>()
             {
-                "Context=Item"
+                new Attribute("Context", "Item")
+                //"Context=Item"
             };
             UpdateInnerHtmlNode(node, "ItemTemplate", newAttributes: itemTemplateContextAttr);
-
-            return base.Convert2Blazor(node);
+            
+            return Convert2BlazorFromParts(NodeTemplate, BlazorName, 
+                GetNewAttributes(node.Attributes, hasItemType ? null : newItemTypeAttr), node.InnerHtml);
         }   
     }
 }

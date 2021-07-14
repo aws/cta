@@ -10,7 +10,7 @@ namespace CTA.WebForms2Blazor.ControlConverters
         protected override Dictionary<string, string> AttributeMap { 
             get
             {
-                return new Dictionary<string, string>()
+                return new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase)
                 {
                     ["id"] = "@ref",
                     ["itemtype"] = "ItemType",
@@ -18,11 +18,11 @@ namespace CTA.WebForms2Blazor.ControlConverters
             } 
         }
 
-        protected override IEnumerable<String> NewAttributes
+        protected override IEnumerable<Attribute> NewAttributes
         {
             get
             {
-                return new List<String>() {"Context=Item"};
+                return new List<Attribute>() {new Attribute("Context", "Item")};
             }
         }
         
@@ -42,9 +42,10 @@ namespace CTA.WebForms2Blazor.ControlConverters
 
             if (!itemPlaceHolder.Equals(string.Empty))
             {
-                IEnumerable<String> layoutContextAttr = new List<String>()
+                IEnumerable<Attribute> layoutContextAttr = new List<Attribute>()
                 {
-                    "Context=" + itemPlaceHolder
+                    new Attribute("Context", itemPlaceHolder)
+                    //"Context=" + itemPlaceHolder
                 };
             
                 var success = UpdateInnerHtmlNode(node, "LayoutTemplate", newAttributes: layoutContextAttr);

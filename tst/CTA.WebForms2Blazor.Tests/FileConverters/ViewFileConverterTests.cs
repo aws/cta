@@ -217,10 +217,6 @@ namespace CTA.WebForms2Blazor.Tests.FileConverters
         </ItemTemplate>
     </asp:ListView>
 </div>";
-            // var htmlDoc = new HtmlDocument();
-            // htmlDoc.LoadHtml(htmlString);
-            // htmlDoc = ControlConverter.ConvertEmbeddedCode(htmlDoc);
-            
             string contents = ControlConverter.ConvertEmbeddedCode(htmlString);
 
             string expectedContents = @"<div class=""esh-table"">
@@ -258,12 +254,6 @@ namespace CTA.WebForms2Blazor.Tests.FileConverters
         </article>
     </div>
 </div>";
-            
-            var htmlDoc = new HtmlDocument();
-            htmlDoc.LoadHtml(htmlString);
-            // htmlDoc = ControlConverter.ConvertEmbeddedCode(htmlDoc);
-            //
-            // string contents = htmlDoc.DocumentNode.WriteTo();
             string contents = ControlConverter.ConvertEmbeddedCode(htmlString);
             string expectedContents = @"<div class=""esh-pager"">
     <div class=""container"">
@@ -351,6 +341,40 @@ namespace CTA.WebForms2Blazor.Tests.FileConverters
             
             string newPath = Path.Combine(FileConverterSetupFixture.TestFilesDirectoryPath, "GridViewControlOnly.razor");
             string relativePath = Path.GetRelativePath(FileConverterSetupFixture.TestProjectPath, newPath);
+            relativePath = Path.Combine("Pages", relativePath);
+
+            string expectedContents = @"<div>
+    <GridView @ref=""GridView1"" AutoGenerateColumns=""false"" ItemType=""People"" SelectMethod=""People.GetPeople"">
+        <Columns>
+            <BoundField DataField=""Name"" HeaderText=""First Name"" ItemType=""Random""></BoundField>
+            <BoundField DataField=""LastName"" HeaderText=""Last Name"" ItemType=""People""></BoundField>
+            <BoundField DataField=""Position"" HeaderText=""Person Type"" ItemType=""People""></BoundField>
+        </Columns>
+    </GridView>
+</div>
+<div>
+    <GridView AutoGenerateColumns=""false"" DataKeyNames=""CustomerID"" SelectMethod=""GetCustomers"" EmptyDataText=""No data available"" ItemType=""PleaseReplaceWithItemTypeHere"">
+        <Columns>
+            <BoundField DataField=""CustomerID"" HeaderText=""ID"" ItemType=""PleaseReplaceWithItemTypeHere""></BoundField>
+            <BoundField DataField=""CompanyName"" HeaderText=""CompanyName"" ItemType=""PleaseReplaceWithItemTypeHere""></BoundField>
+            <BoundField DataField=""FirstName"" HeaderText=""FirstName"" ItemType=""PleaseReplaceWithItemTypeHere""></BoundField>
+            <BoundField DataField=""LastName"" HeaderText=""LastName"" ItemType=""PleaseReplaceWithItemTypeHere""></BoundField>
+            <TemplateField ItemType=""PleaseReplaceWithItemTypeHere"">
+                <ItemTemplate Context=""Item"">
+                    <button type=""button"">Click Me! @(Item.Name )</button>
+                </ItemTemplate>
+            </TemplateField>
+            <ButtonField ButtonType=""Button"" DataTextField=""CompanyName"" DataTextFormatString=""{0}"" CommandName=""Customer"" ItemType=""PleaseReplaceWithItemTypeHere""></ButtonField>
+        </Columns>
+    </GridView>
+</div>";
+            
+            Assert.AreEqual(expectedContents, fileContents);
+            Assert.True(fileContents.Contains("GridView"));
+            Assert.True(fileContents.Contains(@"ref=""GridView1"""));
+            Assert.False(fileContents.Contains("asp:GridView"));
+            Assert.False(fileContents.Contains("asp:BoundField"));
+            Assert.IsTrue(fi.RelativePath.Equals(relativePath));
         }
 
         [Test]

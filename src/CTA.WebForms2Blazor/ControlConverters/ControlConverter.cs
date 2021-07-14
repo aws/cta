@@ -9,8 +9,35 @@ namespace CTA.WebForms2Blazor.ControlConverters
 {
     public abstract class ControlConverter
     {
+        protected class Attribute
+        {
+            public string Name { get; }
+            public string Value { get; }
+
+            public Attribute(string name, string value)
+            {
+                Name = name;
+                Value = value;
+            }
+
+            public override string ToString()
+            {
+                return Name + "=" + Value;
+            }
+
+            public bool Equals(Attribute other)
+            {
+                if (other is null)
+                {
+                    return false;
+                }
+                return this.Name == other.Name;
+            }
+            public override bool Equals(object obj) => Equals(obj as Attribute);
+            public override int GetHashCode() => (Name).GetHashCode();
+        }
         protected abstract Dictionary<String, String> AttributeMap { get; }
-        protected virtual IEnumerable<String> NewAttributes
+        protected virtual IEnumerable<Attribute> NewAttributes
         {
             get { return null; }
         }
@@ -29,17 +56,25 @@ namespace CTA.WebForms2Blazor.ControlConverters
         }
 
         protected virtual string GetNewAttributes(HtmlAttributeCollection oldAttributes,
-            IEnumerable<String> additionalAttributes)
+            IEnumerable<Attribute> additionalAttributes)
         {
-            additionalAttributes ??= new List<String>();
+            additionalAttributes ??= new List<Attribute>();
             var convertedAttributes = ConvertAttributes(oldAttributes);
-            var combinedAttributes = convertedAttributes.Concat(additionalAttributes);
             
-            var combinedAttributesString = string.Join(" ", combinedAttributes);
+            //This Union makes sures that if any attribute with the same name is added, only the original one is kept
+            var combinedAttributes = convertedAttributes.Union(additionalAttributes);
+
+            var attributeStringList = new List<String>();
+            foreach (Attribute attr in combinedAttributes)
+            {
+                attributeStringList.Add(attr.ToString());
+            }
+            
+            var combinedAttributesString = string.Join(" ", attributeStringList);
             return combinedAttributesString;
         }
 
-        protected IEnumerable<String> ConvertAttributes(HtmlAttributeCollection attributeCollection)
+        protected IEnumerable<Attribute> ConvertAttributes(HtmlAttributeCollection attributeCollection)
         {
             var convertedAttributes = attributeCollection
                 .Where(attr => AttributeMap.ContainsKey(attr.Name))
@@ -47,16 +82,16 @@ namespace CTA.WebForms2Blazor.ControlConverters
                 {
                     if (attr.QuoteType == AttributeValueQuote.DoubleQuote)
                     {
-                        return $"{AttributeMap[attr.Name]}=\"{attr.Value}\"";
+                        return new Attribute($"{AttributeMap[attr.Name]}", $"\"{attr.Value}\"");
+                        //return $"{AttributeMap[attr.Name]}=\"{attr.Value}\"";
                     }
-                    return $"{AttributeMap[attr.Name]}='{attr.Value}'";
+                    return new Attribute($"{AttributeMap[attr.Name]}", $"'{attr.Value}'");
+                    //return $"{AttributeMap[attr.Name]}='{attr.Value}'";
                 });
             
             return convertedAttributes;
         }
         
-        //private 
-
         protected HtmlNode Convert2BlazorFromParts(string template, string name, string attributes, string body)
         {
             string newContent = String.Format(template, name, attributes, body);
@@ -67,9 +102,6 @@ namespace CTA.WebForms2Blazor.ControlConverters
         
         public static string ConvertEmbeddedCode(string htmlString)
         {
-            // var documentNode = document;
-            // var htmlString = documentNode.WriteTo();
-
             MatchEvaluator dataBindEval = new MatchEvaluator(EmbeddedCodeReplacers.ReplaceDataBind);
             MatchEvaluator singleExprEval = new MatchEvaluator(EmbeddedCodeReplacers.ReplaceSingleExpr);
             MatchEvaluator directiveEval = new MatchEvaluator(EmbeddedCodeReplacers.ReplaceDirective);
@@ -81,9 +113,7 @@ namespace CTA.WebForms2Blazor.ControlConverters
 
             //Not implemented/used yet
             //htmlString = EmbeddedCodeReplacers.AspExpRegex.Replace(htmlString, aspExprEval);
-
-            // var res = new HtmlDocument();
-            // res.LoadHtml(htmlString);
+            
             return htmlString;
         }
         
@@ -92,7 +122,7 @@ namespace CTA.WebForms2Blazor.ControlConverters
         protected bool UpdateInnerHtmlNode(HtmlNode outerNode, string targetName, 
             string template = null, 
             string newName = null, 
-            IEnumerable<String> newAttributes = null, 
+            IEnumerable<Attribute> newAttributes = null, 
             string newBody = null)
         {
             var lowerName = targetName.ToLower();
@@ -109,11 +139,11 @@ namespace CTA.WebForms2Blazor.ControlConverters
             {
                 template??= NodeTemplate;
                 newName??= targetName;
-                newAttributes??= new List<String>();
+                newAttributes??= new List<Attribute>();
                 for (int i = 0; i < selectedNodes.Count; i++)
                 {
                     var selectedNode = selectedNodes[i];
-                
+                    
                 
                     var parent = selectedNode.ParentNode;
                     var newNode = Convert2BlazorFromParts(template, newName, 
