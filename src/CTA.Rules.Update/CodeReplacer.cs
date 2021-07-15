@@ -275,9 +275,6 @@ namespace CTA.Rules.Update
                 {
                     var actionValidationException = new ActionValidationException(action.Key, action.Name);
                     action.InvalidExecutions = 1;
-                    var originalAction = actions.FirstOrDefault(a => a.GetHashCode() == action.GetHashCode());
-                    if(originalAction != null) 
-                        originalAction.InvalidExecutions = 1;
                     LogHelper.LogError(actionValidationException);
                 }
             }
