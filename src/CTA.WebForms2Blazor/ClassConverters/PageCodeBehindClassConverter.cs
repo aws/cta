@@ -28,7 +28,7 @@ namespace CTA.WebForms2Blazor.ClassConverters
             _newLifecycleLines = new Dictionary<BlazorComponentLifecycleEvent, IEnumerable<StatementSyntax>>();
         }
 
-        public override async Task<IEnumerable<FileInformation>> MigrateClassAsync()
+        public override Task<IEnumerable<FileInformation>> MigrateClassAsync()
         {
             LogStart();
 
@@ -92,7 +92,9 @@ namespace CTA.WebForms2Blazor.ClassConverters
             DoCleanUp();
             LogEnd();
 
-            return new[] { new FileInformation(GetNewRelativePath(), Encoding.UTF8.GetBytes(fileText)) };
+            var result = new[] { new FileInformation(GetNewRelativePath(), Encoding.UTF8.GetBytes(fileText)) };
+
+            return Task.FromResult((IEnumerable<FileInformation>)result);
         }
 
         private string GetNewRelativePath()

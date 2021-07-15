@@ -80,7 +80,7 @@ namespace CTA.WebForms2Blazor.FileConverters
             }
         }
 
-        public override async Task<IEnumerable<FileInformation>> MigrateFileAsync()
+        public override Task<IEnumerable<FileInformation>> MigrateFileAsync()
         {
             LogStart();
 
@@ -112,12 +112,15 @@ namespace CTA.WebForms2Blazor.FileConverters
                 LogEnd();
 
                 // Stuff like Global.asax shouldn't create a Global.razor file
-                return Enumerable.Empty<FileInformation>();
+                return Task.FromResult(Enumerable.Empty<FileInformation>());
             }
 
             LogEnd();
 
-            return new List<FileInformation>() { new FileInformation(newRelativePath, Encoding.UTF8.GetBytes(contents)) };
+            var fileInfo = new FileInformation(newRelativePath, Encoding.UTF8.GetBytes(contents));
+            var result = new[] { fileInfo };
+
+            return Task.FromResult((IEnumerable<FileInformation>)result);
         }
     }
 }

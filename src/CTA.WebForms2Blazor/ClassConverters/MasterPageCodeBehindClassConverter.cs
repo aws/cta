@@ -26,7 +26,7 @@ namespace CTA.WebForms2Blazor.ClassConverters
             // TODO: Register with the necessary services
         }
 
-        public override async Task<IEnumerable<FileInformation>> MigrateClassAsync()
+        public override Task<IEnumerable<FileInformation>> MigrateClassAsync()
         {
             LogStart();
 
@@ -45,7 +45,9 @@ namespace CTA.WebForms2Blazor.ClassConverters
             DoCleanUp();
             LogEnd();
 
-            return new[] { new FileInformation(GetNewRelativePath(), Encoding.UTF8.GetBytes(CodeSyntaxHelper.GetFileSyntaxAsString(namespaceNode, usingStatements))) };
+            var result = new[] { new FileInformation(GetNewRelativePath(), Encoding.UTF8.GetBytes(CodeSyntaxHelper.GetFileSyntaxAsString(namespaceNode, usingStatements))) };
+
+            return Task.FromResult((IEnumerable<FileInformation>)result);
         }
 
         private string GetNewRelativePath()

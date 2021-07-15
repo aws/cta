@@ -42,7 +42,7 @@ namespace CTA.WebForms2Blazor.ClassConverters
             _lifecycleManager.NotifyExpectedMiddlewareSource();
         }
 
-        public override async Task<IEnumerable<FileInformation>> MigrateClassAsync()
+        public override Task<IEnumerable<FileInformation>> MigrateClassAsync()
         {
             LogStart();
 
@@ -113,7 +113,7 @@ namespace CTA.WebForms2Blazor.ClassConverters
             LogEnd();
 
             // TODO: Potentially remove certain folders from beginning of relative path
-            return fileInfoCollection;
+            return Task.FromResult((IEnumerable<FileInformation>)fileInfoCollection);
         }
 
         private FileInformation GetNewMiddlewareFileInformation(MethodDeclarationSyntax methodDeclaration, string middlewareName, bool isPreHandle = false, string originClass = null)
