@@ -1,4 +1,5 @@
 ﻿
+using System;
 using CTA.Rules.Models.Tokens;
 
 namespace CTA.Rules.Models
@@ -9,11 +10,11 @@ namespace CTA.Rules.Models
         public override bool Equals(object obj)
         {
             var token = (MemberAccessToken)obj;
-            return token.FullKey == this.FullKey;
+            return token?.FullKey == this.FullKey;
         }
         public override int GetHashCode()
         {
-            return 17 * FullKey.GetHashCode();
+            return HashCode.Combine(FullKey);
         }
     }
 }

@@ -481,10 +481,23 @@ namespace CTA.Rules.Analyzer
                 ObjectCreationExpressionGenericActionFunc = a.ObjectCreationExpressionGenericActionFunc
             }).ToList());
 
+            fileAction.ExpressionActions.UnionWith(token.ExpressionActions.Select(a => new ExpressionAction()
+            {
+                Key = !string.IsNullOrEmpty(overrideKey) ? overrideKey : a.Key,
+                Description = a.Description,
+                Value = a.Value,
+                Name = a.Name,
+                Type = a.Type,
+                TextSpan = textSpan,
+                ActionValidation = a.ActionValidation,
+                ExpressionActionFunc = a.ExpressionActionFunc
+            }).ToList());
+
 
             if (fileAction.AttributeActions.Any()
                 || fileAction.IdentifierNameActions.Any()
                 || fileAction.InvocationExpressionActions.Any()
+                || fileAction.ExpressionActions.Any()
                 || fileAction.ElementAccessActions.Any()
                 || fileAction.MemberAccessActions.Any()
                 || fileAction.Usingactions.Any()

@@ -18,11 +18,11 @@ namespace CTA.Rules.Actions
     public class ActionsLoader
     {
         private readonly List<MethodInfo> compilationUnitActions, attributeActions, attributeListActions, classActions,
-        identifierNameActions, invocationExpressionActions, methodDeclarationActions, elementAccessActions,
+        identifierNameActions, invocationExpressionActions, expressionActions, methodDeclarationActions, elementAccessActions,
         objectCreationExpressionActions, memberAccessActions, namespaceActions, projectLevelActions, projectFileActions, interfaceActions;
 
         private readonly object attributeObject, attributeListObject, classObject, interfaceObject, compilationUnitObject, identifierNameObject
-            , invocationExpressionObject, methodDeclarationObject, elementAccessObject, memberAccessObject, objectExpressionObject, namespaceObject, projectLevelObject,
+            , invocationExpressionObject, expressionObject, methodDeclarationObject, elementAccessObject, memberAccessObject, objectExpressionObject, namespaceObject, projectLevelObject,
             projectFileObject;
 
         /// <summary>
@@ -37,6 +37,7 @@ namespace CTA.Rules.Actions
             classActions = new List<MethodInfo>();
             identifierNameActions = new List<MethodInfo>();
             invocationExpressionActions = new List<MethodInfo>();
+            expressionActions = new List<MethodInfo>();
             methodDeclarationActions = new List<MethodInfo>();
             elementAccessActions = new List<MethodInfo>();
             memberAccessActions = new List<MethodInfo>();
@@ -78,6 +79,7 @@ namespace CTA.Rules.Actions
                     compilationUnitObject = Activator.CreateInstance(types.FirstOrDefault(t => t.Name == Constants.CompilationUnitActions));
                     identifierNameObject = Activator.CreateInstance(types.FirstOrDefault(t => t.Name == Constants.IdentifierNameActions));
                     invocationExpressionObject = Activator.CreateInstance(types.FirstOrDefault(t => t.Name == Constants.InvocationExpressionActions));
+                    expressionObject = Activator.CreateInstance(types.FirstOrDefault(t => t.Name == Constants.ExpressionActions));
                     methodDeclarationObject = Activator.CreateInstance(types.FirstOrDefault(t => t.Name == Constants.MethodDeclarationActions));
                     elementAccessObject = Activator.CreateInstance(types.FirstOrDefault(t => t.Name == Constants.ElementAccessActions));
                     memberAccessObject = Activator.CreateInstance(types.FirstOrDefault(t => t.Name == Constants.MemberAccessActions));
@@ -125,6 +127,11 @@ namespace CTA.Rules.Actions
                             case Constants.InvocationExpressionActions:
                                 {
                                     invocationExpressionActions.AddRange(GetFuncMethods(t));
+                                    break;
+                                }
+                            case Constants.ExpressionActions:
+                                {
+                                    expressionActions.AddRange(GetFuncMethods(t));
                                     break;
                                 }
                             case Constants.MethodDeclarationActions:
@@ -204,6 +211,9 @@ namespace CTA.Rules.Actions
         public Func<SyntaxGenerator, InvocationExpressionSyntax, InvocationExpressionSyntax> GetInvocationExpressionAction(string name, dynamic value) =>
             GetAction<Func<SyntaxGenerator, InvocationExpressionSyntax, InvocationExpressionSyntax>>
                 (invocationExpressionActions, invocationExpressionObject, name, value);
+        public Func<SyntaxGenerator, SyntaxNode, SyntaxNode> GetExpressionAction(string name, dynamic value) =>
+            GetAction<Func<SyntaxGenerator, SyntaxNode, SyntaxNode>>
+                (expressionActions, expressionObject, name, value);
         public Func<SyntaxGenerator, MethodDeclarationSyntax, MethodDeclarationSyntax> GetMethodDeclarationAction(string name, dynamic value) =>
             GetAction<Func<SyntaxGenerator, MethodDeclarationSyntax, MethodDeclarationSyntax>>
                 (methodDeclarationActions, methodDeclarationObject, name, value);

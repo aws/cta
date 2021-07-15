@@ -53,6 +53,10 @@ namespace CTA.Rules.Models
                 {
                     actions.Add(action.Description);
                 }
+                foreach (var action in fileAction.ExpressionActions)
+                {
+                    actions.Add(action.Description);
+                }
                 foreach (var action in fileAction.MemberAccessActions)
                 {
                     actions.Add(action.Description);
@@ -113,6 +117,10 @@ namespace CTA.Rules.Models
                     actions.Add(string.Concat(action.Type, ":", action.Name, ":", action.Key));
                 }
                 foreach (var action in fileAction.InvocationExpressionActions)
+                {
+                    actions.Add(string.Concat(action.Type, ":", action.Name, ":", action.Key));
+                }
+                foreach (var action in fileAction.ExpressionActions)
                 {
                     actions.Add(string.Concat(action.Type, ":", action.Name, ":", action.Key));
                 }

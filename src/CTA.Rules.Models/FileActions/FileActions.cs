@@ -13,6 +13,7 @@ namespace CTA.Rules.Models
             ElementAccessActions = new HashSet<ElementAccessAction>();
             IdentifierNameActions = new HashSet<IdentifierNameAction>();
             InvocationExpressionActions = new HashSet<InvocationExpressionAction>();
+            ExpressionActions = new HashSet<ExpressionAction>();
             MemberAccessActions = new HashSet<MemberAccessAction>();
             Usingactions = new HashSet<UsingAction>();
             NamespaceActions = new HashSet<NamespaceAction>();
@@ -31,6 +32,7 @@ namespace CTA.Rules.Models
         public HashSet<ElementAccessAction> ElementAccessActions { get; set; }
         public HashSet<IdentifierNameAction> IdentifierNameActions { get; set; }
         public HashSet<InvocationExpressionAction> InvocationExpressionActions { get; set; }
+        public HashSet<ExpressionAction> ExpressionActions { get; set; }
         public HashSet<MemberAccessAction> MemberAccessActions { get; set; }
         public HashSet<ObjectCreationExpressionAction> ObjectCreationExpressionActions { get; set; }
         public HashSet<UsingAction> Usingactions { get; set; }
@@ -50,6 +52,7 @@ namespace CTA.Rules.Models
                 allActions.AddRange(MemberAccessActions);
                 allActions.AddRange(IdentifierNameActions);
                 allActions.AddRange(InvocationExpressionActions);
+                allActions.AddRange(ExpressionActions);
                 allActions.AddRange(MemberAccessActions);
                 allActions.AddRange(Usingactions);
                 allActions.AddRange(ObjectCreationExpressionActions);

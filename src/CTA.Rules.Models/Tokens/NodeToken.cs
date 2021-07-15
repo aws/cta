@@ -15,6 +15,7 @@ namespace CTA.Rules.Models.Tokens
             UsingActions = new List<UsingAction>();
             IdentifierNameActions = new List<IdentifierNameAction>();
             InvocationExpressionActions = new List<InvocationExpressionAction>();
+            ExpressionActions = new List<ExpressionAction>();
             MethodDeclarationActions = new List<MethodDeclarationAction>();
             ElementAccessActions = new List<ElementAccessAction>();
             MemberAccessActions = new List<MemberAccessAction>();
@@ -46,6 +47,7 @@ namespace CTA.Rules.Models.Tokens
         public List<UsingAction> UsingActions { get; set; }
         public List<IdentifierNameAction> IdentifierNameActions { get; set; }
         public List<InvocationExpressionAction> InvocationExpressionActions { get; set; }
+        public List<ExpressionAction> ExpressionActions { get; set; }
         public List<NamespaceAction> NamespaceActions { get; set; }
         public List<ObjectCreationExpressionAction> ObjectCreationExpressionActions { get; set; }
         public List<PackageAction> PackageActions { get; set; }
@@ -67,6 +69,7 @@ namespace CTA.Rules.Models.Tokens
             cloned.UsingActions = cloned.UsingActions.Select(action => action.Clone<UsingAction>()).ToList();
             cloned.IdentifierNameActions = cloned.IdentifierNameActions.Select(action => action.Clone<IdentifierNameAction>()).ToList();
             cloned.InvocationExpressionActions = cloned.InvocationExpressionActions.Select(action => action.Clone<InvocationExpressionAction>()).ToList();
+            cloned.ExpressionActions = cloned.ExpressionActions.Select(action => action.Clone<ExpressionAction>()).ToList();
             cloned.NamespaceActions = cloned.NamespaceActions.Select(action => action.Clone<NamespaceAction>()).ToList();
             cloned.ObjectCreationExpressionActions = cloned.ObjectCreationExpressionActions.Select(action => action.Clone<ObjectCreationExpressionAction>()).ToList();
             cloned.PackageActions = cloned.PackageActions.Select(action => action.Clone()).ToList();
@@ -89,6 +92,7 @@ namespace CTA.Rules.Models.Tokens
                 allActions.AddRange(MemberAccessActions);
                 allActions.AddRange(IdentifierNameActions);
                 allActions.AddRange(InvocationExpressionActions);
+                allActions.AddRange(ExpressionActions);
                 allActions.AddRange(MemberAccessActions);
                 allActions.AddRange(UsingActions);
                 allActions.AddRange(ObjectCreationExpressionActions);

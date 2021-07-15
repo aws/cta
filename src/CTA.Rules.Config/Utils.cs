@@ -16,16 +16,6 @@ namespace CTA.Rules.Config
     {
         private const string DefaultMutexName = "DefaultMutex";
 
-        public static int GenerateHashCode(int prime, string str)
-        {
-            int hash = 0;
-            if (!string.IsNullOrEmpty(str))
-            {
-                hash = prime * str.GetHashCode();
-            }
-            return hash;
-        }
-
         public static byte[] DownloadFromGitHub(string owner, string repo, string tag)
         {
             using var client = new HttpClient();
