@@ -41,6 +41,12 @@ namespace CTA.WebForms2Blazor.Helpers.ControlHelpers
         /// (<%-- and --%>) with content that does not contain the end tag
         /// </summary>
         public static Regex AspCommentRegex = new Regex(@"<%--\s*(?<expr>(?:(?!--%>).)*)\s*--%>");
+        /// <summary>
+        /// Regular expression to identify code block syntax, matches start and end
+        /// tags (<%# and %>) with content that does not contain the end tag and has
+        /// extra conditions to ensure other embedding syntaxes aren't matched accidentally
+        /// </summary>
+        public static Regex EmbeddedCodeBlockRegex = new Regex(@"<%(?!(?:--)|[#=:@\$]).\s*(?<expr>(?:(?!%>).)*)\s*%>");
 
         /// <summary>
         /// Regular expression to identify directive name within directive syntax content,
@@ -50,22 +56,30 @@ namespace CTA.WebForms2Blazor.Helpers.ControlHelpers
 
         public static string ReplaceOneWayDataBinds(string htmlString)
         {
-            return DataBindRegex.Replace(htmlString, match => ConstructOneWayBinding(match.Groups[EmbeddedExpressionRegexGroupName].Value));
+            return DataBindRegex.Replace(htmlString, match => string.Format(
+                Constants.RazorExplicitEmbeddingTemplate,
+                match.Groups[EmbeddedExpressionRegexGroupName].Value.Trim()));
         }
         
         public static string ReplaceRawExprs(string htmlString)
         {
-            return RawExprRegex.Replace(htmlString, match => ConstructRawOneWayBinding(match.Groups[EmbeddedExpressionRegexGroupName].Value));
+            return RawExprRegex.Replace(htmlString, match => string.Format(
+                Constants.RazorExplicitRawEmbeddingTemplate,
+                match.Groups[EmbeddedExpressionRegexGroupName].Value.Trim()));
         }
 
         public static string ReplaceHTMLEncodedExprs(string htmlString)
         {
-            return HTMLEncodedExprRegex.Replace(htmlString, match => ConstructOneWayBinding(match.Groups[EmbeddedExpressionRegexGroupName].Value));
+            return HTMLEncodedExprRegex.Replace(htmlString, match => string.Format(
+                Constants.RazorExplicitEmbeddingTemplate,
+                match.Groups[EmbeddedExpressionRegexGroupName].Value.Trim()));
         }
         
         public static string ReplaceDirectives(string htmlString, ViewImportService viewImportService)
         {
-            return DirectiveRegex.Replace(htmlString, match => ConstructBlazorDirectives(match.Groups[EmbeddedExpressionRegexGroupName].Value, viewImportService));
+            return DirectiveRegex.Replace(htmlString, match => ConstructBlazorDirectives(
+                match.Groups[EmbeddedExpressionRegexGroupName].Value,
+                viewImportService));
         }
         
         public static string ReplaceAspExprs(string htmlString)
@@ -83,22 +97,22 @@ namespace CTA.WebForms2Blazor.Helpers.ControlHelpers
 
         public static string ReplaceAspComments(string htmlString)
         {
-            return AspCommentRegex.Replace(htmlString, match => ConstructRazorServerSideComment(match.Groups[EmbeddedExpressionRegexGroupName].Value));
+            return AspCommentRegex.Replace(htmlString, match => string.Format(
+                Constants.RazorServerSideCommentTemplate,
+                match.Groups[EmbeddedExpressionRegexGroupName].Value.Trim()));
         }
 
-        public static string ConstructRawOneWayBinding(string content)
+        public static string ReplaceEmbeddedCodeBlocks(string htmlString)
         {
-            return string.Format(Constants.RazorExplicitRawEmbeddingTemplate, content.Trim());
-        }
+            // TODO: Insert @for, @if, etc. if embedded code contains a conditional
+            // or loop statement. This is difficult to do because separation of the
+            // statements from each other and the normal statements in the block may
+            // cause issues especially considering that multiple embedded blocks can
+            // contain different parts of the same loop or condition
 
-        public static string ConstructOneWayBinding(string content)
-        {
-            return string.Format(Constants.RazorExplicitEmbeddingTemplate, content.Trim());
-        }
-
-        public static string ConstructRazorServerSideComment(string content)
-        {
-            return string.Format(Constants.RazorServerSideCommentTemplate, content.Trim());
+            return EmbeddedCodeBlockRegex.Replace(htmlString, match => string.Format(
+                Constants.RazorCodeBlockEmbeddingTemplate,
+                match.Groups[EmbeddedExpressionRegexGroupName].Value.Trim()));
         }
 
         public static string ConstructBlazorDirectives(string content, ViewImportService viewImportService)

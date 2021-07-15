@@ -44,15 +44,15 @@ namespace CTA.WebForms2Blazor.Tests.FileConverters
                 </a>
             </nav>
             <td>
-                <a href='@(GetRouteUrl(""EditProductRoute"", new {id =Item.Id}) )' class=""esh-table-link"">
+                <a href='@(GetRouteUrl(""EditProductRoute"", new {id =Item.Id}))' class=""esh-table-link"">
                     Edit
                 </a>
                 |
-                <a href='@(GetRouteUrl(""ProductDetailsRoute"", new {id =Item.Id}) )' class=""esh-table-link"">
+                <a href='@(GetRouteUrl(""ProductDetailsRoute"", new {id =Item.Id}))' class=""esh-table-link"">
                     Details
                 </a>
                 |
-                <a href='@(GetRouteUrl(""DeleteProductRoute"", new {id =Item.Id}) )' class=""esh-table-link"">
+                <a href='@(GetRouteUrl(""DeleteProductRoute"", new {id =Item.Id}))' class=""esh-table-link"">
                     Delete
                 </a>
             </td>
@@ -234,7 +234,7 @@ namespace CTA.WebForms2Blazor.Tests.FileConverters
                     @(Item.MaxStockThreshold)
                 </p>
                 <td>
-                    <asp:HyperLink NavigateUrl='@(GetRouteUrl(""EditProductRoute"", new {id =Item.Id}) )' runat=""server"" CssClass=""esh-table-link"">
+                    <asp:HyperLink NavigateUrl='@(GetRouteUrl(""EditProductRoute"", new {id =Item.Id}))' runat=""server"" CssClass=""esh-table-link"">
                         Edit
                     </asp:HyperLink>
                 </td>

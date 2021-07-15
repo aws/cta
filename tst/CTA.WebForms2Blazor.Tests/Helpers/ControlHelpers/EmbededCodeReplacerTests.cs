@@ -20,6 +20,7 @@ namespace CTA.WebForms2Blazor.Tests.Helpers.ControlHelpers
         private const string WebFormsDirectiveStartTag = "<%@";
         private const string WebFormsAspExpressionStartTag = "<%$";
         private const string WebFormsCommentStartTag = "<%--";
+        private const string WebFormsCodeBlockStartTag = "<%";
         private const string WebFormsNormalEndTag = "%>";
         private const string WebFormsCommentEndTag = "--%>";
         private const string WebFormsMalformedEndTag = "/>";
@@ -29,6 +30,8 @@ namespace CTA.WebForms2Blazor.Tests.Helpers.ControlHelpers
         private const string RazorExplicitBindingEndTag = ")";
         private const string RazorCommentStartTag = "@*";
         private const string RazorCommentEndTag = "*@";
+        private const string RazorCodeBlockStartTag = "@{";
+        private const string RazorCodeBlockEndTag = "}";
 
         [Test]
         public void DataBindRegex_Matches_Normal_Correct_Expressions()
@@ -167,6 +170,34 @@ namespace CTA.WebForms2Blazor.Tests.Helpers.ControlHelpers
         }
 
         [Test]
+        public void EmbeddedCodeBlockRegex_Matches_Normal_Correct_Expressions()
+        {
+            var inputText = $"{WebFormsCodeBlockStartTag} {NormalExpressionContent} {WebFormsNormalEndTag}";
+
+            Assert.True(EmbeddedCodeReplacers.EmbeddedCodeBlockRegex.IsMatch(inputText));
+        }
+
+        [Test]
+        public void EmbeddedCodeBlockRegex_Matches_Expressions_With_Characters_Mutual_To_Tag_Braces()
+        {
+            var inputText = $"{WebFormsCodeBlockStartTag} {MutualTagCharExpressionContent} {WebFormsNormalEndTag}";
+
+            Assert.True(EmbeddedCodeReplacers.EmbeddedCodeBlockRegex.IsMatch(inputText));
+        }
+
+        [Test]
+        public void EmbeddedCodeBlockRegex_Does_Not_Match_Other_Embedding_Syntaxes()
+        {
+            var directiveSyntax = $"{WebFormsDirectiveStartTag} {NormalExpressionContent} {WebFormsNormalEndTag}";
+            var commentSyntax = $"{WebFormsCommentStartTag} {NormalExpressionContent} {WebFormsCommentEndTag}";
+            var aspExprSyntax = $"{WebFormsAspExpressionStartTag} {AppSettingsAspExpressionType}: {AppSettingsAspExpressionContent} {WebFormsNormalEndTag}";
+
+            Assert.False(EmbeddedCodeReplacers.EmbeddedCodeBlockRegex.IsMatch(directiveSyntax));
+            Assert.False(EmbeddedCodeReplacers.EmbeddedCodeBlockRegex.IsMatch(commentSyntax));
+            Assert.False(EmbeddedCodeReplacers.EmbeddedCodeBlockRegex.IsMatch(aspExprSyntax));
+        }
+
+        [Test]
         public void ReplaceOneWayDataBinds_Properly_Reformats_Tag()
         {
             var inputText = $"{WebFormsOneWayDataBindStartTag} {NormalExpressionContent} {WebFormsNormalEndTag}";
@@ -222,6 +253,16 @@ namespace CTA.WebForms2Blazor.Tests.Helpers.ControlHelpers
             var inputText = $"{WebFormsCommentStartTag} {NormalExpressionContent} {WebFormsCommentEndTag}";
             var expectedOutput = $"{RazorCommentStartTag} {NormalExpressionContent} {RazorCommentEndTag}";
             var actualOutput = EmbeddedCodeReplacers.ReplaceAspComments(inputText);
+
+            Assert.AreEqual(expectedOutput, actualOutput);
+        }
+
+        [Test]
+        public void ReplaceEmbeddedCodeBlocks_Properly_Reformats_Code_Blocks()
+        {
+            var inputText = $"{WebFormsCodeBlockStartTag} {NormalExpressionContent} {WebFormsNormalEndTag}";
+            var expectedOutput = $"{RazorCodeBlockStartTag} {NormalExpressionContent} {RazorCodeBlockEndTag}";
+            var actualOutput = EmbeddedCodeReplacers.ReplaceEmbeddedCodeBlocks(inputText);
 
             Assert.AreEqual(expectedOutput, actualOutput);
         }

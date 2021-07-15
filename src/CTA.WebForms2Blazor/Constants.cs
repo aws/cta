@@ -70,6 +70,7 @@
         // View Text Templates
         public const string MarkupCommentTemplate = "<!-- {0} -->";
         public const string RazorServerSideCommentTemplate = "@* {0} *@";
+        public const string RazorCodeBlockEmbeddingTemplate = "@{{ {0} }}";
         public const string RazorExplicitEmbeddingTemplate = "@({0})";
         public const string RazorExplicitRawEmbeddingTemplate = "@(new MarkupString({0}))";
         public const string RazorConfigurationAccessTemplate = "@(Configuration[\"{0}\"])";
