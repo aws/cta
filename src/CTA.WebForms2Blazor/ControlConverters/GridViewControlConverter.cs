@@ -1,12 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using CTA.WebForms2Blazor.Helpers.ControlHelpers;
 using HtmlAgilityPack;
 
 namespace CTA.WebForms2Blazor.ControlConverters
 {
     public class GridViewControlConverter : ControlConverter
     {
+        private const string ItemTypeAttributeName = "ItemType";
+        private const string ItemTemplateNodeName = "ItemTemplate";
+        private const string TempItemType = "PleaseReplaceWithActualItemTypeHere";
         protected override Dictionary<string, string> AttributeMap { 
             get
             {
@@ -74,30 +78,30 @@ namespace CTA.WebForms2Blazor.ControlConverters
         {
             node.OwnerDocument.OptionOutputOriginalCase = true;
             
-            var itemTypeAttr = node.Attributes.AttributesWithName("itemtype").FirstOrDefault();
+            var itemTypeAttr = node.Attributes.AttributesWithName(ItemTypeAttributeName).FirstOrDefault();
             bool hasItemType = itemTypeAttr != null;
-            var itemType  = itemTypeAttr?.Value ?? "PleaseReplaceWithItemTypeHere";
+            var itemType  = itemTypeAttr?.Value ?? TempItemType;
 
-            IEnumerable<Attribute> newItemTypeAttr = new List<Attribute>()
+            IEnumerable<ViewLayerControlAttribute> newItemTypeAttr = new List<ViewLayerControlAttribute>()
             {
-                new Attribute("ItemType", itemType)
-                //"ItemType=" + itemType
+                new ViewLayerControlAttribute(ItemTypeAttributeName, itemType)
             };
+            
             foreach (string subControl in SubControls)
             {
-                //Todo: make sure not adding itemtype if already exists
-                UpdateInnerHtmlNode(node, "asp:" + subControl, newName: subControl, newAttributes: newItemTypeAttr);
+                var aspControlName = Constants.AspControlTag + subControl;
+                UpdateInnerHtmlNode(node, aspControlName, newName: subControl, addedAttributes: newItemTypeAttr);
             }
 
-            IEnumerable<Attribute> itemTemplateContextAttr = new List<Attribute>()
+            IEnumerable<ViewLayerControlAttribute> itemTemplateContextAttr = new List<ViewLayerControlAttribute>()
             {
-                new Attribute("Context", "Item")
-                //"Context=Item"
+                new ViewLayerControlAttribute("Context", "Item")
             };
-            UpdateInnerHtmlNode(node, "ItemTemplate", newAttributes: itemTemplateContextAttr);
-            
-            return Convert2BlazorFromParts(NodeTemplate, BlazorName, 
-                GetNewAttributes(node.Attributes, hasItemType ? null : newItemTypeAttr), node.InnerHtml);
+            UpdateInnerHtmlNode(node, ItemTemplateNodeName, addedAttributes: itemTemplateContextAttr);
+
+            var attrToBeAdded = hasItemType ? null : newItemTypeAttr;
+            var joinedAttributesString = JoinAllAttributes(node.Attributes, attrToBeAdded);
+            return Convert2BlazorFromParts(NodeTemplate, BlazorName, joinedAttributesString, node.InnerHtml);
         }   
     }
 }

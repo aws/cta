@@ -4,42 +4,16 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using CTA.WebForms2Blazor.Helpers.ControlHelpers;
 using HtmlAgilityPack;
+using Microsoft.DotNet.PlatformAbstractions;
 
 namespace CTA.WebForms2Blazor.ControlConverters
 {
     public abstract class ControlConverter
     {
-        protected class Attribute
-        {
-            public string Name { get; }
-            public string Value { get; }
-
-            public Attribute(string name, string value)
-            {
-                Name = name;
-                Value = value;
-            }
-
-            public override string ToString()
-            {
-                return Name + "=" + Value;
-            }
-
-            public bool Equals(Attribute other)
-            {
-                if (other is null)
-                {
-                    return false;
-                }
-                return this.Name == other.Name;
-            }
-            public override bool Equals(object obj) => Equals(obj as Attribute);
-            public override int GetHashCode() => (Name).GetHashCode();
-        }
         protected abstract Dictionary<String, String> AttributeMap { get; }
-        protected virtual IEnumerable<Attribute> NewAttributes
+        protected virtual IEnumerable<ViewLayerControlAttribute> NewAttributes
         {
-            get { return null; }
+            get { return new List<ViewLayerControlAttribute>(); }
         }
         protected abstract string BlazorName { get; }
         protected virtual string NodeTemplate { get { return @"<{0} {1}>{2}</{0}>"; } }
@@ -51,30 +25,26 @@ namespace CTA.WebForms2Blazor.ControlConverters
         
         public virtual HtmlNode Convert2Blazor(HtmlNode node)
         {
+            //This ensures that the newNode will output the original case when called by .WriteTo()
             node.OwnerDocument.OptionOutputOriginalCase = true;
-            return Convert2BlazorFromParts(NodeTemplate, BlazorName, GetNewAttributes(node.Attributes, NewAttributes), node.InnerHtml);
+            
+            return Convert2BlazorFromParts(NodeTemplate, BlazorName, JoinAllAttributes(node.Attributes, NewAttributes), node.InnerHtml);
         }
 
-        protected virtual string GetNewAttributes(HtmlAttributeCollection oldAttributes,
-            IEnumerable<Attribute> additionalAttributes)
+        protected virtual string JoinAllAttributes(HtmlAttributeCollection oldAttributes,
+            IEnumerable<ViewLayerControlAttribute> additionalAttributes)
         {
-            additionalAttributes ??= new List<Attribute>();
             var convertedAttributes = ConvertAttributes(oldAttributes);
             
             //This Union makes sures that if any attribute with the same name is added, only the original one is kept
-            var combinedAttributes = convertedAttributes.Union(additionalAttributes);
-
-            var attributeStringList = new List<String>();
-            foreach (Attribute attr in combinedAttributes)
-            {
-                attributeStringList.Add(attr.ToString());
-            }
+            var combinedAttributes = additionalAttributes == null ? convertedAttributes : convertedAttributes.Union(additionalAttributes);
             
+            var attributeStringList = combinedAttributes.Select(attr => attr.ToString());
             var combinedAttributesString = string.Join(" ", attributeStringList);
             return combinedAttributesString;
         }
 
-        protected IEnumerable<Attribute> ConvertAttributes(HtmlAttributeCollection attributeCollection)
+        protected IEnumerable<ViewLayerControlAttribute> ConvertAttributes(HtmlAttributeCollection attributeCollection)
         {
             var convertedAttributes = attributeCollection
                 .Where(attr => AttributeMap.ContainsKey(attr.Name))
@@ -82,11 +52,9 @@ namespace CTA.WebForms2Blazor.ControlConverters
                 {
                     if (attr.QuoteType == AttributeValueQuote.DoubleQuote)
                     {
-                        return new Attribute($"{AttributeMap[attr.Name]}", $"\"{attr.Value}\"");
-                        //return $"{AttributeMap[attr.Name]}=\"{attr.Value}\"";
+                        return new ViewLayerControlAttribute($"{AttributeMap[attr.Name]}", $"\"{attr.Value}\"");
                     }
-                    return new Attribute($"{AttributeMap[attr.Name]}", $"'{attr.Value}'");
-                    //return $"{AttributeMap[attr.Name]}='{attr.Value}'";
+                    return new ViewLayerControlAttribute($"{AttributeMap[attr.Name]}", $"'{attr.Value}'");
                 });
             
             return convertedAttributes;
@@ -96,7 +64,10 @@ namespace CTA.WebForms2Blazor.ControlConverters
         {
             string newContent = String.Format(template, name, attributes, body);
             HtmlNode newNode = HtmlNode.CreateNode(newContent);
+            
+            //This ensures that the newNode will output the correct case when called by .WriteTo()
             newNode.OwnerDocument.OptionOutputOriginalCase = true;
+            
             return newNode;
         }
         
@@ -117,44 +88,46 @@ namespace CTA.WebForms2Blazor.ControlConverters
             return htmlString;
         }
         
-        //This function only updates the first child node that matches the name,
-        //but for current purposes there should only be one matching node
-        protected bool UpdateInnerHtmlNode(HtmlNode outerNode, string targetName, 
+        //This function only updates the all child nodes that matches the name
+        public bool UpdateInnerHtmlNode(HtmlNode outerNode, string targetName, string id = null,
             string template = null, 
             string newName = null, 
-            IEnumerable<Attribute> newAttributes = null, 
+            IEnumerable<ViewLayerControlAttribute> addedAttributes = null, 
             string newBody = null)
         {
-            var lowerName = targetName.ToLower();
-
-            //Ideally use .SelectSingleNode, but doesnt work with names with ':' character and is less flexible
-            //var selectedNode = node.SelectSingleNode(lowerName);
-            
             var selectedNodes = outerNode.Descendants().Where(child =>
             {
-                return child.Name.ToLower() == lowerName;
+                return String.Equals(child.Name, targetName, StringComparison.InvariantCultureIgnoreCase);
             }).ToList();
-
-            if (selectedNodes.Count > 0)
+            if (!string.IsNullOrEmpty(id))
             {
-                template??= NodeTemplate;
-                newName??= targetName;
-                newAttributes??= new List<Attribute>();
-                for (int i = 0; i < selectedNodes.Count; i++)
+                selectedNodes = outerNode.Descendants().Where(child =>
                 {
-                    var selectedNode = selectedNodes[i];
+                    return String.Equals(child.Name, targetName, StringComparison.InvariantCultureIgnoreCase) &&
+                           String.Equals(child.Id, id, StringComparison.InvariantCultureIgnoreCase);
+                }).ToList();
+            }
+            
+            if (selectedNodes.Count == 0)
+            {
+                return false;
+            }
+            
+            template ??= NodeTemplate;
+            newName ??= targetName;
+            for (int i = 0; i < selectedNodes.Count; i++)
+            {
+                var selectedNode = selectedNodes[i];
+                var parent = selectedNode.ParentNode;
                     
-                
-                    var parent = selectedNode.ParentNode;
-                    var newNode = Convert2BlazorFromParts(template, newName, 
-                        GetNewAttributes(selectedNode.Attributes, newAttributes), newBody ?? selectedNode.InnerHtml);
-                    parent.ReplaceChild(newNode, selectedNode);
-                }
-
-                return true;
+                var joinedAttributesString = JoinAllAttributes(selectedNode.Attributes, addedAttributes);
+                var bodyContent = newBody ?? selectedNode.InnerHtml;
+                var newNode = Convert2BlazorFromParts(template, newName, joinedAttributesString, bodyContent);
+                    
+                parent.ReplaceChild(newNode, selectedNode);
             }
 
-            return false;
+            return true;
         }
     }
 }

@@ -285,7 +285,7 @@ namespace CTA.WebForms2Blazor.Tests.FileConverters
             relativePath = Path.Combine("Pages", relativePath);
 
             string expectedContents = @"<div class=""esh-table"">
-    <ListView @ref=""productList"" ItemType=""eShopLegacyWebForms.Models.CatalogItem"" Context=""Item"">
+    <ListView @ref=""productList"" ItemPlaceHolderID=""itemPlaceHolder"" ItemType=""eShopLegacyWebForms.Models.CatalogItem"" Context=""Item"">
         <EmptyDataTemplate>
             <table>
                 <tr>
@@ -324,7 +324,7 @@ namespace CTA.WebForms2Blazor.Tests.FileConverters
             Assert.True(fileContents.Contains(@"Context=""itemPlaceHolder"""));
             Assert.False(fileContents.Contains("asp:ListView"));
             Assert.False(fileContents.Contains("asp:PlaceHolder"));
-            Assert.IsTrue(fi.RelativePath.Equals(relativePath));
+            Assert.AreEqual(fi.RelativePath, relativePath);
         }
 
         [Test]
@@ -353,18 +353,18 @@ namespace CTA.WebForms2Blazor.Tests.FileConverters
     </GridView>
 </div>
 <div>
-    <GridView AutoGenerateColumns=""false"" DataKeyNames=""CustomerID"" SelectMethod=""GetCustomers"" EmptyDataText=""No data available"" ItemType=""PleaseReplaceWithItemTypeHere"">
+    <GridView AutoGenerateColumns=""false"" DataKeyNames=""CustomerID"" SelectMethod=""GetCustomers"" EmptyDataText=""No data available"" ItemType=""PleaseReplaceWithActualItemTypeHere"">
         <Columns>
-            <BoundField DataField=""CustomerID"" HeaderText=""ID"" ItemType=""PleaseReplaceWithItemTypeHere""></BoundField>
-            <BoundField DataField=""CompanyName"" HeaderText=""CompanyName"" ItemType=""PleaseReplaceWithItemTypeHere""></BoundField>
-            <BoundField DataField=""FirstName"" HeaderText=""FirstName"" ItemType=""PleaseReplaceWithItemTypeHere""></BoundField>
-            <BoundField DataField=""LastName"" HeaderText=""LastName"" ItemType=""PleaseReplaceWithItemTypeHere""></BoundField>
-            <TemplateField ItemType=""PleaseReplaceWithItemTypeHere"">
+            <BoundField DataField=""CustomerID"" HeaderText=""ID"" ItemType=""PleaseReplaceWithActualItemTypeHere""></BoundField>
+            <BoundField DataField=""CompanyName"" HeaderText=""CompanyName"" ItemType=""PleaseReplaceWithActualItemTypeHere""></BoundField>
+            <BoundField DataField=""FirstName"" HeaderText=""FirstName"" ItemType=""PleaseReplaceWithActualItemTypeHere""></BoundField>
+            <BoundField DataField=""LastName"" HeaderText=""LastName"" ItemType=""PleaseReplaceWithActualItemTypeHere""></BoundField>
+            <TemplateField ItemType=""PleaseReplaceWithActualItemTypeHere"">
                 <ItemTemplate Context=""Item"">
                     <button type=""button"">Click Me! @(Item.Name )</button>
                 </ItemTemplate>
             </TemplateField>
-            <ButtonField ButtonType=""Button"" DataTextField=""CompanyName"" DataTextFormatString=""{0}"" CommandName=""Customer"" ItemType=""PleaseReplaceWithItemTypeHere""></ButtonField>
+            <ButtonField ButtonType=""Button"" DataTextField=""CompanyName"" DataTextFormatString=""{0}"" CommandName=""Customer"" ItemType=""PleaseReplaceWithActualItemTypeHere""></ButtonField>
         </Columns>
     </GridView>
 </div>";
@@ -374,7 +374,32 @@ namespace CTA.WebForms2Blazor.Tests.FileConverters
             Assert.True(fileContents.Contains(@"ref=""GridView1"""));
             Assert.False(fileContents.Contains("asp:GridView"));
             Assert.False(fileContents.Contains("asp:BoundField"));
-            Assert.IsTrue(fi.RelativePath.Equals(relativePath));
+            Assert.AreEqual(fi.RelativePath, relativePath);
+        }
+
+        [Test]
+        public void TestUpdateInnerHtmlNode_Matches_Id()
+        {
+            var htmlString = @"<div class=""esh-table"">
+    <asp:ListView ID=""productList"" ItemPlaceholderID=""itemPlaceHolder"" runat=""server"" ItemType=""eShopLegacyWebForms.Models.CatalogItem"">
+        <LayoutTemplate>
+            <table class=""table"">
+                <tbody>
+                    <asp:PlaceHolder runat=""server"" ID=""itemPlaceHolder""></asp:PlaceHolder>
+                </tbody>
+            </table>
+        </LayoutTemplate>
+    </asp:ListView>
+</div>";
+            var htmlNode = HtmlNode.CreateNode(htmlString);
+            var testControlConverter = new ListViewControlConverter();
+            var correctNameAndId = testControlConverter.UpdateInnerHtmlNode(htmlNode, "asp:PlaceHolder", "itemPlaceHolder");
+            var correctNameAndNoId = testControlConverter.UpdateInnerHtmlNode(htmlNode, "asp:PlaceHolder");
+            var correctNameAndIncorrectId = testControlConverter.UpdateInnerHtmlNode(htmlNode, "asp:PlaceHolder", "inccorectid");
+            
+            Assert.True(correctNameAndId);
+            Assert.True(correctNameAndNoId);
+            Assert.False(correctNameAndIncorrectId);
         }
 
         [Test]

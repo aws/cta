@@ -30,6 +30,9 @@ namespace CTA.WebForms2Blazor.FileConverters
             var htmlDoc = new HtmlDocument();
             htmlDoc.Load(FullPath);
             
+            //This ensures that the document will output the original case when called by .WriteTo()
+            //otherwise, all nodes and attribute names will be in lowercase
+            htmlDoc.OptionOutputOriginalCase = true;
             
             FindConversionActions(htmlDoc.DocumentNode, null);
             
