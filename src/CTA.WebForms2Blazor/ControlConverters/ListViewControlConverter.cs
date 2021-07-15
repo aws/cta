@@ -89,7 +89,7 @@ namespace CTA.WebForms2Blazor.ControlConverters
                 {
                     //Could accidentally replace placeholders for other stuff with different IDs,
                     //might need to add ID identifier as well
-                    UpdateInnerHtmlNode(node, AspPlaceHolderNodeName, template: "@{2}", newBody: itemPlaceHolderValue);
+                    UpdateInnerHtmlNode(node, AspPlaceHolderNodeName, id: itemPlaceHolderValue, template: "@{2}", newBody: itemPlaceHolderValue);
                 }
             }
             
