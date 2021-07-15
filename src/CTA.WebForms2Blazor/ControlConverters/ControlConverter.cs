@@ -3,24 +3,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using CTA.WebForms2Blazor.Helpers.ControlHelpers;
+using CTA.WebForms2Blazor.Services;
 using HtmlAgilityPack;
 
 namespace CTA.WebForms2Blazor.ControlConverters
 {
     public abstract class ControlConverter
     {
-        protected abstract Dictionary<String, String> AttributeMap { get; }
-        protected virtual IEnumerable<String> NewAttributes
+        protected abstract Dictionary<string, string> AttributeMap { get; }
+        protected virtual IEnumerable<string> NewAttributes
         {
             get { return null; }
         }
         protected abstract string BlazorName { get; }
         protected virtual string NodeTemplate { get { return @"<{0} {1}>{2}</{0}>"; } }
-
-        protected ControlConverter()
-        {
-            //Constructor might not be needed
-        }
         
         public virtual HtmlNode Convert2Blazor(HtmlNode node)
         {
@@ -28,9 +24,9 @@ namespace CTA.WebForms2Blazor.ControlConverters
         }
 
         protected virtual string GetNewAttributes(HtmlAttributeCollection oldAttributes,
-            IEnumerable<String> additionalAttributes)
+            IEnumerable<string> additionalAttributes)
         {
-            additionalAttributes ??= new List<String>();
+            additionalAttributes ??= new List<string>();
             var convertedAttributes = ConvertAttributes(oldAttributes);
             var combinedAttributes = convertedAttributes.Concat(additionalAttributes);
             
@@ -38,7 +34,7 @@ namespace CTA.WebForms2Blazor.ControlConverters
             return combinedAttributesString;
         }
 
-        protected IEnumerable<String> ConvertAttributes(HtmlAttributeCollection attributeCollection)
+        protected IEnumerable<string> ConvertAttributes(HtmlAttributeCollection attributeCollection)
         {
             var convertedAttributes = attributeCollection
                 .Where(attr => AttributeMap.ContainsKey(attr.Name))
@@ -54,32 +50,32 @@ namespace CTA.WebForms2Blazor.ControlConverters
             return convertedAttributes;
         }
 
+        protected string GetAttributeAsString(HtmlAttribute attr)
+        {
+            if (attr.QuoteType == AttributeValueQuote.DoubleQuote)
+            {
+                return $"{attr.OriginalName}=\"{attr.Value}\"";
+            }
+
+            return $"{attr.OriginalName}='{attr.Value}'";
+        }
+
         protected HtmlNode Convert2BlazorFromParts(string template, string name, string attributes, string body)
         {
-            string newContent = String.Format(template, name, attributes, body);
+            string newContent = string.Format(template, name, attributes, body);
             HtmlNode newNode = HtmlNode.CreateNode(newContent);
             return newNode;
         }
         
-        public static string ConvertEmbeddedCode(string htmlString)
+        public static string ConvertEmbeddedCode(string htmlString, ViewImportService viewImportService)
         {
-            // var documentNode = document;
-            // var htmlString = documentNode.WriteTo();
+            htmlString = EmbeddedCodeReplacers.ReplaceOneWayDataBinds(htmlString);
+            htmlString = EmbeddedCodeReplacers.ReplaceRawExprs(htmlString);
+            htmlString = EmbeddedCodeReplacers.ReplaceHTMLEncodedExprs(htmlString);
+            htmlString = EmbeddedCodeReplacers.ReplaceAspExprs(htmlString);
+            htmlString = EmbeddedCodeReplacers.ReplaceAspComments(htmlString);
+            htmlString = EmbeddedCodeReplacers.ReplaceDirectives(htmlString, viewImportService);
 
-            MatchEvaluator dataBindEval = new MatchEvaluator(EmbeddedCodeReplacers.ReplaceDataBind);
-            MatchEvaluator singleExprEval = new MatchEvaluator(EmbeddedCodeReplacers.ReplaceSingleExpr);
-            MatchEvaluator directiveEval = new MatchEvaluator(EmbeddedCodeReplacers.ReplaceDirective);
-            MatchEvaluator aspExprEval = new MatchEvaluator(EmbeddedCodeReplacers.ReplaceAspExpr);
-            
-            htmlString = EmbeddedCodeReplacers.DataBindRegex.Replace(htmlString, dataBindEval);
-            htmlString = EmbeddedCodeReplacers.SingleExpRegex.Replace(htmlString, singleExprEval);
-            htmlString = EmbeddedCodeReplacers.DirectiveRegex.Replace(htmlString, directiveEval);
-
-            //Not implemented/used yet
-            //htmlString = EmbeddedCodeReplacers.AspExpRegex.Replace(htmlString, aspExprEval);
-
-            // var res = new HtmlDocument();
-            // res.LoadHtml(htmlString);
             return htmlString;
         }
     }

@@ -51,6 +51,7 @@ namespace CTA.WebForms2Blazor.Tests.Factories
                 _testProjectPath,
                 blazorWorkspaceManager,
                 webFormsProjectAnalyzer,
+                new ViewImportService(),
                 new ClassConverterFactory(string.Empty, new LifecycleManagerService(), new TaskManagerService()));
         }
 

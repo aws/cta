@@ -10,7 +10,6 @@ using CTA.WebForms2Blazor.Helpers;
 using CTA.WebForms2Blazor.Helpers.ControlHelpers;
 using CTA.WebForms2Blazor.Services;
 using HtmlAgilityPack;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace CTA.WebForms2Blazor.FileConverters
 {
@@ -18,13 +17,11 @@ namespace CTA.WebForms2Blazor.FileConverters
     {
         private ViewImportService _viewImportService;
         private List<ControlConversionAction> ControlActions;
-        private string _relativeDirectory;
 
         public ViewFileConverter(string sourceProjectPath, string fullPath, ViewImportService viewImportService) 
             : base(sourceProjectPath, fullPath)
         {
             _viewImportService = viewImportService;
-            _relativeDirectory = Path.GetDirectoryName(RelativePath);
             ControlActions = new List<ControlConversionAction>();
         }
 
@@ -36,14 +33,14 @@ namespace CTA.WebForms2Blazor.FileConverters
             
             FindConversionActions(htmlDoc.DocumentNode, null);
             
-            //This will modify the HtmlDocument nodes that will then be changed to a file information object
+            // This will modify the HtmlDocument nodes that will then be changed to a file information object
             ConvertNodes();
             
             
             return htmlDoc;
         }
 
-        //Performs a DFS traversal of the HTML tree, adding nodes to be converted in postorder
+        // Performs a DFS traversal of the HTML tree, adding nodes to be converted in postorder
         private void FindConversionActions(HtmlNode node, HtmlNode parent)
         {
             if (node == null)
@@ -66,6 +63,12 @@ namespace CTA.WebForms2Blazor.FileConverters
                 var conversionAction = new ControlConversionAction(node, parent, SupportedControls.ControlRulesMap[node.Name]);
                 ControlActions.Add(conversionAction);
             }
+            else if (SupportedControls.ControlNameFormatRegex.IsMatch(node.Name))
+            {
+                // If the node appears to be a web forms control but we have no defined control
+                // converter in the ControlRulesMap, then add action to comment it out as a default
+                ControlActions.Add(new ControlConversionAction(node, parent, SupportedControls.DefaultControlConverter));
+            }
         }
 
         private void ConvertNodes()
@@ -81,14 +84,12 @@ namespace CTA.WebForms2Blazor.FileConverters
         {
             LogStart();
 
-            // TODO: Store UI information in necessary services
-
             // View file converters will return razor file contents with
             // only view layer, code behind will be created in another file
 
             HtmlDocument migratedDocument = GetRazorContents();
             string contents = migratedDocument.DocumentNode.WriteTo();
-            contents = ControlConverter.ConvertEmbeddedCode(contents);
+            contents = ControlConverter.ConvertEmbeddedCode(contents, _viewImportService);
 
             // Currently just changing extension to .razor, keeping filename and directory the same
             // but Razor files are renamed and moved around, can't always use same filename/directory in the future

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using CTA.WebForms2Blazor.Extensions;
+﻿using System.Collections.Generic;
 
 namespace CTA.WebForms2Blazor.DirectiveConverters
 {

@@ -20,7 +20,7 @@ namespace CTA.WebForms2Blazor.Tests.FileConverters
         public async Task HyperLinkControlConverter_Returns_Href_Node()
         {
             FileConverter fc = new ViewFileConverter(FileConverterSetupFixture.TestProjectPath, 
-                FileConverterSetupFixture.TestHyperLinkControlFilePath);
+                FileConverterSetupFixture.TestHyperLinkControlFilePath, new ViewImportService());
             
             IEnumerable<FileInformation> fileList = await fc.MigrateFileAsync();
             FileInformation fi = fileList.Single();
@@ -73,7 +73,7 @@ namespace CTA.WebForms2Blazor.Tests.FileConverters
         public async Task ButtonControlConverter_Returns_Button_Node()
         {
             FileConverter fc = new ViewFileConverter(FileConverterSetupFixture.TestProjectPath, 
-                FileConverterSetupFixture.TestButtonControlFilePath);
+                FileConverterSetupFixture.TestButtonControlFilePath, new ViewImportService());
             
             IEnumerable<FileInformation> fileList = await fc.MigrateFileAsync();
             FileInformation fi = fileList.Single();
@@ -109,7 +109,7 @@ namespace CTA.WebForms2Blazor.Tests.FileConverters
         public async Task LabelControlConverter_Returns_DynamicText()
         {
             FileConverter fc = new ViewFileConverter(FileConverterSetupFixture.TestProjectPath, 
-                FileConverterSetupFixture.TestLabelControlFilePath);
+                FileConverterSetupFixture.TestLabelControlFilePath, new ViewImportService());
             
             IEnumerable<FileInformation> fileList = await fc.MigrateFileAsync();
             FileInformation fi = fileList.Single();
@@ -203,10 +203,10 @@ namespace CTA.WebForms2Blazor.Tests.FileConverters
         <ItemTemplate>
             <tr>
                 <td>
-                    <image class=""esh-thumbnail"" src='/Pics/<%#:Item.PictureFileName%>' />
+                    <image class=""esh-thumbnail"" src='/Pics/<%#Item.PictureFileName%>' />
                 </td>
                 <p>
-                    <%#:Item.MaxStockThreshold%>
+                    <%# Item.MaxStockThreshold%>
                 </p>
                 <td>
                     <asp:HyperLink NavigateUrl='<%# GetRouteUrl(""EditProductRoute"", new {id =Item.Id}) %>' runat=""server"" CssClass=""esh-table-link"">
@@ -221,7 +221,7 @@ namespace CTA.WebForms2Blazor.Tests.FileConverters
             // htmlDoc.LoadHtml(htmlString);
             // htmlDoc = ControlConverter.ConvertEmbeddedCode(htmlDoc);
             
-            string contents = ControlConverter.ConvertEmbeddedCode(htmlString);
+            string contents = ControlConverter.ConvertEmbeddedCode(htmlString, new ViewImportService());
 
             string expectedContents = @"<div class=""esh-table"">
     <asp:ListView ID=""productList"" ItemPlaceholderID=""itemPlaceHolder"" runat=""server"" ItemType=""eShopLegacyWebForms.Models.CatalogItem"">
@@ -264,7 +264,7 @@ namespace CTA.WebForms2Blazor.Tests.FileConverters
             // htmlDoc = ControlConverter.ConvertEmbeddedCode(htmlDoc);
             //
             // string contents = htmlDoc.DocumentNode.WriteTo();
-            string contents = ControlConverter.ConvertEmbeddedCode(htmlString);
+            string contents = ControlConverter.ConvertEmbeddedCode(htmlString, new ViewImportService());
             string expectedContents = @"<div class=""esh-pager"">
     <div class=""container"">
         <article class=""esh-pager-wrapper row"">
@@ -282,7 +282,7 @@ namespace CTA.WebForms2Blazor.Tests.FileConverters
         public async Task ListViewControlConverter_Returns_ListView_Node()
         {
             FileConverter fc = new ViewFileConverter(FileConverterSetupFixture.TestProjectPath, 
-                FileConverterSetupFixture.TestListViewControlFilePath);
+                FileConverterSetupFixture.TestListViewControlFilePath, new ViewImportService());
             
             IEnumerable<FileInformation> fileList = await fc.MigrateFileAsync();
             FileInformation fi = fileList.Single();
@@ -291,7 +291,7 @@ namespace CTA.WebForms2Blazor.Tests.FileConverters
             var fileContents = Encoding.UTF8.GetString(bytes);
             
             string newPath = Path.Combine(FileConverterSetupFixture.TestFilesDirectoryPath, "ListViewControlOnly.razor");
-            string relativePath = Path.GetRelativePath(FileConverterSetupFixture.TestProjectPath, newPath);
+            string relativePath = Path.Combine("Pages", Path.GetRelativePath(FileConverterSetupFixture.TestProjectPath, newPath));
 
             string expectedContents = @"<div class=""esh-table"">
     <ListView @ref=""productList"" ItemType=""eShopLegacyWebForms.Models.CatalogItem"" Context=""Item"">
@@ -333,14 +333,14 @@ namespace CTA.WebForms2Blazor.Tests.FileConverters
             Assert.True(fileContents.Contains(@"context=""itemPlaceHolder"""));
             Assert.False(fileContents.Contains("asp:ListView"));
             Assert.False(fileContents.Contains("asp:PlaceHolder"));
-            Assert.IsTrue(fi.RelativePath.Equals(relativePath));
+            Assert.AreEqual(relativePath, fi.RelativePath);
         }
 
         [Test]
         public async Task TestViewFileConverter_DefaultAspx()
         {
             FileConverter fc = new ViewFileConverter(FileConverterSetupFixture.TestProjectPath, 
-                FileConverterSetupFixture.TestViewFilePath);
+                FileConverterSetupFixture.TestViewFilePath, new ViewImportService());
             
             IEnumerable<FileInformation> fileList = await fc.MigrateFileAsync();
             FileInformation fi = fileList.Single();

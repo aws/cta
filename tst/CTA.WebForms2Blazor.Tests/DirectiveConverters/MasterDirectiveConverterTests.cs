@@ -1,4 +1,5 @@
 ﻿using CTA.WebForms2Blazor.DirectiveConverters;
+using CTA.WebForms2Blazor.Services;
 using NUnit.Framework;
 using System;
 
@@ -25,7 +26,7 @@ namespace CTA.WebForms2Blazor.Tests.DirectiveConverters
         [Test]
         public void ConvertDirective_Properly_Executes_Directive_General_Conversion()
         {
-            Assert.AreEqual(string.Empty, _directiveConverter.ConvertDirective(TestDirectiveName, TestDirectiveName));
+            Assert.AreEqual(string.Empty, _directiveConverter.ConvertDirective(TestDirectiveName, TestDirectiveName, new ViewImportService()));
         }
 
         [Test]
@@ -33,7 +34,7 @@ namespace CTA.WebForms2Blazor.Tests.DirectiveConverters
         {
             var expectedText = ExpectedMasterPageFileDirective;
 
-            Assert.AreEqual(expectedText, _directiveConverter.ConvertDirective(TestDirectiveName, TestDirectiveMasterPageFileAttribute));
+            Assert.AreEqual(expectedText, _directiveConverter.ConvertDirective(TestDirectiveName, TestDirectiveMasterPageFileAttribute, new ViewImportService()));
         }
 
         [Test]
@@ -41,15 +42,15 @@ namespace CTA.WebForms2Blazor.Tests.DirectiveConverters
         {
             var expectedText = ExpectedInheritsDirective;
 
-            Assert.AreEqual(expectedText, _directiveConverter.ConvertDirective(TestDirectiveName, TestDirectiveInheritsAttribute));
+            Assert.AreEqual(expectedText, _directiveConverter.ConvertDirective(TestDirectiveName, TestDirectiveInheritsAttribute, new ViewImportService()));
         }
 
         [Test]
-        public void ConvertDirective_Properly_Executes_Multiple_Attribute_Conversions()
+        public void ConvertDirective_Executes_Multiple_Attribute_Conversions_With_Proper_Ordering()
         {
             var expectedText = ExpectedInheritsDirective + Environment.NewLine + ExpectedMasterPageFileDirective;
 
-            Assert.AreEqual(expectedText, _directiveConverter.ConvertDirective(TestDirectiveName, TestDirective2Attributes));
+            Assert.AreEqual(expectedText, _directiveConverter.ConvertDirective(TestDirectiveName, TestDirective2Attributes, new ViewImportService()));
         }
     }
 }

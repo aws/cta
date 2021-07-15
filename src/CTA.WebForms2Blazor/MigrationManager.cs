@@ -86,9 +86,10 @@ namespace CTA.WebForms2Blazor
 
             LogHelper.LogInformation(string.Format(Constants.GenericInformationLogTemplate, GetType().Name, MigrationTasksCompletedLogAction));
 
+            // Adds _Imports.razor file to project
+            _blazorProjectBuilder.WriteFileInformationToProject(_viewImportService.ConstructImportsFile());
+
             // TODO: Any necessary cleanup or last checks on new project
-            // TODO: Maybe add any new files that don't directly correspond
-            // to existing files in Web Forms i.e. _Imports.razor
 
             LogHelper.LogInformation(string.Format(
                 Constants.EndedFromToLogTemplate,

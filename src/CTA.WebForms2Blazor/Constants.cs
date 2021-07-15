@@ -67,6 +67,17 @@
         public const string EventArgsParamTypeName = "EventArgs";
         public const string HttpContextParamTypeName = "HttpContext";
 
+        // View Text Templates
+        public const string MarkupCommentTemplate = "<!-- {0} -->";
+        public const string RazorServerSideCommentTemplate = "@* {0} *@";
+        public const string RazorExplicitEmbeddingTemplate = "@({0})";
+        public const string RazorExplicitRawEmbeddingTemplate = "@(new MarkupString({0}))";
+        public const string RazorConfigurationAccessTemplate = "@(Configuration[\"{0}\"])";
+
+        // appsettings.json Section Names
+        public const string AppSettingsSection = "appsettings";
+        public const string ConnectionStringsSection = "ConnectionStrings";
+
         // Common Comments and Templates
         public const string CodeOriginCommentTemplate = "The following lines were extracted from {0}";
         public const string OperationFailedCommentTemplate = "Attempted to {0} but failed, this must be done manually";

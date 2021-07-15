@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
+using CTA.WebForms2Blazor.Services;
 
 namespace CTA.WebForms2Blazor.DirectiveConverters
 {
@@ -22,7 +22,7 @@ namespace CTA.WebForms2Blazor.DirectiveConverters
 
         private protected virtual IEnumerable<string> AttributeAllowList { get { return Enumerable.Empty<string>(); } }
 
-        public string ConvertDirective(string directiveName, string directiveString)
+        public string ConvertDirective(string directiveName, string directiveString, ViewImportService viewImportService)
         {
             // TODO: We want to make sure that certain directives only occur once (i.e. layout,
             // inherits, etc.) Need to find a better way to detect and deal with those or perhaps
@@ -30,12 +30,25 @@ namespace CTA.WebForms2Blazor.DirectiveConverters
             // to choose is difficult
             var migrationResults = GetMigratedAttributes(directiveString, directiveName);
 
-            // Want to ensure that the general directive conversion stays at the front if it exists
+            // Want to ensure that the general directive conversion stays at the front if it exists,
+            // migratedDirective will be null if there is no need to add extra directives or tags for
+            // general case
             var migratedDirective = GetMigratedDirective(directiveName);
             if (migratedDirective != null)
             {
                 migrationResults = migrationResults.Prepend(migratedDirective);
             }
+
+            // Remove any using directive results and send them to the viewImports service
+            migrationResults = migrationResults.Where(migrationResult => {
+                if (migrationResult.MigrationResultType == DirectiveMigrationResultType.UsingDirective)
+                {
+                    viewImportService.AddViewImport(migrationResult.Content);
+                    return false;
+                }
+
+                return true;
+            });
 
             return string.Join(Environment.NewLine, migrationResults.Select(migrationResult => migrationResult.Content));
         }
