@@ -106,6 +106,7 @@ namespace CTA.Rules.Update
                 throw new FilePortingException(sourceFileBuildResult.SourceFilePath, new Exception("File already exists in collection"));
             }
         }
+
         private void GenerateCodeChanges(SyntaxNode root, SourceFileBuildResult sourceFileBuildResult, FileActions currentFileActions, int fileActionsCount, ConcurrentDictionary<string, List<GenericActionExecution>> actionsPerProject)
         {
             if (currentFileActions != null)
@@ -234,7 +235,10 @@ namespace CTA.Rules.Update
             // Matches all types of comments and strings
             //string regComments = @"\/\*(?:(?!\*\/)(?:.|[\r\n]+))*\*\/|\/\/(.*?)\r?\n|""((\\[^\n]|[^""\n])*)""|@(""[^""""]*"")+";
 
-            foreach (var action in actions)
+            //We should only validate actions that did not throw an exception during execution.
+            var validActions = actions.Where(a => a.InvalidExecutions == 0).ToList();
+
+            foreach (var action in validActions)
             {
                 var actionValidation = action.ActionValidation;
                 string trimmedResult = "";
