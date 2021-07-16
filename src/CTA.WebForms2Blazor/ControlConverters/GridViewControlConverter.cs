@@ -76,8 +76,6 @@ namespace CTA.WebForms2Blazor.ControlConverters
 
         public override HtmlNode Convert2Blazor(HtmlNode node)
         {
-            node.OwnerDocument.OptionOutputOriginalCase = true;
-            
             var itemTypeAttr = node.Attributes.AttributesWithName(ItemTypeAttributeName).FirstOrDefault();
             bool hasItemType = itemTypeAttr != null;
             var itemType  = itemTypeAttr?.Value ?? TempItemType;

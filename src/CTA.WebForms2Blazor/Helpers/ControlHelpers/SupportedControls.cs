@@ -15,7 +15,9 @@ namespace CTA.WebForms2Blazor.Helpers.ControlHelpers
             ["asp:button"] = new ButtonControlConverter(),
             ["asp:label"] = new LabelControlConverter(),
             ["asp:listview"] = new ListViewControlConverter(),
-            ["asp:gridview"] = new GridViewControlConverter()
+            ["asp:gridview"] = new GridViewControlConverter(),
+            ["asp:content"] = new ContentControlConverter(),
+            ["asp:contentplaceholder"] = new ContentPlaceHolderControlConverter()
         };
 
         // NOTE: Directive names appear to be case-insensitive

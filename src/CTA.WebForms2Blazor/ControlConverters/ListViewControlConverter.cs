@@ -35,7 +35,7 @@ namespace CTA.WebForms2Blazor.ControlConverters
                     ["GroupTemplate"] = "GroupTemplate",
                     ["InsertItemPosition"] = "InsertItemPosition",
                     ["ItemPlaceHolder"] = "ItemPlaceHolder",
-                    ["ItemPlaceHolderID"] = "ItemPlaceHolderID",
+                    ["ItemPlaceholderID"] = "ItemPlaceholderID",
                     ["Items"] = "Items",
                     ["ItemSeparatorTemplate"] = "ItemSeparatorTemplate",
                     ["ItemTemplate"] = "ItemTemplate",
@@ -70,8 +70,6 @@ namespace CTA.WebForms2Blazor.ControlConverters
 
         public override HtmlNode Convert2Blazor(HtmlNode node)
         {
-            node.OwnerDocument.OptionOutputOriginalCase = true;
-
             var itemPlaceHolderValue = node.Attributes
                 .AttributesWithName(ItemPlaceHolderIdAttributeName)
                 .FirstOrDefault()

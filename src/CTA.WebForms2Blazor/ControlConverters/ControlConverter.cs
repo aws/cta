@@ -9,7 +9,11 @@ namespace CTA.WebForms2Blazor.ControlConverters
 {
     public abstract class ControlConverter
     {
-        protected abstract Dictionary<string, string> AttributeMap { get; }
+        protected virtual Dictionary<String, String> AttributeMap
+        {
+            get { return new Dictionary<string, string>(); }
+        }
+
         protected virtual IEnumerable<ViewLayerControlAttribute> NewAttributes
         {
             get { return new List<ViewLayerControlAttribute>(); }
@@ -17,13 +21,17 @@ namespace CTA.WebForms2Blazor.ControlConverters
         protected abstract string BlazorName { get; }
         protected virtual string NodeTemplate { get { return @"<{0} {1}>{2}</{0}>"; } }
         
+        //Passing this method through every .CreateNode ensures that all nodes have original capitalization
+        public static void PreserveCapitalization(HtmlDocument htmlDocument)
+        {
+            htmlDocument.OptionOutputOriginalCase = true;
+        }
+        
         public virtual HtmlNode Convert2Blazor(HtmlNode node)
         {
-            //This ensures that the newNode will output the original case when called by .WriteTo()
-            node.OwnerDocument.OptionOutputOriginalCase = true;
-            
             return Convert2BlazorFromParts(NodeTemplate, BlazorName, JoinAllAttributes(node.Attributes, NewAttributes), node.InnerHtml);
         }
+
         protected virtual string JoinAllAttributes(HtmlAttributeCollection oldAttributes,
             IEnumerable<ViewLayerControlAttribute> additionalAttributes)
         {
