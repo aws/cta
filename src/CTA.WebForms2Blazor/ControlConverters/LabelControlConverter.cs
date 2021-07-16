@@ -24,7 +24,8 @@ namespace CTA.WebForms2Blazor.ControlConverters
             var textAttr = node.Attributes.AttributesWithName("text").FirstOrDefault();
             var labelText = textAttr?.Value ?? string.Empty;
 
-            return Convert2BlazorFromParts(NodeTemplate, BlazorName, ConvertAttributes(node.Attributes), labelText);
+            var joinedAttributesString = JoinAllAttributes(node.Attributes, NewAttributes);
+            return Convert2BlazorFromParts(NodeTemplate, BlazorName, joinedAttributesString, labelText);
         }
     }
 }

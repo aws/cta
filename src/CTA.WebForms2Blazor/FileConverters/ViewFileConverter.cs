@@ -29,12 +29,16 @@ namespace CTA.WebForms2Blazor.FileConverters
         {
             var htmlDoc = new HtmlDocument();
             htmlDoc.Load(FullPath);
-            htmlDoc = ControlConverter.ConvertEmbeddedCode(htmlDoc);
+            
+            //This ensures that the document will output the original case when called by .WriteTo()
+            //otherwise, all nodes and attribute names will be in lowercase
+            htmlDoc.OptionOutputOriginalCase = true;
             
             FindConversionActions(htmlDoc.DocumentNode, null);
             
             //This will modify the HtmlDocument nodes that will then be changed to a file information object
             ConvertNodes();
+
             return htmlDoc;
         }
 
@@ -80,8 +84,10 @@ namespace CTA.WebForms2Blazor.FileConverters
 
             // View file converters will return razor file contents with
             // only view layer, code behind will be created in another file
+
             HtmlDocument migratedDocument = GetRazorContents();
-            string contents = migratedDocument.Text;
+            string contents = migratedDocument.DocumentNode.WriteTo();
+            contents = ControlConverter.ConvertEmbeddedCode(contents);
 
             // Currently just changing extension to .razor, keeping filename and directory the same
             // but Razor files are renamed and moved around, can't always use same filename/directory in the future

@@ -101,5 +101,8 @@
         public const string ProjectMigrationLogAction = "Project Migration";
         public const string FileMigrationLogAction = "File Migration";
         public const string ClassMigrationLogAction = "Class Migration";
+        
+        //View layer constants
+        public const string AspControlTag = "asp:";
     }
 }

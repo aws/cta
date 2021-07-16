@@ -196,84 +196,187 @@ namespace CTA.WebForms2Blazor.Tests.FileConverters
         }
 
         [Test]
-        public void ConvertEmbeddedCode_Converts_DataBinding()
+        public async Task ListViewControlConverter_Returns_ListView_Node()
         {
-            string htmlString = @"<div class=""esh-table"">
-    <asp:ListView ID=""productList"" ItemPlaceholderID=""itemPlaceHolder"" runat=""server"" ItemType=""eShopLegacyWebForms.Models.CatalogItem"">
+            FileConverter fc = new ViewFileConverter(FileConverterSetupFixture.TestProjectPath, 
+                FileConverterSetupFixture.TestListViewControlFilePath);
+            
+            IEnumerable<FileInformation> fileList = await fc.MigrateFileAsync();
+            FileInformation fi = fileList.Single();
+            
+            byte[] bytes = fi.FileBytes;
+            var fileContents = Encoding.UTF8.GetString(bytes);
+            
+            string newPath = Path.Combine(FileConverterSetupFixture.TestFilesDirectoryPath, "ListViewControlOnly.razor");
+            string relativePath = Path.GetRelativePath(FileConverterSetupFixture.TestProjectPath, newPath);
+            relativePath = Path.Combine("Pages", relativePath);
+
+            string expectedContents = @"<div class=""esh-table"">
+    <ListView @ref=""productList"" ItemPlaceholderID=""itemPlaceHolder"" ItemType=""eShopLegacyWebForms.Models.CatalogItem"" Context=""Item"">
+        <EmptyDataTemplate>
+            <table>
+                <tr>
+                    <td>No data was returned.</td>
+                </tr>
+            </table>
+        </EmptyDataTemplate>
+        <LayoutTemplate Context=""itemPlaceHolder"">
+            <table class=""table"">
+                <thead>
+                    <tr class=""esh-table-header"">
+                        <th>
+                            Name
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @itemPlaceHolder
+                </tbody>
+            </table>
+        </LayoutTemplate>
         <ItemTemplate>
             <tr>
                 <td>
-                    <image class=""esh-thumbnail"" src='/Pics/<%#:Item.PictureFileName%>' />
-                </td>
-                <p>
-                    <%#:Item.MaxStockThreshold%>
-                </p>
-                <td>
-                    <asp:HyperLink NavigateUrl='<%# GetRouteUrl(""EditProductRoute"", new {id =Item.Id}) %>' runat=""server"" CssClass=""esh-table-link"">
-                        Edit
-                    </asp:HyperLink>
+                    <p>
+                        @(Item.Name)
+                    </p>
                 </td>
             </tr>
         </ItemTemplate>
-    </asp:ListView>
+    </ListView>
 </div>";
-            var htmlDoc = new HtmlDocument();
-            htmlDoc.LoadHtml(htmlString);
-            htmlDoc = ControlConverter.ConvertEmbeddedCode(htmlDoc);
             
-            string contents = htmlDoc.DocumentNode.WriteTo();
-            string expectedContents = @"<div class=""esh-table"">
-    <asp:listview id=""productList"" itemplaceholderid=""itemPlaceHolder"" runat=""server"" itemtype=""eShopLegacyWebForms.Models.CatalogItem"">
-        <itemtemplate>
-            <tr>
-                <td>
-                    <image class=""esh-thumbnail"" src='/Pics/@(Item.PictureFileName)'></image>
-                </td>
-                <p>
-                    @(Item.MaxStockThreshold)
-                </p>
-                <td>
-                    <asp:hyperlink navigateurl='@(GetRouteUrl(""EditProductRoute"", new {id =Item.Id}) )' runat=""server"" cssclass=""esh-table-link"">
-                        Edit
-                    </asp:hyperlink>
-                </td>
-            </tr>
-        </itemtemplate>
-    </asp:listview>
-</div>";
-            Assert.AreEqual(expectedContents, contents);
+            Assert.AreEqual(expectedContents, fileContents);
+            Assert.True(fileContents.Contains("ListView"));
+            Assert.True(fileContents.Contains(@"Context=""itemPlaceHolder"""));
+            Assert.False(fileContents.Contains("asp:ListView"));
+            Assert.False(fileContents.Contains("asp:PlaceHolder"));
+            Assert.AreEqual(fi.RelativePath, relativePath);
         }
 
         [Test]
-        public void ConvertEmbeddedCode_Converts_SingExpr()
+        public async Task TestViewFileConverter_Returns_GridView_Node()
         {
-            string htmlString = @"<div class=""esh-pager"">
-    <div class=""container"">
-        <article class=""esh-pager-wrapper row"">
-            <nav>
-                <span class=""esh-pager-item"">Showing <%: Model.ItemsPerPage%> of <%: Model.TotalItems%> products - Page <%: (Model.ActualPage + 1)%> - <%: Model.TotalPages%>
-                </span>
-            </nav>
-        </article>
+            FileConverter fc = new ViewFileConverter(FileConverterSetupFixture.TestProjectPath, 
+                FileConverterSetupFixture.TestGridViewControlFilePath);
+            
+            IEnumerable<FileInformation> fileList = await fc.MigrateFileAsync();
+            FileInformation fi = fileList.Single();
+            
+            byte[] bytes = fi.FileBytes;
+            var fileContents = Encoding.UTF8.GetString(bytes);
+            
+            string newPath = Path.Combine(FileConverterSetupFixture.TestFilesDirectoryPath, "GridViewControlOnly.razor");
+            string relativePath = Path.GetRelativePath(FileConverterSetupFixture.TestProjectPath, newPath);
+            relativePath = Path.Combine("Pages", relativePath);
+
+            string expectedContents = @"<div>
+    <GridView @ref=""GridView1"" AutoGenerateColumns=""false"" ItemType=""People"" SelectMethod=""People.GetPeople"">
+        <Columns>
+            <BoundField DataField=""Name"" HeaderText=""First Name"" ItemType=""Random""></BoundField>
+            <BoundField DataField=""LastName"" HeaderText=""Last Name"" ItemType=""People""></BoundField>
+            <BoundField DataField=""Position"" HeaderText=""Person Type"" ItemType=""People""></BoundField>
+        </Columns>
+    </GridView>
+</div>
+<div>
+    <GridView AutoGenerateColumns=""false"" DataKeyNames=""CustomerID"" SelectMethod=""GetCustomers"" EmptyDataText=""No data available"" ItemType=""PleaseReplaceWithActualItemTypeHere"">
+        <Columns>
+            <BoundField DataField=""CustomerID"" HeaderText=""ID"" ItemType=""PleaseReplaceWithActualItemTypeHere""></BoundField>
+            <BoundField DataField=""CompanyName"" HeaderText=""CompanyName"" ItemType=""PleaseReplaceWithActualItemTypeHere""></BoundField>
+            <BoundField DataField=""FirstName"" HeaderText=""FirstName"" ItemType=""PleaseReplaceWithActualItemTypeHere""></BoundField>
+            <BoundField DataField=""LastName"" HeaderText=""LastName"" ItemType=""PleaseReplaceWithActualItemTypeHere""></BoundField>
+            <TemplateField ItemType=""PleaseReplaceWithActualItemTypeHere"">
+                <ItemTemplate Context=""Item"">
+                    <button type=""button"">Click Me! @(Item.Name )</button>
+                </ItemTemplate>
+            </TemplateField>
+            <ButtonField ButtonType=""Button"" DataTextField=""CompanyName"" DataTextFormatString=""{0}"" CommandName=""Customer"" ItemType=""PleaseReplaceWithActualItemTypeHere""></ButtonField>
+        </Columns>
+    </GridView>
+</div>";
+            
+            Assert.AreEqual(expectedContents, fileContents);
+            Assert.True(fileContents.Contains("GridView"));
+            Assert.True(fileContents.Contains(@"ref=""GridView1"""));
+            Assert.False(fileContents.Contains("asp:GridView"));
+            Assert.False(fileContents.Contains("asp:BoundField"));
+            Assert.AreEqual(fi.RelativePath, relativePath);
+        }
+
+        [Test]
+        public async Task TestViewFileConverter_Returns_ContentPlaceHolderNode_As_Body_Directive()
+        {
+            FileConverter fc = new ViewFileConverter(FileConverterSetupFixture.TestProjectPath, 
+                FileConverterSetupFixture.TestContentPlaceHolderControlFilePath);
+            
+            IEnumerable<FileInformation> fileList = await fc.MigrateFileAsync();
+            FileInformation fi = fileList.Single();
+            
+            byte[] bytes = fi.FileBytes;
+            var fileContents = Encoding.UTF8.GetString(bytes);
+            
+            string newPath = Path.Combine(FileConverterSetupFixture.TestFilesDirectoryPath, "ContentPlaceHolderControlOnly.razor");
+            string relativePath = Path.GetRelativePath(FileConverterSetupFixture.TestProjectPath, newPath);
+            relativePath = Path.Combine("Pages", relativePath);
+
+            string expectedContents = @"<div>
+    @Body
+</div>";
+            
+            Assert.AreEqual(expectedContents, fileContents);
+            Assert.AreEqual(relativePath, fi.RelativePath);
+        }
+
+        [Test]
+        public async Task TestViewFileConverter_Returns_ContentNode_As_Div()
+        {
+            FileConverter fc = new ViewFileConverter(FileConverterSetupFixture.TestProjectPath, 
+                FileConverterSetupFixture.TestContentControlFilePath);
+            
+            IEnumerable<FileInformation> fileList = await fc.MigrateFileAsync();
+            FileInformation fi = fileList.Single();
+            
+            byte[] bytes = fi.FileBytes;
+            var fileContents = Encoding.UTF8.GetString(bytes);
+            
+            string newPath = Path.Combine(FileConverterSetupFixture.TestFilesDirectoryPath, "ContentControlOnly.razor");
+            string relativePath = Path.GetRelativePath(FileConverterSetupFixture.TestProjectPath, newPath);
+            relativePath = Path.Combine("Pages", relativePath);
+
+            string expectedContents =  @"<div>
+    <div class=""esh-pager"">
+        <div class=""container"">
+            <article class=""esh-pager-wrapper row"">
+                <nav>
+                    <SomeMadeUpTag class=""stuff""></SomeMadeUpTag>
+                </nav>
+            </article>
+        </div>
+    </div>
+    <div>
+        <p> Some random stuff </p>
     </div>
 </div>";
             
-            var htmlDoc = new HtmlDocument();
-            htmlDoc.LoadHtml(htmlString);
-            htmlDoc = ControlConverter.ConvertEmbeddedCode(htmlDoc);
+            Assert.AreEqual(expectedContents, fileContents);
+            Assert.AreEqual(relativePath, fi.RelativePath);
+        }
+
+        [Test]
+        public async Task TestViewFileConverter_DefaultAspx()
+        {
+            FileConverter fc = new ViewFileConverter(FileConverterSetupFixture.TestProjectPath, 
+                FileConverterSetupFixture.TestViewFilePath);
             
-            string contents = htmlDoc.DocumentNode.WriteTo();
-            string expectedContents = @"<div class=""esh-pager"">
-    <div class=""container"">
-        <article class=""esh-pager-wrapper row"">
-            <nav>
-                <span class=""esh-pager-item"">Showing @(Model.ItemsPerPage) of @(Model.TotalItems) products - Page @((Model.ActualPage + 1)) - @(Model.TotalPages)
-                </span>
-            </nav>
-        </article>
-    </div>
-</div>";
-            Assert.AreEqual(expectedContents, contents);
+            IEnumerable<FileInformation> fileList = await fc.MigrateFileAsync();
+            FileInformation fi = fileList.Single();
+            
+            byte[] bytes = fi.FileBytes;
+            var fileContents = Encoding.UTF8.GetString(bytes);
+            
+            string newPath = Path.Combine(FileConverterSetupFixture.TestFilesDirectoryPath, "LabelControlOnly.razor");
+            string relativePath = Path.GetRelativePath(FileConverterSetupFixture.TestProjectPath, newPath);
         }
     }
 }
