@@ -1,28 +1,63 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using CTA.WebForms2Blazor.Helpers.ControlHelpers;
 using HtmlAgilityPack;
 
 namespace CTA.WebForms2Blazor.ControlConverters
 {
     public class ListViewControlConverter : ControlConverter
     {
+        private const string ItemPlaceHolderIdAttributeName = "ItemPlaceHolderID";
+        private const string LayoutTemplateNodeName = "LayoutTemplate";
+        private const string AspPlaceHolderNodeName = "asp:PlaceHolder";
         protected override Dictionary<string, string> AttributeMap { 
             get
             {
-                return new Dictionary<string, string>()
+                return new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase)
                 {
-                    ["id"] = "@ref",
-                    ["itemtype"] = "itemtype",
+                    ["ID"] = "@ref",
+                    ["ItemType"] = "ItemType",
+                    ["AdditionalAttributes"] = "AdditionalAttributes",
+                    ["AlternatingItemTemplate"] = "AlternatingItemTemplate",
+                    ["ChildComponents"] = "ChildComponents",
+                    ["ChildContent"] = "ChildContent",
+                    ["DataKeys"] = "DataKeys",
+                    ["DataMember"] = "DataMember",
+                    ["DataSource"] = "DataSource",
+                    ["DataSourceID"] = "DataSourceID",
+                    ["EmptyDataTemplate"] = "EmptyDataTemplate",
+                    ["Enabled"] = "Enabled",
+                    ["EnableTheming"] = "EnableTheming",
+                    ["EnableViewState"] = "EnableViewState",
+                    ["GroupItemCount"] = "GroupItemCount",
+                    ["GroupSeparatorTemplate"] = "GroupSeparatorTemplate",
+                    ["GroupTemplate"] = "GroupTemplate",
+                    ["InsertItemPosition"] = "InsertItemPosition",
+                    ["ItemPlaceHolder"] = "ItemPlaceHolder",
+                    ["ItemPlaceHolderID"] = "ItemPlaceHolderID",
+                    ["Items"] = "Items",
+                    ["ItemSeparatorTemplate"] = "ItemSeparatorTemplate",
+                    ["ItemTemplate"] = "ItemTemplate",
+                    ["LayoutTemplate"] = "LayoutTemplate",
+                    ["SelectedIndex"] = "SelectedIndex",
+                    ["SelectMethod"] = "SelectMethod",
+                    ["SkinID"] = "SkinID",
+                    ["Style"] = "Style",
+                    ["TabIndex"] = "TabIndex",
+                    ["Visible"] = "Visible",
                 };
             } 
         }
 
-        protected override IEnumerable<String> NewAttributes
+        protected override IEnumerable<ViewLayerControlAttribute> NewAttributes
         {
             get
             {
-                return new List<String>() {"Context=Item"};
+                return new List<ViewLayerControlAttribute>()
+                {
+                    new ViewLayerControlAttribute("Context", "Item")
+                };
             }
         }
         
@@ -32,63 +67,34 @@ namespace CTA.WebForms2Blazor.ControlConverters
         {
             
         }
-        
-        //This function only updates the first child node that matches the name,
-        //but for current purposes there should only be one matching node
-        private bool UpdateInnerHtmlNode(HtmlNode node, string name, 
-            string template = null, 
-            string newName = null, 
-            IEnumerable<String> newAttributes = null, 
-            string newBody = null)
-        {
-            var lowerName = name.ToLower();
-
-            //Ideally use .SelectSingleNode, but doesnt work with names with ':' character and is less flexible
-            //var selectedNode = node.SelectSingleNode(lowerName);
-            
-            var selectedNodes = node.Descendants().Where(child =>
-            {
-                return child.Name.ToLower() == lowerName || child.Id.ToLower() == lowerName;
-            });
-            var selectedNode = selectedNodes.FirstOrDefault();
-
-            if (selectedNode != null)
-            {
-                template??= NodeTemplate;
-                newName??= name;
-                newAttributes??= new List<String>();
-                newBody ??= selectedNode.InnerHtml;
-                
-                var parent = selectedNode.ParentNode;
-                var newNode = Convert2BlazorFromParts(template, newName, 
-                    GetNewAttributes(selectedNode.Attributes, newAttributes), newBody);
-                parent.ReplaceChild(newNode, selectedNode);
-                return true;
-            }
-
-            return false;
-        }
 
         public override HtmlNode Convert2Blazor(HtmlNode node)
         {
-            var itemPlaceHolderIdAttr = node.Attributes.AttributesWithName("itemplaceholderid").FirstOrDefault();
-            var itemPlaceHolder = itemPlaceHolderIdAttr?.Value ?? string.Empty;
+            node.OwnerDocument.OptionOutputOriginalCase = true;
 
-            if (!itemPlaceHolder.Equals(string.Empty))
+            var itemPlaceHolderValue = node.Attributes
+                .AttributesWithName(ItemPlaceHolderIdAttributeName)
+                .FirstOrDefault()
+                ?.Value;
+            
+            if (!string.IsNullOrEmpty(itemPlaceHolderValue))
             {
-                IEnumerable<String> layoutContextAttr = new List<String>()
+                IEnumerable<ViewLayerControlAttribute> layoutContextAttr = new List<ViewLayerControlAttribute>()
                 {
-                    "Context=" + itemPlaceHolder
+                    new ViewLayerControlAttribute("Context", itemPlaceHolderValue)
                 };
             
-                var success = UpdateInnerHtmlNode(node, "LayoutTemplate", newAttributes: layoutContextAttr);
+                var success = UpdateInnerHtmlNode(node, LayoutTemplateNodeName, addedAttributes: layoutContextAttr);
                 if (success)
                 {
-                    UpdateInnerHtmlNode(node, itemPlaceHolder, template: "@{2}", newBody: itemPlaceHolder);
+                    //Could accidentally replace placeholders for other stuff with different IDs,
+                    //might need to add ID identifier as well
+                    UpdateInnerHtmlNode(node, AspPlaceHolderNodeName, id: itemPlaceHolderValue, template: "@{2}", newBody: itemPlaceHolderValue);
                 }
             }
             
-            return Convert2BlazorFromParts(NodeTemplate, BlazorName, GetNewAttributes(node.Attributes, NewAttributes), node.InnerHtml);
+            var joinedAttributesString = JoinAllAttributes(node.Attributes, NewAttributes);
+            return Convert2BlazorFromParts(NodeTemplate, BlazorName, joinedAttributesString, node.InnerHtml);
         }
     }
 }

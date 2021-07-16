@@ -30,13 +30,15 @@ namespace CTA.WebForms2Blazor.FileConverters
             var htmlDoc = new HtmlDocument();
             htmlDoc.Load(FullPath);
             
+            //This ensures that the document will output the original case when called by .WriteTo()
+            //otherwise, all nodes and attribute names will be in lowercase
+            htmlDoc.OptionOutputOriginalCase = true;
             
             FindConversionActions(htmlDoc.DocumentNode, null);
             
             // This will modify the HtmlDocument nodes that will then be changed to a file information object
             ConvertNodes();
-            
-            
+
             return htmlDoc;
         }
 
@@ -63,12 +65,6 @@ namespace CTA.WebForms2Blazor.FileConverters
                 var conversionAction = new ControlConversionAction(node, parent, SupportedControls.ControlRulesMap[node.Name]);
                 ControlActions.Add(conversionAction);
             }
-            else if (SupportedControls.ControlNameFormatRegex.IsMatch(node.Name))
-            {
-                // If the node appears to be a web forms control but we have no defined control
-                // converter in the ControlRulesMap, then add action to comment it out as a default
-                ControlActions.Add(new ControlConversionAction(node, parent, SupportedControls.DefaultControlConverter));
-            }
         }
 
         private void ConvertNodes()
@@ -89,6 +85,11 @@ namespace CTA.WebForms2Blazor.FileConverters
 
             HtmlDocument migratedDocument = GetRazorContents();
             string contents = migratedDocument.DocumentNode.WriteTo();
+            // We comment out the unknown user controls here instead of during
+            // traversal because the post-order nature may comment out controls
+            // that are migrated as part of an ancestor control before that ancestor
+            // can be processed
+            contents = UnknownControlRemover.RemoveUnknownTags(contents);
             contents = ControlConverter.ConvertEmbeddedCode(contents, _viewImportService);
 
             // Currently just changing extension to .razor, keeping filename and directory the same

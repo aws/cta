@@ -22,6 +22,7 @@ namespace CTA.WebForms2Blazor.Tests.FileConverters
         public static string TestButtonControlFilePath;
         public static string TestLabelControlFilePath;
         public static string TestListViewControlFilePath;
+        public static string TestGridViewControlFilePath;
         public static string TestAreaFullPath;
 
         private WorkspaceManagerService _blazorWorkspaceManager;
@@ -41,6 +42,7 @@ namespace CTA.WebForms2Blazor.Tests.FileConverters
             TestButtonControlFilePath = Path.Combine(TestFilesDirectoryPath, "ButtonControlOnly.aspx");
             TestLabelControlFilePath = Path.Combine(TestFilesDirectoryPath, "LabelControlOnly.aspx");
             TestListViewControlFilePath = Path.Combine(TestFilesDirectoryPath, "ListViewControlOnly.aspx");
+            TestGridViewControlFilePath = Path.Combine(TestFilesDirectoryPath, "GridViewControlOnly.aspx");
             TestAreaFullPath = Path.Combine(TestProjectPath, TestFilesDirectoryPath);
             
             _blazorWorkspaceManager = new WorkspaceManagerService();

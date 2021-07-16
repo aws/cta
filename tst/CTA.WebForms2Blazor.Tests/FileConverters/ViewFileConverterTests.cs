@@ -217,10 +217,7 @@ namespace CTA.WebForms2Blazor.Tests.FileConverters
         </ItemTemplate>
     </asp:ListView>
 </div>";
-            // var htmlDoc = new HtmlDocument();
-            // htmlDoc.LoadHtml(htmlString);
-            // htmlDoc = ControlConverter.ConvertEmbeddedCode(htmlDoc);
-            
+
             string contents = ControlConverter.ConvertEmbeddedCode(htmlString, new ViewImportService());
 
             string expectedContents = @"<div class=""esh-table"">
@@ -258,13 +255,9 @@ namespace CTA.WebForms2Blazor.Tests.FileConverters
         </article>
     </div>
 </div>";
-            
-            var htmlDoc = new HtmlDocument();
-            htmlDoc.LoadHtml(htmlString);
-            // htmlDoc = ControlConverter.ConvertEmbeddedCode(htmlDoc);
-            //
-            // string contents = htmlDoc.DocumentNode.WriteTo();
+
             string contents = ControlConverter.ConvertEmbeddedCode(htmlString, new ViewImportService());
+
             string expectedContents = @"<div class=""esh-pager"">
     <div class=""container"">
         <article class=""esh-pager-wrapper row"">
@@ -291,10 +284,11 @@ namespace CTA.WebForms2Blazor.Tests.FileConverters
             var fileContents = Encoding.UTF8.GetString(bytes);
             
             string newPath = Path.Combine(FileConverterSetupFixture.TestFilesDirectoryPath, "ListViewControlOnly.razor");
-            string relativePath = Path.Combine("Pages", Path.GetRelativePath(FileConverterSetupFixture.TestProjectPath, newPath));
+            string relativePath = Path.GetRelativePath(FileConverterSetupFixture.TestProjectPath, newPath);
+            relativePath = Path.Combine("Pages", relativePath);
 
             string expectedContents = @"<div class=""esh-table"">
-    <ListView @ref=""productList"" ItemType=""eShopLegacyWebForms.Models.CatalogItem"" Context=""Item"">
+    <ListView @ref=""productList"" ItemPlaceHolderID=""itemPlaceHolder"" ItemType=""eShopLegacyWebForms.Models.CatalogItem"" Context=""Item"">
         <EmptyDataTemplate>
             <table>
                 <tr>
@@ -328,12 +322,87 @@ namespace CTA.WebForms2Blazor.Tests.FileConverters
     </ListView>
 </div>";
             
-            //Assert.AreEqual(expectedContents, fileContents);
-            Assert.True(fileContents.Contains("listview"));
-            Assert.True(fileContents.Contains(@"context=""itemPlaceHolder"""));
+            Assert.AreEqual(expectedContents, fileContents);
+            Assert.True(fileContents.Contains("ListView"));
+            Assert.True(fileContents.Contains(@"Context=""itemPlaceHolder"""));
             Assert.False(fileContents.Contains("asp:ListView"));
             Assert.False(fileContents.Contains("asp:PlaceHolder"));
             Assert.AreEqual(relativePath, fi.RelativePath);
+        }
+
+        [Test]
+        public async Task TestViewFileConverter_Returns_GridView_Node()
+        {
+            FileConverter fc = new ViewFileConverter(FileConverterSetupFixture.TestProjectPath, 
+                FileConverterSetupFixture.TestGridViewControlFilePath, new ViewImportService());
+            
+            IEnumerable<FileInformation> fileList = await fc.MigrateFileAsync();
+            FileInformation fi = fileList.Single();
+            
+            byte[] bytes = fi.FileBytes;
+            var fileContents = Encoding.UTF8.GetString(bytes);
+            
+            string newPath = Path.Combine(FileConverterSetupFixture.TestFilesDirectoryPath, "GridViewControlOnly.razor");
+            string relativePath = Path.GetRelativePath(FileConverterSetupFixture.TestProjectPath, newPath);
+            relativePath = Path.Combine("Pages", relativePath);
+
+            string expectedContents = @"<div>
+    <GridView @ref=""GridView1"" AutoGenerateColumns=""false"" ItemType=""People"" SelectMethod=""People.GetPeople"">
+        <Columns>
+            <BoundField DataField=""Name"" HeaderText=""First Name"" ItemType=""Random""></BoundField>
+            <BoundField DataField=""LastName"" HeaderText=""Last Name"" ItemType=""People""></BoundField>
+            <BoundField DataField=""Position"" HeaderText=""Person Type"" ItemType=""People""></BoundField>
+        </Columns>
+    </GridView>
+</div>
+<div>
+    <GridView AutoGenerateColumns=""false"" DataKeyNames=""CustomerID"" SelectMethod=""GetCustomers"" EmptyDataText=""No data available"" ItemType=""PleaseReplaceWithActualItemTypeHere"">
+        <Columns>
+            <BoundField DataField=""CustomerID"" HeaderText=""ID"" ItemType=""PleaseReplaceWithActualItemTypeHere""></BoundField>
+            <BoundField DataField=""CompanyName"" HeaderText=""CompanyName"" ItemType=""PleaseReplaceWithActualItemTypeHere""></BoundField>
+            <BoundField DataField=""FirstName"" HeaderText=""FirstName"" ItemType=""PleaseReplaceWithActualItemTypeHere""></BoundField>
+            <BoundField DataField=""LastName"" HeaderText=""LastName"" ItemType=""PleaseReplaceWithActualItemTypeHere""></BoundField>
+            <TemplateField ItemType=""PleaseReplaceWithActualItemTypeHere"">
+                <ItemTemplate Context=""Item"">
+                    <button type=""button"">Click Me! @(Item.Name)</button>
+                </ItemTemplate>
+            </TemplateField>
+            <ButtonField ButtonType=""Button"" DataTextField=""CompanyName"" DataTextFormatString=""{0}"" CommandName=""Customer"" ItemType=""PleaseReplaceWithActualItemTypeHere""></ButtonField>
+        </Columns>
+    </GridView>
+</div>";
+            
+            Assert.AreEqual(expectedContents, fileContents);
+            Assert.True(fileContents.Contains("GridView"));
+            Assert.True(fileContents.Contains(@"ref=""GridView1"""));
+            Assert.False(fileContents.Contains("asp:GridView"));
+            Assert.False(fileContents.Contains("asp:BoundField"));
+            Assert.AreEqual(fi.RelativePath, relativePath);
+        }
+
+        [Test]
+        public void TestUpdateInnerHtmlNode_Matches_Id()
+        {
+            var htmlString = @"<div class=""esh-table"">
+    <asp:ListView ID=""productList"" ItemPlaceholderID=""itemPlaceHolder"" runat=""server"" ItemType=""eShopLegacyWebForms.Models.CatalogItem"">
+        <LayoutTemplate>
+            <table class=""table"">
+                <tbody>
+                    <asp:PlaceHolder runat=""server"" ID=""itemPlaceHolder""></asp:PlaceHolder>
+                </tbody>
+            </table>
+        </LayoutTemplate>
+    </asp:ListView>
+</div>";
+            var htmlNode = HtmlNode.CreateNode(htmlString);
+            var testControlConverter = new ListViewControlConverter();
+            var correctNameAndId = testControlConverter.UpdateInnerHtmlNode(htmlNode, "asp:PlaceHolder", "itemPlaceHolder");
+            var correctNameAndNoId = testControlConverter.UpdateInnerHtmlNode(htmlNode, "asp:PlaceHolder");
+            var correctNameAndIncorrectId = testControlConverter.UpdateInnerHtmlNode(htmlNode, "asp:PlaceHolder", "inccorectid");
+            
+            Assert.True(correctNameAndId);
+            Assert.True(correctNameAndNoId);
+            Assert.False(correctNameAndIncorrectId);
         }
 
         [Test]
