@@ -23,8 +23,8 @@ namespace CTA.WebForms2Blazor.ControlConverters
         {
             var textAttr = node.Attributes.AttributesWithName("text").FirstOrDefault();
             var buttonText = textAttr?.Value ?? string.Empty;
-            var joinedAttributesString = JoinAllAttributes(node.Attributes, NewAttributes);
-            return Convert2BlazorFromParts(NodeTemplate, BlazorName, joinedAttributesString, buttonText);
+            
+            return Convert2BlazorFromParts(NodeTemplate, BlazorName, ConvertAttributes(node.Attributes), buttonText);
         }
     }
 }
