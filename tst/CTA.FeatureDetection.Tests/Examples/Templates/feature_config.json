@@ -26,6 +26,18 @@
                   "ClassName": "AspNetCoreWebApiFeature"
                 },
                 {
+                  "Name": "DotnetCoreFeature",
+                  "ClassName": "DotnetCoreFeature"
+                },
+                {
+                  "Name": "DotnetFrameworkFeature",
+                  "ClassName": "DotnetFrameworkFeature"
+                },
+                {
+                  "Name": "DotnetStandardFeature",
+                  "ClassName": "DotnetStandardFeature"
+                },
+                {
                   "Name": "WebClassLibraryFeature",
                   "ClassName": "WebClassLibraryFeature"
                 }
@@ -66,6 +78,10 @@
                 {
                   "Name": "FormsAuthenticationWithMembershipFeature",
                   "ClassName": "FormsAuthenticationWithMembershipFeature"
+                },
+                {
+                  "Name": "OpenIdFeature",
+                  "ClassName": "OpenIdFeature"
                 }
               ]
             }

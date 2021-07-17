@@ -25,6 +25,9 @@ namespace CTA.FeatureDetection.Tests.FeatureDetection.Load.Loaders
                 nameof(AspNetWebApiFeature),
                 nameof(AspNetCoreMvcFeature),
                 nameof(AspNetCoreWebApiFeature),
+                nameof(DotnetCoreFeature),
+                nameof(DotnetFrameworkFeature),
+                nameof(DotnetStandardFeature),
                 nameof(WebClassLibraryFeature)
             };
 
