@@ -8,13 +8,15 @@ namespace CTA.WebForms2Blazor.Tests.Services
     public class ViewImportServiceTests
     {
         private const string ExpectedBasicImportsContent =
-@"@using Microsoft.AspNetCore.Authorization
+@"@using BlazorWebFormsComponents
+@using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.AspNetCore.Components.Routing
 @using Microsoft.AspNetCore.Components.Web
 @using System.Net.Http";
         private const string ExpectedModifiedImportsContent =
-@"@using Microsoft.AspNetCore.Authorization
+@"@using BlazorWebFormsComponents
+@using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.AspNetCore.Components.Routing
 @using Microsoft.AspNetCore.Components.Web
