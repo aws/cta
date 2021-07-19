@@ -24,6 +24,7 @@ namespace CTA.WebForms2Blazor.Services
         private ISet<string> ViewUsingDirectives = new HashSet<string>()
         {
             // Initialize with set of basic usings likely to be required
+            "@using BlazorWebFormsComponents",
             "@using Microsoft.AspNetCore.Authorization",
             "@using Microsoft.AspNetCore.Components.Forms",
             "@using Microsoft.AspNetCore.Components.Routing",
