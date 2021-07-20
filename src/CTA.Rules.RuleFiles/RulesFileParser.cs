@@ -676,7 +676,7 @@ namespace CTA.Rules.RuleFiles
             }
             else
             {
-                return value + "";
+                return value + string.Empty;
             }
         }
     }

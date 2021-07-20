@@ -12,6 +12,7 @@ namespace CTA.Rules.Actions
 {
     public class ConfigMigrate
     {
+        private const string ConfigFoundMessage = "Found and migrated settings from web.config";
         private readonly string _projectDir;
         private readonly ProjectType _projectType;
         private bool _hasData;
@@ -29,23 +30,21 @@ namespace CTA.Rules.Actions
         /// <summary>
         /// Migrates the web.config file, if it exists
         /// </summary>
-        /// <param name="projectDir">Directory of the project</param>
-        /// <param name="projectType">Type of the project</param>
         private string MigrateWebConfig()
         {
-            var isConfigFound = string.Empty;
+            var migrateConfigMessage = string.Empty;
 
             var configXml = LoadWebConfig(_projectDir);
-            if (configXml == null) { return isConfigFound; }
+            if (configXml == null) { return migrateConfigMessage; }
 
-            var config = ProcessWebConfig(configXml, TemplateHelper.GetTemplateFileContent("", _projectType, Constants.AppSettingsJson));
+            var config = ProcessWebConfig(configXml, TemplateHelper.GetTemplateFileContent(string.Empty, _projectType, Constants.AppSettingsJson));
             if (_hasData)
             {
-                isConfigFound = "Found and migrated settings from web.config";
+                migrateConfigMessage = ConfigFoundMessage;
                 AddAppSettingsJsonFile(config, _projectDir);
             }
 
-            return isConfigFound;
+            return migrateConfigMessage;
         }
         private Configuration LoadWebConfig(string projectDir)
         {

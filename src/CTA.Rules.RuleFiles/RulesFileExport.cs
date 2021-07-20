@@ -104,7 +104,7 @@ namespace CTA.Rules.RuleFiles
                     Name = @namespace.@namespace,
                     KeyType = "Name",
                     Value = @namespace.@namespace,
-                    ContainingType = "",
+                    ContainingType = string.Empty,
 
                     RecommendedActions = new List<RecommendedActions>() { recommendation }
                 };
@@ -130,7 +130,7 @@ namespace CTA.Rules.RuleFiles
                 KeyType = @class.KeyType,
                 Name = @class.Key,
                 Value = @class.FullKey,
-                ContainingType = "",
+                ContainingType = string.Empty,
                 RecommendedActions = new List<RecommendedActions>() { recommendation }
             };
             currentNamespace.Recommendations.Add(r);
