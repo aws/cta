@@ -237,14 +237,13 @@ namespace CTA.Rules.Update
             foreach (var action in actions)
             {
                 var actionValidation = action.ActionValidation;
-                string trimmedResult = "";
+                string trimmedResult;
                 var actionValid = true;
 
                 if (actionValidation == null) { continue; }
 
                 if (string.IsNullOrEmpty(actionValidation.CheckComments) || !bool.Parse(actionValidation.CheckComments))
                 {
-                    //trimmedResult = Regex.Replace(fileResult, regComments, "");
                     trimmedResult = Utils.EscapeAllWhitespace(root.NoComments().NormalizeWhitespace().ToFullString());
                 }
                 else
@@ -252,8 +251,8 @@ namespace CTA.Rules.Update
                     trimmedResult = Utils.EscapeAllWhitespace(root.NormalizeWhitespace().ToFullString());
                 }
 
-                var contains = !string.IsNullOrEmpty(actionValidation.Contains) ? Utils.EscapeAllWhitespace(actionValidation.Contains) : "";
-                var notContains = !string.IsNullOrEmpty(actionValidation.NotContains) ? Utils.EscapeAllWhitespace(actionValidation.NotContains) : "";
+                var contains = !string.IsNullOrEmpty(actionValidation.Contains) ? Utils.EscapeAllWhitespace(actionValidation.Contains) : string.Empty;
+                var notContains = !string.IsNullOrEmpty(actionValidation.NotContains) ? Utils.EscapeAllWhitespace(actionValidation.NotContains) : string.Empty;
 
                 if (!string.IsNullOrEmpty(contains) && !trimmedResult.Contains(contains))
                 {

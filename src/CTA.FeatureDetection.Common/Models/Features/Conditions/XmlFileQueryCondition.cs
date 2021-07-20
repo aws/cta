@@ -46,7 +46,7 @@ namespace CTA.FeatureDetection.Common.Models.Features.Conditions
         {
             var filePatternsToLookFor = FileNamePatterns.Select(f => 
                 //Trim the expression being sent. We need this to support not changing the files until customers have moved to a later version:
-                f.Replace(".*(", "*").Replace(")$", "")
+                f.Replace(".*(", "*").Replace(")$", string.Empty)
             ).ToList();
 
             if (!string.IsNullOrEmpty(FileNamePattern))

@@ -1,12 +1,14 @@
 ﻿using System.IO;
 using System.Reflection;
 using CTA.Rules.Models;
-using CTA.Rules.Config;
 
 namespace CTA.Rules.Config
 {
     public class TemplateHelper
     {
+        private const string MultilineCommentOpen = "/*";
+        private const string MultilineCommentClose = "/*";
+
         /// <summary>
         /// Gets the content of a template file 
         /// </summary>
@@ -20,7 +22,7 @@ namespace CTA.Rules.Config
 
             fileContent = File.ReadAllText(file);
 
-            return fileContent.Replace("/*", "").Replace("*/", "").Replace(Constants.NameSpacePlaceHolder, projectNamespace);
+            return fileContent.Replace(MultilineCommentOpen, string.Empty).Replace(MultilineCommentClose, string.Empty).Replace(Constants.NameSpacePlaceHolder, projectNamespace);
         }
 
         /// <summary>
