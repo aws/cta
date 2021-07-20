@@ -7,7 +7,7 @@ namespace CTA.Rules.Config
     public class TemplateHelper
     {
         private const string MultilineCommentOpen = "/*";
-        private const string MultilineCommentClose = "/*";
+        private const string MultilineCommentClose = "*/";
 
         /// <summary>
         /// Gets the content of a template file 
