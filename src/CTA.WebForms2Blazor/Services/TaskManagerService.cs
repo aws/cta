@@ -93,7 +93,7 @@ namespace CTA.WebForms2Blazor.Services
             // then we do nothing
         }
 
-        private async void TryResolveStall()
+        private void TryResolveStall()
         {
             // NOTE: Commented out for use later, currently
             // configured to immediately cancel oldest task

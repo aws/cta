@@ -1,15 +1,14 @@
-﻿using System.Threading.Tasks;
-using CTA.WebForms2Blazor.FileInformationModel;
-using CTA.WebForms2Blazor.Helpers;
-using CTA.WebForms2Blazor.Extensions;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
-using System.IO;
+using System.Threading.Tasks;
+using CTA.WebForms2Blazor.Extensions;
+using CTA.WebForms2Blazor.FileInformationModel;
+using CTA.WebForms2Blazor.Helpers;
 using CTA.WebForms2Blazor.Services;
-using System.Collections.Generic;
-using System;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace CTA.WebForms2Blazor.ClassConverters
 {
@@ -29,7 +28,7 @@ namespace CTA.WebForms2Blazor.ClassConverters
             _newLifecycleLines = new Dictionary<BlazorComponentLifecycleEvent, IEnumerable<StatementSyntax>>();
         }
 
-        public override async Task<IEnumerable<FileInformation>> MigrateClassAsync()
+        public override Task<IEnumerable<FileInformation>> MigrateClassAsync()
         {
             LogStart();
 
@@ -43,6 +42,9 @@ namespace CTA.WebForms2Blazor.ClassConverters
             var currentClassDeclaration = ((ClassDeclarationSyntax)_originalDeclarationSyntax)
                 // Need to track methods so modifications can be made one after another
                 .TrackNodes(allMethods)
+                // Remove outdated base type references
+                // TODO: Scan and remove specific base types in the future
+                .ClearBaseTypes()
                 // ComponentBase base class is required to use lifecycle events
                 .AddBaseType(Constants.ComponentBaseClass);
 
@@ -90,7 +92,9 @@ namespace CTA.WebForms2Blazor.ClassConverters
             DoCleanUp();
             LogEnd();
 
-            return new[] { new FileInformation(GetNewRelativePath(), Encoding.UTF8.GetBytes(fileText)) };
+            var result = new[] { new FileInformation(GetNewRelativePath(), Encoding.UTF8.GetBytes(fileText)) };
+
+            return Task.FromResult((IEnumerable<FileInformation>)result);
         }
 
         private string GetNewRelativePath()

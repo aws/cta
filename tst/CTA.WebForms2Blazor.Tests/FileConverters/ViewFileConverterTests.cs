@@ -20,7 +20,7 @@ namespace CTA.WebForms2Blazor.Tests.FileConverters
         public async Task HyperLinkControlConverter_Returns_Href_Node()
         {
             FileConverter fc = new ViewFileConverter(FileConverterSetupFixture.TestProjectPath, 
-                FileConverterSetupFixture.TestHyperLinkControlFilePath);
+                FileConverterSetupFixture.TestHyperLinkControlFilePath, new ViewImportService());
             
             IEnumerable<FileInformation> fileList = await fc.MigrateFileAsync();
             FileInformation fi = fileList.Single();
@@ -44,15 +44,15 @@ namespace CTA.WebForms2Blazor.Tests.FileConverters
                 </a>
             </nav>
             <td>
-                <a href='@(GetRouteUrl(""EditProductRoute"", new {id =Item.Id}) )' class=""esh-table-link"">
+                <a href='@(GetRouteUrl(""EditProductRoute"", new {id =Item.Id}))' class=""esh-table-link"">
                     Edit
                 </a>
                 |
-                <a href='@(GetRouteUrl(""ProductDetailsRoute"", new {id =Item.Id}) )' class=""esh-table-link"">
+                <a href='@(GetRouteUrl(""ProductDetailsRoute"", new {id =Item.Id}))' class=""esh-table-link"">
                     Details
                 </a>
                 |
-                <a href='@(GetRouteUrl(""DeleteProductRoute"", new {id =Item.Id}) )' class=""esh-table-link"">
+                <a href='@(GetRouteUrl(""DeleteProductRoute"", new {id =Item.Id}))' class=""esh-table-link"">
                     Delete
                 </a>
             </td>
@@ -73,7 +73,7 @@ namespace CTA.WebForms2Blazor.Tests.FileConverters
         public async Task ButtonControlConverter_Returns_Button_Node()
         {
             FileConverter fc = new ViewFileConverter(FileConverterSetupFixture.TestProjectPath, 
-                FileConverterSetupFixture.TestButtonControlFilePath);
+                FileConverterSetupFixture.TestButtonControlFilePath, new ViewImportService());
             
             IEnumerable<FileInformation> fileList = await fc.MigrateFileAsync();
             FileInformation fi = fileList.Single();
@@ -109,7 +109,7 @@ namespace CTA.WebForms2Blazor.Tests.FileConverters
         public async Task LabelControlConverter_Returns_DynamicText()
         {
             FileConverter fc = new ViewFileConverter(FileConverterSetupFixture.TestProjectPath, 
-                FileConverterSetupFixture.TestLabelControlFilePath);
+                FileConverterSetupFixture.TestLabelControlFilePath, new ViewImportService());
             
             IEnumerable<FileInformation> fileList = await fc.MigrateFileAsync();
             FileInformation fi = fileList.Single();
@@ -199,7 +199,7 @@ namespace CTA.WebForms2Blazor.Tests.FileConverters
         public async Task ListViewControlConverter_Returns_ListView_Node()
         {
             FileConverter fc = new ViewFileConverter(FileConverterSetupFixture.TestProjectPath, 
-                FileConverterSetupFixture.TestListViewControlFilePath);
+                FileConverterSetupFixture.TestListViewControlFilePath, new ViewImportService());
             
             IEnumerable<FileInformation> fileList = await fc.MigrateFileAsync();
             FileInformation fi = fileList.Single();
@@ -251,14 +251,14 @@ namespace CTA.WebForms2Blazor.Tests.FileConverters
             Assert.True(fileContents.Contains(@"Context=""itemPlaceHolder"""));
             Assert.False(fileContents.Contains("asp:ListView"));
             Assert.False(fileContents.Contains("asp:PlaceHolder"));
-            Assert.AreEqual(fi.RelativePath, relativePath);
+            Assert.AreEqual(relativePath, fi.RelativePath);
         }
 
         [Test]
         public async Task TestViewFileConverter_Returns_GridView_Node()
         {
             FileConverter fc = new ViewFileConverter(FileConverterSetupFixture.TestProjectPath, 
-                FileConverterSetupFixture.TestGridViewControlFilePath);
+                FileConverterSetupFixture.TestGridViewControlFilePath, new ViewImportService());
             
             IEnumerable<FileInformation> fileList = await fc.MigrateFileAsync();
             FileInformation fi = fileList.Single();
@@ -288,7 +288,7 @@ namespace CTA.WebForms2Blazor.Tests.FileConverters
             <BoundField DataField=""LastName"" HeaderText=""LastName"" ItemType=""PleaseReplaceWithActualItemTypeHere""></BoundField>
             <TemplateField ItemType=""PleaseReplaceWithActualItemTypeHere"">
                 <ItemTemplate Context=""Item"">
-                    <button type=""button"">Click Me! @(Item.Name )</button>
+                    <button type=""button"">Click Me! @(Item.Name)</button>
                 </ItemTemplate>
             </TemplateField>
             <ButtonField ButtonType=""Button"" DataTextField=""CompanyName"" DataTextFormatString=""{0}"" CommandName=""Customer"" ItemType=""PleaseReplaceWithActualItemTypeHere""></ButtonField>
@@ -308,7 +308,8 @@ namespace CTA.WebForms2Blazor.Tests.FileConverters
         public async Task TestViewFileConverter_Returns_ContentPlaceHolderNode_As_Body_Directive()
         {
             FileConverter fc = new ViewFileConverter(FileConverterSetupFixture.TestProjectPath, 
-                FileConverterSetupFixture.TestContentPlaceHolderControlFilePath);
+                FileConverterSetupFixture.TestContentPlaceHolderControlFilePath,
+                new ViewImportService());
             
             IEnumerable<FileInformation> fileList = await fc.MigrateFileAsync();
             FileInformation fi = fileList.Single();
@@ -332,7 +333,8 @@ namespace CTA.WebForms2Blazor.Tests.FileConverters
         public async Task TestViewFileConverter_Returns_ContentNode_As_Div()
         {
             FileConverter fc = new ViewFileConverter(FileConverterSetupFixture.TestProjectPath, 
-                FileConverterSetupFixture.TestContentControlFilePath);
+                FileConverterSetupFixture.TestContentControlFilePath,
+                new ViewImportService());
             
             IEnumerable<FileInformation> fileList = await fc.MigrateFileAsync();
             FileInformation fi = fileList.Single();
@@ -367,7 +369,7 @@ namespace CTA.WebForms2Blazor.Tests.FileConverters
         public async Task TestViewFileConverter_DefaultAspx()
         {
             FileConverter fc = new ViewFileConverter(FileConverterSetupFixture.TestProjectPath, 
-                FileConverterSetupFixture.TestViewFilePath);
+                FileConverterSetupFixture.TestViewFilePath, new ViewImportService());
             
             IEnumerable<FileInformation> fileList = await fc.MigrateFileAsync();
             FileInformation fi = fileList.Single();

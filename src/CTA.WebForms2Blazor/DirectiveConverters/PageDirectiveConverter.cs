@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using CTA.WebForms2Blazor.Extensions;
+﻿using System.Collections.Generic;
 
 namespace CTA.WebForms2Blazor.DirectiveConverters
 {
@@ -31,7 +28,7 @@ namespace CTA.WebForms2Blazor.DirectiveConverters
 
             // TODO: Retrieve page route from routing service and use it populate pageRoute
 
-            return new DirectiveMigrationResult(DirectiveMigrationResultType.Directive, $"@page \"{pageRoute}\"");
+            return new DirectiveMigrationResult(DirectiveMigrationResultType.GeneralDirective, $"@page \"{pageRoute}\"");
         }
     }
 }

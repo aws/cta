@@ -7,8 +7,9 @@ namespace CTA.WebForms2Blazor.Helpers.ControlHelpers
 {
     public static class SupportedControls
     {
-        //Uncomment when implemented
-        public static readonly Dictionary<String, ControlConverter> ControlRulesMap = new Dictionary<string, ControlConverter>()
+        private const string UnsupportedAspExpressionTypeCommentTemplate = "@* Asp expresion type {0} with content {1} not currently supported *@";
+
+        public static readonly Dictionary<string, ControlConverter> ControlRulesMap = new Dictionary<string, ControlConverter>()
         {
             ["asp:hyperlink"] = new HyperLinkControlConverter(),
             ["asp:button"] = new ButtonControlConverter(),
@@ -26,6 +27,13 @@ namespace CTA.WebForms2Blazor.Helpers.ControlHelpers
             ["Page"] = new PageDirectiveConverter()
         };
 
+        public static readonly Dictionary<string, Func<string, string>> AspExpressionRulesMap = new Dictionary<string, Func<string, string>>()
+        {
+            ["AppSettings"] = expr => string.Format(Constants.RazorConfigurationAccessTemplate, $"{Constants.AppSettingsSection}:{expr}"),
+            ["ConnectionStrings"] = expr => string.Format(Constants.RazorConfigurationAccessTemplate, $"{Constants.ConnectionStringsSection}:{expr}")
+        };
+
         public static readonly DirectiveConverter DefaultDirectiveConverter = new DirectiveConverter();
+        public static readonly Func<string, string, string> DefaultAspExpressionConverter = (exprType, expr) => string.Format(UnsupportedAspExpressionTypeCommentTemplate, exprType, expr);
     }
 }

@@ -8,20 +8,20 @@ using CTA.WebForms2Blazor.ControlConverters;
 using CTA.WebForms2Blazor.FileInformationModel;
 using CTA.WebForms2Blazor.Helpers;
 using CTA.WebForms2Blazor.Helpers.ControlHelpers;
+using CTA.WebForms2Blazor.Services;
 using HtmlAgilityPack;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace CTA.WebForms2Blazor.FileConverters
 {
     public class ViewFileConverter : FileConverter
     {
+        private ViewImportService _viewImportService;
         private List<ControlConversionAction> ControlActions;
-        private string _relativeDirectory;
 
-        public ViewFileConverter(string sourceProjectPath, string fullPath) 
+        public ViewFileConverter(string sourceProjectPath, string fullPath, ViewImportService viewImportService) 
             : base(sourceProjectPath, fullPath)
         {
-            _relativeDirectory = Path.GetDirectoryName(RelativePath);
+            _viewImportService = viewImportService;
             ControlActions = new List<ControlConversionAction>();
         }
 
@@ -36,13 +36,13 @@ namespace CTA.WebForms2Blazor.FileConverters
             
             FindConversionActions(htmlDoc.DocumentNode, null);
             
-            //This will modify the HtmlDocument nodes that will then be changed to a file information object
+            // This will modify the HtmlDocument nodes that will then be changed to a file information object
             ConvertNodes();
 
             return htmlDoc;
         }
 
-        //Performs a DFS traversal of the HTML tree, adding nodes to be converted in postorder
+        // Performs a DFS traversal of the HTML tree, adding nodes to be converted in postorder
         private void FindConversionActions(HtmlNode node, HtmlNode parent)
         {
             if (node == null)
@@ -76,18 +76,21 @@ namespace CTA.WebForms2Blazor.FileConverters
             }
         }
 
-        public override async Task<IEnumerable<FileInformation>> MigrateFileAsync()
+        public override Task<IEnumerable<FileInformation>> MigrateFileAsync()
         {
             LogStart();
-
-            // TODO: Store UI information in necessary services
 
             // View file converters will return razor file contents with
             // only view layer, code behind will be created in another file
 
             HtmlDocument migratedDocument = GetRazorContents();
             string contents = migratedDocument.DocumentNode.WriteTo();
-            contents = ControlConverter.ConvertEmbeddedCode(contents);
+            // We comment out the unknown user controls here instead of during
+            // traversal because the post-order nature may comment out controls
+            // that are migrated as part of an ancestor control before that ancestor
+            // can be processed
+            contents = UnknownControlRemover.RemoveUnknownTags(contents);
+            contents = ControlConverter.ConvertEmbeddedCode(contents, _viewImportService);
 
             // Currently just changing extension to .razor, keeping filename and directory the same
             // but Razor files are renamed and moved around, can't always use same filename/directory in the future
@@ -110,12 +113,15 @@ namespace CTA.WebForms2Blazor.FileConverters
                 LogEnd();
 
                 // Stuff like Global.asax shouldn't create a Global.razor file
-                return Enumerable.Empty<FileInformation>();
+                return Task.FromResult(Enumerable.Empty<FileInformation>());
             }
 
             LogEnd();
 
-            return new List<FileInformation>() { new FileInformation(newRelativePath, Encoding.UTF8.GetBytes(contents)) };
+            var fileInfo = new FileInformation(newRelativePath, Encoding.UTF8.GetBytes(contents));
+            var result = new[] { fileInfo };
+
+            return Task.FromResult((IEnumerable<FileInformation>)result);
         }
     }
 }

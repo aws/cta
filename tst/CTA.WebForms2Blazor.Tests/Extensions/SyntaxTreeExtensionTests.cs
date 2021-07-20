@@ -218,5 +218,16 @@ namespace CTA.WebForms2Blazor.Tests.Extensions
 
             Assert.AreEqual(ClassWith2BaseTypes, actualClassText);
         }
+
+        [Test]
+        public void ClearBaseTypes_Removes_Multiple_Types()
+        {
+            var classDeclaration = SyntaxFactory.ClassDeclaration(TestClassName).AddBaseListTypes(new[] {
+                SyntaxFactory.SimpleBaseType(SyntaxFactory.IdentifierName(TestBaseClassName1)),
+                SyntaxFactory.SimpleBaseType(SyntaxFactory.IdentifierName(TestBaseClassName1))
+            });
+
+            Assert.AreEqual(0, classDeclaration.ClearBaseTypes().BaseList.Types.Count);
+        }
     }
 }

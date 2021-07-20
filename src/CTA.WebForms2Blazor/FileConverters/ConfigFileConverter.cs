@@ -1,16 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using System.Threading.Tasks;
-using CTA.WebForms2Blazor.FileInformationModel;
 using CTA.Rules.Actions;
 using CTA.Rules.Models;
-using Newtonsoft.Json.Linq;
-using System.Configuration;
-using System.IO;
-using System.Reflection;
-using Newtonsoft.Json;
-using System.Linq;
+using CTA.WebForms2Blazor.FileInformationModel;
 
 namespace CTA.WebForms2Blazor.FileConverters
 {
@@ -24,7 +19,7 @@ namespace CTA.WebForms2Blazor.FileConverters
             _relativeDirectory = Path.GetDirectoryName(RelativePath);
         }
 
-        public override async Task<IEnumerable<FileInformation>> MigrateFileAsync()
+        public override Task<IEnumerable<FileInformation>> MigrateFileAsync()
         {
             LogStart();
 
@@ -44,7 +39,7 @@ namespace CTA.WebForms2Blazor.FileConverters
 
             LogEnd();
 
-            return fileList;
+            return Task.FromResult((IEnumerable<FileInformation>)fileList);
         }
     }
 }

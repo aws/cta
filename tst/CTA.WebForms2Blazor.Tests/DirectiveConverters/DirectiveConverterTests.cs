@@ -1,4 +1,5 @@
 ﻿using CTA.WebForms2Blazor.DirectiveConverters;
+using CTA.WebForms2Blazor.Services;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
@@ -28,7 +29,7 @@ namespace CTA.WebForms2Blazor.Tests.DirectiveConverters
         [Test]
         public void ConvertDirective_Properly_Constructs_General_Directive_Unknown_Comment()
         {
-            Assert.AreEqual(ExpectedUnknownDirectiveComment, _directiveConverter.ConvertDirective(TestDirectiveName, TestDirectiveName));
+            Assert.AreEqual(ExpectedUnknownDirectiveComment, _directiveConverter.ConvertDirective(TestDirectiveName, TestDirectiveName, new ViewImportService()));
         }
 
         [Test]
@@ -36,7 +37,7 @@ namespace CTA.WebForms2Blazor.Tests.DirectiveConverters
         {
             var expectedText = ExpectedUnknownDirectiveComment + ExpectedUnknownAttributeComment1;
 
-            Assert.AreEqual(expectedText, _directiveConverter.ConvertDirective(TestDirectiveName, TestDirective1Attribute));
+            Assert.AreEqual(expectedText, _directiveConverter.ConvertDirective(TestDirectiveName, TestDirective1Attribute, new ViewImportService()));
         }
 
         [Test]
@@ -44,7 +45,7 @@ namespace CTA.WebForms2Blazor.Tests.DirectiveConverters
         {
             var expectedText = ExpectedUnknownDirectiveComment + ExpectedUnknownAttributeComment1 + ExpectedUnknownAttributeComment2;
 
-            Assert.AreEqual(expectedText, _directiveConverter.ConvertDirective(TestDirectiveName, TestDirective2Attributes));
+            Assert.AreEqual(expectedText, _directiveConverter.ConvertDirective(TestDirectiveName, TestDirective2Attributes, new ViewImportService()));
         }
     }
 }
