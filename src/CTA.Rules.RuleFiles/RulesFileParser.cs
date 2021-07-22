@@ -156,18 +156,9 @@ namespace CTA.Rules.RuleFiles
                     {
                         if (method.Actions != null && method.Actions.Count > 0)
                         {
-                            if (@class.KeyType == CTA.Rules.Config.Constants.InvocationExpressionActions)
-                            {
-                                var token = new InvocationExpressionToken() { Key = method.Key, Namespace = @namespace.@namespace, FullKey = method.FullKey, Type = @class.Key };
-                                if (!_rootNodes.Invocationexpressiontokens.Contains(token)) { _rootNodes.Invocationexpressiontokens.Add(token); }
-                                ParseActions(token, method.Actions);
-                            }
-                            if (@class.KeyType == CTA.Rules.Config.Constants.ExpressionActions)
-                            {
-                                var token = new ExpressionToken() { Key = method.Key, Namespace = @namespace.@namespace, FullKey = method.FullKey, Type = @class.Key };
-                                if (!_rootNodes.Expressiontokens.Contains(token)) { _rootNodes.Expressiontokens.Add(token); }
-                                ParseActions(token, method.Actions);
-                            }
+                            var token = new InvocationExpressionToken() { Key = method.Key, Namespace = @namespace.@namespace, FullKey = method.FullKey, Type = @class.Key };
+                            if (!_rootNodes.Invocationexpressiontokens.Contains(token)) { _rootNodes.Invocationexpressiontokens.Add(token); }
+                            ParseActions(token, method.Actions);
                         }
                     }
 
@@ -310,6 +301,13 @@ namespace CTA.Rules.RuleFiles
                                     {
                                         var token = new InvocationExpressionToken() { Key = recommendation.Name, Description = recommendedActions.Description, TargetCPU = targetCPUs, Namespace = @namespace.Name, FullKey = recommendation.Value, Type = recommendation.ContainingType };
                                         if (!_rootNodes.Invocationexpressiontokens.Contains(token)) { _rootNodes.Invocationexpressiontokens.Add(token); }
+                                        ParseActions(token, recommendedActions.Actions);
+                                        break;
+                                    }
+                                case ActionTypes.Expression:
+                                    {
+                                        var token = new ExpressionToken() { Key = recommendation.Name, Description = recommendedActions.Description, TargetCPU = targetCPUs, Namespace = @namespace.Name, FullKey = recommendation.Value, Type = recommendation.ContainingType };
+                                        if (!_rootNodes.Expressiontokens.Contains(token)) { _rootNodes.Expressiontokens.Add(token); }
                                         ParseActions(token, recommendedActions.Actions);
                                         break;
                                     }

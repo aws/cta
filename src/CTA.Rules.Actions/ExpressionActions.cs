@@ -20,7 +20,7 @@ namespace CTA.Rules.Actions
             {
                 AwaitExpressionSyntax newNode = SyntaxFactory.AwaitExpression(SyntaxFactory.ParseExpression(node.WithoutTrivia().NormalizeWhitespace().ToFullString())); // SyntaxFactory.AwaitExpression().NormalizeWhitespace();
                 newNode = newNode.WithTriviaFrom(node).NormalizeWhitespace();
-                return newNode;
+                return SyntaxFactory.ExpressionStatement(newNode);
             }
             return AddAwaitOperator;
         }

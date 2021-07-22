@@ -210,6 +210,50 @@ namespace CTA.Rules.Update.Rewriters
             return identifierNameSyntax;
         }
 
+        public override SyntaxNode VisitExpressionStatement(ExpressionStatementSyntax node)
+        {
+            var newNode = base.VisitExpressionStatement(node);
+            SyntaxNode modifiedNode = newNode;
+
+            var invocationExpressionNodes = node.DescendantNodes().OfType<InvocationExpressionSyntax>().ToList();
+            if(invocationExpressionNodes.Count <= 0)
+            {
+                return node;
+            }
+            var invocationExpressionNode = invocationExpressionNodes.First();
+
+            var symbol = SemanticHelper.GetSemanticSymbol(invocationExpressionNode, _semanticModel, _preportSemanticModel);
+            if (symbol == null)
+            {
+                return node;
+            }
+            var nodeKey = symbol.OriginalDefinition.ToString();
+
+            foreach (var action in _allActions.OfType<ExpressionAction>())
+            {
+                if (nodeKey == action.Key)
+                {
+                    var actionExecution = new GenericActionExecution(action, _filePath)
+                    {
+                        TimesRun = 1
+                    };
+                    try
+                    {
+                        modifiedNode = action.ExpressionActionFunc(_syntaxGenerator, newNode);
+                        LogHelper.LogInformation(string.Format("{0}: {1}", node.SpanStart, action.Description));
+                    }
+                    catch (Exception ex)
+                    {
+                        var actionExecutionException = new ActionExecutionException(action.Name, action.Key, ex);
+                        actionExecution.InvalidExecutions = 1;
+                        LogHelper.LogError(actionExecutionException);
+                    }
+                    allExecutedActions.Add(actionExecution);
+                }
+            }
+            return modifiedNode;
+        }
+
         public override SyntaxNode VisitInvocationExpression(InvocationExpressionSyntax node)
         {
             var symbol = SemanticHelper.GetSemanticSymbol(node, _semanticModel, _preportSemanticModel);
@@ -234,28 +278,6 @@ namespace CTA.Rules.Update.Rewriters
                     try
                     {
                         newNode = action.InvocationExpressionActionFunc(_syntaxGenerator, (InvocationExpressionSyntax)newNode);
-                        LogHelper.LogInformation(string.Format("{0}: {1}", node.SpanStart, action.Description));
-                    }
-                    catch (Exception ex)
-                    {
-                        var actionExecutionException = new ActionExecutionException(action.Name, action.Key, ex);
-                        actionExecution.InvalidExecutions = 1;
-                        LogHelper.LogError(actionExecutionException);
-                    }
-                    allExecutedActions.Add(actionExecution);
-                }
-            }
-            foreach (var action in _allActions.OfType<ExpressionAction>())
-            {
-                if (nodeKey == action.Key)
-                {
-                    var actionExecution = new GenericActionExecution(action, _filePath)
-                    {
-                        TimesRun = 1
-                    };
-                    try
-                    {
-                        newNode = action.ExpressionActionFunc(_syntaxGenerator, newNode);
                         LogHelper.LogInformation(string.Format("{0}: {1}", node.SpanStart, action.Description));
                     }
                     catch (Exception ex)

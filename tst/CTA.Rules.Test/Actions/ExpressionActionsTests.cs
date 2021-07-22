@@ -31,7 +31,7 @@ namespace CTA.Rules.Test.Actions
                 _expressionActions.GetAddAwaitOperatorAction("");
             var newNode = addAwaitFunc(_syntaxGenerator, _node);
 
-            var expectedResult = "/* Super comment */\r\nawait Math.Abs(-1)";
+            var expectedResult = "/* Super comment */\r\nawait Math.Abs(-1);";
             Assert.AreEqual(expectedResult, newNode.ToFullString());
         }
 
