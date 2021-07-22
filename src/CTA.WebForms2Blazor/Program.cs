@@ -36,7 +36,8 @@ namespace CTA.WebForms2Blazor
                 { "Autofac", new Tuple<string, string>("4.9.1.0", "4.9.3")},
                 { "EntityFramework", new Tuple<string, string>("6.0.0.0", "6.4.4")},
                 { "log4net", new Tuple<string, string>("2.0.8.0", "2.0.12")},
-                { "Microsoft.Extensions.Logging.Log4Net.AspNetCore", new Tuple<string, string>("1.0.0", "2.2.12")}
+                { "Microsoft.Extensions.Logging.Log4Net.AspNetCore", new Tuple<string, string>("1.0.0", "2.2.12")},
+                { "Fritz.BlazorWebformsComponents", new Tuple<string, string>("0.9.0", "0.9.0")}
             };
                 
             // Create a configuration object using the CLI and other arbitrary values

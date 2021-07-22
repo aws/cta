@@ -3,6 +3,7 @@ using System.IO;
 using CTA.Rules.Config;
 using CTA.WebForms2Blazor.Services;
 using NUnit.Framework;
+using NUnit.Framework.Internal;
 
 namespace CTA.WebForms2Blazor.Tests.FileConverters
 {
@@ -25,6 +26,7 @@ namespace CTA.WebForms2Blazor.Tests.FileConverters
         public static string TestGridViewControlFilePath;
         public static string TestContentPlaceHolderControlFilePath;
         public static string TestContentControlFilePath;
+        public static string TestSiteMasterFilePath;
         public static string TestAreaFullPath;
 
         private WorkspaceManagerService _blazorWorkspaceManager;
@@ -48,6 +50,7 @@ namespace CTA.WebForms2Blazor.Tests.FileConverters
             TestContentPlaceHolderControlFilePath =
                 Path.Combine(TestFilesDirectoryPath, "ContentPlaceHolderControlOnly.aspx");
             TestContentControlFilePath = Path.Combine(TestFilesDirectoryPath, "ContentControlOnly.aspx");
+            TestSiteMasterFilePath = Path.Combine(TestFilesDirectoryPath, "SampleSiteMasterFile.Master");
             TestAreaFullPath = Path.Combine(TestProjectPath, TestFilesDirectoryPath);
             
             _blazorWorkspaceManager = new WorkspaceManagerService();

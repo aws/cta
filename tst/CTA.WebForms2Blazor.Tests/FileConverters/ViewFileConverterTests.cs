@@ -346,7 +346,7 @@ namespace CTA.WebForms2Blazor.Tests.FileConverters
             string relativePath = Path.GetRelativePath(FileConverterSetupFixture.TestProjectPath, newPath);
             relativePath = Path.Combine("Pages", relativePath);
 
-            string expectedContents =  @"<div>
+            string expectedContents =  @"
     <div class=""esh-pager"">
         <div class=""container"">
             <article class=""esh-pager-wrapper row"">
@@ -359,7 +359,7 @@ namespace CTA.WebForms2Blazor.Tests.FileConverters
     <div>
         <p> Some random stuff </p>
     </div>
-</div>";
+";
             
             Assert.AreEqual(expectedContents, fileContents);
             Assert.AreEqual(relativePath, fi.RelativePath);
@@ -377,8 +377,19 @@ namespace CTA.WebForms2Blazor.Tests.FileConverters
             byte[] bytes = fi.FileBytes;
             var fileContents = Encoding.UTF8.GetString(bytes);
             
-            string newPath = Path.Combine(FileConverterSetupFixture.TestFilesDirectoryPath, "LabelControlOnly.razor");
-            string relativePath = Path.GetRelativePath(FileConverterSetupFixture.TestProjectPath, newPath);
+        }
+
+        [Test]
+        public async Task TestViewFileConverter_SiteMaster()
+        {
+            FileConverter fc = new ViewFileConverter(FileConverterSetupFixture.TestProjectPath, 
+                FileConverterSetupFixture.TestSiteMasterFilePath, new ViewImportService());
+            
+            IEnumerable<FileInformation> fileList = await fc.MigrateFileAsync();
+            FileInformation fi = fileList.Single();
+            
+            byte[] bytes = fi.FileBytes;
+            var fileContents = Encoding.UTF8.GetString(bytes);
         }
     }
 }

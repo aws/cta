@@ -72,7 +72,10 @@ namespace CTA.WebForms2Blazor.FileConverters
             foreach (var package in ControlActions)
             {
                 HtmlNode convertedNode = package.Rules.Convert2Blazor(package.Node);
-                package.Parent.ReplaceChild(convertedNode, package.Node);
+                if (convertedNode != null)
+                {
+                    package.Parent.ReplaceChild(convertedNode, package.Node);
+                }
             }
         }
 
