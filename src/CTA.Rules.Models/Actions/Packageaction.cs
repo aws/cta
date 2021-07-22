@@ -1,4 +1,5 @@
 ﻿
+using System;
 using Codelyzer.Analysis.Model;
 
 namespace CTA.Rules.Models
@@ -14,14 +15,13 @@ namespace CTA.Rules.Models
         public override bool Equals(object obj)
         {
             var action = (PackageAction)obj;
-            return action.Name == this.Name
-                && action.Version == this.Version;
+            return action?.Name == this.Name
+                && action?.Version == this.Version;
         }
 
         public override int GetHashCode()
         {
-            return Name.GetHashCode()
-                + 3 * (!string.IsNullOrEmpty(Version) ? Version.GetHashCode() : 0);
+            return HashCode.Combine(Name, Version);
         }
     }
 }

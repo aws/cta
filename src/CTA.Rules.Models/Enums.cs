@@ -3,6 +3,7 @@
     public enum ActionTypes
     {
         Method,
+        Expression,
         Using,
         Class,
         Interface,

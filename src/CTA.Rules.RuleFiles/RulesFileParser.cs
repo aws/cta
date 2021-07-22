@@ -304,6 +304,13 @@ namespace CTA.Rules.RuleFiles
                                         ParseActions(token, recommendedActions.Actions);
                                         break;
                                     }
+                                case ActionTypes.Expression:
+                                    {
+                                        var token = new ExpressionToken() { Key = recommendation.Name, Description = recommendedActions.Description, TargetCPU = targetCPUs, Namespace = @namespace.Name, FullKey = recommendation.Value, Type = recommendation.ContainingType };
+                                        if (!_rootNodes.Expressiontokens.Contains(token)) { _rootNodes.Expressiontokens.Add(token); }
+                                        ParseActions(token, recommendedActions.Actions);
+                                        break;
+                                    }
                                 case ActionTypes.Attribute:
                                     {
                                         var token = new AttributeToken() { Key = recommendation.Name, Description = recommendedActions.Description, TargetCPU = targetCPUs, Namespace = @namespace.Name, FullKey = recommendation.Value, Type = recommendation.ContainingType };
@@ -389,6 +396,24 @@ namespace CTA.Rules.RuleFiles
                                         Name = action.Name,
                                         Type = action.Type,
                                         InvocationExpressionActionFunc = actionFunc
+                                    });
+                                }
+                                break;
+                            }
+                        case ActionTypes.Expression:
+                            {
+                                var actionFunc = actionsLoader.GetExpressionAction(action.Name, action.Value);
+                                if (actionFunc != null)
+                                {
+                                    nodeToken.ExpressionActions.Add(new ExpressionAction()
+                                    {
+                                        Key = nodeToken.Key,
+                                        Value = GetActionValue(action.Value),
+                                        Description = action.Description,
+                                        ActionValidation = action.ActionValidation,
+                                        Name = action.Name,
+                                        Type = action.Type,
+                                        ExpressionActionFunc = actionFunc
                                     });
                                 }
                                 break;
