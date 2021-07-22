@@ -13,9 +13,9 @@ namespace CTA.WebForms2Blazor.Helpers.ControlHelpers
 
         /// <summary>
         /// Regular expression to identify data binding syntax, matches start and end
-        /// tags (<%# and %>) with content that does not contain the end tag
+        /// tags (<%# or <%#: and %>) with content that does not contain the end tag
         /// </summary>
-        public static Regex DataBindRegex = new Regex(@"<%#\s*(?<expr>(?:(?!%>).)*)\s*%>");
+        public static Regex DataBindRegex = new Regex(@"<%#:?\s*(?<expr>(?:(?!%>).)*)\s*%>");
         /// <summary>
         /// Regular expression to identify raw expression syntax, matches start and end
         /// tags (<%= and %>) with content that does not contain the end tag

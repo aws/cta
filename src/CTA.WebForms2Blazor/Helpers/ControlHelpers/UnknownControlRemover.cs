@@ -15,7 +15,7 @@ namespace CTA.WebForms2Blazor.Helpers.ControlHelpers
         /// Used to identify end tags that follow web forms user control format, it will match
         /// if the name consists of 2 strings of word characters separated by a single colon
         /// </summary>
-        public static readonly Regex ControlEndTagRegex = new Regex(@"</\w+:\w+\s*>");
+        public static readonly Regex ControlEndTagRegex = new Regex(@"</\w+:\w+[^>]*>");
 
         public static string RemoveUnknownTags(string htmlString)
         {

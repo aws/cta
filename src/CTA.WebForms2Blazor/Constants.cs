@@ -44,6 +44,7 @@
         public const string WebFormsMasterPageMarkupFileExtension = ".Master";
         public const string WebFormsGlobalMarkupFileExtension = ".asax";
         public const string WebFormsConfigFileExtension = ".config";
+        public const string StyleSheetFileExtension = ".css";
 
         // Notable File Names
         public const string ExpectedGlobalFileName = "Global.asax.cs";
@@ -74,6 +75,9 @@
         public const string RazorExplicitEmbeddingTemplate = "@({0})";
         public const string RazorExplicitRawEmbeddingTemplate = "@(new MarkupString({0}))";
         public const string RazorConfigurationAccessTemplate = "@(Configuration[\"{0}\"])";
+        public const string RazorNamespaceDirective = "@namespace {0}";
+        public const string RazorImplementsDirective = "@implements {0}";
+        public const string RazorPageDirective = "@page \"{0}\"";
 
         // appsettings.json Section Names
         public const string AppSettingsSection = "appsettings";
@@ -89,6 +93,7 @@
 
         public const string UnusableCodeComment = "Unable to migrate the following code, as a result it was removed";
         public const string HeavyModificationNecessaryComment = "Heavy modifications likely necessary, please review";
+        public const string RemoveBeforeProductionDeploymentComment = "For development only, remove before production deployment";
 
         // Common Errors and Templates
         public const string TooManyOperationsError = "Attempted {0} operation, but the expected number of operations has already been reached";

@@ -10,7 +10,7 @@ namespace CTA.WebForms2Blazor.DirectiveConverters
     {
         public const string MasterPageFileAttr = "MasterPageFile";
         public const string InheritsAttr = "Inherits";
-        public const string TitleAttr = "Title";
+        // public const string TitleAttr = "Title";
         public const string CodeBehind = "CodeBehind";
         public const string ClassNameAttr = "ClassName";
         public const string LanguageAttr = "Language";
@@ -39,17 +39,18 @@ namespace CTA.WebForms2Blazor.DirectiveConverters
                         // return Enumerable.Empty<DirectiveMigrationResult>() if it is no longer valid
                         return new[] { new DirectiveMigrationResult(DirectiveMigrationResultType.GeneralDirective, $"@inherits {attrValue.RemoveOuterQuotes()}") };
                     },
-                    [TitleAttr] = attrValue =>
-                    {
-                        var usingDirective = "@using Microsoft.AspNetCore.Components.Web.Extensions.Head";
-                        var titleTag = $"<Title value={attrValue} />";
+                    // No longer sure if this is supported in .NET 5
+                    // [TitleAttr] = attrValue =>
+                    // {
+                    //     var usingDirective = "@using Microsoft.AspNetCore.Components.Web.Extensions.Head";
+                    //     var titleTag = $"<Title value={attrValue} />";
 
-                        return new[]
-                        {
-                            new DirectiveMigrationResult(DirectiveMigrationResultType.UsingDirective, usingDirective),
-                            new DirectiveMigrationResult(DirectiveMigrationResultType.HTMLNode, titleTag)
-                        };
-                    },
+                    //     return new[]
+                    //     {
+                    //         new DirectiveMigrationResult(DirectiveMigrationResultType.UsingDirective, usingDirective),
+                    //         new DirectiveMigrationResult(DirectiveMigrationResultType.HTMLNode, titleTag)
+                    //     };
+                    // },
                     [CodeBehind] = attrValue =>
                     {
                         // TODO: If code behind file name is different from expected value we should notify a service here

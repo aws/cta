@@ -14,7 +14,7 @@ namespace CTA.WebForms2Blazor.DirectiveConverters
                 {
                     UniversalDirectiveAttributeMap.MasterPageFileAttr,
                     UniversalDirectiveAttributeMap.InheritsAttr,
-                    UniversalDirectiveAttributeMap.TitleAttr,
+                    // UniversalDirectiveAttributeMap.TitleAttr,
                     UniversalDirectiveAttributeMap.CodeBehind,
                     UniversalDirectiveAttributeMap.ClassNameAttr,
                     UniversalDirectiveAttributeMap.LanguageAttr
@@ -22,13 +22,13 @@ namespace CTA.WebForms2Blazor.DirectiveConverters
             }
         }
 
-        private protected override DirectiveMigrationResult GetMigratedDirective(string directiveName)
+        private protected override IEnumerable<DirectiveMigrationResult> GetMigratedDirectives(string directiveName)
         {
             var pageRoute = UnknownPagePlaceHolderText;
 
             // TODO: Retrieve page route from routing service and use it populate pageRoute
 
-            return new DirectiveMigrationResult(DirectiveMigrationResultType.GeneralDirective, $"@page \"{pageRoute}\"");
+            return new[] { new DirectiveMigrationResult(DirectiveMigrationResultType.GeneralDirective, string.Format(Constants.RazorPageDirective, pageRoute)) };
         }
     }
 }

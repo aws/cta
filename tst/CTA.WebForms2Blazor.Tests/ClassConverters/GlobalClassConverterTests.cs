@@ -47,6 +47,9 @@ namespace CTA.WebForms2Blazor.Tests.ClassConverters
 }";
         private const string ExpectedOutputComplexClassText =
 @"using System;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace ProjectNamespace
 {
@@ -79,6 +82,14 @@ namespace ProjectNamespace
         {
             app.UseStaticFiles();
             app.UseRouting();
+            // For development only, remove before production
+            // deployment
+            app.UseDeveloperExceptionPage();
+            app.UseEndPoints(endpoints =>
+            {
+                endpoints.MapBlazorHub();
+                endpoints.MapFallbackToPage(""/_Host"");
+            });
             
             // The following lines were extracted from Application_Start
             var x = 10;
