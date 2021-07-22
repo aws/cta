@@ -50,7 +50,7 @@ namespace CTA.WebForms2Blazor.FileConverters
         }
 
 
-        public override async Task<IEnumerable<FileInformation>> MigrateFileAsync()
+        public override Task<IEnumerable<FileInformation>> MigrateFileAsync()
         {
             LogStart();
 
@@ -74,7 +74,7 @@ namespace CTA.WebForms2Blazor.FileConverters
 
             LogEnd();
 
-            return fileList;
+            return Task.FromResult((IEnumerable<FileInformation>)fileList);
         }
     }
 }

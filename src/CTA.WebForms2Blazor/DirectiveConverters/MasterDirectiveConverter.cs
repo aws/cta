@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using CTA.WebForms2Blazor.Extensions;
+﻿using System.Collections.Generic;
 
 namespace CTA.WebForms2Blazor.DirectiveConverters
 {
@@ -25,7 +22,7 @@ namespace CTA.WebForms2Blazor.DirectiveConverters
 
         private protected override DirectiveMigrationResult GetMigratedDirective(string directiveName)
         {
-            return new DirectiveMigrationResult(DirectiveMigrationResultType.Directive, "@inherits LayoutComponentBase");
+            return null;
         }
     }
 }

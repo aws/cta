@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.CSharp;
-using System.Text;
-using System.Text.RegularExpressions;
 using System;
 
 namespace CTA.WebForms2Blazor.Extensions
@@ -59,6 +57,11 @@ namespace CTA.WebForms2Blazor.Extensions
         public static ClassDeclarationSyntax AddBaseType(this ClassDeclarationSyntax classDeclaration, string baseTypeName)
         {
             return classDeclaration.AddBaseListTypes(SyntaxFactory.SimpleBaseType(SyntaxFactory.IdentifierName(baseTypeName)));
+        }
+
+        public static ClassDeclarationSyntax ClearBaseTypes(this ClassDeclarationSyntax classDeclaration)
+        {
+            return classDeclaration.WithBaseList(SyntaxFactory.BaseList());
         }
     }
 }

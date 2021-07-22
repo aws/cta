@@ -26,6 +26,7 @@ namespace CTA.WebForms2Blazor
 
         private TaskManagerService _taskManager;
         private LifecycleManagerService _lifecycleManager;
+        private ViewImportService _viewImportService;
         private WorkspaceManagerService _blazorWorkspaceManager;
 
         private ClassConverterFactory _classConverterFactory;
@@ -85,9 +86,10 @@ namespace CTA.WebForms2Blazor
 
             LogHelper.LogInformation(string.Format(Constants.GenericInformationLogTemplate, GetType().Name, MigrationTasksCompletedLogAction));
 
+            // Adds _Imports.razor file to project
+            _blazorProjectBuilder.WriteFileInformationToProject(_viewImportService.ConstructImportsFile());
+
             // TODO: Any necessary cleanup or last checks on new project
-            // TODO: Maybe add any new files that don't directly correspond
-            // to existing files in Web Forms i.e. _Imports.razor
 
             LogHelper.LogInformation(string.Format(
                 Constants.EndedFromToLogTemplate,
@@ -107,6 +109,7 @@ namespace CTA.WebForms2Blazor
         {
             _taskManager = new TaskManagerService();
             _lifecycleManager = new LifecycleManagerService();
+            _viewImportService = new ViewImportService();
             _blazorWorkspaceManager = new WorkspaceManagerService();
             _blazorWorkspaceManager.CreateSolutionFile();
         }
@@ -114,7 +117,7 @@ namespace CTA.WebForms2Blazor
         private void InitializeFactories()
         {
             _classConverterFactory = new ClassConverterFactory(_inputProjectPath, _lifecycleManager, _taskManager);
-            _fileConverterFactory = new FileConverterFactory(_inputProjectPath, _blazorWorkspaceManager, _webFormsProjectAnalyzer, _classConverterFactory);
+            _fileConverterFactory = new FileConverterFactory(_inputProjectPath, _blazorWorkspaceManager, _webFormsProjectAnalyzer, _viewImportService, _classConverterFactory);
         }
     }
 }

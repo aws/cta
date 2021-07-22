@@ -25,7 +25,7 @@
             <tr>
                 <td>
                     <p>
-                        <%#:Item.Name%>
+                        <%#Item.Name%>
                     </p>
                 </td>
             </tr>

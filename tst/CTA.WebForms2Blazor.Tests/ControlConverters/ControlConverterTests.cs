@@ -1,4 +1,5 @@
 using CTA.WebForms2Blazor.ControlConverters;
+using CTA.WebForms2Blazor.Services;
 using HtmlAgilityPack;
 using NUnit.Framework;
 
@@ -161,10 +162,10 @@ namespace CTA.WebForms2Blazor.Tests.ControlConverters
         <ItemTemplate>
             <tr>
                 <td>
-                    <image class=""esh-thumbnail"" src='/Pics/<%#:Item.PictureFileName%>' />
+                    <image class=""esh-thumbnail"" src='/Pics/<%#Item.PictureFileName%>' />
                 </td>
                 <p>
-                    <%#:Item.MaxStockThreshold%>
+                    <%#Item.MaxStockThreshold%>
                 </p>
                 <td>
                     <asp:HyperLink NavigateUrl='<%# GetRouteUrl(""EditProductRoute"", new {id =Item.Id}) %>' runat=""server"" CssClass=""esh-table-link"">
@@ -175,7 +176,7 @@ namespace CTA.WebForms2Blazor.Tests.ControlConverters
         </ItemTemplate>
     </asp:ListView>
 </div>";
-            string contents = ControlConverter.ConvertEmbeddedCode(htmlString);
+            string contents = ControlConverter.ConvertEmbeddedCode(htmlString, new ViewImportService());
 
             string expectedContents = @"<div class=""esh-table"">
     <asp:ListView ID=""productList"" ItemPlaceholderID=""itemPlaceHolder"" runat=""server"" ItemType=""eShopLegacyWebForms.Models.CatalogItem"">
@@ -188,7 +189,7 @@ namespace CTA.WebForms2Blazor.Tests.ControlConverters
                     @(Item.MaxStockThreshold)
                 </p>
                 <td>
-                    <asp:HyperLink NavigateUrl='@(GetRouteUrl(""EditProductRoute"", new {id =Item.Id}) )' runat=""server"" CssClass=""esh-table-link"">
+                    <asp:HyperLink NavigateUrl='@(GetRouteUrl(""EditProductRoute"", new {id =Item.Id}))' runat=""server"" CssClass=""esh-table-link"">
                         Edit
                     </asp:HyperLink>
                 </td>
@@ -212,7 +213,7 @@ namespace CTA.WebForms2Blazor.Tests.ControlConverters
         </article>
     </div>
 </div>";
-            string contents = ControlConverter.ConvertEmbeddedCode(htmlString);
+            string contents = ControlConverter.ConvertEmbeddedCode(htmlString, new ViewImportService());
             string expectedContents = @"<div class=""esh-pager"">
     <div class=""container"">
         <article class=""esh-pager-wrapper row"">

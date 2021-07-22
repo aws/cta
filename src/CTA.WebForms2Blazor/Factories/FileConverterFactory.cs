@@ -14,6 +14,7 @@ namespace CTA.WebForms2Blazor.Factories
         private readonly string _sourceProjectPath;
         private readonly WorkspaceManagerService _blazorWorkspaceManager;
         private readonly ProjectAnalyzer _webFormsProjectAnalyzer;
+        private readonly ViewImportService _viewImportService;
         private readonly ClassConverterFactory _classConverterFactory;
         
         // TODO: Organize these into "types" and force
@@ -30,11 +31,13 @@ namespace CTA.WebForms2Blazor.Factories
             string sourceProjectPath,
             WorkspaceManagerService blazorWorkspaceManager,
             ProjectAnalyzer webFormsProjectAnalyzer,
+            ViewImportService viewImportService,
             ClassConverterFactory classConverterFactory)
         {
             _sourceProjectPath = sourceProjectPath;
             _blazorWorkspaceManager = blazorWorkspaceManager;
             _webFormsProjectAnalyzer = webFormsProjectAnalyzer;
+            _viewImportService = viewImportService;
             _classConverterFactory = classConverterFactory;
         }
 
@@ -64,7 +67,7 @@ namespace CTA.WebForms2Blazor.Factories
                 || extension.Equals(Constants.WebFormsMasterPageMarkupFileExtension)
                 || extension.Equals(Constants.WebFormsGlobalMarkupFileExtension))
             {
-                fc = new ViewFileConverter(_sourceProjectPath, document.FullName);
+                fc = new ViewFileConverter(_sourceProjectPath, document.FullName, _viewImportService);
             }
             else if (extension.Equals(Constants.CSharpProjectFileExtension))
             {

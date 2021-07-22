@@ -19,6 +19,7 @@
         public const string ExpectedControlBaseClass = "UserControl";
         public const string ExpectedMasterPageBaseClass = "MasterPage";
         public const string ComponentBaseClass = "ComponentBase";
+        public const string LayoutComponentBaseClass = "LayoutComponentBase";
 
         // Notable Interfaces
         public const string HttpHandlerInterface = "IHttpHandler";
@@ -65,6 +66,18 @@
         public const string SenderParamTypeNameAlternate = "Object";
         public const string EventArgsParamTypeName = "EventArgs";
         public const string HttpContextParamTypeName = "HttpContext";
+
+        // View Text Templates
+        public const string MarkupCommentTemplate = "<!-- {0} -->";
+        public const string RazorServerSideCommentTemplate = "@* {0} *@";
+        public const string RazorCodeBlockEmbeddingTemplate = "@{{ {0} }}";
+        public const string RazorExplicitEmbeddingTemplate = "@({0})";
+        public const string RazorExplicitRawEmbeddingTemplate = "@(new MarkupString({0}))";
+        public const string RazorConfigurationAccessTemplate = "@(Configuration[\"{0}\"])";
+
+        // appsettings.json Section Names
+        public const string AppSettingsSection = "appsettings";
+        public const string ConnectionStringsSection = "ConnectionStrings";
 
         // Common Comments and Templates
         public const string CodeOriginCommentTemplate = "The following lines were extracted from {0}";

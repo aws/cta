@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using CTA.WebForms2Blazor.Helpers.ControlHelpers;
+using CTA.WebForms2Blazor.Services;
 using HtmlAgilityPack;
-using Microsoft.DotNet.PlatformAbstractions;
 
 namespace CTA.WebForms2Blazor.ControlConverters
 {
@@ -21,11 +20,6 @@ namespace CTA.WebForms2Blazor.ControlConverters
         }
         protected abstract string BlazorName { get; }
         protected virtual string NodeTemplate { get { return @"<{0} {1}>{2}</{0}>"; } }
-
-        protected ControlConverter()
-        {
-            //Constructor might not be needed
-        }
         
         //Passing this method through every .CreateNode ensures that all nodes have original capitalization
         public static void PreserveCapitalization(HtmlDocument htmlDocument)
@@ -36,14 +30,6 @@ namespace CTA.WebForms2Blazor.ControlConverters
         public virtual HtmlNode Convert2Blazor(HtmlNode node)
         {
             return Convert2BlazorFromParts(NodeTemplate, BlazorName, JoinAllAttributes(node.Attributes, NewAttributes), node.InnerHtml);
-        }
-        
-        protected HtmlNode Convert2BlazorFromParts(string template, string name, string attributes, string body)
-        {
-            string newContent = String.Format(template, name, attributes, body);
-            HtmlNode newNode = HtmlNode.CreateNode(newContent, PreserveCapitalization);
-            
-            return newNode;
         }
 
         protected virtual string JoinAllAttributes(HtmlAttributeCollection oldAttributes,
@@ -75,20 +61,37 @@ namespace CTA.WebForms2Blazor.ControlConverters
             return convertedAttributes;
         }
 
-        public static string ConvertEmbeddedCode(string htmlString)
+        protected string GetAttributeAsString(HtmlAttribute attr)
         {
-            MatchEvaluator dataBindEval = new MatchEvaluator(EmbeddedCodeReplacers.ReplaceDataBind);
-            MatchEvaluator singleExprEval = new MatchEvaluator(EmbeddedCodeReplacers.ReplaceSingleExpr);
-            MatchEvaluator directiveEval = new MatchEvaluator(EmbeddedCodeReplacers.ReplaceDirective);
-            MatchEvaluator aspExprEval = new MatchEvaluator(EmbeddedCodeReplacers.ReplaceAspExpr);
-            
-            htmlString = EmbeddedCodeReplacers.DataBindRegex.Replace(htmlString, dataBindEval);
-            htmlString = EmbeddedCodeReplacers.SingleExpRegex.Replace(htmlString, singleExprEval);
-            htmlString = EmbeddedCodeReplacers.DirectiveRegex.Replace(htmlString, directiveEval);
+            if (attr.QuoteType == AttributeValueQuote.DoubleQuote)
+            {
+                return $"{attr.OriginalName}=\"{attr.Value}\"";
+            }
 
-            //Not implemented/used yet
-            //htmlString = EmbeddedCodeReplacers.AspExpRegex.Replace(htmlString, aspExprEval);
+            return $"{attr.OriginalName}='{attr.Value}'";
+        }
+
+        protected HtmlNode Convert2BlazorFromParts(string template, string name, string attributes, string body)
+        {
+            string newContent = string.Format(template, name, attributes, body);
+            HtmlNode newNode = HtmlNode.CreateNode(newContent);
             
+            //This ensures that the newNode will output the correct case when called by .WriteTo()
+            newNode.OwnerDocument.OptionOutputOriginalCase = true;
+            
+            return newNode;
+        }
+        
+        public static string ConvertEmbeddedCode(string htmlString, ViewImportService viewImportService)
+        {
+            htmlString = EmbeddedCodeReplacers.ReplaceOneWayDataBinds(htmlString);
+            htmlString = EmbeddedCodeReplacers.ReplaceRawExprs(htmlString);
+            htmlString = EmbeddedCodeReplacers.ReplaceHTMLEncodedExprs(htmlString);
+            htmlString = EmbeddedCodeReplacers.ReplaceAspExprs(htmlString);
+            htmlString = EmbeddedCodeReplacers.ReplaceAspComments(htmlString);
+            htmlString = EmbeddedCodeReplacers.ReplaceDirectives(htmlString, viewImportService);
+            htmlString = EmbeddedCodeReplacers.ReplaceEmbeddedCodeBlocks(htmlString);
+
             return htmlString;
         }
         
