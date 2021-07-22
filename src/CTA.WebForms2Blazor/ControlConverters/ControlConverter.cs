@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using CTA.WebForms2Blazor.Helpers.ControlHelpers;
 using CTA.WebForms2Blazor.Services;
 using HtmlAgilityPack;
@@ -143,7 +144,10 @@ namespace CTA.WebForms2Blazor.ControlConverters
             if (keepContents)
             {
                 var childNodes = node.ChildNodes;
-                parent.AppendChildren(childNodes);   
+                foreach (HtmlNode childNode in childNodes)
+                {
+                    parent.InsertBefore(childNode, node);
+                }
             }
             
             parent.RemoveChild(node);
