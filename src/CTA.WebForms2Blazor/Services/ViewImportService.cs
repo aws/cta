@@ -21,7 +21,7 @@ namespace CTA.WebForms2Blazor.Services
         // TODO: May want to determine shared folder layouts and add some
         // @layout directives to lower-level _Imports.razor files
 
-        private ISet<string> ViewUsingDirectives = new HashSet<string>()
+        private readonly ISet<string> ViewUsingDirectives = new HashSet<string>()
         {
             // Initialize with set of basic usings likely to be required
             "@using BlazorWebFormsComponents",

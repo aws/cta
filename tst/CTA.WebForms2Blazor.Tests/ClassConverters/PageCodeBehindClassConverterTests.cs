@@ -48,8 +48,7 @@ namespace CTA.WebForms2Blazor.Tests.ClassConverters
     }
 }";
         private const string ExpectedOutputComplexClassText =
-@"using System;
-using Microsoft.AspNetCore.Components;
+@"using Microsoft.AspNetCore.Components;
 
 namespace TestNamespace
 {

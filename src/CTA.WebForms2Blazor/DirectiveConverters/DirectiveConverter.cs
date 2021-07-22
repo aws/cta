@@ -30,14 +30,8 @@ namespace CTA.WebForms2Blazor.DirectiveConverters
             // to choose is difficult
             var migrationResults = GetMigratedAttributes(directiveString, directiveName);
 
-            // Want to ensure that the general directive conversion stays at the front if it exists,
-            // migratedDirective will be null if there is no need to add extra directives or tags for
-            // general case
-            var migratedDirective = GetMigratedDirective(directiveName);
-            if (migratedDirective != null)
-            {
-                migrationResults = migrationResults.Prepend(migratedDirective);
-            }
+            // Want to ensure that the general directive conversion stays at the front if it exists
+            migrationResults = GetMigratedDirectives(directiveName).Concat(migrationResults);
 
             // Remove any using directive results and send them to the viewImports service
             migrationResults = migrationResults.Where(migrationResult => {
@@ -55,9 +49,9 @@ namespace CTA.WebForms2Blazor.DirectiveConverters
 
         // We want to allow this to be overridden in case some specialized functionality is required to
         // perform the conversion, similar to the reasoning behind using Func<> in the attribute map
-        private protected virtual DirectiveMigrationResult GetMigratedDirective(string directiveName)
+        private protected virtual IEnumerable<DirectiveMigrationResult> GetMigratedDirectives(string directiveName)
         {
-            return new DirectiveMigrationResult(DirectiveMigrationResultType.Comment, string.Format(DirectiveMigrationNotSupportedTemplate, directiveName));
+            return new[] { new DirectiveMigrationResult(DirectiveMigrationResultType.Comment, string.Format(DirectiveMigrationNotSupportedTemplate, directiveName)) };
         }
 
         private IEnumerable<DirectiveMigrationResult> GetMigratedAttributes(string directiveString, string directiveName)

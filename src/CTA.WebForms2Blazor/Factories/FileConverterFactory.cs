@@ -16,6 +16,7 @@ namespace CTA.WebForms2Blazor.Factories
         private readonly ProjectAnalyzer _webFormsProjectAnalyzer;
         private readonly ViewImportService _viewImportService;
         private readonly ClassConverterFactory _classConverterFactory;
+        private readonly HostPageService _hostPageService;
         
         // TODO: Organize these into "types" and force
         // content separation in file system if it doesn't
@@ -32,13 +33,15 @@ namespace CTA.WebForms2Blazor.Factories
             WorkspaceManagerService blazorWorkspaceManager,
             ProjectAnalyzer webFormsProjectAnalyzer,
             ViewImportService viewImportService,
-            ClassConverterFactory classConverterFactory)
+            ClassConverterFactory classConverterFactory,
+            HostPageService hostPageService)
         {
             _sourceProjectPath = sourceProjectPath;
             _blazorWorkspaceManager = blazorWorkspaceManager;
             _webFormsProjectAnalyzer = webFormsProjectAnalyzer;
             _viewImportService = viewImportService;
             _classConverterFactory = classConverterFactory;
+            _hostPageService = hostPageService;
         }
 
         public FileConverter Build(FileInfo document)
@@ -75,7 +78,7 @@ namespace CTA.WebForms2Blazor.Factories
             }
             else if (StaticResourceExtensions.Contains(extension))
             {
-                fc = new StaticResourceFileConverter(_sourceProjectPath, document.FullName);
+                fc = new StaticResourceFileConverter(_sourceProjectPath, document.FullName, _hostPageService);
             }
             else
             {

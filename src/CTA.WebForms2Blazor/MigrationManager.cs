@@ -8,6 +8,7 @@ using CTA.WebForms2Blazor.ProjectManagement;
 using CTA.WebForms2Blazor.FileInformationModel;
 using CTA.Rules.Config;
 using System;
+using System.IO;
 
 namespace CTA.WebForms2Blazor
 {
@@ -18,8 +19,8 @@ namespace CTA.WebForms2Blazor
         private readonly string _inputProjectPath;
         private readonly string _outputProjectPath;
 
-        private PortCoreConfiguration _projectConfiguration;
-        private AnalyzerResult _analyzerResult;
+        private readonly PortCoreConfiguration _projectConfiguration;
+        private readonly AnalyzerResult _analyzerResult;
 
         private ProjectAnalyzer _webFormsProjectAnalyzer;
         private ProjectBuilder _blazorProjectBuilder;
@@ -27,6 +28,9 @@ namespace CTA.WebForms2Blazor
         private TaskManagerService _taskManager;
         private LifecycleManagerService _lifecycleManager;
         private ViewImportService _viewImportService;
+        private ProgramCsService _programCsService;
+        private AppRazorService _appRazorService;
+        private HostPageService _hostPageService;
         private WorkspaceManagerService _blazorWorkspaceManager;
 
         private ClassConverterFactory _classConverterFactory;
@@ -86,8 +90,7 @@ namespace CTA.WebForms2Blazor
 
             LogHelper.LogInformation(string.Format(Constants.GenericInformationLogTemplate, GetType().Name, MigrationTasksCompletedLogAction));
 
-            // Adds _Imports.razor file to project
-            _blazorProjectBuilder.WriteFileInformationToProject(_viewImportService.ConstructImportsFile());
+            WriteServiceDerivedFiles();
 
             // TODO: Any necessary cleanup or last checks on new project
 
@@ -97,6 +100,14 @@ namespace CTA.WebForms2Blazor
                 Constants.ProjectMigrationLogAction,
                 _inputProjectPath,
                 _outputProjectPath));
+        }
+
+        private void WriteServiceDerivedFiles()
+        {
+            _blazorProjectBuilder.WriteFileInformationToProject(_viewImportService.ConstructImportsFile());
+            _blazorProjectBuilder.WriteFileInformationToProject(_programCsService.ConstructProgramCsFile());
+            _blazorProjectBuilder.WriteFileInformationToProject(_appRazorService.ConstructAppRazorFile());
+            _blazorProjectBuilder.WriteFileInformationToProject(_hostPageService.ConstructHostPageFile());
         }
 
         private void InitializeProjectManagementStructures()
@@ -110,14 +121,29 @@ namespace CTA.WebForms2Blazor
             _taskManager = new TaskManagerService();
             _lifecycleManager = new LifecycleManagerService();
             _viewImportService = new ViewImportService();
+            _programCsService = new ProgramCsService();
+            _appRazorService = new AppRazorService();
+            _hostPageService = new HostPageService();
             _blazorWorkspaceManager = new WorkspaceManagerService();
+
+            // By convention, we expect the root namespace to share a name with the project
+            // root folder
+            var rootNamespace = _analyzerResult.ProjectResult.ProjectName;
+            _programCsService.ProgramCsNamespace = rootNamespace;
+            _hostPageService.HostNamespace = rootNamespace;
             _blazorWorkspaceManager.CreateSolutionFile();
         }
 
         private void InitializeFactories()
         {
             _classConverterFactory = new ClassConverterFactory(_inputProjectPath, _lifecycleManager, _taskManager);
-            _fileConverterFactory = new FileConverterFactory(_inputProjectPath, _blazorWorkspaceManager, _webFormsProjectAnalyzer, _viewImportService, _classConverterFactory);
+            _fileConverterFactory = new FileConverterFactory(
+                _inputProjectPath,
+                _blazorWorkspaceManager,
+                _webFormsProjectAnalyzer,
+                _viewImportService,
+                _classConverterFactory,
+                _hostPageService);
         }
     }
 }

@@ -12,6 +12,14 @@ namespace CTA.WebForms2Blazor.Helpers
         public const string StartupConfigureMethodName = "Configure";
         public const string StartupConfigureServicesMethodName = "ConfigureServices";
 
+        public static IEnumerable<string> RequiredNamespaces => new[]
+        {
+            "Microsoft.AspNetCore.Hosting",
+            "Microsoft.AspNetCore.Builder",
+            "Microsoft.Extensions.Configuration",
+            "Microsoft.Extensions.DependencyInjection"
+        };
+
         /// <summary>
         /// Required statement in Configure method, adds use of wwwroot to Blazor app
         /// </summary>
@@ -20,6 +28,16 @@ namespace CTA.WebForms2Blazor.Helpers
         /// Required statement in Configure method, adds routing capabilities to Blazor app
         /// </summary>
         public static string AppUseRoutingText => $"{RuntimeInjectable.AppBuilderInjectable.ParamName}.UseRouting();";
+        /// <summary>
+        /// Statement that will allow us to debug easier when running resulting project, uses a detailed
+        /// dev error page on exception
+        /// </summary>
+        public static string AppUseDevExceptionPageCall => $"{RuntimeInjectable.AppBuilderInjectable.ParamName}.UseDeveloperExceptionPage();";
+        /// <summary>
+        /// Statement that will configure router and other stuff required for normal operation of resulting project
+        /// </summary>
+        public static string AppUseEndpointsCall => $@"{RuntimeInjectable.AppBuilderInjectable.ParamName}.UseEndpoints(endpoints =>
+            {{endpoints.MapBlazorHub();endpoints.MapFallbackToPage(""/_Host"");}});";
 
         /// <summary>
         /// Required statement in ConfigureServices method, adds use of Razor templated pages
@@ -118,7 +136,10 @@ namespace CTA.WebForms2Blazor.Helpers
             {
                 // Standard blazor configuration statements
                 SyntaxFactory.ParseStatement(AppUseStaticFilesText),
-                SyntaxFactory.ParseStatement(AppUseRoutingText)
+                SyntaxFactory.ParseStatement(AppUseRoutingText),
+                SyntaxFactory.ParseStatement(AppUseDevExceptionPageCall)
+                    .AddComment(Constants.RemoveBeforeProductionDeploymentComment),
+                SyntaxFactory.ParseStatement(AppUseEndpointsCall)
             };
 
             if (additonalStatements != null)

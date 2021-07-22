@@ -32,11 +32,15 @@ namespace CTA.WebForms2Blazor.ClassConverters
         {
             LogStart();
 
-            var requiredNamespaceNames = _sourceFileSemanticModel
-                .GetNamespacesReferencedByType(_originalDeclarationSyntax)
-                .Select(namespaceSymbol => namespaceSymbol.ToDisplayString())
-                // This is so we can use ComponentBase base class
-                .Append(Constants.BlazorComponentsNamespace);
+            // NOTE: Removed temporarily until usings can be better determined, at the moment, too
+            // many are being removed
+            //var requiredNamespaceNames = _sourceFileSemanticModel
+            //    .GetNamespacesReferencedByType(_originalDeclarationSyntax)
+            //    .Select(namespaceSymbol => namespaceSymbol.ToDisplayString())
+            //    // This is so we can use ComponentBase base class
+            //    .Append(Constants.BlazorComponentsNamespace);
+
+            var requiredNamespaceNames = _sourceFileSemanticModel.GetOriginalUsingNamespaces().Append(Constants.BlazorComponentsNamespace);
 
             var allMethods = _originalDeclarationSyntax.DescendantNodes().OfType<MethodDeclarationSyntax>();
             var currentClassDeclaration = ((ClassDeclarationSyntax)_originalDeclarationSyntax)

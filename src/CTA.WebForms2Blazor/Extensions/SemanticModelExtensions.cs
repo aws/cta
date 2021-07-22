@@ -59,6 +59,11 @@ namespace CTA.WebForms2Blazor.Extensions
             return namespaceSymbols.Where(namespaceSymbol => namespaceSymbol != null && !namespaceSymbol.ToDisplayString().Equals(Constants.GlobalNamespace));
         }
 
+        public static IEnumerable<string> GetOriginalUsingNamespaces(this SemanticModel model)
+        {
+            return model.SyntaxTree.GetRoot().DescendantNodes().OfType<UsingDirectiveSyntax>().Select(usingDirective => usingDirective.Name.ToFullString());
+        }
+
         public static IEnumerable<INamedTypeSymbol> GetAllInheritedBaseTypes(this INamedTypeSymbol typeSymbol)
         {
             var result = new List<INamedTypeSymbol>();

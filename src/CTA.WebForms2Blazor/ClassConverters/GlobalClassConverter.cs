@@ -29,7 +29,7 @@ namespace CTA.WebForms2Blazor.ClassConverters
         private const string AddMiddlewareUsingsOperation = "retrieve and add usings for middleware namespaces";
         private const string ConfigureRequestPipelineOperation = "configure request pipeline";
         private const string MigrateServiceLayerOperation = "migrate service layer and configure depenency injection in ConfigureServices()";
-
+        
         private LifecycleManagerService _lifecycleManager;
 
         private IEnumerable<StatementSyntax> _configureMethodStatements;
@@ -83,7 +83,7 @@ namespace CTA.WebForms2Blazor.ClassConverters
                 additionalMethodDeclarations: _keepableMethods)
                 .AddClassBlockComment(_endOfClassComments, false);
 
-            var containingNamespace = CodeSyntaxHelper.BuildNamespace(_originalClassSymbol.ContainingNamespace.Name, startupClassDeclaration);
+            var containingNamespace = CodeSyntaxHelper.BuildNamespace(_originalClassSymbol.ContainingNamespace.ToDisplayString(), startupClassDeclaration);
             var fileText = CodeSyntaxHelper.GetFileSyntaxAsString(containingNamespace, await GetAllUsingStatements());
 
             DoCleanUp();
@@ -130,15 +130,19 @@ namespace CTA.WebForms2Blazor.ClassConverters
 
         private async Task<IEnumerable<UsingDirectiveSyntax>> GetAllUsingStatements()
         {
-            var typeRequiredNamespaceNames = _sourceFileSemanticModel
-                .GetNamespacesReferencedByType(_originalDeclarationSyntax)
-                .Select(namespaceSymbol => namespaceSymbol.ToDisplayString());
+            // NOTE: Removed temporarily until usings can be better determined, at the moment, too
+            // many are being removed
+            //var typeRequiredNamespaceNames = _sourceFileSemanticModel
+            //    .GetNamespacesReferencedByType(_originalDeclarationSyntax)
+            //    .Select(namespaceSymbol => namespaceSymbol.ToDisplayString());
+
+            var typeRequiredNamespaceNames = _sourceFileSemanticModel.GetOriginalUsingNamespaces();
 
             // Merging required using statements for middleware and source type contents
             try
             {
                 var middlewareNamespaceNames = await _taskManager.ManagedRun(_taskId, (token) => _lifecycleManager.GetMiddlewareNamespaces(token));
-                return CodeSyntaxHelper.BuildUsingStatements(typeRequiredNamespaceNames.Union(middlewareNamespaceNames));
+                return CodeSyntaxHelper.BuildUsingStatements(typeRequiredNamespaceNames.Union(middlewareNamespaceNames).Union(StartupSyntaxHelper.RequiredNamespaces));
             }
             catch (OperationCanceledException e)
             {
