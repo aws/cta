@@ -77,6 +77,7 @@
         public const string RazorConfigurationAccessTemplate = "@(Configuration[\"{0}\"])";
         public const string RazorNamespaceDirective = "@namespace {0}";
         public const string RazorImplementsDirective = "@implements {0}";
+        public const string RazorInheritsDirective = "@inherits {0}";
         public const string RazorPageDirective = "@page \"{0}\"";
 
         // appsettings.json Section Names

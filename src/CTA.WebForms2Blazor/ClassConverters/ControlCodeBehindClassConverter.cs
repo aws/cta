@@ -30,8 +30,14 @@ namespace CTA.WebForms2Blazor.ClassConverters
         {
             LogStart();
 
-            var requiredNamespaces = _sourceFileSemanticModel.GetNamespacesReferencedByType(_originalDeclarationSyntax);
-            var usingStatements = CodeSyntaxHelper.BuildUsingStatements(requiredNamespaces.Select(namespaceSymbol => namespaceSymbol.ToDisplayString()));
+            // NOTE: Removed temporarily until usings can be better determined, at the moment, too
+            // many are being removed
+            //var requiredNamespaces = _sourceFileSemanticModel.GetNamespacesReferencedByType(_originalDeclarationSyntax);
+            //var namespaceNames = requiredNamespaces.Select(namespaceSymbol => namespaceSymbol.ToDisplayString()).Append(Constants.BlazorComponentsNamespace);
+
+            var requiredNamespaces = _sourceFileSemanticModel.GetOriginalUsingNamespaces().Append(Constants.BlazorComponentsNamespace);
+
+            var usingStatements = CodeSyntaxHelper.BuildUsingStatements(requiredNamespaces);
 
             var modifiedClass = ((ClassDeclarationSyntax)_originalDeclarationSyntax)
                 // Remove outdated base type references
@@ -41,7 +47,7 @@ namespace CTA.WebForms2Blazor.ClassConverters
                 // normal razor components
                 .AddBaseType(Constants.ComponentBaseClass);
 
-            var namespaceNode = CodeSyntaxHelper.BuildNamespace(_originalClassSymbol.ContainingNamespace.Name, modifiedClass);
+            var namespaceNode = CodeSyntaxHelper.BuildNamespace(_originalClassSymbol.ContainingNamespace.ToDisplayString(), modifiedClass);
 
             DoCleanUp();
             LogEnd();

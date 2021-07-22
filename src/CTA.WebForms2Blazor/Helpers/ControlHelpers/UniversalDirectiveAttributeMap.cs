@@ -37,7 +37,7 @@ namespace CTA.WebForms2Blazor.DirectiveConverters
                     {
                         // TODO: Verify if inherited base class is still a valid base class (using CTA/Codelyzer?) and
                         // return Enumerable.Empty<DirectiveMigrationResult>() if it is no longer valid
-                        return new[] { new DirectiveMigrationResult(DirectiveMigrationResultType.GeneralDirective, $"@inherits {attrValue.RemoveOuterQuotes()}") };
+                         return new[] { new DirectiveMigrationResult(DirectiveMigrationResultType.GeneralDirective, $"@inherits {attrValue.RemoveOuterQuotes()}") };
                     },
                     // No longer sure if this is supported in .NET 5
                     // [TitleAttr] = attrValue =>

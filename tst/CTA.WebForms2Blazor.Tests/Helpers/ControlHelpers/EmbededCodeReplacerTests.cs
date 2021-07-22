@@ -14,7 +14,7 @@ namespace CTA.WebForms2Blazor.Tests.Helpers.ControlHelpers
         private const string AppSettingsAspExpressionContent = "setting1";
         private const string UnknownAspExpressionContent = "routeData[\"location\"]";
 
-        private const string WebFormsOneWayDataBindStartTag = "<%#";
+        private const string WebFormsOneWayDataBindStartTag = "<%#:";
         private const string WebFormsRawExpressionStartTag = "<%=";
         private const string WebFormsHTMLEncodedExpressionStartTag = "<%:";
         private const string WebFormsDirectiveStartTag = "<%@";
@@ -241,7 +241,7 @@ namespace CTA.WebForms2Blazor.Tests.Helpers.ControlHelpers
         public void ReplaceAspExprs_Properly_Replaces_Unknown_Type_Tag()
         {
             var inputText = $"{WebFormsAspExpressionStartTag} {UnknownAspExpressionType}: {UnknownAspExpressionContent} {WebFormsNormalEndTag}";
-            var expectedOutput = $"@* Asp expresion type {UnknownAspExpressionType} with content {UnknownAspExpressionContent} not currently supported *@";
+            var expectedOutput = $"@({UnknownAspExpressionType}.{UnknownAspExpressionContent})";
             var actualOutput = EmbeddedCodeReplacers.ReplaceAspExprs(inputText);
 
             Assert.AreEqual(expectedOutput, actualOutput);

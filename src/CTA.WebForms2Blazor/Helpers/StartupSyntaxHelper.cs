@@ -15,6 +15,7 @@ namespace CTA.WebForms2Blazor.Helpers
         public static IEnumerable<string> RequiredNamespaces => new[]
         {
             "Microsoft.AspNetCore.Hosting",
+            "Microsoft.AspNetCore.Builder",
             "Microsoft.Extensions.Configuration",
             "Microsoft.Extensions.DependencyInjection"
         };
@@ -35,7 +36,7 @@ namespace CTA.WebForms2Blazor.Helpers
         /// <summary>
         /// Statement that will configure router and other stuff required for normal operation of resulting project
         /// </summary>
-        public static string AppUseEndpointsCall => $@"{RuntimeInjectable.AppBuilderInjectable.ParamName}.UseEndPoints(endpoints =>
+        public static string AppUseEndpointsCall => $@"{RuntimeInjectable.AppBuilderInjectable.ParamName}.UseEndpoints(endpoints =>
             {{endpoints.MapBlazorHub();endpoints.MapFallbackToPage(""/_Host"");}});";
 
         /// <summary>
