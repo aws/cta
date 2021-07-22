@@ -383,7 +383,7 @@ namespace CTA.WebForms2Blazor.Tests.FileConverters
         public async Task TestViewFileConverter_SiteMaster()
         {
             FileConverter fc = new ViewFileConverter(FileConverterSetupFixture.TestProjectPath, 
-                FileConverterSetupFixture.TestSiteMasterFilePath);
+                FileConverterSetupFixture.TestSiteMasterFilePath, new ViewImportService());
             
             IEnumerable<FileInformation> fileList = await fc.MigrateFileAsync();
             FileInformation fi = fileList.Single();
