@@ -15,7 +15,12 @@ namespace CTA.WebForms2Blazor.Helpers.ControlHelpers
             ["asp:label"] = new LabelControlConverter(),
             ["asp:listview"] = new ListViewControlConverter(),
             ["asp:gridview"] = new GridViewControlConverter(),
-            ["asp:content"] = new ContentControlConverter(),
+            ["asp:content"] = new RemoveNodeKeepContentsConverter(),
+            ["html"] = new RemoveNodeKeepContentsConverter(),
+            ["body"] = new RemoveNodeKeepContentsConverter(),
+            ["head"] = new RemoveNodeAndContentsConverter(),
+            ["scripts"] = new RemoveNodeAndContentsConverter(),
+            ["!doctype"] = new RemoveNodeAndContentsConverter(),
             ["asp:contentplaceholder"] = new ContentPlaceHolderControlConverter()
         };
 

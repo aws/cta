@@ -24,7 +24,7 @@ namespace CTA.WebForms2Blazor.Helpers.ControlHelpers
             {
                 return false;
             }
-            return this.Name == other.Name;
+            return string.Equals(this.Name, other.Name, StringComparison.InvariantCultureIgnoreCase);
         }
         public override bool Equals(object obj) => Equals(obj as ViewLayerControlAttribute);
         public override int GetHashCode() => HashCode.Combine(Name);

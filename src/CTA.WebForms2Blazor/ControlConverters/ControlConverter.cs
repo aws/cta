@@ -133,5 +133,17 @@ namespace CTA.WebForms2Blazor.ControlConverters
 
             return true;
         }
+
+        public void DeleteNode(HtmlNode node, bool keepContents)
+        {
+            var parent = node.ParentNode;
+            if (keepContents)
+            {
+                var childNodes = node.ChildNodes;
+                parent.AppendChildren(childNodes);   
+            }
+            
+            parent.RemoveChild(node);
+        }
     }
 }
