@@ -14,8 +14,8 @@ namespace CTA.WebForms2Blazor.Tests.DirectiveConverters
         private const string TestDirective2Attributes = "Master Inherits=\"TestBaseClass\" MasterPageFile=\"~/directory/TestMasterPage.Master\"";
         private const string ExpectedNamespaceDirective = "@namespace Unknown_code_behind_namespace";
         private const string ExpectedMasterPageFileDirective = "@layout TestMasterPage";
-        private const string ExpectedInheritsDirective = "@inherits TestBaseClass";
-        private const string ExpectedImplementsDirective = "@implements LayoutComponentBase";
+        private const string ExpectedInheritsDirective = "<!-- Conversion of Inherits attribute (value: \"TestBaseClass\") for Master directive not currently supported -->";
+        private const string ExpectedInheritsLayoutDirective = "@inherits LayoutComponentBase";
 
         private DirectiveConverter _directiveConverter;
 
@@ -30,7 +30,7 @@ namespace CTA.WebForms2Blazor.Tests.DirectiveConverters
         {
             var expectedText =
 $@"{ExpectedNamespaceDirective}
-{ExpectedImplementsDirective}";
+{ExpectedInheritsLayoutDirective}";
 
             Assert.AreEqual(expectedText, _directiveConverter.ConvertDirective(TestDirectiveName, TestDirectiveName, new ViewImportService()));
         }
@@ -40,7 +40,7 @@ $@"{ExpectedNamespaceDirective}
         {
             var expectedText =
 $@"{ExpectedNamespaceDirective}
-{ExpectedImplementsDirective}
+{ExpectedInheritsLayoutDirective}
 {ExpectedMasterPageFileDirective}";
 
             Assert.AreEqual(expectedText, _directiveConverter.ConvertDirective(TestDirectiveName, TestDirectiveMasterPageFileAttribute, new ViewImportService()));
@@ -51,7 +51,7 @@ $@"{ExpectedNamespaceDirective}
         {
             var expectedText =
 $@"{ExpectedNamespaceDirective}
-{ExpectedImplementsDirective}
+{ExpectedInheritsLayoutDirective}
 {ExpectedInheritsDirective}";
 
             Assert.AreEqual(expectedText, _directiveConverter.ConvertDirective(TestDirectiveName, TestDirectiveInheritsAttribute, new ViewImportService()));
@@ -62,9 +62,9 @@ $@"{ExpectedNamespaceDirective}
         {
             var expectedText =
 $@"{ExpectedNamespaceDirective}
-{ExpectedImplementsDirective}
-{ExpectedInheritsDirective}
-{ExpectedMasterPageFileDirective}";
+{ExpectedInheritsLayoutDirective}
+{ExpectedMasterPageFileDirective}
+{ExpectedInheritsDirective}";
 
             Assert.AreEqual(expectedText, _directiveConverter.ConvertDirective(TestDirectiveName, TestDirective2Attributes, new ViewImportService()));
         }

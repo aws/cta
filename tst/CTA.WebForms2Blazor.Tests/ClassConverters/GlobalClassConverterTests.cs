@@ -46,8 +46,8 @@ namespace CTA.WebForms2Blazor.Tests.ClassConverters
     }
 }";
         private const string ExpectedOutputComplexClassText =
-@"using System;
-using Microsoft.AspNetCore.Hosting;
+@"using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -85,7 +85,7 @@ namespace ProjectNamespace
             // For development only, remove before production
             // deployment
             app.UseDeveloperExceptionPage();
-            app.UseEndPoints(endpoints =>
+            app.UseEndpoints(endpoints =>
             {
                 endpoints.MapBlazorHub();
                 endpoints.MapFallbackToPage(""/_Host"");

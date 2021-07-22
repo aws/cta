@@ -128,7 +128,7 @@ namespace CTA.WebForms2Blazor
 
             // By convention, we expect the root namespace to share a name with the project
             // root folder
-            var rootNamespace = Path.GetRelativePath(Path.GetDirectoryName(_outputProjectPath), _outputProjectPath);
+            var rootNamespace = _analyzerResult.ProjectResult.ProjectName;
             _programCsService.ProgramCsNamespace = rootNamespace;
             _hostPageService.HostNamespace = rootNamespace;
             _blazorWorkspaceManager.CreateSolutionFile();

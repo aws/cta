@@ -13,7 +13,7 @@ namespace CTA.WebForms2Blazor.DirectiveConverters
                 return new[]
                 {
                     UniversalDirectiveAttributeMap.MasterPageFileAttr,
-                    UniversalDirectiveAttributeMap.InheritsAttr,
+                    // UniversalDirectiveAttributeMap.InheritsAttr,
                     // UniversalDirectiveAttributeMap.TitleAttr,
                     UniversalDirectiveAttributeMap.CodeBehind,
                     UniversalDirectiveAttributeMap.ClassNameAttr,
@@ -30,7 +30,7 @@ namespace CTA.WebForms2Blazor.DirectiveConverters
 
             return new[] {
                 new DirectiveMigrationResult(DirectiveMigrationResultType.GeneralDirective, string.Format(Constants.RazorNamespaceDirective, layoutNamespace)),
-                new DirectiveMigrationResult(DirectiveMigrationResultType.GeneralDirective, string.Format(Constants.RazorImplementsDirective, Constants.LayoutComponentBaseClass))
+                new DirectiveMigrationResult(DirectiveMigrationResultType.GeneralDirective, string.Format(Constants.RazorInheritsDirective, Constants.LayoutComponentBaseClass))
             };
         }
     }

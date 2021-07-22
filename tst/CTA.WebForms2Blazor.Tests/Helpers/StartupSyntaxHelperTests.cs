@@ -64,7 +64,7 @@ $@"{ExpectedStartupClassSignature}
         // For development only, remove before production
         // deployment
         {ExpectedDevErrorPageCall}
-        app.UseEndPoints(endpoints =>
+        app.UseEndpoints(endpoints =>
         {{
             endpoints.MapBlazorHub();
             endpoints.MapFallbackToPage(""/_Host"");
@@ -110,7 +110,7 @@ $@"{ExpectedStartupClassSignature}
         // For development only, remove before production
         // deployment
         {ExpectedDevErrorPageCall}
-        app.UseEndPoints(endpoints =>
+        app.UseEndpoints(endpoints =>
         {{
             endpoints.MapBlazorHub();
             endpoints.MapFallbackToPage(""/_Host"");
@@ -150,7 +150,7 @@ $@"{ExpectedBasicConfigureMethodSignature}
     // For development only, remove before production
     // deployment
     {ExpectedDevErrorPageCall}
-    app.UseEndPoints(endpoints =>
+    app.UseEndpoints(endpoints =>
     {{
         endpoints.MapBlazorHub();
         endpoints.MapFallbackToPage(""/_Host"");
@@ -164,7 +164,7 @@ $@"{ExpectedBasicConfigureMethodSignature}
     // For development only, remove before production
     // deployment
     {ExpectedDevErrorPageCall}
-    app.UseEndPoints(endpoints =>
+    app.UseEndpoints(endpoints =>
     {{
         endpoints.MapBlazorHub();
         endpoints.MapFallbackToPage(""/_Host"");
