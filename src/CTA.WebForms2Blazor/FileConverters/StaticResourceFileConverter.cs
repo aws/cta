@@ -11,7 +11,8 @@ namespace CTA.WebForms2Blazor.FileConverters
     {
         private readonly HostPageService _hostPageService;
 
-        public StaticResourceFileConverter(string sourceProjectPath, string fullPath, HostPageService hostPageService) : base(sourceProjectPath, fullPath)
+        public StaticResourceFileConverter(string sourceProjectPath, string fullPath, HostPageService hostPageService, TaskManagerService taskManagerService)
+            : base(sourceProjectPath, fullPath, taskManagerService)
         {
             _hostPageService = hostPageService;
         }
@@ -35,6 +36,7 @@ namespace CTA.WebForms2Blazor.FileConverters
 
             var fileList = new[] { fi };
 
+            DoCleanUp();
             LogEnd();
 
             return Task.FromResult((IEnumerable<FileInformation>)fileList);

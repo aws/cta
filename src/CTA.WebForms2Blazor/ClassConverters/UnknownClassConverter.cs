@@ -41,6 +41,7 @@ namespace CTA.WebForms2Blazor.ClassConverters
             //var sourceClassComponents = GetSourceClassComponents();
 
             var namespaceNames = _sourceFileSemanticModel.GetOriginalUsingNamespaces().Append(Constants.BlazorComponentsNamespace);
+            namespaceNames = CodeSyntaxHelper.RemoveFrameworkUsings(namespaceNames);
             var usingStatements = CodeSyntaxHelper.BuildUsingStatements(namespaceNames);
             var namespaceNode = CodeSyntaxHelper.BuildNamespace(_originalClassSymbol.ContainingNamespace.ToDisplayString(), _originalDeclarationSyntax);
             var fileText = CodeSyntaxHelper.GetFileSyntaxAsString(namespaceNode, usingStatements);

@@ -9,6 +9,7 @@ namespace CTA.WebForms2Blazor.Tests.DirectiveConverters
 {
     public class DirectiveConverterTests
     {
+        private const string TestPath = "UControl.ascx";
         private const string TestDirectiveName = "DirectiveName";
 
         private const string TestDirective1Attribute = "DirectiveName Attr1=\"value1\"";
@@ -29,7 +30,7 @@ namespace CTA.WebForms2Blazor.Tests.DirectiveConverters
         [Test]
         public void ConvertDirective_Properly_Constructs_General_Directive_Unknown_Comment()
         {
-            Assert.AreEqual(ExpectedUnknownDirectiveComment, _directiveConverter.ConvertDirective(TestDirectiveName, TestDirectiveName, new ViewImportService()));
+            Assert.AreEqual(ExpectedUnknownDirectiveComment, _directiveConverter.ConvertDirective(TestDirectiveName, TestDirectiveName, TestPath, new ViewImportService()));
         }
 
         [Test]
@@ -37,7 +38,7 @@ namespace CTA.WebForms2Blazor.Tests.DirectiveConverters
         {
             var expectedText = ExpectedUnknownDirectiveComment + ExpectedUnknownAttributeComment1;
 
-            Assert.AreEqual(expectedText, _directiveConverter.ConvertDirective(TestDirectiveName, TestDirective1Attribute, new ViewImportService()));
+            Assert.AreEqual(expectedText, _directiveConverter.ConvertDirective(TestDirectiveName, TestDirective1Attribute, TestPath, new ViewImportService()));
         }
 
         [Test]
@@ -45,7 +46,7 @@ namespace CTA.WebForms2Blazor.Tests.DirectiveConverters
         {
             var expectedText = ExpectedUnknownDirectiveComment + ExpectedUnknownAttributeComment1 + ExpectedUnknownAttributeComment2;
 
-            Assert.AreEqual(expectedText, _directiveConverter.ConvertDirective(TestDirectiveName, TestDirective2Attributes, new ViewImportService()));
+            Assert.AreEqual(expectedText, _directiveConverter.ConvertDirective(TestDirectiveName, TestDirective2Attributes, TestPath, new ViewImportService()));
         }
     }
 }

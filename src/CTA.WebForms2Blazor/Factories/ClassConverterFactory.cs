@@ -73,7 +73,7 @@ namespace CTA.WebForms2Blazor.Factories
 
         public IEnumerable<ClassConverter> BuildMany(string sourceFileRelativePath, SemanticModel model)
         {
-            return model.SyntaxTree.GetNamespaceLevelTypes().Select(node => Build(sourceFileRelativePath, model, node));
+            return model.SyntaxTree.GetNamespaceLevelTypes().Select(node => Build(sourceFileRelativePath, model, node)).ToList();
         }
     }
 }

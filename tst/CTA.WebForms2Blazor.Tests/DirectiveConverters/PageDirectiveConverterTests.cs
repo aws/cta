@@ -9,12 +9,13 @@ namespace CTA.WebForms2Blazor.Tests.DirectiveConverters
     [TestFixture]
     public class PageDirectiveConverterTests
     {
+        private const string TestPath = "Default.aspx";
         private const string TestDirectiveName = "Page";
 
         private const string TestDirectiveMasterPageFileAttribute = "Page MasterPageFile=\"~/directory/TestMasterPage.Master\"";
         private const string TestDirectiveInheritsAttribute = "Page Inherits=\"TestBaseClass\"";
 
-        private static string ExpectedPageDirective => "@page \"Unkown_page_route\"";
+        private static string ExpectedPageDirective => "@page \"/\"";
         private static string ExpectedMasterPageFileDirective => $"{Environment.NewLine}@layout TestMasterPage";
         private static string ExpectedInheritsDirective => $"{Environment.NewLine}@inherits TestBaseClass";
 
@@ -29,7 +30,7 @@ namespace CTA.WebForms2Blazor.Tests.DirectiveConverters
         [Test]
         public void ConvertDirective_Properly_Executes_Directive_General_Conversion()
         {
-            Assert.AreEqual(ExpectedPageDirective, _directiveConverter.ConvertDirective(TestDirectiveName, TestDirectiveName, new ViewImportService()));
+            Assert.AreEqual(ExpectedPageDirective, _directiveConverter.ConvertDirective(TestDirectiveName, TestDirectiveName, TestPath, new ViewImportService()));
         }
 
         [Test]
@@ -37,7 +38,7 @@ namespace CTA.WebForms2Blazor.Tests.DirectiveConverters
         {
             var expectedText = ExpectedPageDirective + ExpectedMasterPageFileDirective;
 
-            Assert.AreEqual(expectedText, _directiveConverter.ConvertDirective(TestDirectiveName, TestDirectiveMasterPageFileAttribute, new ViewImportService()));
+            Assert.AreEqual(expectedText, _directiveConverter.ConvertDirective(TestDirectiveName, TestDirectiveMasterPageFileAttribute, TestPath, new ViewImportService()));
         }
 
         [Test]
@@ -45,7 +46,7 @@ namespace CTA.WebForms2Blazor.Tests.DirectiveConverters
         {
             var expectedText = ExpectedPageDirective + ExpectedInheritsDirective;
 
-            Assert.AreEqual(expectedText, _directiveConverter.ConvertDirective(TestDirectiveName, TestDirectiveInheritsAttribute, new ViewImportService()));
+            Assert.AreEqual(expectedText, _directiveConverter.ConvertDirective(TestDirectiveName, TestDirectiveInheritsAttribute, TestPath, new ViewImportService()));
         }
     }
 }

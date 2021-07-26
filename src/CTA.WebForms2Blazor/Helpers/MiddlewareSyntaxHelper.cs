@@ -15,6 +15,12 @@ namespace CTA.WebForms2Blazor.Helpers
         public const string AppUseMiddlewareTextTemplate = "{0}.UseMiddleware<{1}>();";
         public const string FromHandlerComment = "This middleware was originally an http handler, use conditions must be added manually";
 
+        public static IEnumerable<string> RequiredNamespaces => new[]
+        {
+            "Microsoft.AspNetCore.Http",
+            "System.Threading.Tasks"
+        };
+
         /// <summary>
         /// The line that should be executed to trigger the next middleware
         /// </summary>

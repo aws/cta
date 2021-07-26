@@ -74,10 +74,11 @@ namespace CTA.WebForms2Blazor.Helpers.ControlHelpers
                 match.Groups[EmbeddedExpressionRegexGroupName].Value.Trim()));
         }
         
-        public static string ReplaceDirectives(string htmlString, ViewImportService viewImportService)
+        public static string ReplaceDirectives(string htmlString, string originalFilePath, ViewImportService viewImportService)
         {
             return DirectiveRegex.Replace(htmlString, match => ConstructBlazorDirectives(
                 match.Groups[EmbeddedExpressionRegexGroupName].Value,
+                originalFilePath,
                 viewImportService));
         }
         
@@ -114,13 +115,13 @@ namespace CTA.WebForms2Blazor.Helpers.ControlHelpers
                 match.Groups[EmbeddedExpressionRegexGroupName].Value.Trim()));
         }
 
-        public static string ConstructBlazorDirectives(string content, ViewImportService viewImportService)
+        public static string ConstructBlazorDirectives(string content, string originalFilePath, ViewImportService viewImportService)
         {
             var directiveName = DirectiveNameRegex.Match(content).Groups[DirectiveNameRegexGroupName].Value;
             var directiveConverter = SupportedControls.DirectiveRulesMap.ContainsKey(directiveName) ?
                 SupportedControls.DirectiveRulesMap[directiveName] : SupportedControls.DefaultDirectiveConverter;
 
-            return directiveConverter.ConvertDirective(directiveName, content.Trim(), viewImportService);
+            return directiveConverter.ConvertDirective(directiveName, content.Trim(), originalFilePath, viewImportService);
         }
     }
 }

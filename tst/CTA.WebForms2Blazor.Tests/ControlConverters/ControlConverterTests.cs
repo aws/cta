@@ -7,6 +7,8 @@ namespace CTA.WebForms2Blazor.Tests.ControlConverters
 {
     public class ControlConverterTests
     {
+        private const string TestPath = "Default.asax";
+
         private const string TestUpdateInnerHtmlNodeHtmlString = @"<div class=""esh-table"">
     <asp:ListView ID=""productList"" ItemPlaceholderID=""itemPlaceHolder"" runat=""server"" ItemType=""eShopLegacyWebForms.Models.CatalogItem"">
         <LayoutTemplate>
@@ -176,7 +178,7 @@ namespace CTA.WebForms2Blazor.Tests.ControlConverters
         </ItemTemplate>
     </asp:ListView>
 </div>";
-            string contents = ControlConverter.ConvertEmbeddedCode(htmlString, new ViewImportService());
+            string contents = ControlConverter.ConvertEmbeddedCode(htmlString, TestPath, new ViewImportService());
 
             string expectedContents = @"<div class=""esh-table"">
     <asp:ListView ID=""productList"" ItemPlaceholderID=""itemPlaceHolder"" runat=""server"" ItemType=""eShopLegacyWebForms.Models.CatalogItem"">
@@ -213,7 +215,7 @@ namespace CTA.WebForms2Blazor.Tests.ControlConverters
         </article>
     </div>
 </div>";
-            string contents = ControlConverter.ConvertEmbeddedCode(htmlString, new ViewImportService());
+            string contents = ControlConverter.ConvertEmbeddedCode(htmlString, TestPath, new ViewImportService());
             string expectedContents = @"<div class=""esh-pager"">
     <div class=""container"">
         <article class=""esh-pager-wrapper row"">

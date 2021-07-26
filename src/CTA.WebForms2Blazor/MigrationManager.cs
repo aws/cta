@@ -136,14 +136,18 @@ namespace CTA.WebForms2Blazor
 
         private void InitializeFactories()
         {
-            _classConverterFactory = new ClassConverterFactory(_inputProjectPath, _lifecycleManager, _taskManager);
+            _classConverterFactory = new ClassConverterFactory(
+                _inputProjectPath,
+                _lifecycleManager,
+                _taskManager);
             _fileConverterFactory = new FileConverterFactory(
                 _inputProjectPath,
                 _blazorWorkspaceManager,
                 _webFormsProjectAnalyzer,
                 _viewImportService,
                 _classConverterFactory,
-                _hostPageService);
+                _hostPageService,
+                _taskManager);
         }
     }
 }

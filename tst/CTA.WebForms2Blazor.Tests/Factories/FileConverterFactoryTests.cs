@@ -44,6 +44,7 @@ namespace CTA.WebForms2Blazor.Tests.Factories
         {
             var webFormsProjectAnalyzer = new ProjectAnalyzer(_testProjectPath, new AnalyzerResult(), new PortCoreConfiguration());
             var blazorWorkspaceManager = new WorkspaceManagerService();
+            var taskManagerService = new TaskManagerService();
 
             blazorWorkspaceManager.CreateSolutionFile();
 
@@ -52,8 +53,9 @@ namespace CTA.WebForms2Blazor.Tests.Factories
                 blazorWorkspaceManager,
                 webFormsProjectAnalyzer,
                 new ViewImportService(),
-                new ClassConverterFactory(string.Empty, new LifecycleManagerService(), new TaskManagerService()),
-                new HostPageService());
+                new ClassConverterFactory(string.Empty, new LifecycleManagerService(), taskManagerService),
+                new HostPageService(),
+                taskManagerService);
         }
 
         [Test]

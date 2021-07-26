@@ -22,7 +22,7 @@ namespace CTA.WebForms2Blazor.DirectiveConverters
             }
         }
 
-        private protected override IEnumerable<DirectiveMigrationResult> GetMigratedDirectives(string directiveName)
+        private protected override IEnumerable<DirectiveMigrationResult> GetMigratedDirectives(string directiveName, string originalFilePath)
         {
             var layoutNamespace = UnknownNamespacePlaceHolderText;
 

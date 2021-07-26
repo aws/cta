@@ -137,6 +137,7 @@ namespace CTA.WebForms2Blazor.ClassConverters
             //    .Select(namespaceSymbol => namespaceSymbol.ToDisplayString());
 
             var typeRequiredNamespaceNames = _sourceFileSemanticModel.GetOriginalUsingNamespaces();
+            typeRequiredNamespaceNames = CodeSyntaxHelper.RemoveFrameworkUsings(typeRequiredNamespaceNames);
 
             // Merging required using statements for middleware and source type contents
             try

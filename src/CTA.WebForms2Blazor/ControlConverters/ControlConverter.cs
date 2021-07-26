@@ -83,14 +83,14 @@ namespace CTA.WebForms2Blazor.ControlConverters
             return newNode;
         }
         
-        public static string ConvertEmbeddedCode(string htmlString, ViewImportService viewImportService)
+        public static string ConvertEmbeddedCode(string htmlString, string originalFilePath, ViewImportService viewImportService)
         {
             htmlString = EmbeddedCodeReplacers.ReplaceOneWayDataBinds(htmlString);
             htmlString = EmbeddedCodeReplacers.ReplaceRawExprs(htmlString);
             htmlString = EmbeddedCodeReplacers.ReplaceHTMLEncodedExprs(htmlString);
             htmlString = EmbeddedCodeReplacers.ReplaceAspExprs(htmlString);
             htmlString = EmbeddedCodeReplacers.ReplaceAspComments(htmlString);
-            htmlString = EmbeddedCodeReplacers.ReplaceDirectives(htmlString, viewImportService);
+            htmlString = EmbeddedCodeReplacers.ReplaceDirectives(htmlString, originalFilePath, viewImportService);
             htmlString = EmbeddedCodeReplacers.ReplaceEmbeddedCodeBlocks(htmlString);
 
             return htmlString;

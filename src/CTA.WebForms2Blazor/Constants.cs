@@ -123,5 +123,9 @@
         
         //View layer constants
         public const string AspControlTag = "asp:";
+
+        // Routing constants
+        public const string DefaultHomePagePath = "Default.aspx";
+        public const char RouteSeparator = '/';
     }
 }

@@ -36,6 +36,7 @@ namespace CTA.WebForms2Blazor.ClassConverters
             //var namespaceNames = requiredNamespaces.Select(namespaceSymbol => namespaceSymbol.ToDisplayString()).Append(Constants.BlazorComponentsNamespace);
 
             var requiredNamespaces = _sourceFileSemanticModel.GetOriginalUsingNamespaces().Append(Constants.BlazorComponentsNamespace);
+            requiredNamespaces = CodeSyntaxHelper.RemoveFrameworkUsings(requiredNamespaces);
 
             var usingStatements = CodeSyntaxHelper.BuildUsingStatements(requiredNamespaces);
 

@@ -16,7 +16,7 @@ namespace CTA.WebForms2Blazor.Tests.FileConverters
         public async Task TestStaticResourceFileConverter()
         {
             string sourceFilePath = FileConverterSetupFixture.TestStaticResourceFilePath;
-            FileConverter fc = new StaticResourceFileConverter(FileConverterSetupFixture.TestProjectPath, sourceFilePath, new HostPageService());
+            FileConverter fc = new StaticResourceFileConverter(FileConverterSetupFixture.TestProjectPath, sourceFilePath, new HostPageService(), new TaskManagerService());
 
             IEnumerable<FileInformation> fileList = await fc.MigrateFileAsync();
             FileInformation fi = fileList.Single();

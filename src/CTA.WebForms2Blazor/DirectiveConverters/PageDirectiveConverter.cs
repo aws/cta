@@ -1,11 +1,10 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 
 namespace CTA.WebForms2Blazor.DirectiveConverters
 {
     public class PageDirectiveConverter : DirectiveConverter
     {
-        private const string UnknownPagePlaceHolderText = "Unkown_page_route";
-
         private protected override IEnumerable<string> AttributeAllowList
         {
             get
@@ -22,11 +21,24 @@ namespace CTA.WebForms2Blazor.DirectiveConverters
             }
         }
 
-        private protected override IEnumerable<DirectiveMigrationResult> GetMigratedDirectives(string directiveName)
+        private protected override IEnumerable<DirectiveMigrationResult> GetMigratedDirectives(string directiveName, string originalFilePath)
         {
-            var pageRoute = UnknownPagePlaceHolderText;
-
             // TODO: Retrieve page route from routing service and use it populate pageRoute
+            string pageRoute;
+
+            // TODO: Perform this check in a more sophisticated way
+            if (originalFilePath.Equals(Constants.DefaultHomePagePath))
+            {
+                pageRoute = Constants.RouteSeparator.ToString();
+            }
+            else
+            {
+                var directory = Path.GetDirectoryName(originalFilePath);
+                var fileName = Path.GetFileNameWithoutExtension(originalFilePath);
+                var modifiedPath = directory != null ? Path.Combine(directory, fileName) : fileName;
+
+                pageRoute = Constants.RouteSeparator + modifiedPath.Replace(Path.DirectorySeparatorChar, Constants.RouteSeparator);
+            }
 
             return new[] { new DirectiveMigrationResult(DirectiveMigrationResultType.GeneralDirective, string.Format(Constants.RazorPageDirective, pageRoute)) };
         }

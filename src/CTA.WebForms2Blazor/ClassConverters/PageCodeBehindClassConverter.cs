@@ -41,7 +41,7 @@ namespace CTA.WebForms2Blazor.ClassConverters
             //    .Append(Constants.BlazorComponentsNamespace);
 
             var requiredNamespaceNames = _sourceFileSemanticModel.GetOriginalUsingNamespaces().Append(Constants.BlazorComponentsNamespace);
-
+            requiredNamespaceNames = CodeSyntaxHelper.RemoveFrameworkUsings(requiredNamespaceNames);
             var allMethods = _originalDeclarationSyntax.DescendantNodes().OfType<MethodDeclarationSyntax>();
             var currentClassDeclaration = ((ClassDeclarationSyntax)_originalDeclarationSyntax)
                 // Need to track methods so modifications can be made one after another

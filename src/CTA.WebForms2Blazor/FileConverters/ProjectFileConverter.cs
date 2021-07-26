@@ -26,8 +26,9 @@ namespace CTA.WebForms2Blazor.FileConverters
             string sourceProjectPath,
             string fullPath,
             WorkspaceManagerService blazorWorkspaceManager,
-            ProjectAnalyzer projectAnalyzer
-            ) : base(sourceProjectPath, fullPath)
+            ProjectAnalyzer projectAnalyzer,
+            TaskManagerService taskManagerService
+            ) : base(sourceProjectPath, fullPath, taskManagerService)
         {
             _blazorWorkspaceManager = blazorWorkspaceManager;
             _projectAnalyzer = projectAnalyzer;
@@ -72,6 +73,7 @@ namespace CTA.WebForms2Blazor.FileConverters
 
             var fileList = new List<FileInformation>() { fi };
 
+            DoCleanUp();
             LogEnd();
 
             return Task.FromResult((IEnumerable<FileInformation>)fileList);

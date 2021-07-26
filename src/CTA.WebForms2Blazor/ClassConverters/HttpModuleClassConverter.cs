@@ -55,7 +55,9 @@ namespace CTA.WebForms2Blazor.ClassConverters
             //    .GetNamespacesReferencedByType(_originalDeclarationSyntax)
             //    .Select(namespaceSymbol => namespaceSymbol.ToDisplayString()));
 
-            var requiredNamespaces = _sourceFileSemanticModel.GetOriginalUsingNamespaces();
+            var requiredNamespaces = _sourceFileSemanticModel.GetOriginalUsingNamespaces()
+                .Union(MiddlewareSyntaxHelper.RequiredNamespaces);
+            requiredNamespaces = CodeSyntaxHelper.RemoveFrameworkUsings(requiredNamespaces);
             _requiredUsings = CodeSyntaxHelper.BuildUsingStatements(requiredNamespaces);
 
             // Make this call once now so we don't have to keep doing it later

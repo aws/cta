@@ -22,7 +22,7 @@ namespace CTA.WebForms2Blazor.DirectiveConverters
 
         private protected virtual IEnumerable<string> AttributeAllowList { get { return Enumerable.Empty<string>(); } }
 
-        public string ConvertDirective(string directiveName, string directiveString, ViewImportService viewImportService)
+        public string ConvertDirective(string directiveName, string directiveString, string originalFilePath, ViewImportService viewImportService)
         {
             // TODO: We want to make sure that certain directives only occur once (i.e. layout,
             // inherits, etc.) Need to find a better way to detect and deal with those or perhaps
@@ -31,7 +31,7 @@ namespace CTA.WebForms2Blazor.DirectiveConverters
             var migrationResults = GetMigratedAttributes(directiveString, directiveName);
 
             // Want to ensure that the general directive conversion stays at the front if it exists
-            migrationResults = GetMigratedDirectives(directiveName).Concat(migrationResults);
+            migrationResults = GetMigratedDirectives(directiveName, originalFilePath).Concat(migrationResults);
 
             // Remove any using directive results and send them to the viewImports service
             migrationResults = migrationResults.Where(migrationResult => {
@@ -49,7 +49,7 @@ namespace CTA.WebForms2Blazor.DirectiveConverters
 
         // We want to allow this to be overridden in case some specialized functionality is required to
         // perform the conversion, similar to the reasoning behind using Func<> in the attribute map
-        private protected virtual IEnumerable<DirectiveMigrationResult> GetMigratedDirectives(string directiveName)
+        private protected virtual IEnumerable<DirectiveMigrationResult> GetMigratedDirectives(string directiveName, string originalFilePath)
         {
             return new[] { new DirectiveMigrationResult(DirectiveMigrationResultType.Comment, string.Format(DirectiveMigrationNotSupportedTemplate, directiveName)) };
         }
