@@ -9,6 +9,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\codelyzer\src\Analysis\Codelyzer.Analysis\Codelyzer.Analysis.csproj" />
     <ProjectReference Include="..\CTA.Rules.Config\CTA.Rules.Config.csproj" />
   </ItemGroup>
 

@@ -24,5 +24,29 @@
         public const string WebClassLibraryFeatureName = "WebClassLibraryFeature";
         public const string AspNetCoreMvcFeatureName = "AspNetCoreMvcFeature";
         public const string AspNetCoreWebApiFeatureName = "AspNetCoreWebApiFeature";
+        public const string WCFServiceConfigFeatureName = "CoreWCFServiceConfigFeature";
+        public const string WCFServiceCodeFeatureName = "CoreWCFServiceCodeFeature";
+        public const string WCFClientFeatureName = "WCFClientFeature";
+
+        internal const string SystemServiceModelElement = "system.serviceModel";
+        internal const string WCFClientElement = "client";
+        internal const string WCFServiceElement = "services";
+        internal const string WCFServiceEndpoint = "endpoint";
+        internal const string BindingElement = "element";
+        internal const string ServiceContractAttribute = "ServiceContractAttribute";
+        internal const string OperationContractAttribute = "OperationContractAttribute";
+        internal const string BindingsAttribute = "bindings";
+        internal const string BindingAttribute = "binding";
+        internal const string SecurityElement = "security";
+        internal const string ModeAttribute = "mode";
+        internal const string ProtocolMappingAttribute = "protocolMapping";
+        internal const string AddElement = "add";
+
+        internal const string ConfigurationElement = "configuration";
+        internal static readonly string WCFClientElementPath = $"{ConfigurationElement}/{SystemServiceModelElement}/{WCFClientElement}";
+        internal static readonly string WCFServiceElementPath = $"{ConfigurationElement}/{SystemServiceModelElement}/{WCFServiceElement}";
+        internal static readonly string WCFServiceEndpointElementPath = $"{ConfigurationElement}/{SystemServiceModelElement}/{WCFServiceEndpointElementPath}";
+        internal static readonly string WCFBindingElementPath = $"{ConfigurationElement}/{SystemServiceModelElement}/{BindingsAttribute}";
+        internal static readonly string WCFProtocolMappingElement = $"{ConfigurationElement}/{SystemServiceModelElement}/{ProtocolMappingAttribute}";
     }
 }

@@ -71,37 +71,6 @@
           "Microsoft.Extensions.Logging.Console": "5.0.0"
         }
       },
-      "Codelyzer.Analysis.Build": {
-        "type": "Transitive",
-        "resolved": "1.7.6-alpha-gf07df5afc7",
-        "contentHash": "RHYPk5sVux9XEvlg6NYG7Ws6lOKbhfoo3HoQCxZvtLF4kItGftMhGfXTaQTaM3zvYGpt/GbrHoco83MjYR2d1w==",
-        "dependencies": {
-          "Buildalyzer": "3.2.2",
-          "Buildalyzer.Logger": "3.2.2",
-          "Buildalyzer.Workspaces": "3.2.2",
-          "Codelyzer.Analysis.CSharp": "1.7.6-alpha-gf07df5afc7",
-          "Microsoft.Extensions.Logging": "5.0.0",
-          "NuGet.Packaging": "5.11.0"
-        }
-      },
-      "Codelyzer.Analysis.Common": {
-        "type": "Transitive",
-        "resolved": "1.7.6-alpha-gf07df5afc7",
-        "contentHash": "3MBEoNZicm8WtbrSaFfs0LQV54y+kf+LGRp9eRQcEJ+uCjK/+TXNzmf2kTfoCFiJzWudtr3td5u2CTclyMpJkQ==",
-        "dependencies": {
-          "Codelyzer.Analysis.Model": "1.7.6-alpha-gf07df5afc7",
-          "Newtonsoft.Json": "13.0.1"
-        }
-      },
-      "Codelyzer.Analysis.CSharp": {
-        "type": "Transitive",
-        "resolved": "1.7.6-alpha-gf07df5afc7",
-        "contentHash": "ou8resbxFboKJMt+NupA3ppNuxOWv8RwZCDYx+QalQTms1uEFFkRKFXTa0t6gtEaP0FJ3kcum+9uxJmYw+INwA==",
-        "dependencies": {
-          "Codelyzer.Analysis.Common": "1.7.6-alpha-gf07df5afc7",
-          "Codelyzer.Analysis.Model": "1.7.6-alpha-gf07df5afc7"
-        }
-      },
       "Codelyzer.Analysis.Model": {
         "type": "Transitive",
         "resolved": "1.7.6-alpha-gf07df5afc7",
@@ -575,42 +544,42 @@
       },
       "NuGet.Common": {
         "type": "Transitive",
-        "resolved": "5.11.0",
-        "contentHash": "WCHexQBfSqBDRqP3PSDSUw7YM+PwuvMHGAkT/sXI5UHze4T41yLE+VB/km2Fe0z9y3m2mudcr2djFZezivjMJw==",
+        "resolved": "5.10.0",
+        "contentHash": "4smIAbuLTCRVrsD2qjI1UdEreDmeCaptmB37Vps/uHMiI+17QrrGvnRbRy8spL6CAwlWUij5npxBrqixKIAsVg==",
         "dependencies": {
-          "NuGet.Frameworks": "5.11.0"
+          "NuGet.Frameworks": "5.10.0"
         }
       },
       "NuGet.Configuration": {
         "type": "Transitive",
-        "resolved": "5.11.0",
-        "contentHash": "NqsQe198CTHoo7NMrKQL8utd6n9yVb9CPgJmpyF6kpEsLFo/9r0wqGL3ln8Mtcz8yuJpOPWFQEoOlzDzu3LfUg==",
+        "resolved": "5.10.0",
+        "contentHash": "3RYeMEIdqUIrmG8Btv0eXkHT8jZD+I9qB5rLAfm3ItC2IavnGPPdwe6s/L2OWMB/jfGDhwsxmfAV/nFhQvu0og==",
         "dependencies": {
-          "NuGet.Common": "5.11.0",
+          "NuGet.Common": "5.10.0",
           "System.Security.Cryptography.ProtectedData": "4.4.0"
         }
       },
       "NuGet.Frameworks": {
         "type": "Transitive",
-        "resolved": "5.11.0",
-        "contentHash": "eaiXkUjC4NPcquGWzAGMXjuxvLwc6XGKMptSyOGQeT0X70BUZObuybJFZLA0OfTdueLd3US23NBPTBb6iF3V1Q=="
+        "resolved": "5.10.0",
+        "contentHash": "RaXCqj2ZImTVV0DhlwMkE7S7EoOxqkdpmg4YNeZc5DnFpMMC7HYj6TbNTufK25JN/QhKfftuiWf/oqaYkZhnAA=="
       },
       "NuGet.Packaging": {
         "type": "Transitive",
-        "resolved": "5.11.0",
-        "contentHash": "knlpQuqTL8BEXUHTdZ9Wlz3pjck5nv0OYsCpSkaQAukl7fFcX4apAs8cwJgxHiEZjfWNG1npZOzpYdHG59v5xQ==",
+        "resolved": "5.10.0",
+        "contentHash": "3CRJ22SxT/5TvYuyC4ePM9tb4PuB6baIqxdHvN3Z7+gVYBwZzNSkVwSZ4pmAnsXbEGh5dClYYr8A8v9ky2T8+A==",
         "dependencies": {
           "Newtonsoft.Json": "9.0.1",
-          "NuGet.Configuration": "5.11.0",
-          "NuGet.Versioning": "5.11.0",
+          "NuGet.Configuration": "5.10.0",
+          "NuGet.Versioning": "5.10.0",
           "System.Security.Cryptography.Cng": "5.0.0",
           "System.Security.Cryptography.Pkcs": "5.0.0"
         }
       },
       "NuGet.Versioning": {
         "type": "Transitive",
-        "resolved": "5.11.0",
-        "contentHash": "mCv/GzvMk5iatWoZY41PoIShEbwVxq9CDCc1fV/uqPFKZ4DD/1JuKZ5AL/FJJRsTanvMR3EOXKYCLdQ7PFYn8Q=="
+        "resolved": "5.10.0",
+        "contentHash": "kXB4moY6JVjvv8InTlrDFpPEGZYLlK7e3bVrSn8NPbtrWhEdU3MlPagPjE2zsbjL7Oq80RNEnogNv6QkdUB+Rw=="
       },
       "runtime.debian.8-x64.runtime.native.System.Security.Cryptography.OpenSsl": {
         "type": "Transitive",
@@ -1727,10 +1696,36 @@
           "System.Xml.ReaderWriter": "4.3.0"
         }
       },
+      "codelyzer.analysis.build": {
+        "type": "Project",
+        "dependencies": {
+          "Buildalyzer": "3.2.2",
+          "Buildalyzer.Logger": "3.2.2",
+          "Buildalyzer.Workspaces": "3.2.2",
+          "Codelyzer.Analysis.CSharp": "1.0.0",
+          "Microsoft.Extensions.Logging": "5.0.0",
+          "NuGet.Packaging": "5.10.0"
+        }
+      },
+      "codelyzer.analysis.common": {
+        "type": "Project",
+        "dependencies": {
+          "Codelyzer.Analysis.Model": "1.0.0",
+          "Newtonsoft.Json": "13.0.1"
+        }
+      },
+      "codelyzer.analysis.csharp": {
+        "type": "Project",
+        "dependencies": {
+          "Codelyzer.Analysis.Common": "1.0.0",
+          "Codelyzer.Analysis.Model": "1.0.0"
+        }
+      },
       "cta.rules.common": {
         "type": "Project",
         "dependencies": {
           "CTA.Rules.Config": "1.0.0",
+          "Codelyzer.Analysis": "1.0.0",
           "System.Configuration.ConfigurationManager": "5.0.0"
         }
       },

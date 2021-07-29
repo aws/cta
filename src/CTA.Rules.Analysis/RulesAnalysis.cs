@@ -19,17 +19,19 @@ namespace CTA.Rules.Analyzer
         private readonly RootNodes _rootNodes;
         private readonly List<RootUstNode> _sourceFileResults;
         private readonly ProjectActions _projectActions;
+        private readonly ProjectType _projectType;
 
         /// <summary>
         /// Initializes an RulesAnalysis instance
         /// </summary>
         /// <param name="sourceFileResults">List of analyzed code files</param>
         /// <param name="rootNodes">List of rules to be applied to the code files</param>
-        public RulesAnalysis(List<RootUstNode> sourceFileResults, RootNodes rootNodes)
+        public RulesAnalysis(List<RootUstNode> sourceFileResults, RootNodes rootNodes, ProjectType projectType = ProjectType.ClassLibrary)
         {
             _projectActions = new ProjectActions();
             _sourceFileResults = sourceFileResults;
             _rootNodes = rootNodes;
+            _projectType = projectType;
         }
         /// <summary>
         /// Runs the Rules Analysis
@@ -46,6 +48,9 @@ namespace CTA.Rules.Analyzer
                     _projectActions.FileActions.Add(fileAction);
                 }
             });
+
+            AddPackages(_rootNodes.ProjectTokens.Where(p => p.FullKey == _projectType.ToString())?.SelectMany(p => p.PackageActions)?.Distinct()?.ToList(), null);
+            
             return _projectActions;
         }
 

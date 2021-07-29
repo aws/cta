@@ -26,7 +26,10 @@
         WebClassLibrary,
         ClassLibrary,
         CoreWebApi,
-        CoreMvc
+        CoreMvc,
+        WCFConfigBasedService,
+        WCFCodeBasedService,
+        WCFClient
     }
     public enum FileTypeCreation
     {

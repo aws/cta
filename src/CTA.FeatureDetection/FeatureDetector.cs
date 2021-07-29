@@ -181,7 +181,8 @@ namespace CTA.FeatureDetection
                         DeclarationNodes = true,
                         LocationData = true,
                         ReferenceData = true,
-                        LoadBuildData = true
+                        LoadBuildData = true,
+                        InterfaceDeclarations = true
                     }
                 }
             };

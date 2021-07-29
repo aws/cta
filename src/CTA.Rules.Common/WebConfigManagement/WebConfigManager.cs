@@ -65,6 +65,7 @@ namespace CTA.Rules.Common.WebConfigManagement
         private static object LoadWebConfig(string projectDir, ConfigLoadingDelegate configLoadingDelegate)
         {
             string webConfigFile = Path.Combine(projectDir, Constants.WebConfig);
+            string appConfigFile = Path.Combine(projectDir, Constants.AppConfig);
 
             if (File.Exists(webConfigFile))
             {
@@ -75,6 +76,17 @@ namespace CTA.Rules.Common.WebConfigManagement
                 catch (Exception ex)
                 {
                     LogHelper.LogError(ex, string.Format("Error processing web.config file {0}", webConfigFile));
+                }
+            }
+            else if (File.Exists(appConfigFile))
+            {
+                try
+                {
+                    return configLoadingDelegate.Invoke(appConfigFile);
+                }
+                catch (Exception ex)
+                {
+                    LogHelper.LogError(ex, string.Format("Error processing App.config file {0}", appConfigFile));
                 }
             }
             return null;
