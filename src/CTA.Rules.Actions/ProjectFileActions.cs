@@ -16,10 +16,18 @@ namespace CTA.Rules.Actions
             static string func
 (string projectDir, ProjectType projectType, List<string> targetVersion, Dictionary<string, string> packageReferences, List<string> projectReferences, List<string> metaReferences)
             {
-                ProjectFileCreator projectFileCreator = new ProjectFileCreator(projectDir, targetVersion,
+                bool result = false;
+                try
+                {
+                    ProjectFileCreator projectFileCreator = new ProjectFileCreator(projectDir, targetVersion,
                     packageReferences, projectReferences.ToList(), projectType, metaReferences);
 
-                var result = projectFileCreator.Create();
+                    result = projectFileCreator.Create();
+                }
+                catch (Exception)
+                {
+                    // exception is already logged in constructor
+                }
                 return result ? "Project file created" : string.Empty;
             }
             return func;
