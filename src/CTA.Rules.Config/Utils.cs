@@ -170,7 +170,7 @@ namespace CTA.Rules.Config
         {
             try
             {
-                using var fileStream = File.Open(filePath, FileMode.OpenOrCreate, FileAccess.ReadWrite, fileShare);
+                using var fileStream = File.Open(filePath, FileMode.Create, FileAccess.ReadWrite, fileShare);
                 using var streamWriter = new StreamWriter(fileStream);
                 streamWriter.Write(content);
 
@@ -183,7 +183,7 @@ namespace CTA.Rules.Config
                 // and try writing again.
                 var uniqueFileName = GenerateUniqueFileName(filePath, mutexName);
                 
-                using var fileStream = File.Open(uniqueFileName, FileMode.OpenOrCreate, FileAccess.ReadWrite, fileShare);
+                using var fileStream = File.Open(uniqueFileName, FileMode.Create, FileAccess.ReadWrite, fileShare);
                 using var streamWriter = new StreamWriter(fileStream);
                 streamWriter.Write(content);
 
