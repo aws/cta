@@ -84,6 +84,7 @@ namespace CTA.Rules.ProjectFile
             catch (Exception ex)
             {
                 LogHelper.LogError(ex, "Error initializing project file");
+                throw;
             }
         }
 
