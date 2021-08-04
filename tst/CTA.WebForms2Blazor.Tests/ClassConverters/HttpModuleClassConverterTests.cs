@@ -13,7 +13,10 @@ namespace CTA.WebForms2Blazor.Tests.ClassConverters
     public class HttpModuleClassConverterTests
     {
         private const string InputComplexClassText =
-@"namespace ProjectNamespace
+@"using Microsoft.AspNetCore.Http;
+using System.Threading.Tasks;
+
+namespace ProjectNamespace
 {
     public class MyModule : IHttpModule
     {
@@ -35,7 +38,10 @@ namespace CTA.WebForms2Blazor.Tests.ClassConverters
     }
 }";
         private const string ExpectedOutputComplexClassText1 =
-@"namespace ProjectNamespace
+@"using Microsoft.AspNetCore.Http;
+using System.Threading.Tasks;
+
+namespace ProjectNamespace
 {
     // Heavy modifications likely necessary, please
     // review
@@ -57,7 +63,10 @@ namespace CTA.WebForms2Blazor.Tests.ClassConverters
     }
 }";
         private const string ExpectedOutputComplexClassText2 =
-@"namespace ProjectNamespace
+@"using Microsoft.AspNetCore.Http;
+using System.Threading.Tasks;
+
+namespace ProjectNamespace
 {
     // Heavy modifications likely necessary, please
     // review

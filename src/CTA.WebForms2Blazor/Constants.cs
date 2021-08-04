@@ -5,8 +5,8 @@
         // Notable Events
         public const WebFormsAppLifecycleEvent FirstPostHandleEvent = WebFormsAppLifecycleEvent.PostRequestHandlerExecute;
         public const WebFormsPageLifecycleEvent FirstOnInitializedEvent = WebFormsPageLifecycleEvent.InitComplete;
-        public const WebFormsPageLifecycleEvent FirstOnParametersSetEvent = WebFormsPageLifecycleEvent.SaveStateComplete;
-        public const WebFormsPageLifecycleEvent FirstOnAfterRenderEvent = WebFormsPageLifecycleEvent.Render;
+        public const WebFormsPageLifecycleEvent FirstOnParametersSetEvent = WebFormsPageLifecycleEvent.PreRender;
+        public const WebFormsPageLifecycleEvent FirstOnAfterRenderEvent = WebFormsPageLifecycleEvent.SaveStateComplete;
         public const WebFormsPageLifecycleEvent FirstDisposeEvent = WebFormsPageLifecycleEvent.Unload;
 
         // Notable Methods

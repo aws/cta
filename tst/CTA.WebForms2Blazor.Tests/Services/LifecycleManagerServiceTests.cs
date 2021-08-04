@@ -224,19 +224,20 @@ namespace CTA.WebForms2Blazor.Tests.Services
         public void GetEquivalentComponentLifecycleEvent_Returns_Correct_OnInitialized_Events()
         {
             Assert.AreEqual(BlazorComponentLifecycleEvent.OnInitialized, LifecycleManagerService.GetEquivalentComponentLifecycleEvent(WebFormsPageLifecycleEvent.InitComplete));
-            Assert.AreEqual(BlazorComponentLifecycleEvent.OnInitialized, LifecycleManagerService.GetEquivalentComponentLifecycleEvent(WebFormsPageLifecycleEvent.PreRenderComplete));
+            Assert.AreEqual(BlazorComponentLifecycleEvent.OnInitialized, LifecycleManagerService.GetEquivalentComponentLifecycleEvent(WebFormsPageLifecycleEvent.LoadComplete));
         }
 
         [Test]
         public void GetEquivalentComponentLifecycleEvent_Returns_Correct_OnParametersSet_Events()
         {
-            Assert.AreEqual(BlazorComponentLifecycleEvent.OnParametersSet, LifecycleManagerService.GetEquivalentComponentLifecycleEvent(WebFormsPageLifecycleEvent.SaveStateComplete));
+            Assert.AreEqual(BlazorComponentLifecycleEvent.OnParametersSet, LifecycleManagerService.GetEquivalentComponentLifecycleEvent(WebFormsPageLifecycleEvent.PreRender));
+            Assert.AreEqual(BlazorComponentLifecycleEvent.OnParametersSet, LifecycleManagerService.GetEquivalentComponentLifecycleEvent(WebFormsPageLifecycleEvent.PreRenderComplete));
         }
 
         [Test]
         public void GetEquivalentComponentLifecycleEvent_Returns_Correct_OnAfterRender_Events()
         {
-            Assert.AreEqual(BlazorComponentLifecycleEvent.OnAfterRender, LifecycleManagerService.GetEquivalentComponentLifecycleEvent(WebFormsPageLifecycleEvent.Render));
+            Assert.AreEqual(BlazorComponentLifecycleEvent.OnAfterRender, LifecycleManagerService.GetEquivalentComponentLifecycleEvent(WebFormsPageLifecycleEvent.SaveStateComplete));
         }
 
         [Test]
