@@ -40,6 +40,7 @@ namespace CTA.WebForms2Blazor.DirectiveConverters
                          return new[] { new DirectiveMigrationResult(DirectiveMigrationResultType.GeneralDirective, $"@inherits {attrValue.RemoveOuterQuotes()}") };
                     },
                     // No longer sure if this is supported in .NET 5
+                    // TODO: Find some other way to deal with this attribute
                     // [TitleAttr] = attrValue =>
                     // {
                     //     var usingDirective = "@using Microsoft.AspNetCore.Components.Web.Extensions.Head";

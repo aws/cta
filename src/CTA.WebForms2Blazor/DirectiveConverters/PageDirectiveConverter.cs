@@ -13,7 +13,6 @@ namespace CTA.WebForms2Blazor.DirectiveConverters
                 {
                     UniversalDirectiveAttributeMap.MasterPageFileAttr,
                     UniversalDirectiveAttributeMap.InheritsAttr,
-                    // UniversalDirectiveAttributeMap.TitleAttr,
                     UniversalDirectiveAttributeMap.CodeBehind,
                     UniversalDirectiveAttributeMap.ClassNameAttr,
                     UniversalDirectiveAttributeMap.LanguageAttr
