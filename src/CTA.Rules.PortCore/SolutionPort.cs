@@ -328,6 +328,10 @@ namespace CTA.Rules.PortCore
 
         internal void CopyOverrideRules(string sourceDir)
         {
+            // Skip overriding the same directory.
+            if(sourceDir == Constants.RulesDefaultPath) { 
+                return; 
+            }
             var files = Directory.EnumerateFiles(sourceDir, "*.json").ToList();
             files.ForEach(file => {
                 File.Copy(file, Path.Combine(Constants.RulesDefaultPath, Path.GetFileName(file)), true);
