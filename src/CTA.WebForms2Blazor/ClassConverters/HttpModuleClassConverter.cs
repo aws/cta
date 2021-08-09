@@ -9,6 +9,7 @@ using CTA.WebForms2Blazor.FileInformationModel;
 using CTA.WebForms2Blazor.Helpers;
 using CTA.WebForms2Blazor.Services;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace CTA.WebForms2Blazor.ClassConverters
@@ -23,6 +24,7 @@ namespace CTA.WebForms2Blazor.ClassConverters
         private IEnumerable<FieldDeclarationSyntax> _sharedFields;
         private IEnumerable<PropertyDeclarationSyntax> _sharedProperties;
         private IEnumerable<StatementSyntax> _constructorStatements;
+        private IEnumerable<string> _moduleEventHandlerExpectedNames;
         private LifecycleManagerService _lifecycleManager;
 
         private string _originalClassName;
@@ -176,6 +178,17 @@ namespace CTA.WebForms2Blazor.ClassConverters
             // lifecycle are registered
             return paramList.Count() == 1 && firstParam.Type.ToString().Equals(Constants.ExpectedGlobalBaseClass)
                 && methodDeclaration.Identifier.ToString().Equals(Constants.InitMethodName);
+        }
+
+        private bool IsModuleEventHandlerMethod(MethodDeclarationSyntax methodDeclaration)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void ProcessInitMethod(MethodDeclarationSyntax methodDeclaration)
+        {
+            var assignmentStatements = methodDeclaration.Body.Statements.Where(statement => statement.IsKind(SyntaxKind.AddAssignmentExpression)) as IEnumerable<AssignmentExpressionSyntax>;
+            // assignmentStatements.Where(statement => statement.Left.ChildNodes().Single(syntaxNode));
         }
     }
 }
