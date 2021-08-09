@@ -21,6 +21,11 @@ namespace CTA.WebForms2Blazor.Helpers
         };
 
         /// <summary>
+        /// Condition that will return true when in development
+        /// </summary>
+        public static string DevEnvConditionText => $"{RuntimeInjectable.EnvInjectable.PropertyName}.IsDevelopment()";
+
+        /// <summary>
         /// Required statement in Configure method, adds use of wwwroot to Blazor app
         /// </summary>
         public static string AppUseStaticFilesText => $"{RuntimeInjectable.AppBuilderInjectable.ParamName}.UseStaticFiles();";
@@ -132,14 +137,21 @@ namespace CTA.WebForms2Blazor.Helpers
 
         public static MethodDeclarationSyntax ConstructStartupConfigureMethod(IEnumerable<StatementSyntax> additonalStatements = null)
         {
+            var devOnlyStatements = new List<StatementSyntax>()
+            {
+                SyntaxFactory.ParseStatement(AppUseDevExceptionPageCall)
+            };
+
+            var devEnvCondition = SyntaxFactory.ParseExpression(DevEnvConditionText);
+
             var statements = new List<StatementSyntax>()
             {
                 // Standard blazor configuration statements
                 SyntaxFactory.ParseStatement(AppUseStaticFilesText),
                 SyntaxFactory.ParseStatement(AppUseRoutingText),
-                SyntaxFactory.ParseStatement(AppUseDevExceptionPageCall)
-                    .AddComment(Constants.RemoveBeforeProductionDeploymentComment),
-                SyntaxFactory.ParseStatement(AppUseEndpointsCall)
+                SyntaxFactory.ParseStatement(AppUseEndpointsCall),
+                // Dev env dependent statements
+                SyntaxFactory.IfStatement(devEnvCondition, CodeSyntaxHelper.GetStatementsAsBlock(devOnlyStatements))
             };
 
             if (additonalStatements != null)

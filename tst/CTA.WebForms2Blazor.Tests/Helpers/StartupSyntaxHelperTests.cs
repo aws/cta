@@ -61,14 +61,15 @@ $@"{ExpectedStartupClassSignature}
     {{
         {ExpectedConfigureUseStaticFilesCall}
         {ExpectedConfigureUseRoutingCall}
-        // For development only, remove before production
-        // deployment
-        {ExpectedDevErrorPageCall}
         app.UseEndpoints(endpoints =>
         {{
             endpoints.MapBlazorHub();
             endpoints.MapFallbackToPage(""/_Host"");
         }});
+        if (Env.IsDevelopment())
+        {{
+            {ExpectedDevErrorPageCall}
+        }}
     }}
 
     {ExpectedBasicConfigureServicesMethodSignature}
@@ -107,14 +108,16 @@ $@"{ExpectedStartupClassSignature}
     {{
         {ExpectedConfigureUseStaticFilesCall}
         {ExpectedConfigureUseRoutingCall}
-        // For development only, remove before production
-        // deployment
-        {ExpectedDevErrorPageCall}
         app.UseEndpoints(endpoints =>
         {{
             endpoints.MapBlazorHub();
             endpoints.MapFallbackToPage(""/_Host"");
         }});
+        if (Env.IsDevelopment())
+        {{
+            {ExpectedDevErrorPageCall}
+        }}
+
         {SyntaxHelperSetupFixture.AdditionalStatementText}
     }}
 
@@ -147,28 +150,31 @@ $@"{ExpectedBasicConfigureMethodSignature}
 {{
     {ExpectedConfigureUseStaticFilesCall}
     {ExpectedConfigureUseRoutingCall}
-    // For development only, remove before production
-    // deployment
-    {ExpectedDevErrorPageCall}
     app.UseEndpoints(endpoints =>
     {{
         endpoints.MapBlazorHub();
         endpoints.MapFallbackToPage(""/_Host"");
     }});
+    if (Env.IsDevelopment())
+    {{
+        {ExpectedDevErrorPageCall}
+    }}
 }}";
         private static string ExpectedModifiedConfigureText =>
 $@"{ExpectedBasicConfigureMethodSignature}
 {{
     {ExpectedConfigureUseStaticFilesCall}
     {ExpectedConfigureUseRoutingCall}
-    // For development only, remove before production
-    // deployment
-    {ExpectedDevErrorPageCall}
     app.UseEndpoints(endpoints =>
     {{
         endpoints.MapBlazorHub();
         endpoints.MapFallbackToPage(""/_Host"");
     }});
+    if (Env.IsDevelopment())
+    {{
+        {ExpectedDevErrorPageCall}
+    }}
+
     {SyntaxHelperSetupFixture.AdditionalStatementText}
 }}";
         private static string ExpectedBasicConfigureServicesText =>

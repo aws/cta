@@ -94,7 +94,6 @@
 
         public const string UnusableCodeComment = "Unable to migrate the following code, as a result it was removed";
         public const string HeavyModificationNecessaryComment = "Heavy modifications likely necessary, please review";
-        public const string RemoveBeforeProductionDeploymentComment = "For development only, remove before production deployment";
 
         // Common Errors and Templates
         public const string TooManyOperationsError = "Attempted {0} operation, but the expected number of operations has already been reached";

@@ -82,14 +82,16 @@ namespace ProjectNamespace
         {
             app.UseStaticFiles();
             app.UseRouting();
-            // For development only, remove before production
-            // deployment
-            app.UseDeveloperExceptionPage();
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapBlazorHub();
                 endpoints.MapFallbackToPage(""/_Host"");
             });
+            if (Env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
+
             
             // The following lines were extracted from Application_Start
             var x = 10;
