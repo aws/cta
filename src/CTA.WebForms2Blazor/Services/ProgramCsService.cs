@@ -28,7 +28,7 @@ namespace {0}
     }}
 }}";
 
-        public string ProgramCsNamespace { get; set; } = "Unknown_program_cs_namespace";
+        public string ProgramCsNamespace { get; set; } = "Replace_this_with_root_namespace";
 
         public FileInformation ConstructProgramCsFile()
         {

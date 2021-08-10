@@ -13,7 +13,7 @@ namespace CTA.WebForms2Blazor.Tests.DirectiveConverters
         private const string TestDirectiveMasterPageFileAttribute = "Master MasterPageFile=\"~/directory/TestMasterPage.Master\"";
         private const string TestDirectiveInheritsAttribute = "Master Inherits=\"TestBaseClass\"";
         private const string TestDirective2Attributes = "Master Inherits=\"TestBaseClass\" MasterPageFile=\"~/directory/TestMasterPage.Master\"";
-        private const string ExpectedNamespaceDirective = "@namespace Unknown_code_behind_namespace";
+        private const string ExpectedNamespaceDirective = "@namespace Replace_this_with_code_behind_namespace";
         private const string ExpectedMasterPageFileDirective = "@layout TestMasterPage";
         private const string ExpectedInheritsDirective = "<!-- Conversion of Inherits attribute (value: \"TestBaseClass\") for Master directive not currently supported -->";
         private const string ExpectedInheritsLayoutDirective = "@inherits LayoutComponentBase";

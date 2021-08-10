@@ -4,7 +4,7 @@ namespace CTA.WebForms2Blazor.DirectiveConverters
 {
     public class MasterDirectiveConverter : DirectiveConverter
     {
-        private const string UnknownNamespacePlaceHolderText = "Unknown_code_behind_namespace";
+        private const string UnknownNamespacePlaceHolderText = "Replace_this_with_code_behind_namespace";
 
         private protected override IEnumerable<string> AttributeAllowList
         {
