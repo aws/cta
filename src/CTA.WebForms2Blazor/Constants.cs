@@ -5,8 +5,8 @@
         // Notable Events
         public const WebFormsAppLifecycleEvent FirstPostHandleEvent = WebFormsAppLifecycleEvent.PostRequestHandlerExecute;
         public const WebFormsPageLifecycleEvent FirstOnInitializedEvent = WebFormsPageLifecycleEvent.InitComplete;
-        public const WebFormsPageLifecycleEvent FirstOnParametersSetEvent = WebFormsPageLifecycleEvent.SaveStateComplete;
-        public const WebFormsPageLifecycleEvent FirstOnAfterRenderEvent = WebFormsPageLifecycleEvent.Render;
+        public const WebFormsPageLifecycleEvent FirstOnParametersSetEvent = WebFormsPageLifecycleEvent.PreRender;
+        public const WebFormsPageLifecycleEvent FirstOnAfterRenderEvent = WebFormsPageLifecycleEvent.SaveStateComplete;
         public const WebFormsPageLifecycleEvent FirstDisposeEvent = WebFormsPageLifecycleEvent.Unload;
 
         // Notable Methods
@@ -44,6 +44,7 @@
         public const string WebFormsMasterPageMarkupFileExtension = ".Master";
         public const string WebFormsGlobalMarkupFileExtension = ".asax";
         public const string WebFormsConfigFileExtension = ".config";
+        public const string StyleSheetFileExtension = ".css";
 
         // Notable File Names
         public const string ExpectedGlobalFileName = "Global.asax.cs";
@@ -74,6 +75,10 @@
         public const string RazorExplicitEmbeddingTemplate = "@({0})";
         public const string RazorExplicitRawEmbeddingTemplate = "@(new MarkupString({0}))";
         public const string RazorConfigurationAccessTemplate = "@(Configuration[\"{0}\"])";
+        public const string RazorNamespaceDirective = "@namespace {0}";
+        public const string RazorImplementsDirective = "@implements {0}";
+        public const string RazorInheritsDirective = "@inherits {0}";
+        public const string RazorPageDirective = "@page \"{0}\"";
 
         // appsettings.json Section Names
         public const string AppSettingsSection = "appsettings";
@@ -117,5 +122,9 @@
         
         //View layer constants
         public const string AspControlTag = "asp:";
+
+        // Routing constants
+        public const string DefaultHomePagePath = "Default.aspx";
+        public const char RouteSeparator = '/';
     }
 }

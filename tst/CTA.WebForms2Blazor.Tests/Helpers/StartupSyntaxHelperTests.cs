@@ -22,6 +22,7 @@ namespace CTA.WebForms2Blazor.Tests.Helpers
 
         private const string ExpectedConfigureUseStaticFilesCall = "app.UseStaticFiles();";
         private const string ExpectedConfigureUseRoutingCall = "app.UseRouting();";
+        private const string ExpectedDevErrorPageCall = "app.UseDeveloperExceptionPage();";
 
         private const string ExpectedConfigureServicesAddRazorPagesCall = "services.AddRazorPages();";
         private const string ExpectedConfigureServicesAddServerSideBlazorCall = "services.AddServerSideBlazor();";
@@ -60,6 +61,15 @@ $@"{ExpectedStartupClassSignature}
     {{
         {ExpectedConfigureUseStaticFilesCall}
         {ExpectedConfigureUseRoutingCall}
+        app.UseEndpoints(endpoints =>
+        {{
+            endpoints.MapBlazorHub();
+            endpoints.MapFallbackToPage(""/_Host"");
+        }});
+        if (Env.IsDevelopment())
+        {{
+            {ExpectedDevErrorPageCall}
+        }}
     }}
 
     {ExpectedBasicConfigureServicesMethodSignature}
@@ -98,6 +108,16 @@ $@"{ExpectedStartupClassSignature}
     {{
         {ExpectedConfigureUseStaticFilesCall}
         {ExpectedConfigureUseRoutingCall}
+        app.UseEndpoints(endpoints =>
+        {{
+            endpoints.MapBlazorHub();
+            endpoints.MapFallbackToPage(""/_Host"");
+        }});
+        if (Env.IsDevelopment())
+        {{
+            {ExpectedDevErrorPageCall}
+        }}
+
         {SyntaxHelperSetupFixture.AdditionalStatementText}
     }}
 
@@ -130,12 +150,31 @@ $@"{ExpectedBasicConfigureMethodSignature}
 {{
     {ExpectedConfigureUseStaticFilesCall}
     {ExpectedConfigureUseRoutingCall}
+    app.UseEndpoints(endpoints =>
+    {{
+        endpoints.MapBlazorHub();
+        endpoints.MapFallbackToPage(""/_Host"");
+    }});
+    if (Env.IsDevelopment())
+    {{
+        {ExpectedDevErrorPageCall}
+    }}
 }}";
         private static string ExpectedModifiedConfigureText =>
 $@"{ExpectedBasicConfigureMethodSignature}
 {{
     {ExpectedConfigureUseStaticFilesCall}
     {ExpectedConfigureUseRoutingCall}
+    app.UseEndpoints(endpoints =>
+    {{
+        endpoints.MapBlazorHub();
+        endpoints.MapFallbackToPage(""/_Host"");
+    }});
+    if (Env.IsDevelopment())
+    {{
+        {ExpectedDevErrorPageCall}
+    }}
+
     {SyntaxHelperSetupFixture.AdditionalStatementText}
 }}";
         private static string ExpectedBasicConfigureServicesText =>

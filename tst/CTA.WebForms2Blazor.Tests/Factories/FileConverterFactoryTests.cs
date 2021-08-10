@@ -15,7 +15,7 @@ namespace CTA.WebForms2Blazor.Tests.Factories
     [TestFixture]
     class FileConverterFactoryTests
     {
-        private string TestFilesDirectoryPath = Path.Combine("TestingArea", "TestFiles");
+        private readonly string TestFilesDirectoryPath = Path.Combine("TestingArea", "TestFiles");
 
         private string _testProjectPath;
         private string _testCodeFilePath;
@@ -44,6 +44,7 @@ namespace CTA.WebForms2Blazor.Tests.Factories
         {
             var webFormsProjectAnalyzer = new ProjectAnalyzer(_testProjectPath, new AnalyzerResult(), new PortCoreConfiguration());
             var blazorWorkspaceManager = new WorkspaceManagerService();
+            var taskManagerService = new TaskManagerService();
 
             blazorWorkspaceManager.CreateSolutionFile();
 
@@ -52,7 +53,9 @@ namespace CTA.WebForms2Blazor.Tests.Factories
                 blazorWorkspaceManager,
                 webFormsProjectAnalyzer,
                 new ViewImportService(),
-                new ClassConverterFactory(string.Empty, new LifecycleManagerService(), new TaskManagerService()));
+                new ClassConverterFactory(string.Empty, new LifecycleManagerService(), taskManagerService),
+                new HostPageService(),
+                taskManagerService);
         }
 
         [Test]
@@ -75,12 +78,14 @@ namespace CTA.WebForms2Blazor.Tests.Factories
         [Test]
         public void TestBuildManyBasic()
         {
-            List<FileInfo> files = new List<FileInfo>();
-            files.Add(new FileInfo(_testCodeFilePath));
-            files.Add(new FileInfo(_testConfigFilePath));
-            files.Add(new FileInfo(_testStaticFilePath));
-            files.Add(new FileInfo(_testViewFilePath));
-            files.Add(new FileInfo(_testProjectFilePath));
+            var files = new[]
+            {
+                new FileInfo(_testCodeFilePath),
+                new FileInfo(_testConfigFilePath),
+                new FileInfo(_testStaticFilePath),
+                new FileInfo(_testViewFilePath),
+                new FileInfo(_testProjectFilePath)
+            };
 
             List<FileConverter> fileObjects = _fileConverterFactory.BuildMany(files).ToList();
             Assert.True(typeof(CodeFileConverter).IsInstanceOfType(fileObjects[0]));

@@ -26,7 +26,8 @@ namespace CTA.WebForms2Blazor.FileConverters
             string fullPath,
             WorkspaceManagerService blazorWorkspaceManager,
             ProjectAnalyzer webFormsProjectAnalyzer,
-            ClassConverterFactory classConverterFactory) : base(sourceProjectPath, fullPath)
+            ClassConverterFactory classConverterFactory,
+            TaskManagerService taskManagerService) : base(sourceProjectPath, fullPath, taskManagerService)
         {
             // May not need this anymore but not sure yet
             _blazorWorkspaceBuilder = blazorWorkspaceManager;
@@ -56,6 +57,12 @@ namespace CTA.WebForms2Blazor.FileConverters
             LogStart();
 
             var classMigrationTasks = _classConverters.Select(classConverter => classConverter.MigrateClassAsync());
+
+            // We want to do our cleanup now because from this point on all migration tasks
+            // are done by class converters and we want to make sure that we retire the task
+            // related to this file converter before we await
+            DoCleanUp();
+
             var result = (await Task.WhenAll(classMigrationTasks)).SelectMany(newFileInformation => newFileInformation);
 
             LogEnd();

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using CTA.Rules.Actions;
 using CTA.Rules.Models;
 using CTA.WebForms2Blazor.FileInformationModel;
+using CTA.WebForms2Blazor.Services;
 
 namespace CTA.WebForms2Blazor.FileConverters
 {
@@ -14,7 +15,8 @@ namespace CTA.WebForms2Blazor.FileConverters
         private const string WebConfigFile = "web.config";
         private string _relativeDirectory;
 
-        public ConfigFileConverter(string sourceProjectPath, string fullPath) : base(sourceProjectPath, fullPath)
+        public ConfigFileConverter(string sourceProjectPath, string fullPath, TaskManagerService taskManagerService)
+            : base(sourceProjectPath, fullPath, taskManagerService)
         {
             _relativeDirectory = Path.GetDirectoryName(RelativePath);
         }
@@ -37,6 +39,7 @@ namespace CTA.WebForms2Blazor.FileConverters
                 fileList.Add(new FileInformation(newPath, Encoding.UTF8.GetBytes(migratedString)));
             }
 
+            DoCleanUp();
             LogEnd();
 
             return Task.FromResult((IEnumerable<FileInformation>)fileList);

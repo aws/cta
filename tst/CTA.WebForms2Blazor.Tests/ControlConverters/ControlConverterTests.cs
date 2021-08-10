@@ -7,6 +7,8 @@ namespace CTA.WebForms2Blazor.Tests.ControlConverters
 {
     public class ControlConverterTests
     {
+        private const string TestPath = "Default.asax";
+
         private const string TestUpdateInnerHtmlNodeHtmlString = @"<div class=""esh-table"">
     <asp:ListView ID=""productList"" ItemPlaceholderID=""itemPlaceHolder"" runat=""server"" ItemType=""eShopLegacyWebForms.Models.CatalogItem"">
         <LayoutTemplate>
@@ -131,8 +133,7 @@ namespace CTA.WebForms2Blazor.Tests.ControlConverters
         [Test]
         public void TestUpdateInnerHtmlNode_Multiple_Name_Match_Single_Id_Match()
         {
-            var htmlNode = HtmlNode.CreateNode(TestMultipleUpdateInnerHtmlNodeHtmlString);
-            htmlNode.OwnerDocument.OptionOutputOriginalCase = true;
+            var htmlNode = HtmlNode.CreateNode(TestMultipleUpdateInnerHtmlNodeHtmlString, ControlConverter.PreserveCapitalization);
             var multipleNameMatchSingleIdMatch = _testControlConverter.UpdateInnerHtmlNode(htmlNode, "asp:PlaceHolder", 
                 id: "itemPlaceHolder",template: "@{2}", newBody: "itemPlaceHolder");
 
@@ -177,7 +178,7 @@ namespace CTA.WebForms2Blazor.Tests.ControlConverters
         </ItemTemplate>
     </asp:ListView>
 </div>";
-            string contents = ControlConverter.ConvertEmbeddedCode(htmlString, new ViewImportService());
+            string contents = ControlConverter.ConvertEmbeddedCode(htmlString, TestPath, new ViewImportService());
 
             string expectedContents = @"<div class=""esh-table"">
     <asp:ListView ID=""productList"" ItemPlaceholderID=""itemPlaceHolder"" runat=""server"" ItemType=""eShopLegacyWebForms.Models.CatalogItem"">
@@ -214,7 +215,7 @@ namespace CTA.WebForms2Blazor.Tests.ControlConverters
         </article>
     </div>
 </div>";
-            string contents = ControlConverter.ConvertEmbeddedCode(htmlString, new ViewImportService());
+            string contents = ControlConverter.ConvertEmbeddedCode(htmlString, TestPath, new ViewImportService());
             string expectedContents = @"<div class=""esh-pager"">
     <div class=""container"">
         <article class=""esh-pager-wrapper row"">
@@ -226,6 +227,88 @@ namespace CTA.WebForms2Blazor.Tests.ControlConverters
     </div>
 </div>";
             Assert.AreEqual(expectedContents, contents);
+        }
+
+        [Test]
+        public void DeleteNode_Keep_Contents()
+        {
+            var htmlDoc = new HtmlDocument();
+            var htmlString = @"<asp:Content ID=""CatalogList"" ContentPlaceHolderID=""MainContent"" runat=""server"">
+    <div class=""esh-pager"">
+        <div class=""container"">
+            <article class=""esh-pager-wrapper row"">
+                <nav>
+                    <asp:HyperLink ID=""PaginationPrevious"" runat=""server"" CssClass=""esh-pager-item esh-pager-item--navigable"">
+                        Previous
+                    </asp:HyperLink>
+                </nav>
+            </article>
+        </div>
+    </div>
+    <div>
+        <p> Some random stuff </p>
+    </div>
+</asp:Content>";
+            htmlDoc.LoadHtml(htmlString);
+            htmlDoc.OptionOutputOriginalCase = true;
+            var htmlNode = htmlDoc.DocumentNode.FirstChild;
+            _testControlConverter.DeleteNode(htmlNode, true);
+
+            var actualContents = htmlDoc.DocumentNode.WriteTo();
+            var expectedContents = @"
+    <div class=""esh-pager"">
+        <div class=""container"">
+            <article class=""esh-pager-wrapper row"">
+                <nav>
+                    <asp:HyperLink ID=""PaginationPrevious"" runat=""server"" CssClass=""esh-pager-item esh-pager-item--navigable"">
+                        Previous
+                    </asp:HyperLink>
+                </nav>
+            </article>
+        </div>
+    </div>
+    <div>
+        <p> Some random stuff </p>
+    </div>
+";
+        
+            Assert.AreEqual(expectedContents, actualContents);
+        }
+
+        [Test]
+        public void DeleteNode_Removes_Contents()
+        {
+            var htmlDoc = new HtmlDocument();
+            var htmlString = @"<asp:Content ID=""CatalogList"" ContentPlaceHolderID=""MainContent"" runat=""server"">
+    <div class=""esh-pager"">
+        <div class=""container"">
+            <article class=""esh-pager-wrapper row"">
+                <nav>
+                    <asp:HyperLink ID=""PaginationPrevious"" runat=""server"" CssClass=""esh-pager-item esh-pager-item--navigable"">
+                        Previous
+                    </asp:HyperLink>
+                </nav>
+            </article>
+        </div>
+    </div>
+    <div>
+        <p> Some random stuff </p>
+    </div>
+</asp:Content>";
+            htmlDoc.LoadHtml(htmlString);
+            htmlDoc.OptionOutputOriginalCase = true;
+            var htmlNode = htmlDoc.DocumentNode.FirstChild.ChildNodes[1];
+            _testControlConverter.DeleteNode(htmlNode, false);
+
+            var actualContents = htmlDoc.DocumentNode.WriteTo();
+            var expectedContents = @"<asp:Content ID=""CatalogList"" ContentPlaceHolderID=""MainContent"" runat=""server"">
+    
+    <div>
+        <p> Some random stuff </p>
+    </div>
+</asp:Content>";
+            
+            Assert.AreEqual(expectedContents, actualContents);
         }
     }
 }

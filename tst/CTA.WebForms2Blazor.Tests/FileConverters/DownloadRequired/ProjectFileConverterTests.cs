@@ -83,7 +83,8 @@ namespace CTA.WebForms2Blazor.Tests.FileConverters.DownloadRequired
         {
             FileConverter fc = new ProjectFileConverter(DownloadTestProjectsFixture.EShopOnBlazorSolutionPath,
                 DownloadTestProjectsFixture.EShopLegacyWebFormsProjectPath,
-                _blazorWorkspaceManager, _webFormsProjectAnalyzer);
+                _blazorWorkspaceManager, _webFormsProjectAnalyzer,
+                new TaskManagerService());
 
             IEnumerable<FileInformation> fileList = await fc.MigrateFileAsync();
             FileInformation fi = fileList.Single();

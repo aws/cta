@@ -9,6 +9,11 @@ namespace CTA.WebForms2Blazor.Helpers
 {
     public static class CodeSyntaxHelper
     {
+        public static IEnumerable<string> FrameworkOnlyUsings => new[]
+        {
+            "System.Web."
+        };
+
         public static UsingDirectiveSyntax BuildUsingStatement(string referencedNamespace)
         {
             return SyntaxFactory.UsingDirective(SyntaxFactory.ParseName(referencedNamespace));
@@ -55,6 +60,11 @@ namespace CTA.WebForms2Blazor.Helpers
                 // Without the newline the whitespace gets absorbed by other
                 // lines for some reason
                 .WithLeadingTrivia(SyntaxFactory.Whitespace(Environment.NewLine));
+        }
+
+        public static IEnumerable<string> RemoveFrameworkUsings(IEnumerable<string> usings)
+        {
+            return usings.Where(usingName => !FrameworkOnlyUsings.Any(frameworkUsing => usingName.StartsWith(frameworkUsing)));
         }
     }
 }

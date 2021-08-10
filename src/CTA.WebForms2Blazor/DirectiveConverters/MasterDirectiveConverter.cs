@@ -4,6 +4,8 @@ namespace CTA.WebForms2Blazor.DirectiveConverters
 {
     public class MasterDirectiveConverter : DirectiveConverter
     {
+        private const string UnknownNamespacePlaceHolderText = "Replace_this_with_code_behind_namespace";
+
         private protected override IEnumerable<string> AttributeAllowList
         {
             get
@@ -11,8 +13,6 @@ namespace CTA.WebForms2Blazor.DirectiveConverters
                 return new[]
                 {
                     UniversalDirectiveAttributeMap.MasterPageFileAttr,
-                    UniversalDirectiveAttributeMap.InheritsAttr,
-                    UniversalDirectiveAttributeMap.TitleAttr,
                     UniversalDirectiveAttributeMap.CodeBehind,
                     UniversalDirectiveAttributeMap.ClassNameAttr,
                     UniversalDirectiveAttributeMap.LanguageAttr
@@ -20,9 +20,16 @@ namespace CTA.WebForms2Blazor.DirectiveConverters
             }
         }
 
-        private protected override DirectiveMigrationResult GetMigratedDirective(string directiveName)
+        private protected override IEnumerable<DirectiveMigrationResult> GetMigratedDirectives(string directiveName, string originalFilePath)
         {
-            return null;
+            var layoutNamespace = UnknownNamespacePlaceHolderText;
+
+            // TODO: Retrieve code behind namespace from code behind linker service and use it populate layoutNamespace
+
+            return new[] {
+                new DirectiveMigrationResult(DirectiveMigrationResultType.GeneralDirective, string.Format(Constants.RazorNamespaceDirective, layoutNamespace)),
+                new DirectiveMigrationResult(DirectiveMigrationResultType.GeneralDirective, string.Format(Constants.RazorInheritsDirective, Constants.LayoutComponentBaseClass))
+            };
         }
     }
 }

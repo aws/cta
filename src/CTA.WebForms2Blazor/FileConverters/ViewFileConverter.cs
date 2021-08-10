@@ -18,8 +18,12 @@ namespace CTA.WebForms2Blazor.FileConverters
         private ViewImportService _viewImportService;
         private List<ControlConversionAction> ControlActions;
 
-        public ViewFileConverter(string sourceProjectPath, string fullPath, ViewImportService viewImportService) 
-            : base(sourceProjectPath, fullPath)
+        public ViewFileConverter(
+            string sourceProjectPath,
+            string fullPath,
+            ViewImportService viewImportService,
+            TaskManagerService taskManagerService) 
+            : base(sourceProjectPath, fullPath, taskManagerService)
         {
             _viewImportService = viewImportService;
             ControlActions = new List<ControlConversionAction>();
@@ -72,7 +76,10 @@ namespace CTA.WebForms2Blazor.FileConverters
             foreach (var package in ControlActions)
             {
                 HtmlNode convertedNode = package.Rules.Convert2Blazor(package.Node);
-                package.Parent.ReplaceChild(convertedNode, package.Node);
+                if (convertedNode != null)
+                {
+                    package.Parent.ReplaceChild(convertedNode, package.Node);
+                }
             }
         }
 
@@ -89,8 +96,8 @@ namespace CTA.WebForms2Blazor.FileConverters
             // traversal because the post-order nature may comment out controls
             // that are migrated as part of an ancestor control before that ancestor
             // can be processed
+            contents = ControlConverter.ConvertEmbeddedCode(contents, RelativePath, _viewImportService);
             contents = UnknownControlRemover.RemoveUnknownTags(contents);
-            contents = ControlConverter.ConvertEmbeddedCode(contents, _viewImportService);
 
             // Currently just changing extension to .razor, keeping filename and directory the same
             // but Razor files are renamed and moved around, can't always use same filename/directory in the future
@@ -110,12 +117,14 @@ namespace CTA.WebForms2Blazor.FileConverters
             }
             else
             {
+                DoCleanUp();
                 LogEnd();
 
                 // Stuff like Global.asax shouldn't create a Global.razor file
                 return Task.FromResult(Enumerable.Empty<FileInformation>());
             }
 
+            DoCleanUp();
             LogEnd();
 
             var fileInfo = new FileInformation(newRelativePath, Encoding.UTF8.GetBytes(contents));

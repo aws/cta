@@ -7,8 +7,6 @@ namespace CTA.WebForms2Blazor.Helpers.ControlHelpers
 {
     public static class SupportedControls
     {
-        private const string UnsupportedAspExpressionTypeCommentTemplate = "@* Asp expresion type {0} with content {1} not currently supported *@";
-
         public static readonly Dictionary<string, ControlConverter> ControlRulesMap = new Dictionary<string, ControlConverter>()
         {
             ["asp:hyperlink"] = new HyperLinkControlConverter(),
@@ -16,7 +14,12 @@ namespace CTA.WebForms2Blazor.Helpers.ControlHelpers
             ["asp:label"] = new LabelControlConverter(),
             ["asp:listview"] = new ListViewControlConverter(),
             ["asp:gridview"] = new GridViewControlConverter(),
-            ["asp:content"] = new ContentControlConverter(),
+            ["asp:content"] = new RemoveNodeKeepContentsConverter(),
+            ["html"] = new RemoveNodeKeepContentsConverter(),
+            ["body"] = new RemoveNodeKeepContentsConverter(),
+            ["head"] = new RemoveNodeAndContentsConverter(),
+            ["scripts"] = new RemoveNodeAndContentsConverter(),
+            ["!doctype"] = new RemoveNodeAndContentsConverter(),
             ["asp:contentplaceholder"] = new ContentPlaceHolderControlConverter()
         };
 
@@ -34,6 +37,6 @@ namespace CTA.WebForms2Blazor.Helpers.ControlHelpers
         };
 
         public static readonly DirectiveConverter DefaultDirectiveConverter = new DirectiveConverter();
-        public static readonly Func<string, string, string> DefaultAspExpressionConverter = (exprType, expr) => string.Format(UnsupportedAspExpressionTypeCommentTemplate, exprType, expr);
+        public static readonly Func<string, string, string> DefaultAspExpressionConverter = (exprType, expr) => string.Format(Constants.RazorExplicitEmbeddingTemplate, $"{exprType}.{expr}");
     }
 }

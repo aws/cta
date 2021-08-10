@@ -16,7 +16,9 @@ namespace CTA.WebForms2Blazor.Factories
         private readonly ProjectAnalyzer _webFormsProjectAnalyzer;
         private readonly ViewImportService _viewImportService;
         private readonly ClassConverterFactory _classConverterFactory;
-        
+        private readonly HostPageService _hostPageService;
+        private readonly TaskManagerService _taskManagerService;
+
         // TODO: Organize these into "types" and force
         // content separation in file system if it doesn't
         // already exist
@@ -32,13 +34,17 @@ namespace CTA.WebForms2Blazor.Factories
             WorkspaceManagerService blazorWorkspaceManager,
             ProjectAnalyzer webFormsProjectAnalyzer,
             ViewImportService viewImportService,
-            ClassConverterFactory classConverterFactory)
+            ClassConverterFactory classConverterFactory,
+            HostPageService hostPageService,
+            TaskManagerService taskManagerService)
         {
             _sourceProjectPath = sourceProjectPath;
             _blazorWorkspaceManager = blazorWorkspaceManager;
             _webFormsProjectAnalyzer = webFormsProjectAnalyzer;
             _viewImportService = viewImportService;
             _classConverterFactory = classConverterFactory;
+            _hostPageService = hostPageService;
+            _taskManagerService = taskManagerService;
         }
 
         public FileConverter Build(FileInfo document)
@@ -56,30 +62,30 @@ namespace CTA.WebForms2Blazor.Factories
             FileConverter fc;
             if (extension.Equals(Constants.CSharpCodeFileExtension))
             {
-                fc = new CodeFileConverter(_sourceProjectPath, document.FullName, _blazorWorkspaceManager, _webFormsProjectAnalyzer, _classConverterFactory);
+                fc = new CodeFileConverter(_sourceProjectPath, document.FullName, _blazorWorkspaceManager, _webFormsProjectAnalyzer, _classConverterFactory, _taskManagerService);
             }
             else if (extension.Equals(Constants.WebFormsConfigFileExtension))
             {
-                fc = new ConfigFileConverter(_sourceProjectPath, document.FullName);
+                fc = new ConfigFileConverter(_sourceProjectPath, document.FullName, _taskManagerService);
             }
             else if (extension.Equals(Constants.WebFormsPageMarkupFileExtension)
                 || extension.Equals(Constants.WebFormsControlMarkupFileExtenion)
                 || extension.Equals(Constants.WebFormsMasterPageMarkupFileExtension)
                 || extension.Equals(Constants.WebFormsGlobalMarkupFileExtension))
             {
-                fc = new ViewFileConverter(_sourceProjectPath, document.FullName, _viewImportService);
+                fc = new ViewFileConverter(_sourceProjectPath, document.FullName, _viewImportService, _taskManagerService);
             }
             else if (extension.Equals(Constants.CSharpProjectFileExtension))
             {
-                fc = new ProjectFileConverter(_sourceProjectPath, document.FullName, _blazorWorkspaceManager, _webFormsProjectAnalyzer);
+                fc = new ProjectFileConverter(_sourceProjectPath, document.FullName, _blazorWorkspaceManager, _webFormsProjectAnalyzer, _taskManagerService);
             }
             else if (StaticResourceExtensions.Contains(extension))
             {
-                fc = new StaticResourceFileConverter(_sourceProjectPath, document.FullName);
+                fc = new StaticResourceFileConverter(_sourceProjectPath, document.FullName, _hostPageService, _taskManagerService);
             }
             else
             {
-                fc = new StaticFileConverter(_sourceProjectPath, document.FullName);
+                fc = new StaticFileConverter(_sourceProjectPath, document.FullName, _taskManagerService);
             }
 
 
@@ -88,7 +94,7 @@ namespace CTA.WebForms2Blazor.Factories
 
         public IEnumerable<FileConverter> BuildMany(IEnumerable<FileInfo> documents)
         {
-            return documents.Select(document => Build(document));
+            return documents.Select(document => Build(document)).ToList();
         }
     }
 }

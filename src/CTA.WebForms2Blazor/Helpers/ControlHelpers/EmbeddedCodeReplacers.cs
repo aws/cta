@@ -1,5 +1,4 @@
-﻿using System;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using CTA.WebForms2Blazor.Services;
 
 namespace CTA.WebForms2Blazor.Helpers.ControlHelpers
@@ -13,9 +12,9 @@ namespace CTA.WebForms2Blazor.Helpers.ControlHelpers
 
         /// <summary>
         /// Regular expression to identify data binding syntax, matches start and end
-        /// tags (<%# and %>) with content that does not contain the end tag
+        /// tags (<%# or <%#: and %>) with content that does not contain the end tag
         /// </summary>
-        public static Regex DataBindRegex = new Regex(@"<%#\s*(?<expr>(?:(?!%>).)*)\s*%>");
+        public static Regex DataBindRegex = new Regex(@"<%#:?\s*(?<expr>[^:](?:(?!%>).)*)\s*%>");
         /// <summary>
         /// Regular expression to identify raw expression syntax, matches start and end
         /// tags (<%= and %>) with content that does not contain the end tag
@@ -75,10 +74,11 @@ namespace CTA.WebForms2Blazor.Helpers.ControlHelpers
                 match.Groups[EmbeddedExpressionRegexGroupName].Value.Trim()));
         }
         
-        public static string ReplaceDirectives(string htmlString, ViewImportService viewImportService)
+        public static string ReplaceDirectives(string htmlString, string originalFilePath, ViewImportService viewImportService)
         {
             return DirectiveRegex.Replace(htmlString, match => ConstructBlazorDirectives(
                 match.Groups[EmbeddedExpressionRegexGroupName].Value,
+                originalFilePath,
                 viewImportService));
         }
         
@@ -115,13 +115,13 @@ namespace CTA.WebForms2Blazor.Helpers.ControlHelpers
                 match.Groups[EmbeddedExpressionRegexGroupName].Value.Trim()));
         }
 
-        public static string ConstructBlazorDirectives(string content, ViewImportService viewImportService)
+        public static string ConstructBlazorDirectives(string content, string originalFilePath, ViewImportService viewImportService)
         {
             var directiveName = DirectiveNameRegex.Match(content).Groups[DirectiveNameRegexGroupName].Value;
             var directiveConverter = SupportedControls.DirectiveRulesMap.ContainsKey(directiveName) ?
                 SupportedControls.DirectiveRulesMap[directiveName] : SupportedControls.DefaultDirectiveConverter;
 
-            return directiveConverter.ConvertDirective(directiveName, content.Trim(), viewImportService);
+            return directiveConverter.ConvertDirective(directiveName, content.Trim(), originalFilePath, viewImportService);
         }
     }
 }

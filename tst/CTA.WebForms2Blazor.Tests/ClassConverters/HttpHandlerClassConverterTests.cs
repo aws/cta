@@ -40,7 +40,10 @@ namespace CTA.WebForms2Blazor.Tests.ClassConverters
     }
 }";
         private const string ExpectedOutputComplexClassText =
-@"namespace ProjectNamespace
+@"using Microsoft.AspNetCore.Http;
+using System.Threading.Tasks;
+
+namespace ProjectNamespace
 {
     public class MyHandler
     {

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using CTA.WebForms2Blazor.Helpers.ControlHelpers;
 using CTA.WebForms2Blazor.Services;
 using HtmlAgilityPack;
@@ -82,14 +83,14 @@ namespace CTA.WebForms2Blazor.ControlConverters
             return newNode;
         }
         
-        public static string ConvertEmbeddedCode(string htmlString, ViewImportService viewImportService)
+        public static string ConvertEmbeddedCode(string htmlString, string originalFilePath, ViewImportService viewImportService)
         {
             htmlString = EmbeddedCodeReplacers.ReplaceOneWayDataBinds(htmlString);
             htmlString = EmbeddedCodeReplacers.ReplaceRawExprs(htmlString);
             htmlString = EmbeddedCodeReplacers.ReplaceHTMLEncodedExprs(htmlString);
             htmlString = EmbeddedCodeReplacers.ReplaceAspExprs(htmlString);
             htmlString = EmbeddedCodeReplacers.ReplaceAspComments(htmlString);
-            htmlString = EmbeddedCodeReplacers.ReplaceDirectives(htmlString, viewImportService);
+            htmlString = EmbeddedCodeReplacers.ReplaceDirectives(htmlString, originalFilePath, viewImportService);
             htmlString = EmbeddedCodeReplacers.ReplaceEmbeddedCodeBlocks(htmlString);
 
             return htmlString;
@@ -135,6 +136,21 @@ namespace CTA.WebForms2Blazor.ControlConverters
             }
 
             return true;
+        }
+
+        public void DeleteNode(HtmlNode node, bool keepContents)
+        {
+            var parent = node.ParentNode;
+            if (keepContents)
+            {
+                var childNodes = node.ChildNodes;
+                foreach (HtmlNode childNode in childNodes)
+                {
+                    parent.InsertBefore(childNode, node);
+                }
+            }
+            
+            parent.RemoveChild(node);
         }
     }
 }
