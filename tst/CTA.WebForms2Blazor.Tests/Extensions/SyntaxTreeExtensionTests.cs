@@ -30,6 +30,9 @@ namespace CTA.WebForms2Blazor.Tests.Extensions
         private const string EventHandlerObjectParamName = "sender";
         private const string EventHandlerEventArgsParamType = "EventArgs";
         private const string EventHandlerEventArgsParamName = "e";
+        private const string TestExprNoParens = "new EventHandler(() => { })";
+        private const string TestExprSingleParens = "(new EventHandler(() => { }))";
+        private const string TestExprThreeParens = "(((new EventHandler(() => { }))))";
 
         private const string ClassWith1BaseType =
 @"class TestClass : TestBaseClass1
@@ -228,6 +231,32 @@ namespace CTA.WebForms2Blazor.Tests.Extensions
             });
 
             Assert.AreEqual(0, classDeclaration.ClearBaseTypes().BaseList.Types.Count);
+        }
+
+        [Test]
+        public void RemoveSurroundingParentheses_Does_Nothing_For_Non_Parenthesized_Expression()
+        {
+            var expectedExpr = SyntaxFactory.ParseExpression(TestExprNoParens);
+
+            Assert.AreEqual(expectedExpr.ToString(), expectedExpr.RemoveSurroundingParentheses().ToString());
+        }
+
+        [Test]
+        public void RemoveSurroundingParentheses_Removes_Single_Parentheses()
+        {
+            var expectedExpr = SyntaxFactory.ParseExpression(TestExprNoParens);
+            var inputExpr = SyntaxFactory.ParseExpression(TestExprSingleParens);
+
+            Assert.AreEqual(expectedExpr.ToString(), inputExpr.RemoveSurroundingParentheses().ToString());
+        }
+
+        [Test]
+        public void RemoveSurroundingParentheses_Removes_Multiple_Parentheses()
+        {
+            var expectedExpr = SyntaxFactory.ParseExpression(TestExprNoParens);
+            var inputExpr = SyntaxFactory.ParseExpression(TestExprThreeParens);
+
+            Assert.AreEqual(expectedExpr.ToString(), inputExpr.RemoveSurroundingParentheses().ToString());
         }
     }
 }

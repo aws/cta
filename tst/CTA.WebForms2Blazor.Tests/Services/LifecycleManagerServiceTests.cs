@@ -32,6 +32,9 @@ namespace CTA.WebForms2Blazor.Tests.Services
         private const string ProcessRequestMethodName = "ProcessRequest";
         private const string ProcessRequestParamType = "HttpContext";
         private const string ProcessRequestParamName = "context";
+        private const string LifecycleEventStringPrefix = "application.";
+        private const string PrefixedLifecycleEvent = "application.BeginRequest";
+        private const string MisspelledPrefixedLifecycleEvent = "application.BeeginRequest";
 
         private LifecycleManagerService _lcManager;
         private CancellationToken _token;
@@ -274,6 +277,18 @@ namespace CTA.WebForms2Blazor.Tests.Services
             var result = LifecycleManagerService.IsProcessRequestMethod(methodDeclaration);
 
             Assert.False(result);
+        }
+
+        [Test]
+        public void CheckWebFormsLifecycleEventWithPrefix_Returns_Correct_Lifecycle_Event()
+        {
+            Assert.AreEqual(LifecycleManagerService.CheckWebFormsLifecycleEventWithPrefix(PrefixedLifecycleEvent, LifecycleEventStringPrefix), WebFormsAppLifecycleEvent.BeginRequest);
+        }
+
+        [Test]
+        public void CheckWebFormsLifecycleEventWithPrefix_Returns_Null_On_Failed_Match()
+        {
+            Assert.AreEqual(LifecycleManagerService.CheckWebFormsLifecycleEventWithPrefix(MisspelledPrefixedLifecycleEvent, LifecycleEventStringPrefix), null);
         }
     }
 }
