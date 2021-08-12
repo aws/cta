@@ -8,11 +8,11 @@
     <PackageReference Include="Microsoft.Extensions.Logging" Version="5.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="5.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="5.0.0" />
-    <PackageReference Include="NJsonSchema" Version="10.4.1" />
+    <PackageReference Include="NJsonSchema" Version="10.5.2" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Update="Nerdbank.GitVersioning" Version="3.4.194" />
+    <PackageReference Update="Nerdbank.GitVersioning" Version="3.4.231" />
   </ItemGroup>
 
 </Project>

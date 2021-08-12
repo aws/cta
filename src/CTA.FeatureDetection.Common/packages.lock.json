@@ -26,9 +26,9 @@
       },
       "Nerdbank.GitVersioning": {
         "type": "Direct",
-        "requested": "[3.4.194, )",
-        "resolved": "3.4.194",
-        "contentHash": "f4V2lLy9G0BnddqGhfaVa+dKsbu8iCiLiUARHKBo0l899MgJdRjVU2C7e29gHrZWxc2HZkq3aq28OHHK7q0/iQ=="
+        "requested": "[3.4.231, )",
+        "resolved": "3.4.231",
+        "contentHash": "ifpSbv0sySgIVymTQQz0pjI6O7o/JxnIQMlj28JF5Ybr1LoUTcMfoKnAKwteRlhpQM9qJmONGy9M8BgrEcOteg=="
       },
       "Buildalyzer": {
         "type": "Transitive",
@@ -477,8 +477,8 @@
       },
       "Namotion.Reflection": {
         "type": "Transitive",
-        "resolved": "1.0.19",
-        "contentHash": "+eY1uabKkJEvjfHvr8uHLB1lvrb8S+akpXOe6fKMLTeZEMYIQywFL0/5+zrpNFklJIYzaEoApw2p3zFx357LjQ==",
+        "resolved": "2.0.3",
+        "contentHash": "tZCe/UrSBAMW8A4TjD/SlpRHaWjnHlSWdyRuOXhf3yrE0OX+4fXg0uzj7mwFDclXznfCGRAZbP+akPt4G/mclw==",
         "dependencies": {
           "Microsoft.CSharp": "4.3.0"
         }
@@ -541,10 +541,10 @@
       },
       "NJsonSchema": {
         "type": "Transitive",
-        "resolved": "10.4.1",
-        "contentHash": "XzOfrW2QRS7B6/Z4dVfXXta740oVXvonV2W3OXfhzW+g5tF5FXzwtgseR2vBOf0c6LvLNcR4Wj4vop8uqiSIJA==",
+        "resolved": "10.5.2",
+        "contentHash": "Vr2CbySuXh74TQFU0rGJYZOS492xOE64cPXdB7a0cfXJb/N45Bf4v7sd4LOla0jNhgc5V/B61Ko3qecriL195w==",
         "dependencies": {
-          "Namotion.Reflection": "1.0.19",
+          "Namotion.Reflection": "2.0.3",
           "Newtonsoft.Json": "9.0.1"
         }
       },
@@ -1698,7 +1698,7 @@
           "Microsoft.Extensions.Logging": "5.0.0",
           "Microsoft.Extensions.Logging.Abstractions": "5.0.0",
           "Microsoft.Extensions.Logging.Console": "5.0.0",
-          "NJsonSchema": "10.4.1"
+          "NJsonSchema": "10.5.2"
         }
       }
     }
