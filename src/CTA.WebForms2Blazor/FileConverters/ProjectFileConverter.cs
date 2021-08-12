@@ -14,6 +14,7 @@ using CTA.Rules.PortCore;
 using CTA.Rules.Config;
 using CTA.Rules.ProjectFile;
 using CTA.Rules.Update;
+using CTA.WebForms2Blazor.Helpers;
 
 namespace CTA.WebForms2Blazor.FileConverters
 {
@@ -69,7 +70,7 @@ namespace CTA.WebForms2Blazor.FileConverters
             string newCsProjContent = GenerateProjectFileContents(_projectAnalyzer.ProjectResult,
                 _projectAnalyzer.ProjectConfiguration, _projectAnalyzer.ProjectReferences, _projectAnalyzer.MetaReferences);
             
-            FileInformation fi = new FileInformation(RelativePath, Encoding.UTF8.GetBytes(newCsProjContent));
+            FileInformation fi = new FileInformation(FilePathHelper.RemoveDuplicateDirectories(RelativePath), Encoding.UTF8.GetBytes(newCsProjContent));
 
             var fileList = new List<FileInformation>() { fi };
 

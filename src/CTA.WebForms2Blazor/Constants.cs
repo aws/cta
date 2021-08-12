@@ -49,6 +49,7 @@
         // Notable File Names
         public const string ExpectedGlobalFileName = "Global.asax.cs";
         public const string StartupFileName = "Startup.cs";
+        public const string AppSettingsFileName = "appsettings.json";
 
         // Notable Directory Names
         public const string WebRootDirectoryName = "wwwroot";

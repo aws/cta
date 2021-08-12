@@ -89,29 +89,30 @@ namespace CTA.WebForms2Blazor.Services
             return ((int)lcEvent) < (int)Constants.FirstPostHandleEvent;
         }
 
+        public static WebFormsAppLifecycleEvent? CheckWebFormsLifecycleEventWithPrefix(string stringToCheck, string expectedPrefix)
+        {
+            foreach (int value in Enum.GetValues(typeof(WebFormsAppLifecycleEvent)))
+            {
+                var currentEvent = (WebFormsAppLifecycleEvent)value;
+
+                if (stringToCheck.Equals(expectedPrefix + currentEvent.ToString()))
+                {
+                    return currentEvent;
+                }
+            }
+
+            return null;
+        }
+
         public static WebFormsAppLifecycleEvent? CheckMethodApplicationLifecycleHook(MethodDeclarationSyntax methodDeclaration)
         {
             if (methodDeclaration.HasEventHandlerParameters())
             {
                 var methodName = methodDeclaration.Identifier.ToString();
+                var lcEvent = CheckWebFormsLifecycleEventWithPrefix(methodName, ApplicationLifecycleHookMethodPrefix);
 
-                foreach (int value in Enum.GetValues(typeof(WebFormsAppLifecycleEvent)))
-                {
-                    var currentEvent = (WebFormsAppLifecycleEvent)value;
-
-                    if (currentEvent == WebFormsAppLifecycleEvent.RequestHandlerExecute)
-                    {
-                        // RequestHandlerExecute is a special event that
-                        // technically isn't a part of the lifecycle but is
-                        // used to represent new http handler middleware,
-                        // don't use this loop to identify it
-                        continue;
-                    }
-
-                    if (methodName.Equals(ApplicationLifecycleHookMethodPrefix + currentEvent.ToString()))
-                    {
-                        return currentEvent;
-                    }
+                if (lcEvent != null && lcEvent != WebFormsAppLifecycleEvent.RequestHandlerExecute) {
+                    return lcEvent;
                 }
             }
 
