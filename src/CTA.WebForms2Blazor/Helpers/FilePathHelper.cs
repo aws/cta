@@ -1,5 +1,7 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
+using System.Text;
 
 namespace CTA.WebForms2Blazor.Helpers
 {
@@ -27,6 +29,25 @@ namespace CTA.WebForms2Blazor.Helpers
             }
 
             return newFileNameWithExtension;
+        }
+
+        public static string RemoveDuplicateDirectories(string filePath)
+        {
+            var directories = filePath.Split(Path.DirectorySeparatorChar);
+            var lastDirectory = string.Empty;
+            var result = string.Empty;
+
+            foreach (var directory in directories)
+            {
+                if (!directory.Equals(lastDirectory))
+                {
+                    result = string.IsNullOrEmpty(result) ? directory : Path.Combine(result, directory);
+                }
+
+                lastDirectory = directory;
+            }
+
+            return result;
         }
     }
 }

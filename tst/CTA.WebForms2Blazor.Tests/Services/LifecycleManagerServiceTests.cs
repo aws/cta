@@ -282,13 +282,13 @@ namespace CTA.WebForms2Blazor.Tests.Services
         [Test]
         public void CheckWebFormsLifecycleEventWithPrefix_Returns_Correct_Lifecycle_Event()
         {
-            Assert.AreEqual(LifecycleManagerService.CheckWebFormsLifecycleEventWithPrefix(PrefixedLifecycleEvent, LifecycleEventStringPrefix), WebFormsAppLifecycleEvent.BeginRequest);
+            Assert.AreEqual(WebFormsAppLifecycleEvent.BeginRequest, LifecycleManagerService.CheckWebFormsLifecycleEventWithPrefix(PrefixedLifecycleEvent, LifecycleEventStringPrefix));
         }
 
         [Test]
         public void CheckWebFormsLifecycleEventWithPrefix_Returns_Null_On_Failed_Match()
         {
-            Assert.AreEqual(LifecycleManagerService.CheckWebFormsLifecycleEventWithPrefix(MisspelledPrefixedLifecycleEvent, LifecycleEventStringPrefix), null);
+            Assert.AreEqual(null, LifecycleManagerService.CheckWebFormsLifecycleEventWithPrefix(MisspelledPrefixedLifecycleEvent, LifecycleEventStringPrefix));
         }
     }
 }

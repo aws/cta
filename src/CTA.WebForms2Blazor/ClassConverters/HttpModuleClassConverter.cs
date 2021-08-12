@@ -166,7 +166,7 @@ namespace CTA.WebForms2Blazor.ClassConverters
             }
 
             // Http modules are turned into middleware and so we use a new middleware directory
-            var newRelativePath = Path.Combine(Constants.MiddlewareDirectoryName, FilePathHelper.AlterFileName(_relativePath, newFileName: middlewareName));
+            var newRelativePath = FilePathHelper.RemoveDuplicateDirectories(Path.Combine(Constants.MiddlewareDirectoryName, FilePathHelper.AlterFileName(_relativePath, newFileName: middlewareName)));
             var namespaceNode = CodeSyntaxHelper.BuildNamespace(_namespaceName, classDeclaration);
             var fileText = CodeSyntaxHelper.GetFileSyntaxAsString(namespaceNode, _requiredUsings);
 
