@@ -12,6 +12,7 @@ using System;
 using System.Web;
 using System.Security.Claims;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.AspNetCore.Owin;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -39,9 +40,10 @@ namespace AspNetRoutes
             return context.Response.WriteAsync(""Hello World "" + check);
         }
 
-        public async Task<bool> SignUpUser(HttpContext authenticationManager)
+        public async Task<bool> SignUpUser(HttpContext authenticationManager, ISecureDataFormat<AuthenticationTicket> df)
         {
-            List<ClaimsIdentity> claims = new List<ClaimsIdentity>();
+            List<ClaimsIdentity> claims = new List<ClaimsIdentity>()
+            {new ClaimsIdentity()};
             AuthenticationProperties authProp = new AuthenticationProperties();
             var authResult = await authenticationManager.AuthenticateAsync("""");
             /* Added by CTA: Please use your AuthenticationProperties object with this ChallengeAsync api if needed. You can also include a scheme. */
@@ -56,7 +58,11 @@ namespace AspNetRoutes
             await authenticationManager.SignInAsync(claims.ToArray());
             /* Added by CTA: You can only pass in a single scheme as a parameter and you can also include an AuthenticationProperties object as well. */
             await authenticationManager.SignOutAsync();
-            return true;
+            AuthenticationTicket at = /* Added by CTA: Please use a ClaimsPrincipal object to wrap your ClaimsIdentity parameter to pass to this method, you can optionally include an AuthenticationProperties object and must include a scheme. */
+            new AuthenticationTicket(claims.First(), authProp);
+            string prot = df.Protect(at);
+            AuthenticationTicket unProtectedAT = df.Unprotect(prot);
+            return at.Equals(unProtectedAT);
         }
     }
 }";

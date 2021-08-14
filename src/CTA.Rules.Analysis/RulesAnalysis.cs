@@ -234,6 +234,16 @@ namespace CTA.Rules.Analyzer
                                             overrideKey = compareToken.Key;
                                         }
                                     }
+                                    //If the semanticClassType is too specific to apply to all TData types
+                                    if(token == null)
+                                    {
+                                        if(invocationExpression.SemanticClassType.Contains('<'))
+                                        {
+                                            string semanticClassType = invocationExpression.SemanticClassType.Substring(0,invocationExpression.SemanticClassType.IndexOf('<'));
+                                            compareToken = new InvocationExpressionToken() { Key = invocationExpression.SemanticOriginalDefinition, Namespace = invocationExpression.Reference.Namespace, Type = semanticClassType };
+                                            _rootNodes.Invocationexpressiontokens.TryGetValue(compareToken, out token);
+                                        }
+                                    }
                                 }
 
                                 if (token != null)
