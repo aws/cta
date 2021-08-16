@@ -34,7 +34,7 @@ namespace CTA.WebForms2Blazor.ClassConverters
             // or something else to these undefined code files, most likely though we may still
             // want to scan parts of these files and remove/alter/take note of certain lines/info
 
-            var newRelativePath = FilePathHelper.AlterFileName(_relativePath, newFileName: _originalClassSymbol.Name);
+            var newRelativePath = FilePathHelper.RemoveDuplicateDirectories(FilePathHelper.AlterFileName(_relativePath, newFileName: _originalClassSymbol.Name));
 
             // NOTE: Removed temporarily until usings can be better determined, at the moment, too
             // many are being removed

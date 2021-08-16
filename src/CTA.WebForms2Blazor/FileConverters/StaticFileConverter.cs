@@ -2,6 +2,7 @@
 using System.IO;
 using System.Threading.Tasks;
 using CTA.WebForms2Blazor.FileInformationModel;
+using CTA.WebForms2Blazor.Helpers;
 using CTA.WebForms2Blazor.Services;
 
 namespace CTA.WebForms2Blazor.FileConverters
@@ -18,7 +19,7 @@ namespace CTA.WebForms2Blazor.FileConverters
         {
             LogStart();
 
-            FileInformation fi = new FileInformation(RelativePath, File.ReadAllBytes(FullPath));
+            FileInformation fi = new FileInformation(FilePathHelper.RemoveDuplicateDirectories(RelativePath), File.ReadAllBytes(FullPath));
 
             var fileList = new List<FileInformation>();
             fileList.Add(fi);

@@ -51,5 +51,23 @@ namespace CTA.WebForms2Blazor.Tests.Helpers
 
             Assert.AreEqual(expectedOutputFileName, actualOutputFileName);
         }
+
+        [Test]
+        public void RemoveDuplicateDirectories_Removes_Single_Duplicate()
+        {
+            var inputPath = Path.Combine("Dir1", "Dir2", "Dir2", "Dir3");
+            var expectedPath = Path.Combine("Dir1", "Dir2", "Dir3");
+
+            Assert.AreEqual(expectedPath, FilePathHelper.RemoveDuplicateDirectories(inputPath));
+        }
+
+        [Test]
+        public void RemoveDuplicateDirectories_Removes_Multiple_Duplicates()
+        {
+            var inputPath = Path.Combine("Dir1", "Dir2", "Dir2", "Dir2", "Dir2", "Dir3");
+            var expectedPath = Path.Combine("Dir1", "Dir2", "Dir3");
+
+            Assert.AreEqual(expectedPath, FilePathHelper.RemoveDuplicateDirectories(inputPath));
+        }
     }
 }

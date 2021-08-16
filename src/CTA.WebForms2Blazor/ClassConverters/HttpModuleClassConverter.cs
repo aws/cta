@@ -9,6 +9,7 @@ using CTA.WebForms2Blazor.FileInformationModel;
 using CTA.WebForms2Blazor.Helpers;
 using CTA.WebForms2Blazor.Services;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace CTA.WebForms2Blazor.ClassConverters
@@ -23,6 +24,7 @@ namespace CTA.WebForms2Blazor.ClassConverters
         private IEnumerable<FieldDeclarationSyntax> _sharedFields;
         private IEnumerable<PropertyDeclarationSyntax> _sharedProperties;
         private IEnumerable<StatementSyntax> _constructorStatements;
+        private IEnumerable<(string, WebFormsAppLifecycleEvent)> _moduleEventHandlerExpectedNameTuples;
         private LifecycleManagerService _lifecycleManager;
 
         private string _originalClassName;
@@ -62,20 +64,24 @@ namespace CTA.WebForms2Blazor.ClassConverters
 
             // Make this call once now so we don't have to keep doing it later
             var originalDescendantNodes = _originalDeclarationSyntax.DescendantNodes();
+
+            // Process init method first before classifying so that we know what method names to look for
+            var initMethod = originalDescendantNodes.OfType<MethodDeclarationSyntax>().Where(method => IsInitMethod(method)).SingleOrDefault();
             // Classify methods and store results as tuple so we don't have to keep recalculating it
-            var classifiedMethods = originalDescendantNodes.OfType<MethodDeclarationSyntax>()
-                // NOTE: This is not the proper way to check application lifecycle hooks in http modules,
-                // in reality modules must manually add their methods to the application builder Init method
-                // parameter as event handlers, parsing this extracting the event the methods correspond to
-                // would be costly time-wise so instead we rely on the assumption that they follow proper
-                // naming conventions
-                .Select(method => (method, LifecycleManagerService.CheckMethodApplicationLifecycleHook(method)));
+            IEnumerable<(MethodDeclarationSyntax, WebFormsAppLifecycleEvent?)> classifiedMethods;
+            if (initMethod != null)
+            {
+                ProcessInitMethod(initMethod);
+                classifiedMethods = originalDescendantNodes.OfType<MethodDeclarationSyntax>().Select(method => (method, CheckModuleEventHandlerMethod(method)));
+            }
+            else
+            {
+                classifiedMethods = originalDescendantNodes.OfType<MethodDeclarationSyntax>().Select(method => (method, (WebFormsAppLifecycleEvent?)null));
+            }
 
             // These shared features will be a part of all middleware classes generated because there's no
             // easy way to share scope between them or split up what each one requires while maintaining functionality,
             // best to let the developer handle this
-            // NOTE: We want to remove the init method here as it is no longer used, in the future we want to scan this
-            // for true application lifecycle event handlers rather than relying on convention
             _sharedMethods = classifiedMethods.Where(methodTuple => methodTuple.Item2 == null && !IsInitMethod(methodTuple.Item1))
                 .Select(methodTuple => methodTuple.Item1);
             _sharedFields = originalDescendantNodes.OfType<FieldDeclarationSyntax>();
@@ -160,7 +166,7 @@ namespace CTA.WebForms2Blazor.ClassConverters
             }
 
             // Http modules are turned into middleware and so we use a new middleware directory
-            var newRelativePath = Path.Combine(Constants.MiddlewareDirectoryName, FilePathHelper.AlterFileName(_relativePath, newFileName: middlewareName));
+            var newRelativePath = FilePathHelper.RemoveDuplicateDirectories(Path.Combine(Constants.MiddlewareDirectoryName, FilePathHelper.AlterFileName(_relativePath, newFileName: middlewareName)));
             var namespaceNode = CodeSyntaxHelper.BuildNamespace(_namespaceName, classDeclaration);
             var fileText = CodeSyntaxHelper.GetFileSyntaxAsString(namespaceNode, _requiredUsings);
 
@@ -176,6 +182,53 @@ namespace CTA.WebForms2Blazor.ClassConverters
             // lifecycle are registered
             return paramList.Count() == 1 && firstParam.Type.ToString().Equals(Constants.ExpectedGlobalBaseClass)
                 && methodDeclaration.Identifier.ToString().Equals(Constants.InitMethodName);
+        }
+
+        private WebFormsAppLifecycleEvent? CheckModuleEventHandlerMethod(MethodDeclarationSyntax methodDeclaration)
+        {
+            foreach (var expectedNameTuple in _moduleEventHandlerExpectedNameTuples)
+            {
+                if (methodDeclaration.IsEventHandler(expectedNameTuple.Item1))
+                {
+                    return expectedNameTuple.Item2;
+                }
+            }
+
+            return null;
+        }
+
+        private void ProcessInitMethod(MethodDeclarationSyntax methodDeclaration)
+        {
+            // Predicates checked in IsInitMethod() insure that no exceptions will be thrown here
+            var appParamName = methodDeclaration.ParameterList.Parameters
+                .Where(param => param.Type.ToString().Equals(Constants.ExpectedGlobalBaseClass))
+                .Single().Identifier.ToString();
+
+            var assignmentExprs = methodDeclaration.Body.Statements
+                .Where(statement => statement.IsKind(SyntaxKind.ExpressionStatement))
+                .Select(statement => (statement as ExpressionStatementSyntax).Expression as AssignmentExpressionSyntax)
+                .Where(expr => expr?.IsKind(SyntaxKind.AddAssignmentExpression) ?? false);
+
+            var results = new List<(string, WebFormsAppLifecycleEvent)>();
+            foreach (var expr in assignmentExprs)
+            {
+                var lcEvent = LifecycleManagerService.CheckWebFormsLifecycleEventWithPrefix(expr.Left.ToString(), $"{appParamName}.");
+
+                if (lcEvent != null)
+                {
+                    var objCreationExpr = expr.Right.RemoveSurroundingParentheses() as ObjectCreationExpressionSyntax;
+
+                    if (objCreationExpr != null && objCreationExpr.Type.ToString().Equals(typeof(EventHandler).Name))
+                    {
+                        var arguments = objCreationExpr.ArgumentList.Arguments;
+                        var memberAccessExpr = arguments.FirstOrDefault().Expression as MemberAccessExpressionSyntax;
+                        var methodName = memberAccessExpr.Name.ToString();
+                        results.Add((methodName, (WebFormsAppLifecycleEvent)lcEvent));
+                    }
+                }
+            }
+
+            _moduleEventHandlerExpectedNameTuples = results;
         }
     }
 }

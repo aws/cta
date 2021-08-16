@@ -63,7 +63,7 @@ namespace CTA.WebForms2Blazor.ClassConverters
                 oldExtension: Constants.MasterPageCodeBehindExtension,
                 newExtension: Constants.RazorCodeBehindFileExtension);
 
-            return Path.Combine(Constants.RazorLayoutDirectoryName, newRelativePath);
+            return FilePathHelper.RemoveDuplicateDirectories(Path.Combine(Constants.RazorLayoutDirectoryName, newRelativePath));
         }
     }
 }

@@ -108,7 +108,7 @@ namespace CTA.WebForms2Blazor.ClassConverters
                 oldExtension: Constants.PageCodeBehindExtension,
                 newExtension: Constants.RazorCodeBehindFileExtension);
 
-            return Path.Combine(Constants.RazorPageDirectoryName, newRelativePath);
+            return FilePathHelper.RemoveDuplicateDirectories(Path.Combine(Constants.RazorPageDirectoryName, newRelativePath));
         }
 
         private void ProcessLifecycleEventMethod(MethodDeclarationSyntax methodDeclaration, WebFormsPageLifecycleEvent lifecycleEvent)

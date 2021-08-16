@@ -90,7 +90,7 @@ namespace CTA.WebForms2Blazor.ClassConverters
             LogEnd();
 
             // Http modules are turned into middleware and so we use a new middleware directory
-            var newRelativePath = Path.Combine(Constants.MiddlewareDirectoryName, FilePathHelper.AlterFileName(_relativePath, newFileName: className));
+            var newRelativePath = FilePathHelper.RemoveDuplicateDirectories(Path.Combine(Constants.MiddlewareDirectoryName, FilePathHelper.AlterFileName(_relativePath, newFileName: className)));
             // TODO: Potentially remove certain folders from beginning of relative path
             var result = new[] { new FileInformation(newRelativePath, Encoding.UTF8.GetBytes(fileText)) };
 

@@ -63,5 +63,19 @@ namespace CTA.WebForms2Blazor.Extensions
         {
             return classDeclaration.WithBaseList(SyntaxFactory.BaseList());
         }
+
+        public static ExpressionSyntax RemoveSurroundingParentheses(this ExpressionSyntax expression)
+        {
+            var parenExpression = expression as ParenthesizedExpressionSyntax;
+
+            if (parenExpression == null)
+            {
+                return expression;
+            }
+            else
+            {
+                return RemoveSurroundingParentheses(parenExpression.Expression);
+            }
+        }
     }
 }
