@@ -35,9 +35,6 @@ namespace CTA.WebForms2Blazor.DirectiveConverters
         
         private protected override IEnumerable<DirectiveMigrationResult> GetMigratedDirectives(string directiveName, string originalFilePath)
         {
-            string oldName;
-            string newName;
-            //_registeredUserControls.UserControlRulesMap.Add("foo", new UserControlConverter("bar"));
             return Enumerable.Empty<DirectiveMigrationResult>();
         }
 
@@ -58,7 +55,9 @@ namespace CTA.WebForms2Blazor.DirectiveConverters
             {
                 string oldControlName = attrMap[ControlTagPrefix] + ":" + attrMap[ControlTagName];
                 string newControlName = Path.GetFileNameWithoutExtension(attrMap[ControlSourceFile]);
-                _registeredUserControls.UserControlRulesMap.Add(oldControlName, new UserControlConverter(newControlName));
+                _registeredUserControls.UserControlRulesMap[oldControlName] = new UserControlConverter(newControlName);
+
+                //_registeredUserControls.UserControlRulesMap.Add(oldControlName, new UserControlConverter(newControlName));
 
                 string namespaceName = FilePathHelper.FilePathToNamespace(attrMap[ControlSourceFile], projectName);
                 string content = $"@using {namespaceName}";

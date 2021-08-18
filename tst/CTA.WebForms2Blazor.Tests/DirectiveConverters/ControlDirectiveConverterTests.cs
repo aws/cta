@@ -6,47 +6,31 @@ using NUnit.Framework;
 namespace CTA.WebForms2Blazor.Tests.DirectiveConverters
 {
     [TestFixture]
-    public class ControlDirectiveConverter
+    public class ControlDirectiveConverterTests
     {
         private const string TestPath = "Default.aspx";
         private const string TestDirectiveName = "Control";
         private const string TestProjectName = "eShopOnBlazor";
+        
+        private const string TestStandardControlDirective =
+            @"<%@ Control Language=""C#"" AutoEventWireup=""true"" CodeBehind=""Counter.ascx.cs"" Inherits=""eShopLegacyWebForms.Counter"" %>";
 
-        private const string TestDirectiveMasterPageFileAttribute = "Page MasterPageFile=\"~/directory/TestMasterPage.Master\"";
-        private const string TestDirectiveInheritsAttribute = "Page Inherits=\"TestBaseClass\"";
-
-        private static string ExpectedPageDirective => "@page \"/\"";
-        private static string ExpectedMasterPageFileDirective => $"{Environment.NewLine}@layout TestMasterPage";
-        private static string ExpectedInheritsDirective => $"{Environment.NewLine}@inherits TestBaseClass";
+        private const string ExpectedStandardControlDirective =
+            @"<!-- Conversion of AutoEventWireup attribute (value: ""true"") for Control directive not currently supported -->";
 
         private DirectiveConverter _directiveConverter;
 
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
-            _directiveConverter = new PageDirectiveConverter();
+            _directiveConverter = new ControlDirectiveConverter();
         }
 
         [Test]
-        public void ConvertDirective_Properly_Executes_Directive_General_Conversion()
+        public void RegisterDirective_Properly_Executes_Standard_Conversion()
         {
-            Assert.AreEqual(ExpectedPageDirective, _directiveConverter.ConvertDirective(TestDirectiveName, TestDirectiveName, TestPath, TestProjectName, new ViewImportService()));
-        }
-
-        [Test]
-        public void ConvertDirective_Properly_Converts_MasterPageFile_Attribute()
-        {
-            var expectedText = ExpectedPageDirective + ExpectedMasterPageFileDirective;
-
-            Assert.AreEqual(expectedText, _directiveConverter.ConvertDirective(TestDirectiveName, TestDirectiveMasterPageFileAttribute, TestPath, TestProjectName, new ViewImportService()));
-        }
-
-        [Test]
-        public void ConvertDirective_Properly_Converts_Inherits_Attribute()
-        {
-            var expectedText = ExpectedPageDirective + ExpectedInheritsDirective;
-
-            Assert.AreEqual(expectedText, _directiveConverter.ConvertDirective(TestDirectiveName, TestDirectiveInheritsAttribute, TestPath, TestProjectName, new ViewImportService()));
+            Assert.AreEqual(ExpectedStandardControlDirective, _directiveConverter.ConvertDirective(
+                TestDirectiveName, TestStandardControlDirective, TestPath, TestProjectName, new ViewImportService()));
         }
     }
 }

@@ -64,7 +64,7 @@ namespace CTA.WebForms2Blazor.DirectiveConverters
                     var attrValue = match.Groups[AttributeValueRegexGroupName].Value;
 
                     return AttributeAllowList.Contains(attrName, StringComparer.InvariantCultureIgnoreCase)
-                        ? UniversalDirectiveAttributeMap.AttributeMap[attrName](attrValue)
+                        ? UniversalDirectiveAttributeMap.AttributeMap[attrName](new[] {attrValue})
                         : new[] { new DirectiveMigrationResult(
                             DirectiveMigrationResultType.Comment,
                             string.Format(AttributeMigrationNotSupportedTemplate, attrName, attrValue, directiveName)) };
