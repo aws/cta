@@ -14,6 +14,7 @@ namespace CTA.WebForms2Blazor.DirectiveConverters
         public const string CodeBehind = "CodeBehind";
         public const string ClassNameAttr = "ClassName";
         public const string LanguageAttr = "Language";
+        public const string SourceAttr = "Src";
 
         // Decided to use a universal attribute map because many of the attributes seem to be shared between
         // directives and using attribute allow lists by directive seemed like a better solution
@@ -63,7 +64,17 @@ namespace CTA.WebForms2Blazor.DirectiveConverters
                         return Enumerable.Empty<DirectiveMigrationResult>();
                     },
                     // This doesn't need to be converted or have anything to be converted to so we have it return nothing
-                    [LanguageAttr] = attrvalue => Enumerable.Empty<DirectiveMigrationResult>(),
+                    [LanguageAttr] = attrValue => Enumerable.Empty<DirectiveMigrationResult>(),
+                    [SourceAttr] = attrValue =>
+                    {
+                        // TODO: Verify if inherited base class is still a valid base class (using CTA/Codelyzer?) and
+                        // return Enumerable.Empty<DirectiveMigrationResult>() if it is no longer valid
+                        return new[]
+                        {
+                            new DirectiveMigrationResult(DirectiveMigrationResultType.GeneralDirective,
+                                $"@inherits {attrValue.RemoveOuterQuotes()}")
+                        };
+                    }
                 };
             }
         }

@@ -1,16 +1,15 @@
-﻿using CTA.WebForms2Blazor.DirectiveConverters;
+using System;
+using CTA.WebForms2Blazor.DirectiveConverters;
 using CTA.WebForms2Blazor.Services;
 using NUnit.Framework;
-using System;
-using System.Text;
 
 namespace CTA.WebForms2Blazor.Tests.DirectiveConverters
 {
     [TestFixture]
-    public class PageDirectiveConverterTests
+    public class ControlDirectiveConverter
     {
         private const string TestPath = "Default.aspx";
-        private const string TestDirectiveName = "Page";
+        private const string TestDirectiveName = "Control";
         private const string TestProjectName = "eShopOnBlazor";
 
         private const string TestDirectiveMasterPageFileAttribute = "Page MasterPageFile=\"~/directory/TestMasterPage.Master\"";

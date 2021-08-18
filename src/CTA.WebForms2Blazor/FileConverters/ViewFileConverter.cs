@@ -29,10 +29,10 @@ namespace CTA.WebForms2Blazor.FileConverters
             ControlActions = new List<ControlConversionAction>();
         }
 
-        private HtmlDocument GetRazorContents()
+        private HtmlDocument GetRazorContents(string htmlString)
         {
             var htmlDoc = new HtmlDocument();
-            htmlDoc.Load(FullPath);
+            htmlDoc.LoadHtml(htmlString);
             
             //This ensures that the document will output the original case when called by .WriteTo()
             //otherwise, all nodes and attribute names will be in lowercase
@@ -68,6 +68,12 @@ namespace CTA.WebForms2Blazor.FileConverters
             {
                 var conversionAction = new ControlConversionAction(node, parent, SupportedControls.ControlRulesMap[node.Name]);
                 ControlActions.Add(conversionAction);
+            } 
+            else if (SupportedControls.UserControls.UserControlRulesMap.ContainsKey(node.Name))
+            {
+                var conversionAction = new ControlConversionAction(node, parent, 
+                    SupportedControls.UserControls.UserControlRulesMap[node.Name]);
+                ControlActions.Add(conversionAction);
             }
         }
 
@@ -82,16 +88,23 @@ namespace CTA.WebForms2Blazor.FileConverters
                 }
             }
         }
-
+        
+        // View file converters will return razor file contents with
+        // only view layer, code behind will be created in another file
         public override Task<IEnumerable<FileInformation>> MigrateFileAsync()
         {
             LogStart();
-
-            // View file converters will return razor file contents with
-            // only view layer, code behind will be created in another file
-
-            HtmlDocument migratedDocument = GetRazorContents();
+            
+            string htmlString = File.ReadAllText(FullPath);
+            
+            //Replace directives first to build up list of user controls to be converted later by the ControlConverters
+            string projectName = Path.GetFileName(ProjectPath);
+            htmlString = EmbeddedCodeReplacers.ReplaceDirectives(htmlString, RelativePath, projectName, _viewImportService);
+            
+            //Convert the Web Forms controls to Blazor equivalent
+            HtmlDocument migratedDocument = GetRazorContents(htmlString);
             string contents = migratedDocument.DocumentNode.WriteTo();
+            
             // We comment out the unknown user controls here instead of during
             // traversal because the post-order nature may comment out controls
             // that are migrated as part of an ancestor control before that ancestor

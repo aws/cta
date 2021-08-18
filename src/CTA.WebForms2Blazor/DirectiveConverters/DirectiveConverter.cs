@@ -2,33 +2,34 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using CTA.WebForms2Blazor.Helpers.ControlHelpers;
 using CTA.WebForms2Blazor.Services;
 
 namespace CTA.WebForms2Blazor.DirectiveConverters
 {
     public class DirectiveConverter
     {
-        private const string AttributeNameRegexGroupName = "AttributeName";
-        private const string AttributeValueRegexGroupName = "AttributeValue";
-        private const string AttributeMigrationNotSupportedTemplate = "<!-- Conversion of {0} attribute (value: {1}) for {2} directive not currently supported -->";
-        private const string DirectiveMigrationNotSupportedTemplate = "<!-- General conversion for {0} directive not currently supported -->";
+        protected const string AttributeNameRegexGroupName = "AttributeName";
+        protected const string AttributeValueRegexGroupName = "AttributeValue";
+        protected const string AttributeMigrationNotSupportedTemplate = "<!-- Conversion of {0} attribute (value: {1}) for {2} directive not currently supported -->";
+        protected const string DirectiveMigrationNotSupportedTemplate = "<!-- General conversion for {0} directive not currently supported -->";
 
         /// <summary>
         /// Each match of this regular expression represents an attribute of the Web Forms directive it is being
         /// applied to, the first named capture group, AttributeName, is the name of the attribute while the second,
         /// AttributeValue, is the value
         /// </summary>
-        private static Regex AttributeSplitRegex { get { return new Regex(@"(?<AttributeName>[^\s=]+)\s*=\s*(?<AttributeValue>[""'][^""']*[""'])"); } }
+        protected static Regex AttributeSplitRegex { get { return new Regex(@"(?<AttributeName>[^\s=]+)\s*=\s*(?<AttributeValue>[""'][^""']*[""'])"); } }
 
         private protected virtual IEnumerable<string> AttributeAllowList { get { return Enumerable.Empty<string>(); } }
 
-        public string ConvertDirective(string directiveName, string directiveString, string originalFilePath, ViewImportService viewImportService)
+        public string ConvertDirective(string directiveName, string directiveString, string originalFilePath, string projectName, ViewImportService viewImportService)
         {
             // TODO: We want to make sure that certain directives only occur once (i.e. layout,
             // inherits, etc.) Need to find a better way to detect and deal with those or perhaps
             // just leave it up the the developer given that detecting which layout or base class
             // to choose is difficult
-            var migrationResults = GetMigratedAttributes(directiveString, directiveName);
+            var migrationResults = GetMigratedAttributes(directiveString, directiveName, projectName);
 
             // Want to ensure that the general directive conversion stays at the front if it exists
             migrationResults = GetMigratedDirectives(directiveName, originalFilePath).Concat(migrationResults);
@@ -54,7 +55,7 @@ namespace CTA.WebForms2Blazor.DirectiveConverters
             return new[] { new DirectiveMigrationResult(DirectiveMigrationResultType.Comment, string.Format(DirectiveMigrationNotSupportedTemplate, directiveName)) };
         }
 
-        private IEnumerable<DirectiveMigrationResult> GetMigratedAttributes(string directiveString, string directiveName)
+        private protected virtual IEnumerable<DirectiveMigrationResult> GetMigratedAttributes(string directiveString, string directiveName, string projectName)
         {
             return AttributeSplitRegex
                 .Matches(directiveString)

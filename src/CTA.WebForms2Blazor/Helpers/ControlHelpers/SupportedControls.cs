@@ -7,6 +7,11 @@ namespace CTA.WebForms2Blazor.Helpers.ControlHelpers
 {
     public static class SupportedControls
     {
+        //RegisteredUserControls is a wrapper class for the dictionary UserControlMap
+        //This was done to create a modifiable static dictionary that is passed into every Register directive,
+        //which adds all user controls detected in the file to one overall dictionary
+        public static RegisteredUserControls UserControls = new RegisteredUserControls();
+        
         public static readonly Dictionary<string, ControlConverter> ControlRulesMap = new Dictionary<string, ControlConverter>()
         {
             ["asp:hyperlink"] = new HyperLinkControlConverter(),
@@ -27,7 +32,9 @@ namespace CTA.WebForms2Blazor.Helpers.ControlHelpers
         public static readonly Dictionary<string, DirectiveConverter> DirectiveRulesMap = new Dictionary<string, DirectiveConverter>(StringComparer.InvariantCultureIgnoreCase)
         {
             ["Master"] = new MasterDirectiveConverter(),
-            ["Page"] = new PageDirectiveConverter()
+            ["Page"] = new PageDirectiveConverter(),
+            ["Register"] = new RegisterDirectiveConverter(UserControls),
+            ["Control"] = new ControlDirectiveConverter()
         };
 
         public static readonly Dictionary<string, Func<string, string>> AspExpressionRulesMap = new Dictionary<string, Func<string, string>>()

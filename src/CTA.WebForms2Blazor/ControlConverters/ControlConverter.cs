@@ -90,7 +90,6 @@ namespace CTA.WebForms2Blazor.ControlConverters
             htmlString = EmbeddedCodeReplacers.ReplaceHTMLEncodedExprs(htmlString);
             htmlString = EmbeddedCodeReplacers.ReplaceAspExprs(htmlString);
             htmlString = EmbeddedCodeReplacers.ReplaceAspComments(htmlString);
-            htmlString = EmbeddedCodeReplacers.ReplaceDirectives(htmlString, originalFilePath, viewImportService);
             htmlString = EmbeddedCodeReplacers.ReplaceEmbeddedCodeBlocks(htmlString);
 
             return htmlString;

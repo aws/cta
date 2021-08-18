@@ -364,6 +364,50 @@ namespace CTA.WebForms2Blazor.Tests.FileConverters
             Assert.AreEqual(expectedContents, fileContents);
             Assert.AreEqual(relativePath, fi.RelativePath);
         }
+        
+        [Test]
+        public async Task TestViewFileConverter_Converts_Directives()
+        {
+            FileConverter fc = new ViewFileConverter(FileConverterSetupFixture.TestProjectPath, 
+                FileConverterSetupFixture.TestDirectiveFilePath,
+                new ViewImportService(), new TaskManagerService());
+            
+            IEnumerable<FileInformation> fileList = await fc.MigrateFileAsync();
+            FileInformation fi = fileList.Single();
+            
+            byte[] bytes = fi.FileBytes;
+            var fileContents = Encoding.UTF8.GetString(bytes);
+            
+            string newPath = Path.Combine(FileConverterSetupFixture.TestFilesDirectoryPath, "DirectiveOnly.razor");
+            string relativePath = Path.GetRelativePath(FileConverterSetupFixture.TestProjectPath, newPath);
+            relativePath = Path.Combine("Pages", relativePath);
+
+            string expectedContents =  @"@using CTA.WebForms2Blazor.Tests.CustomControls
+@using eShopOnBlazor
+@using Cannot convert file name to namespace, file path Footer.ascx does not have a directory
+@page ""/TestingArea/TestFiles/DirectiveOnly""
+@layout Site
+@inherits eShopLegacyWebForms._Default
+<!-- Conversion of Title attribute (value: ""Home Page"") for Page directive not currently supported -->
+<!-- Conversion of AutoEventWireup attribute (value: ""true"") for Page directive not currently supported -->
+@namespace Replace_this_with_code_behind_namespace
+@inherits LayoutComponentBase
+<!-- Conversion of autoeventwireup attribute (value: ""true"") for Master directive not currently supported -->
+<!-- Conversion of inherits attribute (value: ""eShopLegacyWebForms.SiteMaster"") for Master directive not currently supported -->
+<!-- General conversion for Control directive not currently supported -->
+<!-- Conversion of Language attribute (value: ""C#"") for Control directive not currently supported -->
+<!-- Conversion of AutoEventWireup attribute (value: ""true"") for Control directive not currently supported -->
+<!-- Conversion of CodeBehind attribute (value: ""Counter.ascx.cs"") for Control directive not currently supported -->
+<!-- Conversion of Inherits attribute (value: ""eShopLegacyWebForms.Counter"") for Control directive not currently supported -->
+
+<div>
+    <Counter IncrementAmount=""10""></Counter>
+    <Foobar></Foobar>
+</div>";
+            
+            Assert.AreEqual(expectedContents, fileContents);
+            Assert.AreEqual(relativePath, fi.RelativePath);
+        }
 
         [Test]
         public async Task TestViewFileConverter_DefaultAspx()
