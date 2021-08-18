@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using CTA.WebForms2Blazor.FileInformationModel;
+using CTA.WebForms2Blazor.Helpers;
 using CTA.WebForms2Blazor.Services;
 
 namespace CTA.WebForms2Blazor.FileConverters
@@ -29,7 +30,7 @@ namespace CTA.WebForms2Blazor.FileConverters
                 _hostPageService.AddStyleSheetPath(RelativePath);
             }
 
-            var newPath = Path.Combine(Constants.WebRootDirectoryName, RelativePath);
+            var newPath = FilePathHelper.RemoveDuplicateDirectories(Path.Combine(Constants.WebRootDirectoryName, RelativePath));
             var fullPath = Path.Combine(ProjectPath, RelativePath);
 
             FileInformation fi = new FileInformation(newPath, File.ReadAllBytes(fullPath));

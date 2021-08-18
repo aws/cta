@@ -90,7 +90,8 @@ namespace CTA.WebForms2Blazor.ClassConverters
             LogEnd();
 
             // Global.asax.cs turns into Startup.cs
-            return new[] { new FileInformation(Path.Combine(Path.GetDirectoryName(_relativePath), Constants.StartupFileName), Encoding.UTF8.GetBytes(fileText)) };
+            var newRelativePath = FilePathHelper.RemoveDuplicateDirectories(Path.Combine(Path.GetDirectoryName(_relativePath), Constants.StartupFileName));
+            return new[] { new FileInformation(newRelativePath, Encoding.UTF8.GetBytes(fileText)) };
         }
 
         private void ProcessMethods(IEnumerable<MethodDeclarationSyntax> orignalMethods)

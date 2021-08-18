@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using CTA.Rules.Actions;
 using CTA.Rules.Models;
 using CTA.WebForms2Blazor.FileInformationModel;
+using CTA.WebForms2Blazor.Helpers;
 using CTA.WebForms2Blazor.Services;
 
 namespace CTA.WebForms2Blazor.FileConverters
@@ -35,7 +36,7 @@ namespace CTA.WebForms2Blazor.FileConverters
                 ConfigMigrate configMigrate = new ConfigMigrate(FullPath, ProjectType.WebForms);
                 var migratedString = configMigrate.WebformsWebConfigMigrateHelper();
 
-                string newPath = Path.Combine(_relativeDirectory, "appsettings.json");
+                string newPath = FilePathHelper.RemoveDuplicateDirectories(Path.Combine(_relativeDirectory, Constants.AppSettingsFileName));
                 fileList.Add(new FileInformation(newPath, Encoding.UTF8.GetBytes(migratedString)));
             }
 

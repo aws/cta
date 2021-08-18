@@ -2,6 +2,8 @@
 using System.IO;
 using CTA.FeatureDetection.Common.Extensions;
 using CTA.WebForms2Blazor.Extensions;
+using System.Linq;
+using System.Text;
 
 namespace CTA.WebForms2Blazor.Helpers
 {
@@ -33,15 +35,34 @@ namespace CTA.WebForms2Blazor.Helpers
 
             return newFileNameWithExtension;
         }
-        
+
         public static string FilePathToNamespace(string filePath, string projectName)
         {
             string res = filePath.RemoveOuterQuotes();
             res = Path.GetDirectoryName(res);
-            
-            return res.IsNullOrEmpty() ? 
-                string.Format(FileNameDoesNotContainDirectoryError, filePath) : 
-                res.Replace("~", projectName).Replace("/", ".");
+
+            return res.IsNullOrEmpty()
+                ? string.Format(FileNameDoesNotContainDirectoryError, filePath)
+                : res.Replace("~", projectName).Replace("/", ".");
+        }
+
+        public static string RemoveDuplicateDirectories(string filePath)
+        {
+            var directories = filePath.Split(Path.DirectorySeparatorChar);
+            var lastDirectory = string.Empty;
+            var result = string.Empty;
+
+            foreach (var directory in directories)
+            {
+                if (!directory.Equals(lastDirectory))
+                {
+                    result = string.IsNullOrEmpty(result) ? directory : Path.Combine(result, directory);
+                }
+
+                lastDirectory = directory;
+            }
+
+            return result;
         }
     }
 }

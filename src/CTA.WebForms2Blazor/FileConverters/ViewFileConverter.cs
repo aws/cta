@@ -140,7 +140,7 @@ namespace CTA.WebForms2Blazor.FileConverters
             DoCleanUp();
             LogEnd();
 
-            var fileInfo = new FileInformation(newRelativePath, Encoding.UTF8.GetBytes(contents));
+            var fileInfo = new FileInformation(FilePathHelper.RemoveDuplicateDirectories(newRelativePath), Encoding.UTF8.GetBytes(contents));
             var result = new[] { fileInfo };
 
             return Task.FromResult((IEnumerable<FileInformation>)result);
