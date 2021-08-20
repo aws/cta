@@ -902,6 +902,198 @@
           ]
         }
       ]
+    },
+    {
+      "Type": "Class",
+      "Name": "Microsoft.Owin.Security.AuthenticationTicket",
+      "Value": "Microsoft.Owin.Security.AuthenticationTicket",
+      "KeyType": "Identifier",
+      "ContainingType": "Microsoft.Owin.Security",
+      "RecommendedActions": [
+        {
+          "Source": "Amazon",
+          "Preferred": "Yes",
+          "TargetFrameworks": [
+            {
+              "Name": "netcoreapp3.1",
+              "TargetCPU": [ "x86", "x64", "ARM32", "ARM64" ]
+            },
+            {
+              "Name": "net5.0",
+              "TargetCPU": [ "x86", "x64", "ARM32", "ARM64" ]
+            }
+          ],
+          "Description": "For Microsoft.Owin.Security.AuthenticationTicket add directive Microsoft.AspNetCore.Authentication.",
+          "Actions": [
+            {
+              "Name": "AddDirective",
+              "Type": "Using",
+              "Value": "Microsoft.AspNetCore.Authentication",
+              "Description": "Add Microsoft.AspNetCore.Authentication namespace",
+              "ActionValidation": {
+                "Contains": "using Microsoft.AspNetCore.Authentication;",
+                "NotContains": ""
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Type": "ObjectCreation",
+      "Name": "Microsoft.Owin.Security.AuthenticationTicket.AuthenticationTicket(System.Security.Claims.ClaimsIdentity, Microsoft.Owin.Security.AuthenticationProperties)",
+      "Value": "Microsoft.Owin.Security.AuthenticationTicket.AuthenticationTicket(System.Security.Claims.ClaimsIdentity, Microsoft.Owin.Security.AuthenticationProperties)",
+      "KeyType": "Name",
+      "ContainingType": "AuthenticationTicket",
+      "RecommendedActions": [
+        {
+          "Source": "Amazon",
+          "Preferred": "Yes",
+          "TargetFrameworks": [
+            {
+              "Name": "netcoreapp3.1",
+              "TargetCPU": [ "x86", "x64", "ARM32", "ARM64" ]
+            },
+            {
+              "Name": "net5.0",
+              "TargetCPU": [ "x86", "x64", "ARM32", "ARM64" ]
+            }
+          ],
+          "Description": "For Microsoft.Owin.Security.AuthenticationTicket.AuthenticationTicket(System.Security.Claims.ClaimsIdentity, Microsoft.Owin.Security.AuthenticationProperties) add directive Microsoft.AspNetCore.Authentication, add a comment to explain the new parameters requirements.",
+          "Actions": [
+            {
+              "Name": "AddDirective",
+              "Type": "Using",
+              "Value": "Microsoft.AspNetCore.Authentication",
+              "Description": "Add Microsoft.AspNetCore.Authentication namespace",
+              "ActionValidation": {
+                "Contains": "using Microsoft.AspNetCore.Authentication;",
+                "NotContains": ""
+              }
+            },
+            {
+              "Name": "AddComment",
+              "Type": "ObjectCreation",
+              "Value": "Please use a ClaimsPrincipal object to wrap your ClaimsIdentity parameter to pass to this method, you can optionally include an AuthenticationProperties object and must include a scheme.",
+              "Description": "Add a comment to explain how to use the parameters for the AuthenticationTicket constructor.",
+              "ActionValidation": {
+                "Contains": "Please use a ClaimsPrincipal object to wrap your list of ClaimsIdentity to pass it to this method as a parameter, you can also include an AuthenticationProperties object and a scheme as well.",
+                "NotContains": "",
+                "CheckComments": "True"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Type": "Method",
+      "Name": "Microsoft.Owin.Security.ISecureDataFormat<TData>.Protect(TData)",
+      "Value": "Microsoft.Owin.Security.ISecureDataFormat<TData>.Protect(TData)",
+      "KeyType": "",
+      "ContainingType": "ISecureDataFormat",
+      "RecommendedActions": [
+        {
+          "Source": "Amazon",
+          "Preferred": "Yes",
+          "TargetFrameworks": [
+            {
+              "Name": "netcoreapp3.1",
+              "TargetCPU": [ "x86", "x64", "ARM32", "ARM64" ]
+            },
+            {
+              "Name": "net5.0",
+              "TargetCPU": [ "x86", "x64", "ARM32", "ARM64" ]
+            }
+          ],
+          "Description": "For Microsoft.Owin.Security.ISecureDataFormat<TData>.Protect(TData) add directive Microsoft.AspNetCore.Authentication.",
+          "Actions": [
+            {
+              "Name": "AddDirective",
+              "Type": "Using",
+              "Value": "Microsoft.AspNetCore.Authentication",
+              "Description": "Add Microsoft.AspNetCore.Authentication namespace",
+              "ActionValidation": {
+                "Contains": "using Microsoft.AspNetCore.Authentication;",
+                "NotContains": ""
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Type": "Method",
+      "Name": "Microsoft.Owin.Security.ISecureDataFormat<TData>.Unprotect(string)",
+      "Value": "Microsoft.Owin.Security.ISecureDataFormat<TData>.Unprotect(string)",
+      "KeyType": "",
+      "ContainingType": "ISecureDataFormat",
+      "RecommendedActions": [
+        {
+          "Source": "Amazon",
+          "Preferred": "Yes",
+          "TargetFrameworks": [
+            {
+              "Name": "netcoreapp3.1",
+              "TargetCPU": [ "x86", "x64", "ARM32", "ARM64" ]
+            },
+            {
+              "Name": "net5.0",
+              "TargetCPU": [ "x86", "x64", "ARM32", "ARM64" ]
+            }
+          ],
+          "Description": "For Microsoft.Owin.Security.ISecureDataFormat<TData>.Unprotect(string) add directive Microsoft.AspNetCore.Authentication.",
+          "Actions": [
+            {
+              "Name": "AddDirective",
+              "Type": "Using",
+              "Value": "Microsoft.AspNetCore.Authentication",
+              "Description": "Add Microsoft.AspNetCore.Authentication namespace",
+              "ActionValidation": {
+                "Contains": "using Microsoft.AspNetCore.Authentication;",
+                "NotContains": ""
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Type": "Namespace",
+      "Name": "Microsoft.Owin.Security.OAuth",
+      "Value": "Microsoft.Owin.Security.OAuth",
+      "KeyType": "Name",
+      "ContainingType": "",
+      "RecommendedActions": [
+        {
+          "Source": "Amazon",
+          "Preferred": "Yes",
+          "TargetFrameworks": [
+            {
+              "Name": "netcoreapp3.1",
+              "TargetCPU": [ "x86", "x64", "ARM32", "ARM64" ]
+            },
+            {
+              "Name": "net5.0",
+              "TargetCPU": [ "x86", "x64", "ARM32", "ARM64" ]
+            }
+          ],
+          "Description": "Add a comment to explain how to setup OAuth in .net core.",
+          "Actions": [
+            {
+              "Name": "AddComment",
+              "Type": "Using",
+              "Value": "OAuth is now handled by using the public void ConfigureServices(IServiceCollection services) method in the Startup.cs class. The basic process is to use services.AddAuthentication(options => and then set a series of options. We can chain unto that the actual OAuth settings call services.AddOAuth(\"Auth_Service_here_such_as_GitHub_Canvas...\", options =>. Also remember to add a call to IApplicationBuilder.UseAuthentication() in your public void Configure(IApplicationBuilder app, IHostingEnvironment env) method. Please ensure this call comes before setting up your routes.",
+              "Description": "Add a comment to explain how to setup OAuth in .net core.",
+              "ActionValidation": {
+                "Contains": "OAuth is now handled by using the public void ConfigureServices(IServiceCollection services) method in the Startup.cs class. The basic process is to use services.AddAuthentication(options => and then set a series of options. We can chain unto that the actual OAuth settings call services.AddOAuth(\"Auth_Service_here_such_as_GitHub_Canvas...\", options =>. Also remember to add a call to IApplicationBuilder.UseAuthentication() in your public void Configure(IApplicationBuilder app, IHostingEnvironment env) method. Please ensure this call comes before setting up your routes.",
+                "NotContains": "",
+                "CheckComments": "True"
+              }
+            }
+          ]
+        }
+      ]
     }
   ]
 }

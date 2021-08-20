@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using CTA.Rules.Config;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -42,6 +43,19 @@ namespace CTA.Rules.Actions
                 return node;
             }
             return RemoveDirective;
+        }
+
+        public Func<SyntaxGenerator, CompilationUnitSyntax, CompilationUnitSyntax> GetAddCommentAction(string comment)
+        {
+            CompilationUnitSyntax AddComment(SyntaxGenerator syntaxGenerator, CompilationUnitSyntax node)
+            {
+                SyntaxTriviaList currentTrivia = node.GetLeadingTrivia();
+                //TODO see if this will lead NPE    
+                currentTrivia = currentTrivia.Add(SyntaxFactory.SyntaxTrivia(SyntaxKind.MultiLineCommentTrivia, string.Format(Constants.CommentFormat, comment)));
+                node = node.WithLeadingTrivia(currentTrivia).NormalizeWhitespace();
+                return node;
+            }
+            return AddComment;
         }
     }
 }
