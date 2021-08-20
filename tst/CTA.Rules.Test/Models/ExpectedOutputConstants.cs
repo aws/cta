@@ -7,8 +7,10 @@ namespace CTA.Rules.Test.Models
     public class ExpectedOutputConstants
     {
         public const string AspNetRoutesStartup =
-@"using System.Threading.Tasks;
+@"/* Added by CTA: OAuth is now handled by using the public void ConfigureServices(IServiceCollection services) method in the Startup.cs class. The basic process is to use services.AddAuthentication(options => and then set a series of options. We can chain unto that the actual OAuth settings call services.AddOAuth(""Auth_Service_here_such_as_GitHub_Canvas..."", options =>. Also remember to add a call to IApplicationBuilder.UseAuthentication() in your public void Configure(IApplicationBuilder app, IHostingEnvironment env) method. Please ensure this call comes before setting up your routes. */
+using System.Threading.Tasks;
 using System;
+using Microsoft.Owin.Security.OAuth;
 using System.Web;
 using System.Security.Claims;
 using System.Collections.Generic;
@@ -62,6 +64,8 @@ namespace AspNetRoutes
             new AuthenticationTicket(claims.First(), authProp);
             string prot = df.Protect(at);
             AuthenticationTicket unProtectedAT = df.Unprotect(prot);
+            OAuthAuthorizationServerOptions auth = new OAuthAuthorizationServerOptions()
+            {AccessTokenExpireTimeSpan = new TimeSpan(), AllowInsecureHttp = true, };
             return at.Equals(unProtectedAT);
         }
     }
