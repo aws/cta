@@ -80,6 +80,7 @@ namespace CTA.Rules.Test.Metrics
                     ProjectFile = projectPath1,
                     TargetVersions = new List<string>() {Constants.DefaultCoreVersion},
                     UpgradePackages = new List<PackageAction>() {new PackageAction() { Name = "Newtonsoft.Json", OriginalVersion="9.0.0", Version="12.0.0" } },
+                    MissingMetaReferences = new List<string> { @"C://reference1.dll", @"C://reference2.dll" },
                     ProjectActions = new ProjectActions() {
                         FileActions = new BlockingCollection<FileActions>()
                         {
@@ -211,6 +212,20 @@ namespace CTA.Rules.Test.Metrics
     ""solutionPath"": ""5fa9de0cb5af2d468dfb1702b1e342f47de2df9a195dabb3be2d04f9c2767482"",
     ""projectGuid"": ""1234-5678"",
     ""filePath"": ""eb98c1d648bc61064bdeaca9523a49e51bb3312f28f59376fb385e1569c77822""
+  },
+  {
+    ""metricsType"": ""CTA"",
+    ""metricName"": ""MissingMetaReference"",
+    ""metaReference"": ""C://reference1.dll"",
+    ""solutionPath"": ""5fa9de0cb5af2d468dfb1702b1e342f47de2df9a195dabb3be2d04f9c2767482"",
+    ""projectGuid"": ""1234-5678""
+  },
+  {
+    ""metricsType"": ""CTA"",
+    ""metricName"": ""MissingMetaReference"",
+    ""metaReference"": ""C://reference2.dll"",
+    ""solutionPath"": ""5fa9de0cb5af2d468dfb1702b1e342f47de2df9a195dabb3be2d04f9c2767482"",
+    ""projectGuid"": ""1234-5678""
   }
 ]";
             var formattedReport = JValue.Parse(ReportGenerator.AnalyzeSolutionResultJsonReport.Trim()).ToString(Formatting.Indented);
@@ -261,6 +276,20 @@ namespace CTA.Rules.Test.Metrics
     ""metricsType"": ""CTA"",
     ""metricName"": ""DetectedFeature"",
     ""featureName"": ""Feature 1a"",
+    ""solutionPath"": ""5fa9de0cb5af2d468dfb1702b1e342f47de2df9a195dabb3be2d04f9c2767482"",
+    ""projectGuid"": ""1234-5678""
+  },
+  {
+    ""metricsType"": ""CTA"",
+    ""metricName"": ""MissingMetaReference"",
+    ""metaReference"": ""C://reference1.dll"",
+    ""solutionPath"": ""5fa9de0cb5af2d468dfb1702b1e342f47de2df9a195dabb3be2d04f9c2767482"",
+    ""projectGuid"": ""1234-5678""
+  },
+  {
+    ""metricsType"": ""CTA"",
+    ""metricName"": ""MissingMetaReference"",
+    ""metaReference"": ""C://reference2.dll"",
     ""solutionPath"": ""5fa9de0cb5af2d468dfb1702b1e342f47de2df9a195dabb3be2d04f9c2767482"",
     ""projectGuid"": ""1234-5678""
   }
@@ -442,6 +471,20 @@ Count: 400";
     ""count"": 400,
     ""solutionPath"": ""5fa9de0cb5af2d468dfb1702b1e342f47de2df9a195dabb3be2d04f9c2767482"",
     ""projectGuid"": ""N/A""
+  },
+  {
+    ""metricsType"": ""CTA"",
+    ""metricName"": ""MissingMetaReference"",
+    ""metaReference"": ""C://reference1.dll"",
+    ""solutionPath"": ""5fa9de0cb5af2d468dfb1702b1e342f47de2df9a195dabb3be2d04f9c2767482"",
+    ""projectGuid"": ""1234-5678""
+  },
+  {
+    ""metricsType"": ""CTA"",
+    ""metricName"": ""MissingMetaReference"",
+    ""metaReference"": ""C://reference2.dll"",
+    ""solutionPath"": ""5fa9de0cb5af2d468dfb1702b1e342f47de2df9a195dabb3be2d04f9c2767482"",
+    ""projectGuid"": ""1234-5678""
   }
 ]";
             var unformattedReport = ReportGenerator.PortSolutionResultJsonReport.Trim();

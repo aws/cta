@@ -15,6 +15,7 @@ namespace CTA.Rules.Metrics
         public PortSolutionResult PortSolutionResult { get; set; }
         public Dictionary<string, FeatureDetectionResult> FeatureDetectionResults { get; set; }
         public IEnumerable<ReferencesMetric> ReferencesMetrics { get; set; }
+        public IEnumerable<MissingMetaReferenceMetric> MissingMetaReferenceMetrics { get; set; }
         public IEnumerable<DownloadedFilesMetric> DownloadedFilesMetrics { get; set; }
         public IEnumerable<TargetVersionMetric> TargetVersionMetrics { get; set; }
         public IEnumerable<UpgradePackageMetric> UpgradePackageMetrics { get; set; }
@@ -63,12 +64,14 @@ namespace CTA.Rules.Metrics
             var actionPackageMetrics = new List<ActionPackageMetric>();
             var actionMetrics = new List<GenericActionMetric>();
             var featureDetectionMetrics = new List<FeatureDetectionMetric>();
+            var missingMetaReferenceMetrics = new List<MissingMetaReferenceMetric>();
 
             foreach (var projectResult in PortSolutionResult.ProjectResults)
             {
                 upgradePackageMetrics.AddRange(MetricsTransformer.TransformUpgradePackages(Context, projectResult));
                 actionPackageMetrics.AddRange(MetricsTransformer.TransformActionPackages(Context, projectResult));
                 actionMetrics.AddRange(MetricsTransformer.TransformProjectActions(Context, projectResult));
+                missingMetaReferenceMetrics.AddRange(MetricsTransformer.TransformMissingMetaReferences(Context, projectResult));
             }
             featureDetectionMetrics.AddRange(MetricsTransformer.TransformFeatureDetectionResults(Context, FeatureDetectionResults));
 
@@ -76,6 +79,7 @@ namespace CTA.Rules.Metrics
             ActionPackageMetrics = actionPackageMetrics;
             GenericActionMetrics = actionMetrics;
             FeatureDetectionMetrics = featureDetectionMetrics;
+            MissingMetaReferenceMetrics = missingMetaReferenceMetrics;
         }
 
         private void GenerateMetrics()
@@ -90,6 +94,7 @@ namespace CTA.Rules.Metrics
             var upgradePackageMetrics = new List<UpgradePackageMetric>();
             var actionPackageMetrics = new List<ActionPackageMetric>();
             var actionExecutionMetrics = new List<GenericActionExecutionMetric>();
+            var missingMetaReferenceMetrics = new List<MissingMetaReferenceMetric>();
 
             foreach (var projectResult in PortSolutionResult.ProjectResults)
             {
@@ -97,12 +102,14 @@ namespace CTA.Rules.Metrics
                 upgradePackageMetrics.AddRange(MetricsTransformer.TransformUpgradePackages(Context, projectResult));
                 actionPackageMetrics.AddRange(MetricsTransformer.TransformActionPackages(Context, projectResult));
                 actionExecutionMetrics.AddRange(MetricsTransformer.TransformGenericActionExecutions(Context, projectResult));
+                missingMetaReferenceMetrics.AddRange(MetricsTransformer.TransformMissingMetaReferences(Context, projectResult));
             }
 
             TargetVersionMetrics = targetVersionMetrics;
             UpgradePackageMetrics = upgradePackageMetrics;
             ActionPackageMetrics = actionPackageMetrics;
             GenericActionExecutionMetrics = actionExecutionMetrics;
+            MissingMetaReferenceMetrics = missingMetaReferenceMetrics;
         }
 
         private string GenerateAnalyzeSolutionResultJsonReport()
@@ -113,6 +120,7 @@ namespace CTA.Rules.Metrics
                 .Concat(ActionPackageMetrics)
                 .Concat(GenericActionMetrics)
                 .Concat(FeatureDetectionMetrics)
+                .Concat(MissingMetaReferenceMetrics)
                 .ToList();
 
             AnalyzeSolutionResultJsonReport = JsonConvert.SerializeObject(allMetrics);
@@ -129,6 +137,7 @@ namespace CTA.Rules.Metrics
                 .Concat(ActionPackageMetrics)
                 .Concat(GenericActionExecutionMetrics)
                 .Concat(BuildErrorMetrics)
+                .Concat(MissingMetaReferenceMetrics)
                 .ToList();
 
             PortSolutionResultJsonReport = JsonConvert.SerializeObject(allMetrics);
