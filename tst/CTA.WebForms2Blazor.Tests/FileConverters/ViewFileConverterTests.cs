@@ -384,7 +384,7 @@ namespace CTA.WebForms2Blazor.Tests.FileConverters
 
             string expectedContents =  @"@using CTA.WebForms2Blazor.Tests.CustomControls
 @using eShopOnBlazor
-@using Cannot convert file name to namespace, file path Footer.ascx does not have a directory
+<!-- Cannot convert file name to namespace, file path Footer.ascx does not have a directory -->
 @page ""/TestingArea/TestFiles/DirectiveOnly""
 @layout Site
 @inherits eShopLegacyWebForms._Default

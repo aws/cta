@@ -59,8 +59,14 @@ namespace CTA.WebForms2Blazor.DirectiveConverters
 
                 //_registeredUserControls.UserControlRulesMap.Add(oldControlName, new UserControlConverter(newControlName));
 
-                string namespaceName = FilePathHelper.FilePathToNamespace(attrMap[ControlSourceFile], projectName);
+                var res = FilePathHelper.RelativeFilePathToNamespace(attrMap[ControlSourceFile], projectName);
+                string namespaceName = res.Item1;
+                bool isValid = res.Item2;
                 string content = $"@using {namespaceName}";
+                if (!isValid)
+                {
+                    content = $"<!-- {namespaceName} -->";
+                }
                 migratedDirectives.Add(new DirectiveMigrationResult(DirectiveMigrationResultType.GeneralDirective,
                     content));
             }

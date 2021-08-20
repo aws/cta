@@ -36,14 +36,14 @@ namespace CTA.WebForms2Blazor.Helpers
             return newFileNameWithExtension;
         }
 
-        public static string FilePathToNamespace(string filePath, string projectName)
+        public static (string, bool) RelativeFilePathToNamespace(string filePath, string projectName)
         {
             string res = filePath.RemoveOuterQuotes();
             res = Path.GetDirectoryName(res);
 
             return res.IsNullOrEmpty()
-                ? string.Format(FileNameDoesNotContainDirectoryError, filePath)
-                : res.Replace("~", projectName).Replace("/", ".");
+                ? (string.Format(FileNameDoesNotContainDirectoryError, filePath), false)
+                : (res.Replace("~", projectName).Replace("/", "."), true);
         }
 
         public static string RemoveDuplicateDirectories(string filePath)

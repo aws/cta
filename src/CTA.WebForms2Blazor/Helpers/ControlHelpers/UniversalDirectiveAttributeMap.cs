@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -21,12 +22,12 @@ namespace CTA.WebForms2Blazor.DirectiveConverters
         // directives and using attribute allow lists by directive seemed like a better solution
         // Func takes in a string array to allow for variable number of string inputs,
         // which may be required for different attributes
-        public static IDictionary<string, Func<string[], IEnumerable<DirectiveMigrationResult>>> AttributeMap
+        public static ConcurrentDictionary<string, Func<string[], IEnumerable<DirectiveMigrationResult>>> AttributeMap
         {
             get
             {
                 // NOTE: Directive attributes appear to be case-insensitive
-                return new Dictionary<string, Func<string[], IEnumerable<DirectiveMigrationResult>>>(StringComparer.InvariantCultureIgnoreCase)
+                return new ConcurrentDictionary<string, Func<string[], IEnumerable<DirectiveMigrationResult>>>(StringComparer.InvariantCultureIgnoreCase)
                 {
                     [MasterPageFileAttr] = input =>
                     {
