@@ -20,9 +20,10 @@ namespace CTA.Rules.Actions
                 var allUsings = node.Usings;
 
                 var usingDirective = SyntaxFactory.UsingDirective(SyntaxFactory.ParseName(@namespace)).NormalizeWhitespace();
-                allUsings = allUsings.Add(usingDirective);
+                // TODO shanshan check if there will be case when a CS file has no using statement
+                allUsings = allUsings.Add(usingDirective.WithTriviaFrom(allUsings.LastOrDefault()));
 
-                node = node.WithUsings(allUsings).NormalizeWhitespace();
+                node = node.WithUsings(allUsings);
                 return node;
             }
             return AddDirective;
@@ -39,7 +40,7 @@ namespace CTA.Rules.Actions
                 {
                     allUsings = allUsings.Remove(item);
                 }
-                node = node.WithUsings(allUsings).NormalizeWhitespace();
+                node = node.WithUsings(allUsings);
                 return node;
             }
             return RemoveDirective;

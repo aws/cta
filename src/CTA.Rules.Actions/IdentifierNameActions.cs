@@ -18,7 +18,7 @@ namespace CTA.Rules.Actions
             {
                 var leadingTrivia = node.GetLeadingTrivia();
                 var trailingTrivia = node.GetTrailingTrivia();
-                node = node.WithIdentifier(SyntaxFactory.Identifier(identifierName)).NormalizeWhitespace();
+                node = node.WithIdentifier(SyntaxFactory.Identifier(identifierName));
                 node = node.WithLeadingTrivia(leadingTrivia);
                 node = node.WithTrailingTrivia(trailingTrivia);
                 return node;

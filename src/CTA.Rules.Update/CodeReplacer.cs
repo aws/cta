@@ -91,7 +91,7 @@ namespace CTA.Rules.Update
         {
             ActionsRewriter oneRewriter = new ActionsRewriter(sourceFileBuildResult.SemanticModel, sourceFileBuildResult.PrePortSemanticModel, sourceFileBuildResult.SyntaxGenerator, currentFileActions.FilePath, currentFileActions.AllActions);
             root = oneRewriter.Visit(root);
-            var result = root.NormalizeWhitespace().ToFullString();
+            var result = root.ToFullString();
 
             if (!_projectConfiguration.IsMockRun)
             {

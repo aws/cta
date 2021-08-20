@@ -100,7 +100,7 @@ namespace CTA.Rules.Config
         public const string ConnectionStrings = "ConnectionStrings";
 
         public static readonly List<string> SupportedMethodModifiers = new List<string>() { "public", "internal", "protected", "private", "abstract", "extern", "override", "static", "unsafe", "virtual", "async" };
-
+        public const string TabSpaces = "    ";
 
         public static readonly List<List<string>> TemplateFiles = new List<List<string>>() {
             new List<string> {"default.json"},

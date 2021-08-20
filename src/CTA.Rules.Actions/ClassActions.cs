@@ -62,7 +62,7 @@ namespace CTA.Rules.Actions
         {
             ClassDeclarationSyntax ChangeName(SyntaxGenerator syntaxGenerator, ClassDeclarationSyntax node)
             {
-                node = node.WithIdentifier(SyntaxFactory.Identifier(className)).NormalizeWhitespace();
+                node = node.WithIdentifier(SyntaxFactory.Identifier(className));
                 return node;
             }
             return ChangeName;
@@ -91,7 +91,7 @@ namespace CTA.Rules.Actions
                     attributeLists = attributeLists.Remove(attributeToRemove);
                 }
 
-                node = node.WithAttributeLists(attributeLists).NormalizeWhitespace();
+                node = node.WithAttributeLists(attributeLists);
                 return node;
             }
 
@@ -102,12 +102,19 @@ namespace CTA.Rules.Actions
             ClassDeclarationSyntax AddAttribute(SyntaxGenerator syntaxGenerator, ClassDeclarationSyntax node)
             {
                 var attributeLists = node.AttributeLists;
+                var leadingTrivia = attributeLists.Any()? attributeLists.FirstOrDefault().GetLeadingTrivia() : node.GetLeadingTrivia();
+                var trailingTrivia = attributeLists.Any() ? attributeLists.FirstOrDefault().GetTrailingTrivia() : node.GetTrailingTrivia();
                 attributeLists = attributeLists.Add(
                             SyntaxFactory.AttributeList(
                                 SyntaxFactory.SingletonSeparatedList<AttributeSyntax>(
-                                    SyntaxFactory.Attribute(SyntaxFactory.ParseName(attribute)))));
+                                    SyntaxFactory.Attribute(SyntaxFactory.ParseName(attribute))
+                                    .WithLeadingTrivia(leadingTrivia)
+                                    .WithTrailingTrivia(trailingTrivia)
+                                    )
+                                )
+                            );
 
-                node = node.WithAttributeLists(attributeLists).NormalizeWhitespace();
+                node = node.WithAttributeLists(attributeLists);
                 return node;
             }
             return AddAttribute;
@@ -119,7 +126,9 @@ namespace CTA.Rules.Actions
                 SyntaxTriviaList currentTrivia = node.GetLeadingTrivia();
                 //TODO see if this will lead NPE    
                 currentTrivia = currentTrivia.Add(SyntaxFactory.SyntaxTrivia(SyntaxKind.MultiLineCommentTrivia, string.Format(Constants.CommentFormat, comment)));
-                node = node.WithLeadingTrivia(currentTrivia).NormalizeWhitespace();
+                currentTrivia = currentTrivia.Add(SyntaxFactory.CarriageReturnLineFeed);
+                currentTrivia = currentTrivia.AddRange(node.GetLeadingTrivia());
+                node = node.WithLeadingTrivia(currentTrivia);
                 return node;
             }
             return AddComment;
@@ -129,8 +138,10 @@ namespace CTA.Rules.Actions
             ClassDeclarationSyntax AddMethod(SyntaxGenerator syntaxGenerator, ClassDeclarationSyntax node)
             {
                 var allMembers = node.Members;
-                allMembers = allMembers.Add(SyntaxFactory.ParseMemberDeclaration(expression));
-                node = node.WithMembers(allMembers).NormalizeWhitespace();
+                var leadingTrivia = allMembers.Any() ? allMembers.First().GetLeadingTrivia() : node.GetLeadingTrivia();
+                var trainlingTrivia = allMembers.Any() ? allMembers.First().GetTrailingTrivia() : node.GetTrailingTrivia();
+                allMembers = allMembers.Add(SyntaxFactory.ParseMemberDeclaration(expression).WithLeadingTrivia(leadingTrivia).WithTrailingTrivia(trainlingTrivia));
+                node = node.WithMembers(allMembers);
                 return node;
             }
             return AddMethod;
@@ -147,7 +158,7 @@ namespace CTA.Rules.Actions
                     var removeMethod = allMethods.FirstOrDefault(m => m.Identifier.ToString() == methodName);
                     if (removeMethod != null)
                     {
-                        node = node.RemoveNode(removeMethod, SyntaxRemoveOptions.KeepNoTrivia).NormalizeWhitespace();
+                        node = node.RemoveNode(removeMethod, SyntaxRemoveOptions.KeepNoTrivia);
                     }
                 }
 
@@ -159,7 +170,7 @@ namespace CTA.Rules.Actions
         {
             ClassDeclarationSyntax RenameClass(SyntaxGenerator syntaxGenerator, ClassDeclarationSyntax node)
             {
-                node = node.WithIdentifier(SyntaxFactory.Identifier(newClassName)).NormalizeWhitespace();
+                node = node.WithIdentifier(SyntaxFactory.Identifier(newClassName));
                 return node;
             }
             return RenameClass;
@@ -178,10 +189,17 @@ namespace CTA.Rules.Actions
                         var allModifiersAreValid = modifiers.Split(new char[] { ' ', ',' }).All(m => Constants.SupportedMethodModifiers.Contains(m));
                         if (allModifiersAreValid)
                         {
+                            var leadingTrivia = allMembers.Any() ? allMembers.First().GetLeadingTrivia()
+                                : node.GetLeadingTrivia().Add(SyntaxFactory.SyntaxTrivia(SyntaxKind.WhitespaceTrivia, Constants.TabSpaces));
+                            var trailingTrivia = allMembers.Any() ? allMembers.First().GetTrailingTrivia()
+                                : node.GetTrailingTrivia();
                             SyntaxTokenList tokenList = new SyntaxTokenList(SyntaxFactory.ParseTokens(modifiers));
-                            var newMethod = replaceMethod.WithModifiers(tokenList);
+                            var newMethod = replaceMethod.WithModifiers(tokenList)
+                                .NormalizeWhitespace()
+                                .WithLeadingTrivia(leadingTrivia)
+                                .WithTrailingTrivia(trailingTrivia);
 
-                            node = node.WithMembers(node.Members.Replace(replaceMethod, newMethod)).NormalizeWhitespace();
+                            node = node.WithMembers(node.Members.Replace(replaceMethod, newMethod));
                         }
                     }
                 }
@@ -198,8 +216,10 @@ namespace CTA.Rules.Actions
                 if (!parsedExpression.FullSpan.IsEmpty)
                 {
                     var nodeDeclarations = node.Members;
-                    nodeDeclarations = nodeDeclarations.Insert(0,parsedExpression);
-                    node = node.WithMembers(nodeDeclarations).NormalizeWhitespace();
+                    var leadingTrivia = nodeDeclarations.Any() ? nodeDeclarations.First().GetLeadingTrivia() : node.GetLeadingTrivia();
+                    var trainlingTrivia = nodeDeclarations.Any() ? nodeDeclarations.First().GetTrailingTrivia() : node.GetTrailingTrivia();
+                    nodeDeclarations = nodeDeclarations.Insert(0, parsedExpression.WithLeadingTrivia(leadingTrivia).WithTrailingTrivia(trainlingTrivia));
+                    node = node.WithMembers(nodeDeclarations);
                 }
                 return node;
             }
@@ -233,7 +253,7 @@ namespace CTA.Rules.Actions
                     {
                         constructorNode = constructorNode.WithInitializer(SyntaxFactory.ConstructorInitializer(SyntaxKind.BaseConstructorInitializer).AddArgumentListArguments(newArguments.ToArray()));
                     }
-                    node = node.ReplaceNode(constructor, constructorNode).NormalizeWhitespace();
+                    node = node.ReplaceNode(constructor, constructorNode);
                 }
                 return node;
             }
@@ -248,11 +268,17 @@ namespace CTA.Rules.Actions
                 if (constructor != null)
                 {
                     ConstructorDeclarationSyntax constructorNode = (ConstructorDeclarationSyntax)constructor;
-                    StatementSyntax statementExpression = SyntaxFactory.ParseStatement(expression);
+                    var leadingTrivia = constructorNode.Body.Statements.Any() ? 
+                        constructorNode.Body.Statements.First().GetLeadingTrivia() 
+                        : node.GetLeadingTrivia().Add(SyntaxFactory.SyntaxTrivia(SyntaxKind.WhitespaceTrivia, Constants.TabSpaces));
+                    var trailingTrivia = constructorNode.Body.Statements.Any() ?
+                        constructorNode.Body.Statements.First().GetTrailingTrivia()
+                        : node.GetTrailingTrivia();
+                    StatementSyntax statementExpression = SyntaxFactory.ParseStatement(expression).WithLeadingTrivia(leadingTrivia).WithTrailingTrivia(trailingTrivia);
                     if (!statementExpression.FullSpan.IsEmpty)
                     {
                         constructorNode = constructorNode.AddBodyStatements(statementExpression);
-                        node = node.ReplaceNode(constructor, constructorNode).NormalizeWhitespace();
+                        node = node.ReplaceNode(constructor, constructorNode);
                     }
                 }
                 return node;

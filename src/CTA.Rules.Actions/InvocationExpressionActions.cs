@@ -28,8 +28,7 @@ namespace CTA.Rules.Actions
                 node = SyntaxFactory.InvocationExpression(
                         SyntaxFactory.IdentifierName(newMethod),
                         SyntaxFactory.ParseArgumentList(newParameters))
-                    .WithLeadingTrivia(node.GetLeadingTrivia())
-                    .NormalizeWhitespace();
+                    .WithLeadingTrivia(node.GetLeadingTrivia());
                 return node;
             }
             return ReplaceMethod;
@@ -47,8 +46,7 @@ namespace CTA.Rules.Actions
             InvocationExpressionSyntax ReplaceMethod(SyntaxGenerator syntaxGenerator, InvocationExpressionSyntax node)
             {
                 node = node.WithExpression(SyntaxFactory.ParseExpression(newMethod))
-                    .WithLeadingTrivia(node.GetLeadingTrivia())
-                    .NormalizeWhitespace(); 
+                    .WithLeadingTrivia(node.GetLeadingTrivia()); 
                 return node;
             }
             return ReplaceMethod;
@@ -72,7 +70,7 @@ namespace CTA.Rules.Actions
                     node = node.WithArgumentList(argumentList).WithLeadingTrivia(node.GetLeadingTrivia());
                 }
 
-                node = node.WithExpression(SyntaxFactory.ParseExpression(newMethod)).WithLeadingTrivia(node.GetLeadingTrivia()).NormalizeWhitespace();
+                node = node.WithExpression(SyntaxFactory.ParseExpression(newMethod)).WithLeadingTrivia(node.GetLeadingTrivia());
                 return node;
             }
             return ReplaceMethod;
@@ -94,7 +92,7 @@ namespace CTA.Rules.Actions
                 node = node.WithExpression(SyntaxFactory.ParseExpression(node.Expression.ToString().Replace(oldMethod, newMethod)))
                     .WithArgumentList(SyntaxFactory.ParseArgumentList(newParameters))
                     .WithLeadingTrivia(node.GetLeadingTrivia())
-                    .NormalizeWhitespace();
+                    .WithTrailingTrivia(node.GetTrailingTrivia());
                 return node;
             }
             return ReplaceOnlyMethod;
@@ -112,8 +110,7 @@ namespace CTA.Rules.Actions
             InvocationExpressionSyntax ReplaceOnlyMethod(SyntaxGenerator syntaxGenerator, InvocationExpressionSyntax node)
             {
                 node = node.WithExpression(SyntaxFactory.ParseExpression(node.Expression.ToString().Replace(oldMethod, newMethod)))
-                    .WithLeadingTrivia(node.GetLeadingTrivia())
-                    .NormalizeWhitespace();
+                    .WithLeadingTrivia(node.GetLeadingTrivia());
                 return node;
             }
             return ReplaceOnlyMethod;
@@ -155,8 +152,11 @@ namespace CTA.Rules.Actions
             InvocationExpressionSyntax AddComment(SyntaxGenerator syntaxGenerator, InvocationExpressionSyntax node)
             {
                 SyntaxTriviaList currentTrivia = node.GetLeadingTrivia();
-                currentTrivia = currentTrivia.Add(SyntaxFactory.SyntaxTrivia(SyntaxKind.MultiLineCommentTrivia, string.Format(Constants.CommentFormat, comment)));
-                node = node.WithLeadingTrivia(currentTrivia).NormalizeWhitespace();
+                currentTrivia = currentTrivia.Add(
+                    SyntaxFactory.SyntaxTrivia(SyntaxKind.MultiLineCommentTrivia, string.Format(Constants.CommentFormat, comment)));
+                currentTrivia = currentTrivia.Add(SyntaxFactory.CarriageReturnLineFeed);
+                currentTrivia = currentTrivia.AddRange(node.GetLeadingTrivia());
+                node = node.WithLeadingTrivia(currentTrivia);
                 return node;
             }
             return AddComment;
