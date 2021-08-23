@@ -22,86 +22,22 @@
             {
               "Name": "netcoreapp3.1",
               "TargetCPU": [ "x86", "x64", "ARM32", "ARM64" ]
-            }
-          ],
-          "Description": "Add a reference to Microsoft.AspNetCore.Owin and remove Microsoft.Owin.Security, Microsoft.Owin and Owin.",
-          "Actions": [
-            {
-              "Name": "AddPackage",
-              "Type": "Package",
-              "Value": {
-                "Name": "Microsoft.AspNetCore.Owin",
-                "Version": "3.1.14"
-              },
-              "Description": "Add package Microsoft.AspNetCore.Owin"
             },
-            {
-              "Name": "AddDirective",
-              "Type": "Using",
-              "Value": "Microsoft.AspNetCore.Owin",
-              "Description": "Add Microsoft.AspNetCore.Owin namespace",
-              "ActionValidation": {
-                "Contains": "using Microsoft.AspNetCore.Owin;",
-                "NotContains": ""
-              }
-            },
-            {
-              "Name": "RemoveDirective",
-              "Type": "Using",
-              "Value": "Microsoft.Owin.Security",
-              "Description": "Remove Microsoft.Owin.Security namespace",
-              "ActionValidation": {
-                "Contains": "",
-                "NotContains": "using Microsoft.Owin.Security;"
-              }
-            },
-            {
-              "Name": "RemoveDirective",
-              "Type": "Using",
-              "Value": "Microsoft.Owin",
-              "Description": "Remove Microsoft.Owin namespace",
-              "ActionValidation": {
-                "Contains": "",
-                "NotContains": "using Microsoft.Owin;"
-              }
-            },
-            {
-              "Name": "RemoveDirective",
-              "Type": "Using",
-              "Value": "Owin",
-              "Description": "Remove Owin namespace",
-              "ActionValidation": {
-                "Contains": "",
-                "NotContains": "using Owin;"
-              }
-            }
-          ]
-        },
-        {
-          "Source": "Amazon",
-          "Preferred": "Yes",
-          "TargetFrameworks": [
             {
               "Name": "net5.0",
               "TargetCPU": [ "x86", "x64", "ARM32", "ARM64" ]
             }
           ],
-          "Description": "Add a reference to Microsoft.AspNetCore.Owin and remove Microsoft.Owin.Security, Microsoft.Owin and Owin.",
+          "Description": "Remove Microsoft.Owin.Security.OAuth, Microsoft.Owin.Security.",
           "Actions": [
             {
-              "Name": "AddPackage",
-              "Type": "Package",
-              "Value": "Microsoft.AspNetCore.Owin",
-              "Description": "Add package Microsoft.AspNetCore.Owin"
-            },
-            {
-              "Name": "AddDirective",
+              "Name": "RemoveDirective",
               "Type": "Using",
-              "Value": "Microsoft.AspNetCore.Owin",
-              "Description": "Add Microsoft.AspNetCore.Owin namespace",
+              "Value": "Microsoft.Owin.Security.OAuth",
+              "Description": "Remove Microsoft.Owin.Security.OAuth namespace",
               "ActionValidation": {
-                "Contains": "using Microsoft.AspNetCore.Owin;",
-                "NotContains": ""
+                "Contains": "",
+                "NotContains": "using Microsoft.Owin.Security.OAuth;"
               }
             },
             {
@@ -112,26 +48,6 @@
               "ActionValidation": {
                 "Contains": "",
                 "NotContains": "using Microsoft.Owin.Security;"
-              }
-            },
-            {
-              "Name": "RemoveDirective",
-              "Type": "Using",
-              "Value": "Microsoft.Owin",
-              "Description": "Remove Microsoft.Owin namespace",
-              "ActionValidation": {
-                "Contains": "",
-                "NotContains": "using Microsoft.Owin;"
-              }
-            },
-            {
-              "Name": "RemoveDirective",
-              "Type": "Using",
-              "Value": "Owin",
-              "Description": "Remove Owin namespace",
-              "ActionValidation": {
-                "Contains": "",
-                "NotContains": "using Owin;"
               }
             }
           ]
