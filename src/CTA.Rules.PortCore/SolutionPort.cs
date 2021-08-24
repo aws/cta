@@ -98,6 +98,8 @@ namespace CTA.Rules.PortCore
                 analyzerResults = analyzer.AnalyzeSolution(solutionFilePath).Result;
             }
 
+            // sync up passed in configuration with analyze results
+            solutionConfiguration = solutionConfiguration.Where(s => analyzerResults.Select(a => a.ProjectResult?.ProjectFilePath).Contains(s.ProjectPath)).ToList();
 
             _context = new MetricsContext(solutionFilePath, analyzerResults);
             InitSolutionRewriter(analyzerResults, solutionConfiguration);
