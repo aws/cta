@@ -33,6 +33,9 @@
     <None Update="CTAFiles\action.namespace.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="TempRules\microsoft.aspnet.identity.owin.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="TempRules\microsoft.owin.security.dataprotection.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

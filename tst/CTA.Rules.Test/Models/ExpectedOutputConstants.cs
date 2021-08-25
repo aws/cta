@@ -16,6 +16,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Owin;
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Authentication;
@@ -60,6 +61,18 @@ namespace AspNetRoutes
             await authenticationManager.SignInAsync(claims.ToArray());
             /* Added by CTA: You can only pass in a single scheme as a parameter and you can also include an AuthenticationProperties object as well. */
             await authenticationManager.SignOutAsync();
+            ExternalLoginInfo info = /* Added by CTA: You must declare a Microsoft.AspNetCore.Identity.SignInManager<TUser> object and access the GetExternalLoginInfoAsync method to replace this invocation. */
+            authenticationManager.GetExternalLoginInfo();
+            ExternalLoginInfo infoAsync1 = await /* Added by CTA: You must declare a Microsoft.AspNetCore.Identity.SignInManager<TUser> object and access the GetExternalLoginInfoAsync method to replace this invocation. */
+            authenticationManager.GetExternalLoginInfoAsync();
+            ExternalLoginInfo infoAsync2 = await /* Added by CTA: You must declare a Microsoft.AspNetCore.Identity.SignInManager<TUser> object and access the GetExternalLoginInfoAsync method to replace this invocation. */
+            authenticationManager.GetExternalLoginInfoAsync(""key_here"", ""expected"");
+            List<AuthenticationScheme> desc = /* Added by CTA: You must declare a Microsoft.AspNetCore.Identity.SignInManager<TUser> object and access the GetExternalAuthenticationSchemesAsync method to replace this invocation. */
+            authenticationManager.GetExternalAuthenticationTypes().ToList();
+            bool rem = /* Added by CTA: You must declare a Microsoft.AspNetCore.Identity.SignInManager<TUser> object and access the TwoFactorBrowserRemembered(TUser) method to replace this invocation. */
+            authenticationManager.TwoFactorBrowserRemembered(""userID"");
+            bool remAsync = await /* Added by CTA: You must declare a Microsoft.AspNetCore.Identity.SignInManager<TUser> object and access the TwoFactorBrowserRememberedAsync(TUser) method to replace this invocation. */
+            authenticationManager.TwoFactorBrowserRememberedAsync(""userID"");
             AuthenticationTicket at = /* Added by CTA: Please use a ClaimsPrincipal object to wrap your ClaimsIdentity parameter to pass to this method, you can optionally include an AuthenticationProperties object and must include a scheme. */
             new AuthenticationTicket(claims.First(), authProp);
             string prot = df.Protect(at);
@@ -161,6 +174,7 @@ namespace BranchingPipelines
 using System;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNetCore.Owin;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 
