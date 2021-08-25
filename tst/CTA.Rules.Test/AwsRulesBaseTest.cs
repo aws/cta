@@ -123,6 +123,14 @@ namespace CTA.Rules.Test
 
                         solutionPortConfiguration.Add(projectConfiguration);
                     }
+                    
+                    // SolutionPort should remove this extra config because it does not have a matching analyzer result.
+                    // Otherwise will hit KeyNotFoundException 
+                    solutionPortConfiguration.Add(new PortCoreConfiguration
+                    {
+                        ProjectPath = "fakeproject.csproj",
+                        UseDefaultRules = true,
+                    });
 
                     SolutionPort solutionPort = new SolutionPort(solutionPath, solutionPortConfiguration);
                     CopyTestRules();
