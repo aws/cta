@@ -10,12 +10,13 @@ namespace CTA.Rules.Test.Models
 @"/* Added by CTA: OAuth is now handled by using the public void ConfigureServices(IServiceCollection services) method in the Startup.cs class. The basic process is to use services.AddAuthentication(options => and then set a series of options. We can chain unto that the actual OAuth settings call services.AddOAuth(""Auth_Service_here_such_as_GitHub_Canvas..."", options =>. Also remember to add a call to IApplicationBuilder.UseAuthentication() in your public void Configure(IApplicationBuilder app, IHostingEnvironment env) method. Please ensure this call comes before setting up your routes. */
 using System.Threading.Tasks;
 using System;
-using Microsoft.Owin.Security.OAuth;
 using System.Web;
 using System.Security.Claims;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Owin;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Authentication;
@@ -60,6 +61,18 @@ namespace AspNetRoutes
             await authenticationManager.SignInAsync(claims.ToArray());
             /* Added by CTA: You can only pass in a single scheme as a parameter and you can also include an AuthenticationProperties object as well. */
             await authenticationManager.SignOutAsync();
+            ExternalLoginInfo info = /* Added by CTA: You must declare a Microsoft.AspNetCore.Identity.SignInManager<TUser> object and access the GetExternalLoginInfoAsync method to replace this invocation. */
+            authenticationManager.GetExternalLoginInfo();
+            ExternalLoginInfo infoAsync1 = await /* Added by CTA: You must declare a Microsoft.AspNetCore.Identity.SignInManager<TUser> object and access the GetExternalLoginInfoAsync method to replace this invocation. */
+            authenticationManager.GetExternalLoginInfoAsync();
+            ExternalLoginInfo infoAsync2 = await /* Added by CTA: You must declare a Microsoft.AspNetCore.Identity.SignInManager<TUser> object and access the GetExternalLoginInfoAsync method to replace this invocation. */
+            authenticationManager.GetExternalLoginInfoAsync(""key_here"", ""expected"");
+            List<AuthenticationScheme> desc = /* Added by CTA: You must declare a Microsoft.AspNetCore.Identity.SignInManager<TUser> object and access the GetExternalAuthenticationSchemesAsync method to replace this invocation. */
+            authenticationManager.GetExternalAuthenticationTypes().ToList();
+            bool rem = /* Added by CTA: You must declare a Microsoft.AspNetCore.Identity.SignInManager<TUser> object and access the TwoFactorBrowserRemembered(TUser) method to replace this invocation. */
+            authenticationManager.TwoFactorBrowserRemembered(""userID"");
+            bool remAsync = await /* Added by CTA: You must declare a Microsoft.AspNetCore.Identity.SignInManager<TUser> object and access the TwoFactorBrowserRememberedAsync(TUser) method to replace this invocation. */
+            authenticationManager.TwoFactorBrowserRememberedAsync(""userID"");
             AuthenticationTicket at = /* Added by CTA: Please use a ClaimsPrincipal object to wrap your ClaimsIdentity parameter to pass to this method, you can optionally include an AuthenticationProperties object and must include a scheme. */
             new AuthenticationTicket(claims.First(), authProp);
             string prot = df.Protect(at);
@@ -67,6 +80,15 @@ namespace AspNetRoutes
             OAuthAuthorizationServerOptions auth = new OAuthAuthorizationServerOptions()
             {AccessTokenExpireTimeSpan = new TimeSpan(), AllowInsecureHttp = true, };
             return at.Equals(unProtectedAT);
+        }
+
+        public void Protector(IDataProtectionProvider protector)
+        {
+            string[] purposes = new string[]{"""", """"};
+            IDataProtector prot1 = protector.CreateProtector(purposes);
+            DpapiDataProtectionProvider dpapi = /* Added by CTA: DpapiDataProtectionProvider should be replaced with a Dependency injection for the IDataProtectionProvider interface. Please include a parameter with this interface to replace this class. */
+            new DpapiDataProtectionProvider();
+            IDataProtector prot2 = dpapi.CreateProtector(purposes);
         }
     }
 }";
@@ -152,6 +174,7 @@ namespace BranchingPipelines
 using System;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNetCore.Owin;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 
