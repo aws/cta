@@ -98,7 +98,6 @@ namespace CTA.Rules.PortCore
                 analyzerResults = analyzer.AnalyzeSolution(solutionFilePath).Result;
             }
 
-
             _context = new MetricsContext(solutionFilePath, analyzerResults);
             InitSolutionRewriter(analyzerResults, solutionConfiguration);
         }
@@ -191,6 +190,8 @@ namespace CTA.Rules.PortCore
         {
             using var projectTypeFeatureDetector = new FeatureDetector();
 
+            // sync up passed in configuration with analyze results
+            solutionConfiguration = solutionConfiguration.Where(s => analyzerResults.Select(a => a.ProjectResult?.ProjectFilePath).Contains(s.ProjectPath)).ToList();
             analyzerResults = analyzerResults.Where(a => solutionConfiguration.Select(s => s.ProjectPath).Contains(a.ProjectResult?.ProjectFilePath)).ToList();
             _projectTypeFeatureResults = projectTypeFeatureDetector.DetectFeaturesInProjects(analyzerResults);
 
