@@ -613,6 +613,7 @@ namespace WebApi
             );
             config.Formatters.XmlFormatter.UseXmlSerializer = true;
             config.Formatters.Remove(config.Formatters.JsonFormatter);
+            // config.Formatters.JsonFormatter.UseDataContractJsonSerializer = true;
             /* Added by CTA: Please add a new ConfigureServices method: public void ConfigureServices(IServiceCollection services) { services.AddControllers(); } */
             builder.UseEndpoints(endpoints =>
             {
