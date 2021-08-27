@@ -42,6 +42,7 @@ namespace CTA.Rules.Test
 
             StringAssert.Contains(@"Microsoft.AspNetCore.Owin", csProjContent);
             StringAssert.Contains(@"Microsoft.AspNetCore.Diagnostics", csProjContent);
+            StringAssert.Contains(version == TargetFramework.Dotnet5 ? @"Microsoft.AspNetCore.Authentication.Google" : @"<PackageReference Include=""Microsoft.AspNetCore.Authentication.Google"" Version=""3.1.18"" />", csProjContent);
 
             //Check that correct version is used
             Assert.True(csProjContent.IndexOf(string.Concat(">", version, "<")) > 0);
