@@ -10,14 +10,15 @@ namespace CTA.Rules.Test.Models
 @"/* Added by CTA: OAuth is now handled by using the public void ConfigureServices(IServiceCollection services) method in the Startup.cs class. The basic process is to use services.AddAuthentication(options => and then set a series of options. We can chain unto that the actual OAuth settings call services.AddOAuth(""Auth_Service_here_such_as_GitHub_Canvas..."", options =>. Also remember to add a call to IApplicationBuilder.UseAuthentication() in your public void Configure(IApplicationBuilder app, IHostingEnvironment env) method. Please ensure this call comes before setting up your routes. */
 using System.Threading.Tasks;
 using System;
-using Microsoft.Owin.Logging;
 using Microsoft.Owin.Security.Google;
 using System.Security.Claims;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Owin;
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Authentication;
@@ -94,10 +95,12 @@ namespace AspNetRoutes
 
         public void UtilitiesLogger(ILogger logger, IApplicationBuilder app)
         {
-            Microsoft.Owin.Infrastructure.WebUtilities.AddQueryString(""uri"", ""queryString"");
-            Microsoft.Owin.Infrastructure.WebUtilities.AddQueryString(""uri"", new Dictionary<string, string>());
-            Microsoft.Owin.Infrastructure.WebUtilities.AddQueryString(""uri"", ""name"", ""value"");
-            logger.WriteInformation(""message"");
+            /* Added by CTA: Please replace your parameters as the AddQueryString(string, string) method has been deprecated and you must either use the AddQueryString(string, string, string) method or the AddQueryString(string, System.Collections.Generic.IDictionary<string, string>) method. */
+            QueryHelpers.AddQueryString(""uri"", ""queryString"");
+            QueryHelpers.AddQueryString(""uri"", new Dictionary<string, string>());
+            QueryHelpers.AddQueryString(""uri"", ""name"", ""value"");
+            logger.LogInformation(""message"");
+            /* Added by CTA: Please add IApplicationBuilder.UseAuthentication() in your configure method. Within your public void ConfigureServices(IServiceCollection services) method please add services.AddAuthentication().AddGoogle(options => { IConfigurationSection googleAuthNSection = Configuration.GetSection(""Authentication:Google""); options.ClientId = googleAuthNSection[""ClientId""]; options.ClientSecret = googleAuthNSection[""ClientSecret""]; } ); */
             app.UseGoogleAuthentication(new GoogleOAuth2AuthenticationOptions());
         }
     }

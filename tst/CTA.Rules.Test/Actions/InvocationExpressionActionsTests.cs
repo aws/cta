@@ -21,7 +21,7 @@ namespace CTA.Rules.Test.Actions
             var language = LanguageNames.CSharp;
             _syntaxGenerator = SyntaxGenerator.GetGenerator(workspace, language);
             _invocationExpressionActions = new InvocationExpressionActions();
-            _node = SyntaxFactory.ParseExpression("Math.Abs(-1)") as InvocationExpressionSyntax;
+            _node = SyntaxFactory.ParseExpression("/* Comment */ Math.Abs(-1)") as InvocationExpressionSyntax;
         }
 
         [Test]
@@ -33,7 +33,7 @@ namespace CTA.Rules.Test.Actions
                 _invocationExpressionActions.GetReplaceMethodWithObjectAndParametersAction(newMethod, newParameter);
             var newNode = replaceMethodFunc(_syntaxGenerator, _node);
 
-            var expectedResult = "Math.Floor(-2)";
+            var expectedResult = "/* Comment */\r\nMath.Floor(-2)";
             Assert.AreEqual(expectedResult, newNode.ToFullString());
         }
 
@@ -45,20 +45,20 @@ namespace CTA.Rules.Test.Actions
                 _invocationExpressionActions.GetReplaceMethodWithObjectAction(newMethod);
             var newNode = replaceMethodFunc(_syntaxGenerator, _node);
 
-            var expectedResult = "Math.Floor(-1)";
+            var expectedResult = "/* Comment */\r\nMath.Floor(-1)";
             Assert.AreEqual(expectedResult, newNode.ToFullString());
         }
 
         [Test]
         public void GetReplaceMethodWithObjectAddTypeAction()
         {
-            _node = SyntaxFactory.ParseExpression("DependencyResolver.Current.GetService<object>()") as InvocationExpressionSyntax;
+            _node = SyntaxFactory.ParseExpression("/* Comment */ DependencyResolver.Current.GetService<object>()") as InvocationExpressionSyntax;
             const string newMethod = "DependencyResolver.Current.GetService";
             var replaceMethodFunc =
                 _invocationExpressionActions.GetReplaceMethodWithObjectAddTypeAction(newMethod);
             var newNode = replaceMethodFunc(_syntaxGenerator, _node);
 
-            var expectedResult = "DependencyResolver.Current.GetService(typeof(object))";
+            var expectedResult = "/* Comment */\r\nDependencyResolver.Current.GetService(typeof(object))";
             Assert.AreEqual(expectedResult, newNode.ToFullString());
         }
 
@@ -71,7 +71,7 @@ namespace CTA.Rules.Test.Actions
                 _invocationExpressionActions.GetReplaceMethodAndParametersAction("Abs", newMethod, newParameter);
             var newNode = replaceMethodFunc(_syntaxGenerator, _node);
 
-            var expectedResult = "Math.Floor(-2)";
+            var expectedResult = "/* Comment */\r\nMath.Floor(-2)";
             Assert.AreEqual(expectedResult, newNode.ToFullString());
         }
 
@@ -83,7 +83,7 @@ namespace CTA.Rules.Test.Actions
                 _invocationExpressionActions.GetReplaceMethodOnlyAction("Abs",newMethod);
             var newNode = replaceMethodFunc(_syntaxGenerator, _node);
 
-            var expectedResult = "Math.Floor(-1)";
+            var expectedResult = "/* Comment */\r\nMath.Floor(-1)";
             Assert.AreEqual(expectedResult, newNode.ToFullString());
         }
 
@@ -95,7 +95,7 @@ namespace CTA.Rules.Test.Actions
                 _invocationExpressionActions.GetReplaceParametersOnlyAction(newParam);
             var newNode = replaceMethodFunc(_syntaxGenerator, _node);
 
-            var expectedResult = "Math.Abs(8)";
+            var expectedResult = "/* Comment */\r\nMath.Abs(8)";
             Assert.AreEqual(expectedResult, newNode.ToFullString());
         }
 
@@ -107,7 +107,7 @@ namespace CTA.Rules.Test.Actions
                 _invocationExpressionActions.GetAppendMethodAction(invocationToAppend);
             var newNode = appendMethodFunc(_syntaxGenerator, _node);
 
-            var expectedResult = "Math.Abs(-1).ToString()";
+            var expectedResult = "/* Comment */\r\nMath.Abs(-1).ToString()";
             Assert.AreEqual(expectedResult, newNode.ToFullString());
         }
 
