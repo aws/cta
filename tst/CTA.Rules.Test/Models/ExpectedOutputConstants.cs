@@ -539,6 +539,7 @@ namespace StaticFilesSample
     {
         public void Configuration(IApplicationBuilder app)
         {
+#if DEBUG
             app.UseDeveloperExceptionPage();
             PhysicalFileProvider defaultFS = new PhysicalFileProvider(@"".\defaults"");
 #endif
