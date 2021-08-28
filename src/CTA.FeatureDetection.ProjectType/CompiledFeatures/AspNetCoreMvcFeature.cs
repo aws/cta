@@ -3,11 +3,18 @@ using Codelyzer.Analysis;
 using Codelyzer.Analysis.Model;
 using CTA.FeatureDetection.Common.Extensions;
 using CTA.FeatureDetection.Common.Models.Features.Base;
+using CTA.FeatureDetection.Common.Reporting;
 
 namespace CTA.FeatureDetection.ProjectType.CompiledFeatures
 {
     public class AspNetCoreMvcFeature : CompiledFeature
     {
+        public override FeatureCategory FeatureCategory => FeatureCategory.ProjectType;
+
+        public override string Description => "This project type is ASP.NET Core MVC.";
+
+        public override bool IsLinuxCompatible => true;
+
         /// <summary>
         /// Determines that a project is an ASP.NET Core MVC project if:
         ///     1) Any class derived from the Controller abstract class also calls any method returning a view-related object
