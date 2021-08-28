@@ -5,6 +5,7 @@ using CTA.FeatureDetection.Common.Models.Configuration;
 using CTA.FeatureDetection.Common.Models.Enums;
 using CTA.FeatureDetection.Common.Models.Features.Base;
 using CTA.FeatureDetection.Common.Models.Features.Conditions.Base;
+using CTA.FeatureDetection.Common.Reporting;
 
 [assembly: InternalsVisibleTo("CTA.FeatureDetection.Tests")]
 namespace CTA.FeatureDetection.Load.Factories
@@ -16,12 +17,21 @@ namespace CTA.FeatureDetection.Load.Factories
         /// </summary>
         /// <param name="featureScope">The scope in which to look for this feature</param>
         /// <param name="name">Name of the feature</param>
+        /// <param name="featureCategory">Category of the feature</param>
+        /// <param name="description">Description of the feature</param>
+        /// <param name="isLinuxCompatible">Whether or not the feature is compatible with Linux</param>
         /// <param name="conditionMetadata">Metadata defining the feature condition</param>
         /// <returns>Instance of the defined feature</returns>
-        public static ConfiguredFeature GetInstance(FeatureScope featureScope, string name, ConditionMetadata conditionMetadata)
+        public static ConfiguredFeature GetInstance(
+            FeatureScope featureScope, 
+            string name,
+            FeatureCategory featureCategory,
+            string description,
+            bool isLinuxCompatible,
+            ConditionMetadata conditionMetadata)
         {
             var condition = ConditionFactory.GetCondition(conditionMetadata);
-            return new ConfiguredFeature(featureScope, name, condition);
+            return new ConfiguredFeature(featureScope, name, featureCategory, description, isLinuxCompatible, condition);
         }
 
         /// <summary>
@@ -29,16 +39,25 @@ namespace CTA.FeatureDetection.Load.Factories
         /// </summary>
         /// <param name="featureScope">The scope in which to look for this feature</param>
         /// <param name="name">Name of the feature</param>
+        /// <param name="featureCategory">Category of the feature</param>
+        /// <param name="description">Description of the feature</param>
+        /// <param name="isLinuxCompatible">Whether or not the feature is compatible with Linux</param>
         /// <param name="conditionGroupMetadata">Metadata defining the feature condition group</param>
         /// <returns>Instance of the defined feature</returns>
-        public static ConfiguredFeature GetInstance(FeatureScope featureScope, string name, ConditionGroupMetadata conditionGroupMetadata)
+        public static ConfiguredFeature GetInstance(
+            FeatureScope featureScope,
+            string name,
+            FeatureCategory featureCategory,
+            string description,
+            bool isLinuxCompatible, 
+            ConditionGroupMetadata conditionGroupMetadata)
         {
             var conditionGroup = new ConditionGroup
             {
                 JoinOperator = conditionGroupMetadata.JoinOperator,
                 Conditions = ConditionFactory.GetConditions(conditionGroupMetadata.Conditions)
             };
-            return new ConfiguredFeature(featureScope, name, conditionGroup);
+            return new ConfiguredFeature(featureScope, name, featureCategory, description, isLinuxCompatible, conditionGroup);
         }
 
         /// <summary>
@@ -46,9 +65,18 @@ namespace CTA.FeatureDetection.Load.Factories
         /// </summary>
         /// <param name="featureScope">The scope in which to look for this feature</param>
         /// <param name="name">Name of the feature</param>
+        /// <param name="featureCategory">Category of the feature</param>
+        /// <param name="description">Description of the feature</param>
+        /// <param name="isLinuxCompatible">Whether or not the feature is compatible with Linux</param>
         /// <param name="conditionGroupsMetadata">Metadata defining the feature condition groups</param>
         /// <returns>Instance of the defined feature</returns>
-        public static ConfiguredFeature GetInstance(FeatureScope featureScope, string name, IEnumerable<ConditionGroupMetadata> conditionGroupsMetadata)
+        public static ConfiguredFeature GetInstance(
+            FeatureScope featureScope,
+            string name,
+            FeatureCategory featureCategory,
+            string description,
+            bool isLinuxCompatible, 
+            IEnumerable<ConditionGroupMetadata> conditionGroupsMetadata)
         {
             var conditionGroups = conditionGroupsMetadata.Select(conditionGroupMetadata =>
                 new ConditionGroup
@@ -57,7 +85,7 @@ namespace CTA.FeatureDetection.Load.Factories
                     Conditions = ConditionFactory.GetConditions(conditionGroupMetadata.Conditions)
                 }
             );
-            return new ConfiguredFeature(featureScope, name, conditionGroups);
+            return new ConfiguredFeature(featureScope, name, featureCategory, description, isLinuxCompatible, conditionGroups);
         }
     }
 }
