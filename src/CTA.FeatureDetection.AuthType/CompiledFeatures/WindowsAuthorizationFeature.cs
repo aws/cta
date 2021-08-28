@@ -1,9 +1,16 @@
 ﻿using Codelyzer.Analysis;
+using CTA.FeatureDetection.Common.Reporting;
 
 namespace CTA.FeatureDetection.AuthType.CompiledFeatures
 {
     public class WindowsAuthorizationFeature : WindowsAuthenticationFeature
     {
+        public override FeatureCategory FeatureCategory => FeatureCategory.AuthType;
+
+        public override string Description => "This project uses Windows Authorization.";
+
+        public override bool IsLinuxCompatible => false;
+
         /// <summary>
         /// Determines if Windows Authorization is being used in a given project based on
         /// Web.config settings

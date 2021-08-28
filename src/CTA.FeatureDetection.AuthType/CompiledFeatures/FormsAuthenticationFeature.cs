@@ -1,10 +1,16 @@
 ﻿using Codelyzer.Analysis;
+using CTA.FeatureDetection.Common.Reporting;
 using CTA.Rules.Common.WebConfigManagement;
 
 namespace CTA.FeatureDetection.AuthType.CompiledFeatures
 {
     public class FormsAuthenticationFeature : WebConfigFeature
     {
+        public override FeatureCategory FeatureCategory => FeatureCategory.AuthType;
+
+        public override string Description => "This project uses the Forms Authentication method.";
+
+        public override bool IsLinuxCompatible => true;
         /// <summary>
         /// Determines if Forms Authentication is being used in a given project based on
         /// Web.config settings.

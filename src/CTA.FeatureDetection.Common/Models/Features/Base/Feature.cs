@@ -1,6 +1,7 @@
 ﻿using System;
 using Codelyzer.Analysis;
 using CTA.FeatureDetection.Common.Models.Enums;
+using CTA.FeatureDetection.Common.Reporting;
 
 namespace CTA.FeatureDetection.Common.Models.Features.Base
 {
@@ -12,6 +13,12 @@ namespace CTA.FeatureDetection.Common.Models.Features.Base
         public virtual string Name { get; set; }
 
         public FeatureScope FeatureScope { get; set; }
+
+        public abstract FeatureCategory FeatureCategory { get; }
+
+        public abstract string Description { get; }
+
+        public abstract bool IsLinuxCompatible { get; }
 
         /// <summary>
         /// Determines whether or not the feature is present in a given project

@@ -1,12 +1,19 @@
 ﻿using System.Linq;
 using Codelyzer.Analysis;
 using Codelyzer.Analysis.Model;
+using CTA.FeatureDetection.Common.Reporting;
 using CTA.Rules.Common.WebConfigManagement;
 
 namespace CTA.FeatureDetection.AuthType.CompiledFeatures
 {
     public class FederatedAuthenticationFeature : WebConfigFeature
     {
+        public override FeatureCategory FeatureCategory => FeatureCategory.AuthType;
+
+        public override string Description => "This project uses the Federated Authentication method.";
+
+        public override bool IsLinuxCompatible => true;
+
         /// <summary>
         /// Determines if Federated Authentication is being used in a given project based on
         /// Web.config settings and method invocations in code.
