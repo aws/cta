@@ -10,16 +10,15 @@ namespace CTA.Rules.Test.Models
 @"/* Added by CTA: OAuth is now handled by using the public void ConfigureServices(IServiceCollection services) method in the Startup.cs class. The basic process is to use services.AddAuthentication(options => and then set a series of options. We can chain unto that the actual OAuth settings call services.AddOAuth(""Auth_Service_here_such_as_GitHub_Canvas..."", options =>. Also remember to add a call to IApplicationBuilder.UseAuthentication() in your public void Configure(IApplicationBuilder app, IHostingEnvironment env) method. Please ensure this call comes before setting up your routes. */
 using System.Threading.Tasks;
 using System;
-using Microsoft.Owin.Security.Notifications;
 using System.Security.Claims;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.Owin.Security.OpenIdConnect;
 using Microsoft.IdentityModel.Protocols;
 using Microsoft.AspNetCore.Owin;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -106,11 +105,13 @@ namespace AspNetRoutes
             app.UseGoogleAuthentication(new GoogleOAuth2AuthenticationOptions());
         }
 
-        public void OnAuthenticationFailed(HttpContext context, BaseNotification<OpenIdConnectAuthenticationOptions> baseNotif)
+        public void OnAuthenticationFailed(HttpContext context, BaseNotification<OpenIdConnectOptions> baseNotif)
         {
-            OpenIdConnectAuthenticationOptions options = new OpenIdConnectAuthenticationOptions();
-            RedirectToIdentityProviderNotification<OpenIdConnectMessage, OpenIdConnectAuthenticationOptions> redirectContext = new RedirectToIdentityProviderNotification<OpenIdConnectMessage, OpenIdConnectAuthenticationOptions>(context, options);
+            OpenIdConnectOptions options = new OpenIdConnectOptions();
+            RedirectToIdentityProviderNotification<OpenIdConnectMessage, OpenIdConnectOptions> redirectContext = new RedirectToIdentityProviderNotification<OpenIdConnectMessage, OpenIdConnectOptions>(context, options);
+            /* Added by CTA: Please replace RedirectToIdentityProviderNotification with RedirectContext. The constructor for this new class takes the following parameters: new RedirectContext(HttpContext, AuthenticationScheme, OpenIdConnectOptions, AuthenticationProperties); */
             redirectContext.HandleResponse();
+            /* Added by CTA: Please replace BaseNotification with a class from the Microsoft.AspNetCore.Authentication.OpenIdConnect namespace. The MessageReceivedContext class is a good candidate. Its constructor takes the following parameters: new MessageReceivedContext(HttpContext, AuthenticationScheme, OpenIdConnectOptions, AuthenticationProperties); */
             baseNotif.HandleResponse();
         }
     }
