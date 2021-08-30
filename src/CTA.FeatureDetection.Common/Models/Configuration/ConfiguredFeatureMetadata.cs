@@ -1,5 +1,6 @@
 ﻿using CTA.FeatureDetection.Common.Reporting;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace CTA.FeatureDetection.Common.Models.Configuration
 {
@@ -9,6 +10,7 @@ namespace CTA.FeatureDetection.Common.Models.Configuration
         public string Name { get; set; }
 
         [JsonProperty(Required = Required.Default)]
+        [JsonConverter(typeof(StringEnumConverter))]
         public FeatureCategory FeatureCategory { get; set; }
 
         [JsonProperty(Required = Required.Default)]

@@ -5,6 +5,7 @@ using CTA.FeatureDetection.Load.Factories;
 using CTA.FeatureDetection.Tests.TestBase;
 using NUnit.Framework;
 using System.Linq;
+using CTA.FeatureDetection.Common.Reporting;
 
 namespace CTA.FeatureDetection.Tests.FeatureDetection.Load.Factories
 {
@@ -15,11 +16,23 @@ namespace CTA.FeatureDetection.Tests.FeatureDetection.Load.Factories
         {
             var featureScope = FeatureScope.Project;
             var featureName = "FeatureName";
-            var feature = ConfiguredFeatureFactory.GetInstance(featureScope, featureName, ConditionMetadata);
+            var featureCategory = FeatureCategory.ProjectType;
+            var description = "Description";
+            var isLinuxCompatible = false;
+            var feature = ConfiguredFeatureFactory.GetInstance(
+                featureScope, 
+                featureName,
+                featureCategory,
+                description,
+                isLinuxCompatible,
+                ConditionMetadata);
 
             Assert.NotNull(feature);
             Assert.True(feature.Name == featureName);
             Assert.True(feature.FeatureScope == featureScope);
+            Assert.True(feature.FeatureCategory == featureCategory);
+            Assert.True(feature.Description == description);
+            Assert.True(feature.IsLinuxCompatible == isLinuxCompatible);
             Assert.True(feature is ConfiguredFeature);
             Assert.True(feature.Condition is XmlFileQueryCondition);
         }
@@ -29,11 +42,23 @@ namespace CTA.FeatureDetection.Tests.FeatureDetection.Load.Factories
         {
             var featureScope = FeatureScope.Project;
             var featureName = "FeatureName";
-            var feature = ConfiguredFeatureFactory.GetInstance(featureScope, featureName, ConditionGroupMetadata);
+            var featureCategory = FeatureCategory.ProjectType;
+            var description = "Description";
+            var isLinuxCompatible = false;
+            var feature = ConfiguredFeatureFactory.GetInstance(
+                featureScope,
+                featureName,
+                featureCategory,
+                description,
+                isLinuxCompatible, 
+                ConditionGroupMetadata);
 
             Assert.NotNull(feature);
             Assert.True(feature.Name == featureName);
             Assert.True(feature.FeatureScope == featureScope);
+            Assert.True(feature.FeatureCategory == featureCategory);
+            Assert.True(feature.Description == description);
+            Assert.True(feature.IsLinuxCompatible == isLinuxCompatible);
             Assert.True(feature is ConfiguredFeature);
             Assert.True(feature.ConditionGroup.Conditions.All(c => c.GetType() == typeof(XmlFileQueryCondition)));
             Assert.True(feature.ConditionGroup.Conditions.Count() == 2);
@@ -44,11 +69,23 @@ namespace CTA.FeatureDetection.Tests.FeatureDetection.Load.Factories
         {
             var featureScope = FeatureScope.Project;
             var featureName = "FeatureName";
-            var feature = ConfiguredFeatureFactory.GetInstance(featureScope, featureName, ConditionGroupsMetadata);
+            var featureCategory = FeatureCategory.ProjectType;
+            var description = "Description";
+            var isLinuxCompatible = false;
+            var feature = ConfiguredFeatureFactory.GetInstance(
+                featureScope,
+                featureName,
+                featureCategory,
+                description,
+                isLinuxCompatible, 
+                ConditionGroupsMetadata);
 
             Assert.NotNull(feature);
             Assert.True(feature.Name == featureName);
             Assert.True(feature.FeatureScope == featureScope);
+            Assert.True(feature.FeatureCategory == featureCategory);
+            Assert.True(feature.Description == description);
+            Assert.True(feature.IsLinuxCompatible == isLinuxCompatible);
             Assert.True(feature is ConfiguredFeature);
             Assert.True(feature.ConditionGroups.All(c => c.Conditions.Count() == 2));
             Assert.True(feature.ConditionGroups.Count() == 2);
