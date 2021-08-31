@@ -318,6 +318,23 @@ namespace CTA.Rules.Test
 
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.DotnetCoreApp31)]
+        public void TestOwinExtraAPI(string version)
+        {
+            TestSolutionAnalysis results = AnalyzeSolution("OwinExtraAPI.sln", tempDir, downloadLocation, version);
+
+            string projectDir = results.ProjectResults.FirstOrDefault().ProjectDirectory;
+            var csProjContent = results.ProjectResults.FirstOrDefault().CsProjectContent;
+
+            var programText = File.ReadAllText(Path.Combine(projectDir, "Program.cs"));
+
+            StringAssert.AreEqualIgnoringCase(ExpectedOutputConstants.OwinExtraAPIProgram, programText);
+
+            //Check that correct version is used
+            Assert.True(csProjContent.IndexOf(string.Concat(">", version, "<")) > 0);
+        }
+
+        [TestCase(TargetFramework.Dotnet5)]
+        [TestCase(TargetFramework.DotnetCoreApp31)]
         public void TestOwinParadise(string version)
         {
             TestSolutionAnalysis results = AnalyzeSolution("OwinParadise.sln", tempDir, downloadLocation, version);
