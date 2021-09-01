@@ -41,8 +41,9 @@ namespace CTA.Rules.Update
                     Name = p.Key,
                     OriginalVersion = p.Value.Item1,
                     Version = p.Value.Item2
-                }).ToList()
-            };
+                }).ToList(),
+                MissingMetaReferences = analyzerResult?.ProjectBuildResult?.MissingReferences
+        };
 
             _sourceFileBuildResults = analyzerResult?.ProjectBuildResult?.SourceFileBuildResults;
             _sourceFileResults = analyzerResult?.ProjectResult?.SourceFileResults;
