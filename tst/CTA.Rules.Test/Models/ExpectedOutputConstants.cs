@@ -781,6 +781,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication;
 
 namespace OwinExtraAPI
 {
@@ -805,6 +806,18 @@ namespace OwinExtraAPI
             });
             AuthorizationPolicyBuilder apolBuild = new AuthorizationPolicyBuilder(apol);
             apolBuild = apolBuild.AddRequirements(req);
+        }
+
+        public void OwinDataHandler(ITextEncoder encoder, SecureDataFormat<AuthenticationProperties> secure)
+        {
+            AuthenticationProperties props = new AuthenticationProperties();
+            string secured = secure.Protect(props);
+            AuthenticationProperties unsecured = secure.Unprotect(secured);
+            byte[] decoded = new byte[10];
+            string encoded = /* Added by CTA: Please replace the ITextEncoder with its appropriate class either Microsoft.AspNetCore.WebUtilities.Base64UrlTextEncoder to encode and decode URLs or System.Text.Encoding for general encoding needs. */
+            encoder.Encode(decoded);
+            decoded = /* Added by CTA: Please replace the ITextEncoder with its appropriate class either Microsoft.AspNetCore.WebUtilities.Base64UrlTextEncoder to encode and decode URLs or System.Text.Encoding for general encoding needs. */
+            encoder.Decode(encoded);
         }
     }
 }";
