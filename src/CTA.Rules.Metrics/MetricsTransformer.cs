@@ -108,6 +108,19 @@ namespace CTA.Rules.Metrics
             return referencesMetrics;
         }
 
+        internal static IEnumerable<MissingMetaReferenceMetric> TransformMissingMetaReferences(MetricsContext context, ProjectResult projectResult)
+        {
+            var projectFile = projectResult.ProjectFile;
+            var missingMetaReferences = projectResult.MissingMetaReferences;
+            var missingMetaReferenceMetrics = new List<MissingMetaReferenceMetric>();
+            foreach (var reference in missingMetaReferences)
+            {
+                missingMetaReferenceMetrics.Add(new MissingMetaReferenceMetric(context, reference, projectFile));
+            }
+
+            return missingMetaReferenceMetrics;
+        }
+
         internal static IEnumerable<BuildErrorMetric> TransformBuildErrors(MetricsContext context,
             Dictionary<string, Dictionary<string, int>> buildErrorsByProject)
         {

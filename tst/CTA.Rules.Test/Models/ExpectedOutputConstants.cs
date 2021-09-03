@@ -10,12 +10,16 @@ namespace CTA.Rules.Test.Models
 @"/* Added by CTA: OAuth is now handled by using the public void ConfigureServices(IServiceCollection services) method in the Startup.cs class. The basic process is to use services.AddAuthentication(options => and then set a series of options. We can chain unto that the actual OAuth settings call services.AddOAuth(""Auth_Service_here_such_as_GitHub_Canvas..."", options =>. Also remember to add a call to IApplicationBuilder.UseAuthentication() in your public void Configure(IApplicationBuilder app, IHostingEnvironment env) method. Please ensure this call comes before setting up your routes. */
 using System.Threading.Tasks;
 using System;
-using System.Web;
 using System.Security.Claims;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.IdentityModel.Protocols;
 using Microsoft.AspNetCore.Owin;
+using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Authentication;
@@ -60,6 +64,18 @@ namespace AspNetRoutes
             await authenticationManager.SignInAsync(claims.ToArray());
             /* Added by CTA: You can only pass in a single scheme as a parameter and you can also include an AuthenticationProperties object as well. */
             await authenticationManager.SignOutAsync();
+            ExternalLoginInfo info = /* Added by CTA: You must declare a Microsoft.AspNetCore.Identity.SignInManager<TUser> object and access the GetExternalLoginInfoAsync method to replace this invocation. */
+            authenticationManager.GetExternalLoginInfo();
+            ExternalLoginInfo infoAsync1 = await /* Added by CTA: You must declare a Microsoft.AspNetCore.Identity.SignInManager<TUser> object and access the GetExternalLoginInfoAsync method to replace this invocation. */
+            authenticationManager.GetExternalLoginInfoAsync();
+            ExternalLoginInfo infoAsync2 = await /* Added by CTA: You must declare a Microsoft.AspNetCore.Identity.SignInManager<TUser> object and access the GetExternalLoginInfoAsync method to replace this invocation. */
+            authenticationManager.GetExternalLoginInfoAsync(""key_here"", ""expected"");
+            List<AuthenticationScheme> desc = /* Added by CTA: You must declare a Microsoft.AspNetCore.Identity.SignInManager<TUser> object and access the GetExternalAuthenticationSchemesAsync method to replace this invocation. */
+            authenticationManager.GetExternalAuthenticationTypes().ToList();
+            bool rem = /* Added by CTA: You must declare a Microsoft.AspNetCore.Identity.SignInManager<TUser> object and access the TwoFactorBrowserRemembered(TUser) method to replace this invocation. */
+            authenticationManager.TwoFactorBrowserRemembered(""userID"");
+            bool remAsync = await /* Added by CTA: You must declare a Microsoft.AspNetCore.Identity.SignInManager<TUser> object and access the TwoFactorBrowserRememberedAsync(TUser) method to replace this invocation. */
+            authenticationManager.TwoFactorBrowserRememberedAsync(""userID"");
             AuthenticationTicket at = /* Added by CTA: Please use a ClaimsPrincipal object to wrap your ClaimsIdentity parameter to pass to this method, you can optionally include an AuthenticationProperties object and must include a scheme. */
             new AuthenticationTicket(claims.First(), authProp);
             string prot = df.Protect(at);
@@ -76,6 +92,27 @@ namespace AspNetRoutes
             DpapiDataProtectionProvider dpapi = /* Added by CTA: DpapiDataProtectionProvider should be replaced with a Dependency injection for the IDataProtectionProvider interface. Please include a parameter with this interface to replace this class. */
             new DpapiDataProtectionProvider();
             IDataProtector prot2 = dpapi.CreateProtector(purposes);
+        }
+
+        public void UtilitiesLogger(ILogger logger, IApplicationBuilder app)
+        {
+            /* Added by CTA: Please replace your parameters as the AddQueryString(string, string) method has been deprecated and you must either use the AddQueryString(string, string, string) method or the AddQueryString(string, System.Collections.Generic.IDictionary<string, string>) method. */
+            QueryHelpers.AddQueryString(""uri"", ""queryString"");
+            QueryHelpers.AddQueryString(""uri"", new Dictionary<string, string>());
+            QueryHelpers.AddQueryString(""uri"", ""name"", ""value"");
+            logger.LogInformation(""message"");
+            /* Added by CTA: Please add IApplicationBuilder.UseAuthentication() in your configure method. Within your public void ConfigureServices(IServiceCollection services) method please add services.AddAuthentication().AddGoogle(options => { IConfigurationSection googleAuthNSection = Configuration.GetSection(""Authentication:Google""); options.ClientId = googleAuthNSection[""ClientId""]; options.ClientSecret = googleAuthNSection[""ClientSecret""]; } ); */
+            app.UseGoogleAuthentication(new GoogleOAuth2AuthenticationOptions());
+        }
+
+        public void OnAuthenticationFailed(HttpContext context, BaseNotification<OpenIdConnectOptions> baseNotif)
+        {
+            OpenIdConnectOptions options = new OpenIdConnectOptions();
+            RedirectToIdentityProviderNotification<OpenIdConnectMessage, OpenIdConnectOptions> redirectContext = new RedirectToIdentityProviderNotification<OpenIdConnectMessage, OpenIdConnectOptions>(context, options);
+            /* Added by CTA: Please replace RedirectToIdentityProviderNotification with RedirectContext. The constructor for this new class takes the following parameters: new RedirectContext(HttpContext, AuthenticationScheme, OpenIdConnectOptions, AuthenticationProperties); */
+            redirectContext.HandleResponse();
+            /* Added by CTA: Please replace BaseNotification with a class from the Microsoft.AspNetCore.Authentication.OpenIdConnect namespace. The MessageReceivedContext class is a good candidate. Its constructor takes the following parameters: new MessageReceivedContext(HttpContext, AuthenticationScheme, OpenIdConnectOptions, AuthenticationProperties); */
+            baseNotif.HandleResponse();
         }
     }
 }";
@@ -161,6 +198,7 @@ namespace BranchingPipelines
 using System;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNetCore.Owin;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 
@@ -512,6 +550,7 @@ namespace StaticFilesSample
     {
         public void Configuration(IApplicationBuilder app)
         {
+#if DEBUG
             app.UseDeveloperExceptionPage();
             PhysicalFileProvider defaultFS = new PhysicalFileProvider(@"".\defaults"");
 #endif
@@ -586,6 +625,7 @@ namespace WebApi
             );
             config.Formatters.XmlFormatter.UseXmlSerializer = true;
             config.Formatters.Remove(config.Formatters.JsonFormatter);
+            // config.Formatters.JsonFormatter.UseDataContractJsonSerializer = true;
             /* Added by CTA: Please add a new ConfigureServices method: public void ConfigureServices(IServiceCollection services) { services.AddControllers(); } */
             builder.UseEndpoints(endpoints =>
             {
@@ -729,6 +769,55 @@ namespace WebSocketServer
                 Console.WriteLine(""Ready, press any key to exit..."");
                 Console.ReadKey();
             }
+        }
+    }
+}";
+
+        public const string OwinExtraAPIProgram =
+@"using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication;
+
+namespace OwinExtraAPI
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+        }
+
+        public void OwinAuthorization(IAuthorizationRequirement req)
+        {
+            List<IAuthorizationRequirement> listReq = new List<IAuthorizationRequirement>()
+            {req};
+            AuthorizationHandlerContext ahc = new AuthorizationHandlerContext(listReq, new ClaimsPrincipal(), null);
+            ahc.Succeed(req);
+            AuthorizationOptions aops = new AuthorizationOptions();
+            AuthorizationPolicy apol = new AuthorizationPolicy(listReq, new List<string>()
+            {""""});
+            aops.AddPolicy("""", apol);
+            aops.AddPolicy("""", policy =>
+            {
+            });
+            AuthorizationPolicyBuilder apolBuild = new AuthorizationPolicyBuilder(apol);
+            apolBuild = apolBuild.AddRequirements(req);
+        }
+
+        public void OwinDataHandler(ITextEncoder encoder, SecureDataFormat<AuthenticationProperties> secure)
+        {
+            AuthenticationProperties props = new AuthenticationProperties();
+            string secured = secure.Protect(props);
+            AuthenticationProperties unsecured = secure.Unprotect(secured);
+            byte[] decoded = new byte[10];
+            string encoded = /* Added by CTA: Please replace the ITextEncoder with its appropriate class either Microsoft.AspNetCore.WebUtilities.Base64UrlTextEncoder to encode and decode URLs or System.Text.Encoding for general encoding needs. */
+            encoder.Encode(decoded);
+            decoded = /* Added by CTA: Please replace the ITextEncoder with its appropriate class either Microsoft.AspNetCore.WebUtilities.Base64UrlTextEncoder to encode and decode URLs or System.Text.Encoding for general encoding needs. */
+            encoder.Decode(encoded);
         }
     }
 }";

@@ -10,6 +10,7 @@ namespace CTA.Rules.Models
         public List<PackageAction> ActionPackages { get; set; }
         public List<string> TargetVersions { get; set; }
         public List<string> MetaReferences { get; set; }
+        public List<string> MissingMetaReferences { get; set; }
 
         public ProjectResult()
         {
