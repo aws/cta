@@ -10,6 +10,8 @@ using Codelyzer.Analysis.Build;
 using Codelyzer.Analysis.Model;
 using CTA.FeatureDetection;
 using CTA.FeatureDetection.Common.Models;
+using CTA.FeatureDetection.Common.Models.Features;
+using CTA.FeatureDetection.Common.Reporting;
 using CTA.FeatureDetection.ProjectType.Extensions;
 using CTA.Rules.Config;
 using CTA.Rules.Metrics;
@@ -29,6 +31,7 @@ namespace CTA.Rules.PortCore
         private readonly PortSolutionResult _portSolutionResult;
         private readonly MetricsContext _context;
         private Dictionary<string, FeatureDetectionResult> _projectTypeFeatureResults;
+        private FeatureSet _loadedFeatures;
         private readonly IDEProjectResult _projectResult;
         private SolutionResult _solutionAnalysisResult;
         private SolutionResult _solutionRunResult;
@@ -190,6 +193,7 @@ namespace CTA.Rules.PortCore
         private void InitRules(List<PortCoreConfiguration> solutionConfiguration, List<AnalyzerResult> analyzerResults)
         {
             using var projectTypeFeatureDetector = new FeatureDetector();
+            _loadedFeatures = projectTypeFeatureDetector.LoadedFeatureSet;
 
             analyzerResults = analyzerResults.Where(a => solutionConfiguration.Select(s => s.ProjectPath).Contains(a.ProjectResult?.ProjectFilePath)).ToList();
             _projectTypeFeatureResults = projectTypeFeatureDetector.DetectFeaturesInProjects(analyzerResults);
@@ -245,6 +249,11 @@ namespace CTA.Rules.PortCore
 
                 LogHelper.LogInformation("Generating Post-Analysis Report");
                 LogHelper.LogError($"{Constants.MetricsTag}: {reportGenerator.AnalyzeSolutionResultJsonReport}");
+
+                LogHelper.LogInformation("Generating Feature Detection Report");
+                var featureDetectionReportContent = FeatureReportGenerator.GenerateCsvReport(_projectTypeFeatureResults, _loadedFeatures);
+                var solutionDir = Directory.GetParent(_solutionPath).FullName;
+                FeatureReportGenerator.ExportReport(featureDetectionReportContent, solutionDir);
             }
             return _solutionAnalysisResult;
         }

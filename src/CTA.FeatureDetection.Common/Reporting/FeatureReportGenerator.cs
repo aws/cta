@@ -7,17 +7,29 @@ using CTA.FeatureDetection.Common.Models;
 using CTA.FeatureDetection.Common.Models.Features;
 using CTA.FeatureDetection.Common.Models.Features.Base;
 using CTA.Rules.Config;
+using Microsoft.Extensions.Logging;
 
 namespace CTA.FeatureDetection.Common.Reporting
 {
     public class FeatureReportGenerator
     {
-        private const string DefaultFeatureReportPath = "DetectedFeaturesReport.csv";
+        private const string DefaultFeatureReportFilename = "DetectedFeaturesReport.csv";
 
+        /// <summary>
+        /// Creates a csv report in string form from a collection of features detected.
+        /// </summary>
+        /// <param name="featureDetectionResults">Feature Detection results for a set of projects</param>
+        /// <param name="loadedFeatures">Features loaded into the feature detector used to create featureDetectionResults</param>
+        /// <returns></returns>
         public static string GenerateCsvReport(
             IDictionary<string, FeatureDetectionResult> featureDetectionResults, 
             FeatureSet loadedFeatures)
         {
+            if (featureDetectionResults == null || loadedFeatures == null)
+            {
+                return string.Empty;
+            }
+
             var featureLookup = ConvertLoadedFeaturesToDict(loadedFeatures);
             var featureReportRecords = featureDetectionResults.SelectMany(kvp =>
             {
@@ -35,11 +47,15 @@ namespace CTA.FeatureDetection.Common.Reporting
         /// <summary>
         /// Saves string content to a file.
         /// </summary>
-        /// <param name="csvReport"></param>
-        /// <param name="exportPath"></param>
-        public static void ExportReport(string csvReport, string exportPath = null)
+        /// <param name="csvReport">Report content to save</param>
+        /// <param name="directory">Destination directory</param>
+        /// <param name="filename">Name of file to write to</param>
+        public static void ExportReport(string csvReport, string directory = null, string filename = null)
         {
-            exportPath = string.IsNullOrEmpty(exportPath) ? DefaultFeatureReportPath : exportPath;
+            directory ??= string.Empty;
+            filename = string.IsNullOrEmpty(filename) ? DefaultFeatureReportFilename : filename;
+            var exportPath = Path.Combine(directory, filename);
+
             Utils.ThreadSafeExportStringToFile(exportPath, csvReport);
         }
 
@@ -55,24 +71,34 @@ namespace CTA.FeatureDetection.Common.Reporting
                 .ToDictionary(feature => feature.Name, feature => feature);
         }
 
-        // TODO: Properly assign FeatureCategory and Description
         private static IEnumerable<FeatureReportRecord> ConvertFeatureResultsToRecords(
             string projectName,
             FeatureDetectionResult featureDetectionResult,
             IDictionary<string, Feature> featureLookup)
         {
-            return featureDetectionResult.PresentFeatures.Select(feature =>
+            var featureReportRecords = new List<FeatureReportRecord>();
+            foreach (var feature in featureDetectionResult.PresentFeatures)
             {
-                var featureMetadata = featureLookup[feature];
-                return new FeatureReportRecord
+                try
                 {
-                    ProjectName = projectName,
-                    FeatureCategory = featureMetadata.FeatureCategory,
-                    FeatureName = featureMetadata.Name,
-                    Description = featureMetadata.Description,
-                    IsLinuxCompatible = featureMetadata.IsLinuxCompatible
-                };
-            });
+                    var featureMetadata = featureLookup[feature];
+                    var newRecord = new FeatureReportRecord
+                    {
+                        ProjectName = projectName,
+                        FeatureCategory = featureMetadata.FeatureCategory,
+                        FeatureName = featureMetadata.Name,
+                        Description = featureMetadata.Description,
+                        IsLinuxCompatible = featureMetadata.IsLinuxCompatible
+                    };
+                    featureReportRecords.Add(newRecord);
+                }
+                catch (KeyNotFoundException e)
+                {
+                    Log.Logger.LogError(e.ToString());
+                }
+            }
+
+            return featureReportRecords;
         }
     }
 }

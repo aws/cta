@@ -2,6 +2,7 @@
 {
     public enum FeatureCategory
     {
+        Unknown,
         ProjectType,
         DbProvider,
         AuthType
