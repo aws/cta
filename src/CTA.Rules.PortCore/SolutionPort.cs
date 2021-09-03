@@ -10,6 +10,8 @@ using Codelyzer.Analysis.Build;
 using Codelyzer.Analysis.Model;
 using CTA.FeatureDetection;
 using CTA.FeatureDetection.Common.Models;
+using CTA.FeatureDetection.Common.Models.Features;
+using CTA.FeatureDetection.Common.Reporting;
 using CTA.FeatureDetection.ProjectType.Extensions;
 using CTA.Rules.Config;
 using CTA.Rules.Metrics;
@@ -29,6 +31,7 @@ namespace CTA.Rules.PortCore
         private readonly PortSolutionResult _portSolutionResult;
         private readonly MetricsContext _context;
         private Dictionary<string, FeatureDetectionResult> _projectTypeFeatureResults;
+        private FeatureSet _loadedFeatures;
         private readonly IDEProjectResult _projectResult;
         private SolutionResult _solutionAnalysisResult;
         private SolutionResult _solutionRunResult;
@@ -189,6 +192,7 @@ namespace CTA.Rules.PortCore
         private void InitRules(List<PortCoreConfiguration> solutionConfiguration, List<AnalyzerResult> analyzerResults)
         {
             using var projectTypeFeatureDetector = new FeatureDetector();
+            _loadedFeatures = projectTypeFeatureDetector.LoadedFeatureSet;
 
             // sync up passed in configuration with analyze results
             solutionConfiguration = solutionConfiguration.Where(s => analyzerResults.Select(a => a.ProjectResult?.ProjectFilePath).Contains(s.ProjectPath)).ToList();
@@ -246,6 +250,11 @@ namespace CTA.Rules.PortCore
 
                 LogHelper.LogInformation("Generating Post-Analysis Report");
                 LogHelper.LogError($"{Constants.MetricsTag}: {reportGenerator.AnalyzeSolutionResultJsonReport}");
+
+                LogHelper.LogInformation("Generating Feature Detection Report");
+                var featureDetectionReportContent = FeatureReportGenerator.GenerateCsvReport(_projectTypeFeatureResults, _loadedFeatures);
+                var solutionDir = Directory.GetParent(_solutionPath).FullName;
+                FeatureReportGenerator.ExportReport(featureDetectionReportContent, solutionDir);
             }
             return _solutionAnalysisResult;
         }

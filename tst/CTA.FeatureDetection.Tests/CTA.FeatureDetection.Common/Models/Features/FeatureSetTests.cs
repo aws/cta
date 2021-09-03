@@ -8,6 +8,7 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using CTA.FeatureDetection.Common.Reporting;
 
 namespace CTA.FeatureDetection.Tests.FeatureDetection.Common.Models.Features
 {
@@ -18,8 +19,20 @@ namespace CTA.FeatureDetection.Tests.FeatureDetection.Common.Models.Features
         {
             var configuredFeatures = new List<ConfiguredFeature>
             {
-                new ConfiguredFeature(FeatureScope.Undefined, "ConfiguredFeature1", ConditionThatIsAlwaysTrue),
-                new ConfiguredFeature(FeatureScope.Undefined, "ConfiguredFeature2", ConditionThatIsAlwaysTrue)
+                new ConfiguredFeature(
+                    FeatureScope.Undefined, 
+                    "ConfiguredFeature1", 
+                    FeatureCategory.ProjectType,
+                    string.Empty,
+                    false,
+                    ConditionThatIsAlwaysTrue),
+                new ConfiguredFeature(
+                    FeatureScope.Undefined, 
+                    "ConfiguredFeature2",
+                    FeatureCategory.ProjectType,
+                    string.Empty,
+                    false,
+                    ConditionThatIsAlwaysTrue)
             };
             var featureSet = new FeatureSet(configuredFeatures);
 
@@ -114,6 +127,10 @@ namespace CTA.FeatureDetection.Tests.FeatureDetection.Common.Models.Features
 
         private class UnsupportedFeature : Feature
         {
+            public override FeatureCategory FeatureCategory => FeatureCategory.ProjectType;
+            public override string Description => "";
+            public override bool IsLinuxCompatible => false;
+
             public override bool IsPresent(AnalyzerResult analyzerResult)
             {
                 return false;

@@ -10,7 +10,8 @@
   </ItemGroup>
   
   <ItemGroup>
-    <PackageReference Include="Codelyzer.Analysis" Version="1.6.18-alpha-gb5c231484b" />
+    <PackageReference Include="Codelyzer.Analysis" Version="1.7.3-alpha-g5c12c344a9" />
+    <PackageReference Include="CsvHelper" Version="27.1.1" />
   </ItemGroup>
   
   <ItemGroup>    

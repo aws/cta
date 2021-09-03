@@ -3,11 +3,18 @@ using Codelyzer.Analysis;
 using Codelyzer.Analysis.Model;
 using CTA.FeatureDetection.Common.Extensions;
 using CTA.FeatureDetection.Common.Models.Features.Base;
+using CTA.FeatureDetection.Common.Reporting;
 
 namespace CTA.FeatureDetection.ProjectType.CompiledFeatures
 {
     public class AspNetCoreWebApiFeature : CompiledFeature
     {
+        public override FeatureCategory FeatureCategory => FeatureCategory.ProjectType;
+
+        public override string Description => "This project type is ASP.NET Core Web API.";
+
+        public override bool IsLinuxCompatible => true;
+
         /// <summary>
         /// Determines that a project is an ASP.NET Core WebAPi project if:
         ///     1) There are any classes derived from the ControllerBase abstract class

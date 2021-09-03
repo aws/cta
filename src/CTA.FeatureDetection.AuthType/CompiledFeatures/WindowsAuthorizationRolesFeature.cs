@@ -1,11 +1,18 @@
 ﻿using System.Linq;
 using Codelyzer.Analysis;
 using Codelyzer.Analysis.Model;
+using CTA.FeatureDetection.Common.Reporting;
 
 namespace CTA.FeatureDetection.AuthType.CompiledFeatures
 {
     public class WindowsAuthorizationRolesFeature : WindowsAuthorizationFeature
     {
+        public override FeatureCategory FeatureCategory => FeatureCategory.AuthType;
+
+        public override string Description => "This project uses Windows Authorization with Roles.";
+
+        public override bool IsLinuxCompatible => false;
+
         /// <summary>
         /// Determines if Windows Authorization Roles are being used in a given project based on
         /// Web.config settings and attributes used in code.

@@ -63,17 +63,35 @@ namespace CTA.FeatureDetection.Load.Loaders
                 {
                     if (configuredFeature.ConditionGroups != null && configuredFeature.ConditionGroups.Any())
                     {
-                        var loadedFeature = ConfiguredFeatureFactory.GetInstance(featureScope, configuredFeature.Name, configuredFeature.ConditionGroups);
+                        var loadedFeature = ConfiguredFeatureFactory.GetInstance(
+                            featureScope, 
+                            configuredFeature.Name, 
+                            configuredFeature.FeatureCategory,
+                            configuredFeature.Description,
+                            configuredFeature.IsLinuxCompatible,
+                            configuredFeature.ConditionGroups);
                         loadedConfiguredFeatures.Add(loadedFeature);
                     }
                     else if (configuredFeature.ConditionGroup != null)
                     {
-                        var loadedFeature = ConfiguredFeatureFactory.GetInstance(featureScope, configuredFeature.Name, configuredFeature.ConditionGroup);
+                        var loadedFeature = ConfiguredFeatureFactory.GetInstance(
+                            featureScope,
+                            configuredFeature.Name,
+                            configuredFeature.FeatureCategory,
+                            configuredFeature.Description,
+                            configuredFeature.IsLinuxCompatible, 
+                            configuredFeature.ConditionGroup);
                         loadedConfiguredFeatures.Add(loadedFeature);
                     }
                     else if (configuredFeature.Condition != null)
                     {
-                        var loadedFeature = ConfiguredFeatureFactory.GetInstance(featureScope, configuredFeature.Name, configuredFeature.Condition);
+                        var loadedFeature = ConfiguredFeatureFactory.GetInstance(
+                            featureScope,
+                            configuredFeature.Name,
+                            configuredFeature.FeatureCategory,
+                            configuredFeature.Description,
+                            configuredFeature.IsLinuxCompatible, 
+                            configuredFeature.Condition);
                         loadedConfiguredFeatures.Add(loadedFeature);
                     }
                 }
