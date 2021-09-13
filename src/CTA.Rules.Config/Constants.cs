@@ -98,6 +98,7 @@ namespace CTA.Rules.Config
         public const string Key = "key";
         public const string Value = "value";
         public const string ConnectionStrings = "ConnectionStrings";
+        public const string nginxConfig = "nginx.json";
 
         public static readonly List<string> SupportedMethodModifiers = new List<string>() { "public", "internal", "protected", "private", "abstract", "extern", "override", "static", "unsafe", "virtual", "async" };
 
@@ -111,7 +112,19 @@ namespace CTA.Rules.Config
             new List<string> {"mvc","appsettings.json"},
             new List<string> {"mvc","Program.cs"},
             new List<string> {"mvc","Startup.cs" },
-            new List<string> {"webclasslibrary","appsettings.json" }
+            new List<string> {"webclasslibrary","appsettings.json" },
+            new List<string> {"webapi","nginx.json"},
+            new List<string> {"mvc","nginx.json"},
         };
+
+        // nginx attributes needed for deployment
+        public static readonly Dictionary<string, List<string>> nginxBaseAttributes = new Dictionary<string, List<string>>()
+        {
+            {"proxy_pass", new List<string>{"http://127.0.0.1:5000;" } },
+            {"proxy_set_header", new List<string>{"Host $host", "X-Real-IP $remote_addr", "X-Forwarded-For $proxy_add_x_forwarded_for", "X-Forwarded-Proto $scheme"}},
+            {"client_max_body_size", new List<string>{ "10m" }}
+        };
+        
+
     }
 }

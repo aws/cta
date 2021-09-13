@@ -15,6 +15,13 @@ namespace CTA.Rules.PortCore
         {
             try
             {
+                args = new[]
+             {
+                     "-p", @"C:\Users\saakla\source\repos\TestMvcApplication\TestMvcApplication.sln",
+                     "-d", "true",
+                     "-m", "false",
+                     "-c", "true"
+                };
                 PortCoreRulesCli cli = new PortCoreRulesCli();
                 cli.HandleCommand(args);
                 Console.WriteLine(cli.FilePath);

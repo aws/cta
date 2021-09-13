@@ -31,6 +31,7 @@
     public enum FileTypeCreation
     {
         Startup,
-        Program
+        Program,
+        nginx
     }
 }

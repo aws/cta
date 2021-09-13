@@ -59,6 +59,9 @@
     <None Update="Templates\webclasslibrary\appsettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+	<None Update="Templates\mvc\nginx.conf">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	</None>  
   </ItemGroup>
 
 </Project>

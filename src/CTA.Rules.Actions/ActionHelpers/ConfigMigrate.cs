@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
 using System.Linq;
+using CTA.Rules.Actions.ActionHelpers;
 using CTA.Rules.Config;
 using CTA.Rules.Models;
 using Newtonsoft.Json;
@@ -45,8 +46,21 @@ namespace CTA.Rules.Actions
                 AddAppSettingsJsonFile(config, _projectDir);
             }
 
+            if (_projectType == ProjectType.Mvc || _projectType == ProjectType.CoreMvc || _projectType == ProjectType.WebApi || _projectType == ProjectType.CoreWebApi)
+            {
+                // add Nginx configuration
+                bool hasServerSettings = configXml.Sections["system.webServer"] != null;
+
+                if (hasServerSettings)
+                {
+                    NginxMigrate nginxMigrate = new NginxMigrate(_projectDir, _projectType);
+                    nginxMigrate.MigrateConfigToNginx(configXml);
+                }
+            }
+                
             return isConfigFound;
         }
+
         private Configuration LoadWebConfig(string projectDir)
         {
             string webConfigFile = Path.Combine(projectDir, Constants.WebConfig);
@@ -169,6 +183,9 @@ namespace CTA.Rules.Actions
             File.WriteAllText(Path.Combine(projectDir, Constants.AppSettingsJson), content.ToString());
             LogChange(string.Format("Create appsettings.json file using web.config settings"));
         }
+
+       
+
         private void LogChange(string message)
         {
             LogHelper.LogInformation(message);
