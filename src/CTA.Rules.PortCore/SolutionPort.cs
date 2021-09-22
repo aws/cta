@@ -239,7 +239,7 @@ namespace CTA.Rules.PortCore
 
         private void AddWCFReferences(ProjectType projectType, HashSet<string> allReferences)
         {
-            if (projectType == ProjectType.WCFCodeBasedService || projectType == ProjectType.WCFConfigBasedService)
+            if (projectType == ProjectType.WCFCodeBasedService || projectType == ProjectType.WCFConfigBasedService || projectType == ProjectType.WCFServiceLibrary)
             {
                 allReferences.UnionWith(WCFConstants.CoreWCFRules);
 
@@ -250,6 +250,10 @@ namespace CTA.Rules.PortCore
                 else if (projectType == ProjectType.WCFCodeBasedService)
                 {
                     allReferences.Add(WCFConstants.CoreWCFCodeBasedProjectRule);
+                }
+                else if (projectType == ProjectType.WCFServiceLibrary)
+                {
+                    allReferences.Add(WCFConstants.CoreWCFServiceLibraryProjectRule);
                 }
 
             }
@@ -412,7 +416,14 @@ namespace CTA.Rules.PortCore
             }
             else if (projectTypeFeatureResult.IsWCFServiceConfigBasedProject())
             {
-                return ProjectType.WCFConfigBasedService;
+                if(projectTypeFeatureResult.HasServiceHostReference())
+                {
+                    return ProjectType.WCFConfigBasedService;
+                }
+                else
+                {
+                    return ProjectType.WCFServiceLibrary;
+                }
             }
             else if (projectTypeFeatureResult.IsWCFServiceCodeBasedProject())
             {

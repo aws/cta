@@ -85,6 +85,7 @@ namespace CTA.FeatureDetection.ProjectType.Extensions
             return featureDetectionResult.FeatureStatus.GetValueOrDefault(Constants.WCFServiceConfigFeatureName, false);
         }
 
+
         /// <summary>
         /// Queries a FeatureDetectionResult object to determine if the project is a WCF Code based Service Project.
         /// </summary>
@@ -103,6 +104,18 @@ namespace CTA.FeatureDetection.ProjectType.Extensions
         public static bool IsWCFClientProject(this FeatureDetectionResult featureDetectionResult)
         {
             return featureDetectionResult.FeatureStatus.GetValueOrDefault(Constants.WCFClientFeatureName, false);
+        }
+
+        /// <summary>
+        /// 
+        /// Queries a FeatureDetectionResult object to determine if the project has a ServiceHost Reference, by checking
+        /// if project Type is WCFServiceHost.
+        /// </summary>
+        /// <param name="featureDetectionResult"></param>
+        /// <returns></returns>
+        public static bool HasServiceHostReference(this FeatureDetectionResult featureDetectionResult)
+        {
+            return featureDetectionResult.FeatureStatus.GetValueOrDefault(Constants.WCFServiceHostFeatureName, false);
         }
     }
 }

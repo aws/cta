@@ -29,7 +29,8 @@
         CoreMvc,
         WCFConfigBasedService,
         WCFCodeBasedService,
-        WCFClient
+        WCFClient,
+        WCFServiceLibrary
     }
     public enum FileTypeCreation
     {

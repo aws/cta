@@ -27,6 +27,7 @@
         public const string WCFServiceConfigFeatureName = "CoreWCFServiceConfigFeature";
         public const string WCFServiceCodeFeatureName = "CoreWCFServiceCodeFeature";
         public const string WCFClientFeatureName = "WCFClientFeature";
+        public const string WCFServiceHostFeatureName = "WCFServiceHostFeature";
 
         internal const string SystemServiceModelElement = "system.serviceModel";
         internal const string WCFClientElement = "client";
@@ -41,6 +42,8 @@
         internal const string ModeAttribute = "mode";
         internal const string ProtocolMappingAttribute = "protocolMapping";
         internal const string AddElement = "add";
+        internal const string ServiceHostClass = "ServiceHost";
+        internal const string SvcExtension = "svc";
 
         internal const string ConfigurationElement = "configuration";
         internal static readonly string WCFClientElementPath = $"{ConfigurationElement}/{SystemServiceModelElement}/{WCFClientElement}";

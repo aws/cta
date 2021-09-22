@@ -100,5 +100,23 @@ namespace CTA.FeatureDetection.Common.Extensions
         /// <returns></returns>
         public static IEnumerable<ObjectCreationExpression> GetObjectCreationExpressionBySemanticClassType(this ProjectWorkspace project, string semanticClassType)
             => project.SourceFileResults.SelectMany(r => r.AllObjectCreationExpressions().Where(o => o.SemanticClassType.Equals(semanticClassType)));
+
+        /// <summary>
+        /// Determines if the project contains a file with the given extension.
+        /// </summary>
+        /// <param name="project">ProjectWorkspace to search</param>
+        /// <param name="extension">Extension name to search for without '.'</param>
+        /// <param name="searchSubdirectories">Whether or not to search recursively through directories</param>
+        /// <returns>Whether or not a file with extesnion exists in the project directory</returns>
+        /// <returns></returns>
+        public static bool ContainsFileWithExtension(this ProjectWorkspace project, string extension,
+            bool searchSubdirectories = true)
+        {
+            var projectDirectory = project.ProjectRootPath;
+            var searchOption = searchSubdirectories ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
+            var searchPattern = string.Join(".", "*", extension);
+
+            return Directory.EnumerateFiles(projectDirectory, searchPattern, searchOption).Any();
+        }
     }
 }

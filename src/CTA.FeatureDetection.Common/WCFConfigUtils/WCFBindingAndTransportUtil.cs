@@ -56,6 +56,14 @@ namespace CTA.FeatureDetection.Common.WCFConfigUtils
             {
                 BindingTagCheck(appConfig, bindingsTransportMap);
             }
+            else if (webConfig.ContainsElement(Constants.WCFEndpointElementPath))
+            {
+                EndpointTagCheck(webConfig, bindingsTransportMap);
+            }
+            else if (appConfig.ContainsElement(Constants.WCFEndpointElementPath))
+            {
+                EndpointTagCheck(appConfig, bindingsTransportMap);
+            }
         }
 
         /// <summary>
@@ -80,7 +88,7 @@ namespace CTA.FeatureDetection.Common.WCFConfigUtils
 
                     if (modeList.IsNullOrEmpty())
                     {
-                        bindingsTransportMap.Add(bindingName, new BindingConfiguration());
+                        bindingsTransportMap[bindingName] = new BindingConfiguration();
                     }
 
                     foreach (var securityElement in modeList)
@@ -89,14 +97,31 @@ namespace CTA.FeatureDetection.Common.WCFConfigUtils
 
                         if (modeName != null)
                         {
-                            bindingsTransportMap.Add(bindingName, new BindingConfiguration
+                            bindingsTransportMap[bindingName] = new BindingConfiguration
                             {
                                 Mode = modeName.Value.ToLower()
-                            });
+                            };
                             break;
                         }
                     }
                 }
+            }
+        }
+
+        /// <summary>
+        /// Given XML Config with <endpoint> element check for binding.
+        /// </summary>
+        /// <param name="config">XML object for config</param>
+        /// <param name="bindingsTransportMap">Dictionary of binding and transport mode</param>
+        public static void EndpointTagCheck(WebConfigXDocument config, Dictionary<string, BindingConfiguration> bindingsTransportMap)
+        {
+            var endpointElement = config.GetElementByPath(Constants.WCFEndpointElementPath);
+
+            var binding = endpointElement.Attribute(Constants.BindingAttribute);
+
+            if (binding != null)
+            {
+                bindingsTransportMap[binding.Value.ToLower()] = new BindingConfiguration();
             }
         }
 
@@ -117,7 +142,7 @@ namespace CTA.FeatureDetection.Common.WCFConfigUtils
                 if (binding != null)
                 {
                     var bindingName = binding.Value.ToLower();
-                    bindingsTransportMap.Add(bindingName, new BindingConfiguration());
+                    bindingsTransportMap[bindingName] = new BindingConfiguration();
                 }
             }
         }
@@ -129,15 +154,15 @@ namespace CTA.FeatureDetection.Common.WCFConfigUtils
         /// <param name="bindingsTransportMap">Dictionary of binding and transport mode</param>
         public static void CodeBasedCheck(ProjectWorkspace project, Dictionary<string, BindingConfiguration> bindingsTransportMap)
         {
-            IEnumerable<InvocationExpression> addEnpointInvocations = project.GetInvocationExpressionsByMethodName(Constants.AddServiceEndpointType);
+            IEnumerable<InvocationExpression> addEndpointInvocations = project.GetInvocationExpressionsByMethodName(Constants.AddServiceEndpointType);
 
-            foreach (var addEnpointInvocation in addEnpointInvocations)
+            foreach (var addEndpointInvocation in addEndpointInvocations)
             {
-                var argumentCount = addEnpointInvocation.Arguments.Count();
+                var argumentCount = addEndpointInvocation.Arguments.Count();
 
                 if (argumentCount == 1)
                 {
-                    var endpointIdentifier = addEnpointInvocation.Arguments.First();
+                    var endpointIdentifier = addEndpointInvocation.Arguments.First();
 
                     IEnumerable<ObjectCreationExpression> serviceEndpointObjectExpressions = project.GetObjectCreationExpressionBySemanticClassType(Constants.ServiceEndpointClass);
 
@@ -151,17 +176,17 @@ namespace CTA.FeatureDetection.Common.WCFConfigUtils
                         var bindingName = binding.SemanticClassType;
                         var bindingNameFormatted = bindingName.ToString().ToLower();
 
-                        bindingsTransportMap.Add(bindingName, new BindingConfiguration
+                        bindingsTransportMap[bindingName] = new BindingConfiguration
                         {
                             Mode = GetModeFromObjectArguments(binding.Arguments),
-                            EndpointAddress = GetEndpointFromInvocationArguments(addEnpointInvocation.Arguments)
-                        });
+                            EndpointAddress = GetEndpointFromInvocationArguments(addEndpointInvocation.Arguments)
+                        };
                     }
                 }
 
-                var bindingArgument = addEnpointInvocation.Arguments.Where(a => a.SemanticType.ToLower().Contains("binding"));
+                var bindingArgument = addEndpointInvocation.Arguments.Where(a => a.SemanticType.ToLower().Contains("binding"));
 
-                var objectDeclarations = addEnpointInvocation.GetObjectCreationExpressionBySemanticNamespace(Constants.SystemServiceModelClass);
+                var objectDeclarations = addEndpointInvocation.GetObjectCreationExpressionBySemanticNamespace(Constants.SystemServiceModelClass);
 
                 ObjectCreationExpression objectCreationExpression;
 
@@ -179,7 +204,7 @@ namespace CTA.FeatureDetection.Common.WCFConfigUtils
                         }
                         else
                         {
-                            bindingsTransportMap.Add(bindingName, new BindingConfiguration());
+                            bindingsTransportMap[bindingName] = new BindingConfiguration();
                             return;
                         }
                     }
@@ -197,11 +222,11 @@ namespace CTA.FeatureDetection.Common.WCFConfigUtils
                 {
                     var bindingName = objectCreationExpression.SemanticClassType.ToLower();
 
-                    bindingsTransportMap.Add(bindingName, new BindingConfiguration
+                    bindingsTransportMap[bindingName] = new BindingConfiguration
                     {
                         Mode = GetModeFromObjectArguments(objectCreationExpression.Arguments),
-                        EndpointAddress = GetEndpointFromInvocationArguments(addEnpointInvocation.Arguments)
-                    });
+                        EndpointAddress = GetEndpointFromInvocationArguments(addEndpointInvocation.Arguments)
+                    };
                 }
             }
 
@@ -255,7 +280,7 @@ namespace CTA.FeatureDetection.Common.WCFConfigUtils
 
             foreach (var argument in arguments)
             {
-                if (argument.SemanticType.ToLower() == "string")
+                if (argument.SemanticType != null && argument.SemanticType.ToLower() == Constants.StringType)
                 {
                     endpointAddress = argument.Identifier;
                     break;

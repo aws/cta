@@ -26,6 +26,7 @@ namespace CTA.Rules.Update.WCF
 
         public const string CoreWCFConfigBasedProjectRule = "CoreWCF.ConfigurationBased.Project";
         public const string CoreWCFCodeBasedProjectRule = "CoreWCF.CodeBased.Project";
+        public const string CoreWCFServiceLibraryProjectRule = "CoreWCF.ServiceLibrary.Project";
 
         public const string WCFClientProjectRule = "WCF.Client";
 

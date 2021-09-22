@@ -37,7 +37,23 @@ namespace CTA.Rules.PortCore
         /// <returns>New Config File for CoreWCF</returns>
         public string GetNewConfigFile()
         {
-            var config = WebConfigManager.LoadWebConfigAsXDocument(_projectPath);
+            var webConfig = WebConfigManager.LoadWebConfigAsXDocument(_projectPath);
+            var appConfig = WebConfigManager.LoadAppConfigAsXDocument(_projectPath);
+
+            WebConfigXDocument config;
+
+            if (webConfig.ContainsElement(Constants.SystemServiceModelElement))
+            {
+                config = webConfig;
+            }
+            else if (appConfig.ContainsElement(Constants.SystemServiceModelElement))
+            {
+                config = appConfig;
+            }
+            else
+            {
+                return null;
+            }
 
             var wcfConfig = config.GetDescendantsAndSelf(Constants.SystemServiceModelElement);
 
@@ -67,7 +83,7 @@ namespace CTA.Rules.PortCore
         /// </summary>
         /// <param name="programTree">Syntax Tree for existing Program.cs Template</param>
         /// <returns>New root with updated Program.cs</returns>
-        public SyntaxNode replaceProgramFile(SyntaxTree programTree)
+        public SyntaxNode ReplaceProgramFile(SyntaxTree programTree)
         {
             Dictionary<string, int> transportPort = new Dictionary<string, int>();
             Dictionary<string, BindingConfiguration> bindingModeMap = new Dictionary<string, BindingConfiguration>();
@@ -92,7 +108,7 @@ namespace CTA.Rules.PortCore
 
             var containsTransportWithMessageMode = bindingModeMap.Any(b => b.Value.Mode.ToLower() == Constants.TransportMessageCredentialsMode.ToLower());
 
-            var newRoot = replaceProgramNode(transportPort, programTree, containsTransportWithMessageMode);
+            var newRoot = ReplaceProgramNode(transportPort, programTree, containsTransportWithMessageMode);
 
             return newRoot;
         }
@@ -104,7 +120,7 @@ namespace CTA.Rules.PortCore
         /// <param name="programTree">Existing Program.cs Template SyntaxTree</param>
         /// <param name="containsTransportWithMessageMode">Flag to check if any binding uses TransportWithMessage Mode</param>
         /// <returns>New root with updated Program.cs contents</returns>
-        public static SyntaxNode replaceProgramNode(Dictionary<string, int> transportPort, SyntaxTree programTree, bool containsTransportWithMessageMode)
+        public static SyntaxNode ReplaceProgramNode(Dictionary<string, int> transportPort, SyntaxTree programTree, bool containsTransportWithMessageMode)
         {
             string httpListen = Constants.ListenLocalHostFormat;
             string httpsListen = Constants.ListenHttpsFormat;
@@ -174,7 +190,7 @@ namespace CTA.Rules.PortCore
         /// </summary>
         /// <param name="startupFilePath">Path to existing Startup.cs template</param>
         /// <returns>New Startup.cs contents</returns>
-        public string replaceStartupFile(string startupFilePath)
+        public string ReplaceStartupFile(string startupFilePath)
         {
             var startupFileContents = File.ReadAllText(startupFilePath);
 
@@ -263,7 +279,7 @@ namespace CTA.Rules.PortCore
 
             foreach (var line in lines)
             {
-                newFileContents.Append(line + "\n");
+                newFileContents.AppendLine(line);
 
                 if (line.Contains(Constants.WCFConfigManagerAPI))
                 {

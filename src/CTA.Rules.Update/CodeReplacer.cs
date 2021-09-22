@@ -112,7 +112,7 @@ namespace CTA.Rules.Update
                 {
                     var programFileTree = CSharpSyntaxTree.ParseText(File.ReadAllText(programFile));
 
-                    var newRootNode = wcfServicePort.replaceProgramFile(programFileTree);
+                    var newRootNode = wcfServicePort.ReplaceProgramFile(programFileTree);
 
                     File.WriteAllText(programFile, newRootNode.ToFullString());
                 }
@@ -132,7 +132,10 @@ namespace CTA.Rules.Update
 
                     var newConfigPath = Path.Combine(projectDir, WCFConstants.PortedConfigFileName);
 
-                    File.WriteAllText(newConfigPath, newConfigFileText);
+                    if (newConfigFileText != null) 
+                    {
+                        File.WriteAllText(newConfigPath, newConfigFileText);
+                    }
                 }
             }
             catch (Exception e)
@@ -144,7 +147,7 @@ namespace CTA.Rules.Update
             {
                 if (File.Exists(startupFile))
                 {
-                    var newStartupFileText = wcfServicePort.replaceStartupFile(startupFile);
+                    var newStartupFileText = wcfServicePort.ReplaceStartupFile(startupFile);
 
                     File.WriteAllText(startupFile, newStartupFileText);
                 }

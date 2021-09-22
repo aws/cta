@@ -5,8 +5,9 @@ namespace CTA.FeatureDetection.Common.WCFConfigUtils
     {
         internal const string SystemServiceModelElement = "system.serviceModel";
         internal const string WCFClientElement = "client";
-        internal const string WCFServiceElement = "services";
-        internal const string WCFServiceEndpoint = "endpoint";
+        internal const string WCFServicesElement = "services";
+        internal const string WCFServicElement = "service";
+        internal const string WCFServiceEndpointElement = "endpoint";
         internal const string BindingElement = "element";
         internal const string ServiceContractAttribute = "ServiceContractAttribute";
         internal const string OperationContractAttribute = "OperationContractAttribute";
@@ -21,6 +22,7 @@ namespace CTA.FeatureDetection.Common.WCFConfigUtils
         internal const string EndpointAddressType = "EndpointAddress";
         internal const string SystemServiceModelClass = "System.ServiceModel";
         internal const string ServiceEndpointClass = "ServiceEndpoint";
+        internal const string StringType = "string";
 
         internal const string NetTcpBinding = "nettcpbinding";
         internal const string WSHttpBinding = "wshttpbinding";
@@ -43,9 +45,10 @@ namespace CTA.FeatureDetection.Common.WCFConfigUtils
 
         internal const string ConfigurationElement = "configuration";
         internal static readonly string WCFClientElementPath = $"{ConfigurationElement}/{SystemServiceModelElement}/{WCFClientElement}";
-        internal static readonly string WCFServiceElementPath = $"{ConfigurationElement}/{SystemServiceModelElement}/{WCFServiceElement}";
+        internal static readonly string WCFServiceElementPath = $"{ConfigurationElement}/{SystemServiceModelElement}/{WCFServicesElement}";
         internal static readonly string WCFServiceEndpointElementPath = $"{ConfigurationElement}/{SystemServiceModelElement}/{WCFServiceEndpointElementPath}";
         internal static readonly string WCFBindingElementPath = $"{ConfigurationElement}/{SystemServiceModelElement}/{BindingsAttribute}";
+        internal static readonly string WCFEndpointElementPath = $"{ConfigurationElement}/{SystemServiceModelElement}/{WCFServicesElement}/{WCFServicElement}/{WCFServiceEndpointElement}";
         internal static readonly string WCFProtocolMappingElement = $"{ConfigurationElement}/{SystemServiceModelElement}/{ProtocolMappingAttribute}";
     }
 }
