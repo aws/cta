@@ -1,3 +1,4 @@
+using System;
 using Codelyzer.Analysis;
 using CTA.Rules.Models;
 using CTA.Rules.PortCore;
@@ -163,7 +164,7 @@ namespace CTA.Rules.Test
 
             CodeAnalyzer analyzer = CodeAnalyzerFactory.GetAnalyzer(configuration, NullLogger.Instance);
             SolutionPort solutionPort = new SolutionPort(solutionPath);
-            
+
             var resultEnumerator = analyzer.AnalyzeSolutionGeneratorAsync(solutionPath).GetAsyncEnumerator();
 
             while (await resultEnumerator.MoveNextAsync())
@@ -263,8 +264,8 @@ namespace CTA.Rules.Test
             var solutionPath = CopySolutionFolderToTemp("MvcMusicStore.sln", tempDir);
             TestSolutionAnalysis results = AnalyzeSolution(solutionPath, version);
 
-            ValidateMvcMusicStore(results, version);            
-        }        
+            ValidateMvcMusicStore(results, version);
+        }
 
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.DotnetCoreApp31)]
@@ -311,7 +312,7 @@ namespace CTA.Rules.Test
             // After updating the Clone method to deep clone, we are seeing
             // 2 TextChange objects in each FileAction.NodeTokens.TextChanges
             // list, which is correct and expected.
-            var expectedNodeTokenTextChangesCounts = new Dictionary<string ,int>()
+            var expectedNodeTokenTextChangesCounts = new Dictionary<string, int>()
             {
                 ["Global.asax.cs"] = 2,
                 ["CheckoutController.cs"] = 2,
@@ -330,7 +331,7 @@ namespace CTA.Rules.Test
                 expected =>
                 {
                     Assert.AreEqual(
-                        expected.Value, 
+                        expected.Value,
                         fileActions.FirstOrDefault(
                             action => action.FilePath.Contains(expected.Key))
                         .NodeTokens.First().TextChanges.Count);
@@ -485,6 +486,26 @@ namespace CTA.Rules.Test
             StringAssert.Contains("TryUpdateModelAsync", homeController);
         }
 
+        [TestCase(TargetFramework.Dotnet5)]
+        public void TestMemoryUsageForMvcWebApiSolution(string version)
+        {
+            // This upper limit was chosen by taking the avg memory consumption of this
+            // this test over 10 executions, then increasing the limit by ~50%
+            var expectedUpperLimitMemoryUsageKb = 30000;
+
+            // Before the execution
+            GC.Collect();
+            var kbBeforeExecution = GC.GetTotalMemory(false) / 1024;
+
+            // Run analysis and porting
+            AnalyzeSolution("SampleMvcWebApp.sln", tempDir, downloadLocation, version);
+
+            // Calculate the memory difference
+            var kbAfterExecution = GC.GetTotalMemory(false) / 1024;
+            var kbDifference = kbAfterExecution - kbBeforeExecution;
+
+            Assert.LessOrEqual(kbDifference, expectedUpperLimitMemoryUsageKb);
+        }
 
         private void ValidateConfig(string controllerText)
         {
