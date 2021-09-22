@@ -14,7 +14,7 @@ using CTA.Rules.Models;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Constants = CTA.Rules.Config.Constants;
+using Constants = CTA.Rules.Update.WCF.Constants;
 
 namespace CTA.Rules.PortCore
 {
@@ -210,7 +210,7 @@ namespace CTA.Rules.PortCore
                 {
                     var binding = keyValuePair.Key;
                     var mode = keyValuePair.Value.Mode;
-                    var endpointAddress = keyValuePair.Value.EndpointAddress ?? String.Join("", "\\", binding.ToLower());
+                    var endpointAddress = keyValuePair.Value.EndpointAddress ?? String.Join("", "\\", "\"", binding.ToLower(), "\"");
 
                     if (binding == Constants.HttpProtocol)
                     {
@@ -298,15 +298,15 @@ namespace CTA.Rules.PortCore
             {
                 if (binding == Constants.HttpProtocol || binding == Constants.NethttpProtocol || binding == Constants.WSHttpProtocol)
                 {
-                    transportPortMap.Add(Constants.HttpProtocol, 8080);
+                    transportPortMap.Add(Constants.HttpProtocol, Constants.HttpDefaultPort);
                 }
                 else if (binding == Constants.HttpsProtocol)
                 {
-                    transportPortMap.Add(Constants.HttpsProtocol, 8888);
+                    transportPortMap.Add(Constants.HttpsProtocol, Constants.HttpsDefaultPort);
                 }
                 else if (binding == Constants.NettcpProtocol)
                 {
-                    transportPortMap.Add(Constants.NettcpProtocol, 8000);
+                    transportPortMap.Add(Constants.NettcpProtocol, Constants.NetTcpDefaultPort);
                 }
             }
         }

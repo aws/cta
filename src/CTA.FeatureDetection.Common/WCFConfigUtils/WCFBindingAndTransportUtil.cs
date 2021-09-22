@@ -45,13 +45,16 @@ namespace CTA.FeatureDetection.Common.WCFConfigUtils
         /// <param name="bindingsTransportMap">Dictionary of binding and transport mode</param>
         public static void ConfigBasedCheck(string projectDir, Dictionary<string, BindingConfiguration> bindingsTransportMap)
         {
-            var config = WebConfigManager.LoadWebConfigAsXDocument(projectDir);
+            var webConfig = WebConfigManager.LoadWebConfigAsXDocument(projectDir);
+            var appConfig = WebConfigManager.LoadAppConfigAsXDocument(projectDir);
 
-            var containsBindingElement = config.ContainsElement(Constants.WCFBindingElementPath);
-
-            if (containsBindingElement)
+            if (webConfig.ContainsElement(Constants.WCFBindingElementPath))
             {
-                BindingTagCheck(config, bindingsTransportMap);
+                BindingTagCheck(webConfig, bindingsTransportMap);
+            }
+            else if (appConfig.ContainsElement(Constants.WCFBindingElementPath))
+            {
+                BindingTagCheck(appConfig, bindingsTransportMap);
             }
         }
 
@@ -202,13 +205,16 @@ namespace CTA.FeatureDetection.Common.WCFConfigUtils
                 }
             }
 
-            var config = WebConfigManager.LoadWebConfigAsXDocument(project.ProjectRootPath);
+            var webConfig = WebConfigManager.LoadWebConfigAsXDocument(project.ProjectRootPath);
+            var appConfig = WebConfigManager.LoadAppConfigAsXDocument(project.ProjectRootPath);
 
-            var containsProtocolMappingElement = config.ContainsElement(Constants.WCFProtocolMappingElement);
-
-            if (containsProtocolMappingElement)
+            if (webConfig.ContainsElement(Constants.WCFProtocolMappingElement))
             {
-                ProtocolTagCheck(config, bindingsTransportMap);
+                ProtocolTagCheck(webConfig, bindingsTransportMap);
+            }
+            else if (appConfig.ContainsElement(Constants.WCFProtocolMappingElement))
+            {
+                ProtocolTagCheck(appConfig, bindingsTransportMap);
             }
         }
 

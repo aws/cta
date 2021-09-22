@@ -21,9 +21,17 @@ namespace CTA.FeatureDetection.ProjectType.CompiledFeatures
             string webConfigFile = Path.Combine(projectDir, Rules.Config.Constants.WebConfig);
             string appConfigFile = Path.Combine(projectDir, Rules.Config.Constants.AppConfig);
 
-            if (File.Exists(webConfigFile) || File.Exists(appConfigFile))
+            if (File.Exists(webConfigFile))
             {
                 var config = WebConfigManager.LoadWebConfigAsXDocument(projectDir);
+                if (config.ContainsElement(Constants.WCFClientElementPath))
+                {
+                    return true;
+                }
+            }
+            if (File.Exists(appConfigFile))
+            {
+                var config = WebConfigManager.LoadAppConfigAsXDocument(projectDir);
                 if (config.ContainsElement(Constants.WCFClientElementPath))
                 {
                     return true;

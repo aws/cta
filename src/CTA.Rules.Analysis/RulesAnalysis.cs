@@ -26,6 +26,20 @@ namespace CTA.Rules.Analyzer
         /// </summary>
         /// <param name="sourceFileResults">List of analyzed code files</param>
         /// <param name="rootNodes">List of rules to be applied to the code files</param>
+        public RulesAnalysis(List<RootUstNode> sourceFileResults, RootNodes rootNodes)
+        {
+            _projectActions = new ProjectActions();
+            _sourceFileResults = sourceFileResults;
+            _rootNodes = rootNodes;
+            _projectType = ProjectType.ClassLibrary;
+        }
+
+        /// <summary>
+        /// Initializes a RulesAnalysis instance
+        /// </summary>
+        /// <param name="sourceFileResults">List of analyzed code files</param>
+        /// <param name="rootNodes">List of rules to be applied to the code files</param>
+        /// <param name="projectType">Type of project</param>
         public RulesAnalysis(List<RootUstNode> sourceFileResults, RootNodes rootNodes, ProjectType projectType = ProjectType.ClassLibrary)
         {
             _projectActions = new ProjectActions();
@@ -33,6 +47,7 @@ namespace CTA.Rules.Analyzer
             _rootNodes = rootNodes;
             _projectType = projectType;
         }
+
         /// <summary>
         /// Runs the Rules Analysis
         /// </summary>

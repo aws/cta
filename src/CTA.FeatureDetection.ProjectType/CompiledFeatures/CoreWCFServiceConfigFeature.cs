@@ -38,9 +38,17 @@ namespace CTA.FeatureDetection.ProjectType.CompiledFeatures
             string appConfigFile = Path.Combine(projectDir, Rules.Config.Constants.AppConfig);
 
             // For Config based look for <services> element.
-            if (File.Exists(webConfigFile) || File.Exists(appConfigFile))
+            if (File.Exists(webConfigFile))
             {
                 var config = WebConfigManager.LoadWebConfigAsXDocument(projectDir);
+                if (config.ContainsElement(Constants.WCFServiceElementPath))
+                {
+                    return true;
+                }
+            }
+            if (File.Exists(appConfigFile))
+            {
+                var config = WebConfigManager.LoadAppConfigAsXDocument(projectDir);
                 if (config.ContainsElement(Constants.WCFServiceElementPath))
                 {
                     return true;

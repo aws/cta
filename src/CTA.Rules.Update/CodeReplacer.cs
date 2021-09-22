@@ -17,6 +17,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Text;
 using TextChange = CTA.Rules.Models.TextChange;
 using TextSpan = Codelyzer.Analysis.Model.TextSpan;
+using WCFConstants = CTA.Rules.Update.WCF.Constants;
 
 namespace CTA.Rules.Update
 {
@@ -105,31 +106,52 @@ namespace CTA.Rules.Update
 
             WCFServicePort wcfServicePort = new WCFServicePort(projectDir, _projectConfiguration.ProjectType, _analyzerResult);
 
-            if (File.Exists(programFile))
+            try
             {
-                var programFileTree = CSharpSyntaxTree.ParseText(File.ReadAllText(programFile));
+                if (File.Exists(programFile))
+                {
+                    var programFileTree = CSharpSyntaxTree.ParseText(File.ReadAllText(programFile));
 
-                var newRootNode = wcfServicePort.replaceProgramFile(programFileTree);
+                    var newRootNode = wcfServicePort.replaceProgramFile(programFileTree);
 
-                File.WriteAllText(programFile, newRootNode.ToFullString());
+                    File.WriteAllText(programFile, newRootNode.ToFullString());
+                }
+            }
+            catch (Exception e)
+            {
+                LogHelper.LogError("WCF Porting Error: Error while writing to Program.cs file: ", e.Message);
             }
 
             var startupFile = Path.Combine(projectDir, FileTypeCreation.Startup.ToString() + ".cs");
 
-            if(_projectConfiguration.ProjectType == ProjectType.WCFConfigBasedService)
+            try
             {
-                var newConfigFileText = wcfServicePort.GetNewConfigFile();
+                if (_projectConfiguration.ProjectType == ProjectType.WCFConfigBasedService)
+                {
+                    var newConfigFileText = wcfServicePort.GetNewConfigFile();
 
-                var newConfigPath = Path.Combine(projectDir, Constants.PortedConfigFileName);
+                    var newConfigPath = Path.Combine(projectDir, WCFConstants.PortedConfigFileName);
 
-                File.WriteAllText(newConfigPath, newConfigFileText);
+                    File.WriteAllText(newConfigPath, newConfigFileText);
+                }
+            }
+            catch (Exception e)
+            {
+                LogHelper.LogError("WCF Porting Error: Error while writing to Startup.cs file: ", e.Message);
             }
 
-            if (File.Exists(startupFile))
+            try
             {
-                var newStartupFileText = wcfServicePort.replaceStartupFile(startupFile);
+                if (File.Exists(startupFile))
+                {
+                    var newStartupFileText = wcfServicePort.replaceStartupFile(startupFile);
 
-                File.WriteAllText(startupFile, newStartupFileText);
+                    File.WriteAllText(startupFile, newStartupFileText);
+                }
+            }
+            catch (Exception e)
+            {
+                LogHelper.LogError("WCF Porting Error: Error while creating config file: ", e.Message);
             }
         }
 
