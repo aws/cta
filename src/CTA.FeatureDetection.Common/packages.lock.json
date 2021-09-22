@@ -2,18 +2,6 @@
   "version": 1,
   "dependencies": {
     ".NETCoreApp,Version=v3.1": {
-      "Codelyzer.Analysis": {
-        "type": "Direct",
-        "requested": "[1.6.8-alpha-g34252ac19a, )",
-        "resolved": "1.6.8-alpha-g34252ac19a",
-        "contentHash": "3VnrsQ5/xypMVDCbDHwgc2Xe7N+F9aCqwVJeS18jXaGpv/KZWFM41dfYtIQz4cUvJme44hQQfBE4PAqLaxxXGw==",
-        "dependencies": {
-          "Codelyzer.Analysis.Build": "1.6.8-alpha-g34252ac19a",
-          "Codelyzer.Analysis.CSharp": "1.6.8-alpha-g34252ac19a",
-          "CommandLineParser": "2.8.0",
-          "Microsoft.Extensions.Logging.Console": "5.0.0"
-        }
-      },
       "Microsoft.SourceLink.GitHub": {
         "type": "Direct",
         "requested": "[1.0.0, )",
@@ -1733,54 +1721,10 @@
           "System.Xml.ReaderWriter": "4.3.0"
         }
       },
-      "codelyzer.analysis": {
-        "type": "Project",
-        "dependencies": {
-          "Codelyzer.Analysis.Build": "1.0.0",
-          "Codelyzer.Analysis.CSharp": "1.0.0",
-          "CommandLineParser": "2.8.0",
-          "Microsoft.Extensions.Logging.Console": "5.0.0"
-        }
-      },
-      "codelyzer.analysis.build": {
-        "type": "Project",
-        "dependencies": {
-          "Buildalyzer": "3.2.2",
-          "Buildalyzer.Logger": "3.2.2",
-          "Buildalyzer.Workspaces": "3.2.2",
-          "Codelyzer.Analysis.CSharp": "1.0.0",
-          "Microsoft.Extensions.Logging": "5.0.0",
-          "NuGet.Packaging": "5.10.0"
-        }
-      },
-      "codelyzer.analysis.common": {
-        "type": "Project",
-        "dependencies": {
-          "Codelyzer.Analysis.Model": "1.0.0",
-          "Newtonsoft.Json": "13.0.1"
-        }
-      },
-      "codelyzer.analysis.csharp": {
-        "type": "Project",
-        "dependencies": {
-          "Codelyzer.Analysis.Common": "1.0.0",
-          "Codelyzer.Analysis.Model": "1.0.0"
-        }
-      },
-      "codelyzer.analysis.model": {
-        "type": "Project",
-        "dependencies": {
-          "Microsoft.CodeAnalysis": "3.11.0",
-          "Microsoft.CodeAnalysis.CSharp": "3.11.0",
-          "Microsoft.Extensions.Logging": "5.0.0",
-          "Newtonsoft.Json": "13.0.1"
-        }
-      },
       "cta.rules.common": {
         "type": "Project",
         "dependencies": {
           "CTA.Rules.Config": "1.0.0",
-          "Codelyzer.Analysis": "1.0.0",
           "System.Configuration.ConfigurationManager": "5.0.0"
         }
       },
