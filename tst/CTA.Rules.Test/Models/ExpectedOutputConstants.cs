@@ -10,6 +10,7 @@ namespace CTA.Rules.Test.Models
 @"/* Added by CTA: OAuth is now handled by using the public void ConfigureServices(IServiceCollection services) method in the Startup.cs class. The basic process is to use services.AddAuthentication(options => and then set a series of options. We can chain unto that the actual OAuth settings call services.AddOAuth(""Auth_Service_here_such_as_GitHub_Canvas..."", options =>. Also remember to add a call to IApplicationBuilder.UseAuthentication() in your public void Configure(IApplicationBuilder app, IHostingEnvironment env) method. Please ensure this call comes before setting up your routes. */
 using System.Threading.Tasks;
 using System;
+using Microsoft.Owin.Security.Infrastructure;
 using System.Security.Claims;
 using System.Collections.Generic;
 using System.Linq;
@@ -113,6 +114,15 @@ namespace AspNetRoutes
             redirectContext.HandleResponse();
             /* Added by CTA: Please replace BaseNotification with a class from the Microsoft.AspNetCore.Authentication.OpenIdConnect namespace. The MessageReceivedContext class is a good candidate. Its constructor takes the following parameters: new MessageReceivedContext(HttpContext, AuthenticationScheme, OpenIdConnectOptions, AuthenticationProperties); */
             baseNotif.HandleResponse();
+        }
+
+        public void OwinSecurityInfrastructure(AuthenticationTokenCreateContext create, AuthenticationTokenReceiveContext receive)
+        {
+            string serializedTicket = create.SerializeTicket();
+            create.SetToken("""");
+            receive.DeserializeTicket(serializedTicket);
+            SecurityHelper helper = new SecurityHelper();
+            helper.LookupChallenge(""Authentication_Type"", AuthenticationMode.Active);
         }
     }
 }";
