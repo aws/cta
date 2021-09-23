@@ -24,7 +24,8 @@ namespace CTA.Rules.Test.Actions
             _syntaxGenerator = SyntaxGenerator.GetGenerator(workspace, language);
             _compilationUnitActions = new CompilationUnitActions();
 
-            SyntaxTree tree = CSharpSyntaxTree.ParseText(@$"using System.Web;
+            SyntaxTree tree = CSharpSyntaxTree.ParseText(@$"using System.Web; 
+            using System.Web;
 class MyClass
 {{
 }}");
