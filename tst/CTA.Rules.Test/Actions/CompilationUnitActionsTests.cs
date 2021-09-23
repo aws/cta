@@ -25,7 +25,6 @@ namespace CTA.Rules.Test.Actions
             _compilationUnitActions = new CompilationUnitActions();
 
             SyntaxTree tree = CSharpSyntaxTree.ParseText(@$"using System.Web; 
-            using System.Web;
 class MyClass
 {{
 }}");
