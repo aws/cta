@@ -42,11 +42,11 @@ namespace CTA.Rules.PortCore
 
             WebConfigXDocument config;
 
-            if (webConfig.ContainsElement(Constants.SystemServiceModelElement))
+            if (webConfig.ContainsElement(Constants.SystemServiceModelElementPath))
             {
                 config = webConfig;
             }
-            else if (appConfig.ContainsElement(Constants.SystemServiceModelElement))
+            else if (appConfig.ContainsElement(Constants.SystemServiceModelElementPath))
             {
                 config = appConfig;
             }
@@ -106,9 +106,12 @@ namespace CTA.Rules.PortCore
                 return programTree.GetRoot();
             }
 
-            var containsTransportWithMessageMode = bindingModeMap.Any(b => b.Value.Mode.ToLower() == Constants.TransportMessageCredentialsMode.ToLower());
+            var containsTransportRelatedMode = 
+                bindingModeMap.Any(b => 
+                b.Value.Mode.ToLower() == Constants.TransportMessageCredentialsMode.ToLower() || 
+                b.Value.Mode.ToLower() == Constants.TransportMode.ToLower());
 
-            var newRoot = ReplaceProgramNode(transportPort, programTree, containsTransportWithMessageMode);
+            var newRoot = ReplaceProgramNode(transportPort, programTree, containsTransportRelatedMode);
 
             return newRoot;
         }
@@ -118,9 +121,9 @@ namespace CTA.Rules.PortCore
         /// </summary>
         /// <param name="transportPort">Map of Binding And Port</param>
         /// <param name="programTree">Existing Program.cs Template SyntaxTree</param>
-        /// <param name="containsTransportWithMessageMode">Flag to check if any binding uses TransportWithMessage Mode</param>
+        /// <param name="containsTransportRelatedMode">Flag to check if any binding uses TransportWithMessage Mode</param>
         /// <returns>New root with updated Program.cs contents</returns>
-        public static SyntaxNode ReplaceProgramNode(Dictionary<string, int> transportPort, SyntaxTree programTree, bool containsTransportWithMessageMode)
+        public static SyntaxNode ReplaceProgramNode(Dictionary<string, int> transportPort, SyntaxTree programTree, bool containsTransportRelatedMode)
         {
             string httpListen = Constants.ListenLocalHostFormat;
             string httpsListen = Constants.ListenHttpsFormat;
@@ -146,7 +149,7 @@ namespace CTA.Rules.PortCore
                 newBlock = block.AddStatements(SyntaxFactory.ParseStatement(httpListen));
             }
 
-            if (transportPort.ContainsKey(Constants.HttpsProtocol) || containsTransportWithMessageMode)
+            if (transportPort.ContainsKey(Constants.HttpsProtocol) || containsTransportRelatedMode)
             {
                 httpsListen = String.Format(httpsListen, parameter.Identifier.ValueText, transportPort.GetValueOrDefault(Constants.HttpsProtocol, 8888));
                 newBlock = newBlock.AddStatements(SyntaxFactory.ParseStatement(httpsListen));
@@ -226,28 +229,31 @@ namespace CTA.Rules.PortCore
                 {
                     var binding = keyValuePair.Key;
                     var mode = keyValuePair.Value.Mode;
-                    var endpointAddress = keyValuePair.Value.EndpointAddress ?? String.Join("", "\\", "\"", binding.ToLower(), "\"");
+                    var endpointAddress = keyValuePair.Value.EndpointAddress ?? String.Join("", "\"", "/", binding.ToLower(), "\"");
 
                     if (binding == Constants.HttpProtocol)
                     {
                         endpointConfigs += String.Format(endpointConfigTemplate, serviceClassName, serviceInterfaceName, 
-                            "new BasicHttpBinding(BasicHttpSecurityMode." + mode + ")", endpointAddress);
+                            mode == Constants.NoneMode ? "new BasicHttpBinding()" : "new BasicHttpBinding(BasicHttpSecurityMode." + mode + ")", endpointAddress);
                     }
                     else if(binding == Constants.NettcpProtocol)
                     {
-                        endpointConfigs += String.Format(endpointConfigTemplate, serviceClassName, serviceInterfaceName, "new NetTcpBinding(SecurityMode." + mode + ")", endpointAddress);
+                        endpointConfigs += String.Format(endpointConfigTemplate, serviceClassName, serviceInterfaceName,
+                            mode == Constants.NoneMode ? "new NetTcpBinding()" : "new NetTcpBinding(SecurityMode." + mode + ")", endpointAddress);
                     }
                     else if (binding == Constants.WSHttpProtocol)
                     {
-                        endpointConfigs += String.Format(endpointConfigTemplate, serviceClassName, serviceInterfaceName, "new WSHttpBinding(SecurityMode." + mode + ")", endpointAddress);
+                        endpointConfigs += String.Format(endpointConfigTemplate, serviceClassName, serviceInterfaceName,
+                            mode == Constants.NoneMode ? "new WSHttpBinding()" : "new WSHttpBinding(SecurityMode." + mode + ")", endpointAddress);
                     }
                     else if (binding == Constants.HttpsProtocol)
                     {
-                        endpointConfigs += String.Format(endpointConfigTemplate, serviceClassName, serviceInterfaceName, "new BasicHttpsBinding(BasicHttpsSecurityMode." + mode + ")", endpointAddress);
+                        endpointConfigs += String.Format(endpointConfigTemplate, serviceClassName, serviceInterfaceName, "new BasicHttpBinding(BasicHttpSecurityMode.Transport)", endpointAddress);
                     }
                     else if (binding == Constants.NethttpProtocol)
                     {
-                        endpointConfigs += String.Format(endpointConfigTemplate, serviceClassName, serviceInterfaceName, "new NetHttpBinding(BasicHttpSecurityMode." + mode + ")", endpointAddress);
+                        endpointConfigs += String.Format(endpointConfigTemplate, serviceClassName, serviceInterfaceName,
+                            mode == Constants.NoneMode ? "new NetHttpBinding()" : "new NetHttpBinding(BasicHttpSecurityMode." + mode + ")", endpointAddress);
                     }
                 }
 

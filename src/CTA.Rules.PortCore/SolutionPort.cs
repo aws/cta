@@ -227,39 +227,43 @@ namespace CTA.Rules.PortCore
                         }
                     });
                 }
-                AddWCFReferences(projectConfiguration.ProjectType, allReferences);
+                AddWCFReferences(projectConfiguration);
+                
+                projectConfiguration.AdditionalReferences.Add(Constants.ProjectRecommendationFile);
+
+                allReferences.UnionWith(projectConfiguration.AdditionalReferences);
             }
 
-            allReferences.Add(Constants.ProjectRecommendationFile);
             _portSolutionResult.References = allReferences.ToHashSet<string>();
 
             DownloadRecommendationFiles(allReferences);
 
         }
 
-        private void AddWCFReferences(ProjectType projectType, HashSet<string> allReferences)
+        private void AddWCFReferences(PortCoreConfiguration projectConfiguration)
         {
+            ProjectType projectType = projectConfiguration.ProjectType;
             if (projectType == ProjectType.WCFCodeBasedService || projectType == ProjectType.WCFConfigBasedService || projectType == ProjectType.WCFServiceLibrary)
             {
-                allReferences.UnionWith(WCFConstants.CoreWCFRules);
+                projectConfiguration.AdditionalReferences.AddRange(WCFConstants.CoreWCFRules);
 
                 if (projectType == ProjectType.WCFConfigBasedService)
                 {
-                    allReferences.Add(WCFConstants.CoreWCFConfigBasedProjectRule);
+                    projectConfiguration.AdditionalReferences.Add(WCFConstants.CoreWCFConfigBasedProjectRule);
                 }
                 else if (projectType == ProjectType.WCFCodeBasedService)
                 {
-                    allReferences.Add(WCFConstants.CoreWCFCodeBasedProjectRule);
+                    projectConfiguration.AdditionalReferences.Add(WCFConstants.CoreWCFCodeBasedProjectRule);
                 }
                 else if (projectType == ProjectType.WCFServiceLibrary)
                 {
-                    allReferences.Add(WCFConstants.CoreWCFServiceLibraryProjectRule);
+                    projectConfiguration.AdditionalReferences.Add(WCFConstants.CoreWCFServiceLibraryProjectRule);
                 }
 
             }
             if (projectType == ProjectType.WCFClient)
             {
-                allReferences.Add(WCFConstants.WCFClientProjectRule);
+                projectConfiguration.AdditionalReferences.Add(WCFConstants.WCFClientProjectRule);
             }
         }
 

@@ -41,7 +41,9 @@ namespace CTA.Rules.Update.WCF
         public const string ConfigurationElement = "configuration";
         public const string BehaviorsElement = "behaviors";
         public static readonly string BehaviorsPath = $"{ConfigurationElement}/{SystemServiceModelElement}/{BehaviorsElement}";
+        public static readonly string SystemServiceModelElementPath = $"{ConfigurationElement}/{SystemServiceModelElement}";
         public const string BindingAttribute = "binding";
+        public const string NoneMode = "None";
 
         public const string XMLPathPlaceholder = "#XMLPATH#";
 
@@ -58,6 +60,7 @@ namespace CTA.Rules.Update.WCF
         public const string NethttpProtocol = "nethttpbinding";
         public const string MexBinding = "mexHttpBinding";
         public const string TransportMessageCredentialsMode = "TransportWithMessageCredential";
+        public const string TransportMode = "Transport";
 
         public const int HttpDefaultPort = 8080;
         public const int HttpsDefaultPort = 8888;

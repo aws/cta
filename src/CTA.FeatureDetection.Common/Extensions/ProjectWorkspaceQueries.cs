@@ -99,7 +99,7 @@ namespace CTA.FeatureDetection.Common.Extensions
         /// <param name="semanticClassType">Semantic Class Type to search for</param>
         /// <returns></returns>
         public static IEnumerable<ObjectCreationExpression> GetObjectCreationExpressionBySemanticClassType(this ProjectWorkspace project, string semanticClassType)
-            => project.SourceFileResults.SelectMany(r => r.AllObjectCreationExpressions().Where(o => o.SemanticClassType.Equals(semanticClassType)));
+            => project.SourceFileResults.SelectMany(r => r.AllObjectCreationExpressions().Where(o => o.SemanticClassType == semanticClassType));
 
         /// <summary>
         /// Determines if the project contains a file with the given extension.

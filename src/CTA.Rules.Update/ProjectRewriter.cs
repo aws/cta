@@ -53,8 +53,8 @@ namespace CTA.Rules.Update
             _metaReferences = analyzerResult?.ProjectBuildResult?.Project?.MetadataReferences?.Select(m => m.Display).ToList()
                 ?? rulesEngineConfiguration.MetaReferences;
             RulesEngineConfiguration = rulesEngineConfiguration;
-
         }
+
         public ProjectRewriter(IDEProjectResult projectResult, ProjectConfiguration rulesEngineConfiguration)
         {
             _sourceFileResults = projectResult.RootNodes;
@@ -83,8 +83,9 @@ namespace CTA.Rules.Update
             ProjectActions projectActions = new ProjectActions();
             try
             {
-                var allReferences = _sourceFileResults?.SelectMany(s => s.References).Distinct();
+                var allReferences = _sourceFileResults?.SelectMany(s => s.References).Distinct().Union(RulesEngineConfiguration.AdditionalReferences.Select(r => new Reference{ Assembly = r, Namespace = r }));
                 RulesFileLoader rulesFileLoader = new RulesFileLoader(allReferences, RulesEngineConfiguration.RulesDir, RulesEngineConfiguration.TargetVersions, string.Empty, RulesEngineConfiguration.AssemblyDir);
+
                 var projectRules = rulesFileLoader.Load();
 
                 RulesAnalysis walker = new RulesAnalysis(_sourceFileResults, projectRules, RulesEngineConfiguration.ProjectType);
