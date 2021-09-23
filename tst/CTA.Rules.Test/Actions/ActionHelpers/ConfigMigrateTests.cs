@@ -165,5 +165,129 @@ namespace CTA.Rules.Test.Actions.ActionHelpers
 
             Assert.Null(doc);
         }
+
+        [Test]
+        public void MigrateServerConfig()
+        {
+            // Get private method to invoke
+            var projectType = ProjectType.Mvc;
+            ConfigMigrate configMigrateInstance = new ConfigMigrate(Directory.GetCurrentDirectory(), projectType);
+            Type configMigrateType = configMigrateInstance.GetType();
+
+
+            var loadWebConfigMethod = TestUtils.GetPrivateMethod(configMigrateType, "LoadWebConfig");
+            var portServerConfigMethod = TestUtils.GetPrivateMethod(configMigrateType, "PortServerConfig");
+
+            var webConfig = @"
+                    <configuration>
+                            <runtime>
+                                 <assemblyBinding xmlns=""urn:schemas-microsoft-com:asm.v1"">
+                                  <dependentAssembly>
+                                     <assemblyIdentity name=""System.Web.Mvc"" publicKeyToken=""31bf3856ad364e35""/>
+                                     <bindingRedirect oldVersion=""3.0.0.0-3.0.0.1"" newVersion=""3.0.0.1""/>
+                                   </dependentAssembly>
+                                 </assemblyBinding>
+                            </runtime>
+                            <system.webServer>
+                                <security>
+                                    <authentication>
+                                        <anonymousAuthentication enabled=""false"" />
+                                        <windowsAuthentication enabled = ""true"" />
+                                    </authentication>
+                                </security>
+                                 <modules>
+			                        <add name=""AppShutDownModule"" type=""TestMvcApplication.AppShutDownModule"" />
+		                        </modules>
+		                        <handlers>  
+			                        <add name=""AppShutDownHandler"" verb=""*"" path=""*.cshtml"" type=""TestMvcApplication.AppShutDownHandler"" />  
+		                        </handlers>
+                           </system.webServer>	
+                </configuration>";
+
+            var projectDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            File.WriteAllText(Path.Combine(projectDir, "web.config"), webConfig);
+            // create temp Startup.cs file
+            var file = Path.Combine(projectDir, "Startup.cs");
+            File.WriteAllText(file, GetstartupTestTemplate());
+
+            ServerConfigMigrate serverConfigMigrate = new ServerConfigMigrate(projectDir);
+
+            var configuration = (Configuration)loadWebConfigMethod.Invoke(configMigrateInstance, new object[] { projectDir });
+
+            // Invoke port server config method
+            portServerConfigMethod.Invoke(configMigrateInstance, new object[] { configuration, projectDir });
+
+            var programcsContent = File.ReadAllText(Path.Combine(projectDir, "Startup.cs"));
+            Assert.True(programcsContent.Contains("app.UseMiddleware<AppShutDownModule>();"));
+            Assert.True(programcsContent.Contains("appBranch.UseMiddleware<AppShutDownHandler>();"));
+            Assert.True(programcsContent.Contains("using Microsoft.AspNetCore.Authentication.Negotiate;"));
+
+            //clean up
+            File.Delete(Path.Combine(projectDir, "Startup.cs"));
+            File.Delete(Path.Combine(projectDir, "web.config"));
+
+        }
+
+        private string GetstartupTestTemplate()
+        {
+            return @"
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+namespace #NAMESPACEPLACEHOLDER#
+{
+    public class Startup
+    {
+        public Startup(IConfiguration configuration)
+        {
+            Configuration = configuration;
+            ConfigurationManager.Configuration = configuration;
+        }
+        public IConfiguration Configuration { get; }
+        // This method gets called by the runtime. Use this method to add services to the container.
+        public void ConfigureServices(IServiceCollection services)
+        {
+            services.AddControllersWithViews();
+            //Added Services
+        }
+        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        {
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
+            else
+            {
+                app.UseExceptionHandler(""/Home/Error"");
+                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+                app.UseHsts();
+        }
+            app.UseRouting();
+            app.UseAuthorization();
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllerRoute(
+                    name: ""default"",
+                    pattern: ""{controller=Home}/{action=Index}/{id?}"");
+            });
+        }
+    }
+    public class ConfigurationManager
+    {
+            public static IConfiguration Configuration { get; set; }
+    }
+    }
+";
+        }
     }
 }

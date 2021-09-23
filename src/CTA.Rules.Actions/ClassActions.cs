@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using CTA.Rules.Config;
 using Microsoft.CodeAnalysis;
@@ -258,6 +259,211 @@ namespace CTA.Rules.Actions
                 return node;
             }
             return AppendConstructorExpression;
+        }
+
+        public Func<SyntaxGenerator, ClassDeclarationSyntax, ClassDeclarationSyntax> GetCreateConstructorAction(string types, string identifiers)
+        {
+
+            ClassDeclarationSyntax CreateConstructor(SyntaxGenerator syntaxGenerator, ClassDeclarationSyntax node)
+            {
+                var constructorName = node.Identifier.Value.ToString();
+                if (!string.IsNullOrWhiteSpace(constructorName))
+                {
+                    var constructorNode = SyntaxFactory.ConstructorDeclaration(constructorName).AddBodyStatements().AddModifiers(SyntaxFactory.Token(SyntaxKind.PublicKeyword));
+
+                    // Add constructor parameters if provided
+                    if (!string.IsNullOrWhiteSpace(identifiers) && !string.IsNullOrWhiteSpace(types))
+                    {
+                        var identifiersArray = identifiers.Split(',', StringSplitOptions.RemoveEmptyEntries);
+                        var typesArray = types.Split(',', StringSplitOptions.RemoveEmptyEntries);
+
+                        if (identifiersArray.Length == typesArray.Length)
+                        {
+                            List<ParameterSyntax> parameters = new List<ParameterSyntax>();
+                            for (int i = 0; i < identifiersArray.Length; i++)
+                            {
+                                parameters.Add(SyntaxFactory.Parameter(SyntaxFactory.Identifier(identifiersArray[i])).WithType(SyntaxFactory.ParseTypeName(typesArray[i])));
+                            }
+                            constructorNode = constructorNode.AddParameterListParameters(parameters.ToArray());
+                        }
+
+                    };
+                    node = node.AddMembers(constructorNode).NormalizeWhitespace();
+                }
+                return node;
+            }
+            return CreateConstructor;
+        }
+
+        public Func<SyntaxGenerator, ClassDeclarationSyntax, ClassDeclarationSyntax> GetChangeMethodNameAction(string existingMethodName, string newMethodName)
+        {
+            ClassDeclarationSyntax ChangeMethodName(SyntaxGenerator syntaxGenerator, ClassDeclarationSyntax node)
+            {
+                // if we have more than one method with same name return with making changes
+                var methodNode = GetMethodNode(node, existingMethodName);
+                if (methodNode != null)
+                {
+                    var newMethodNode = methodNode;
+                    newMethodNode = newMethodNode.WithIdentifier(SyntaxFactory.Identifier(newMethodName)).NormalizeWhitespace();
+                    node = node.ReplaceNode(methodNode, newMethodNode);
+                }
+                return node;
+            }
+            return ChangeMethodName;
+        }
+
+        public Func<SyntaxGenerator, ClassDeclarationSyntax, ClassDeclarationSyntax> GetChangeMethodToReturnTaskTypeAction(string methodName)
+        {
+            ClassDeclarationSyntax ChangeMethodToReturnTaskType(SyntaxGenerator syntaxGenerator, ClassDeclarationSyntax node)
+            {
+                // if we have more than one method with same name return with making changes
+                var methodNode = GetMethodNode(node, methodName);
+                if (methodNode != null)
+                {
+                    TypeSyntax asyncReturnType;
+
+                    if (methodNode.ReturnType.ToFullString().Trim().Equals("void", StringComparison.OrdinalIgnoreCase))
+                    {
+                        asyncReturnType = SyntaxFactory.IdentifierName("Task").WithTrailingTrivia(SyntaxFactory.Space);
+                    }
+                    else
+                    {
+                        var currentTrivia = methodNode.ReturnType.GetTrailingTrivia();
+                        asyncReturnType = SyntaxFactory.GenericName(SyntaxFactory.Identifier("Task")).WithTypeArgumentList(SyntaxFactory.TypeArgumentList(SyntaxFactory.SingletonSeparatedList(methodNode.ReturnType.WithoutTrailingTrivia()))).WithTrailingTrivia(currentTrivia);
+                    }
+
+                    var newMethodNode = methodNode.WithReturnType(asyncReturnType);
+                    node = node.ReplaceNode(methodNode, newMethodNode);
+
+                }
+                return node;
+            }
+            return ChangeMethodToReturnTaskType;
+        }
+
+        public Func<SyntaxGenerator, ClassDeclarationSyntax, ClassDeclarationSyntax> GetRemoveMethodParametersAction(string methodName)
+        {
+            ClassDeclarationSyntax RemoveMethodParameters(SyntaxGenerator syntaxGenerator, ClassDeclarationSyntax node)
+            {
+                // if we have more than one method with same name return with making changes
+                var methodNode = GetMethodNode(node, methodName);
+                if (methodNode != null)
+                {
+                    List<ParameterSyntax> parameters = new List<ParameterSyntax>();
+                    var newMethodNode = methodNode.WithParameterList(SyntaxFactory.ParameterList(SyntaxFactory.SeparatedList(parameters))).NormalizeWhitespace();
+                    node = node.ReplaceNode(methodNode, newMethodNode);
+                }
+                return node;
+            }
+            return RemoveMethodParameters;
+        }
+
+        public Func<SyntaxGenerator, ClassDeclarationSyntax, ClassDeclarationSyntax> GetCommentMethodAction(string methodName, string comment = null)
+        {
+            ClassDeclarationSyntax CommentMethod(SyntaxGenerator syntaxGenerator, ClassDeclarationSyntax node)
+            {
+                // if we have more than one method with same name return with making changes
+                var methodNode = GetMethodNode(node, methodName);
+
+                if (methodNode != null)
+                {
+                    var startComment = SyntaxFactory.SyntaxTrivia(SyntaxKind.MultiLineCommentTrivia, "/*");
+                    var endComment = SyntaxFactory.SyntaxTrivia(SyntaxKind.MultiLineCommentTrivia, "*/");
+
+                    var newMethodNode = methodNode.WithLeadingTrivia(new SyntaxTriviaList(startComment)).WithTrailingTrivia(new SyntaxTriviaList(endComment));
+                    node = node.ReplaceNode(methodNode, newMethodNode);
+
+                    if (!string.IsNullOrWhiteSpace(comment))
+                    {
+                        var addCommentsToMethodFunc = GetAddCommentsToMethodAction(methodName, comment);
+                        return addCommentsToMethodFunc(syntaxGenerator, node);
+                    }
+                }
+                return node;
+            }
+            return CommentMethod;
+        }
+
+        public Func<SyntaxGenerator, ClassDeclarationSyntax, ClassDeclarationSyntax> GetAddCommentsToMethodAction(string methodName, string comment)
+        {
+            ClassDeclarationSyntax AddCommentsToMethod(SyntaxGenerator syntaxGenerator, ClassDeclarationSyntax node)
+            {
+                // if we have more than one method with same name return with making changes
+                var methodNode = GetMethodNode(node, methodName);
+                if (methodNode != null)
+                {
+                    if (!string.IsNullOrWhiteSpace(comment))
+                    {
+                        SyntaxTriviaList currentTrivia = methodNode.GetLeadingTrivia();
+                        currentTrivia = currentTrivia.Insert(0, SyntaxFactory.SyntaxTrivia(SyntaxKind.MultiLineCommentTrivia, string.Format(Constants.CommentFormat, comment)));
+                        var newMethodNode = methodNode.WithLeadingTrivia(currentTrivia).NormalizeWhitespace();
+                        node = node.ReplaceNode(methodNode, newMethodNode);
+                    }
+                }
+                return node;
+            }
+            return AddCommentsToMethod;
+        }
+
+        public Func<SyntaxGenerator, ClassDeclarationSyntax, ClassDeclarationSyntax> GetAddExpressionToMethodAction(string methodName, string expression)
+        {
+            ClassDeclarationSyntax AddExpressionToMethod(SyntaxGenerator syntaxGenerator, ClassDeclarationSyntax node)
+            {
+                // if we have more than one method with same name return with making changes
+                var methodNode = GetMethodNode(node, methodName);
+                if (methodNode != null)
+                {
+                    StatementSyntax parsedExpression = SyntaxFactory.ParseStatement(expression);
+                    if (!parsedExpression.FullSpan.IsEmpty)
+                    {
+                        var newMethodNode = methodNode.AddBodyStatements(new StatementSyntax[] { parsedExpression }).NormalizeWhitespace();
+                        node = node.ReplaceNode(methodNode, newMethodNode);
+                    }
+                }
+                return node;
+            }
+            return AddExpressionToMethod;
+        }
+
+        public Func<SyntaxGenerator, ClassDeclarationSyntax, ClassDeclarationSyntax> GetAddParametersToMethodAction(string methodName, string types, string identifiers)
+        {
+            ClassDeclarationSyntax AddParametersToMethod(SyntaxGenerator syntaxGenerator, ClassDeclarationSyntax node)
+            {
+                // if we have more than one method with same name return with making changes
+                var methodNode = GetMethodNode(node, methodName);
+                if (methodNode != null)
+                {
+                    if (!string.IsNullOrWhiteSpace(identifiers) && !string.IsNullOrWhiteSpace(types))
+                    {
+                        var identifiersArray = identifiers.Split(',', StringSplitOptions.RemoveEmptyEntries);
+                        var typesArray = types.Split(',', StringSplitOptions.RemoveEmptyEntries);
+
+                        if (identifiersArray.Length == typesArray.Length)
+                        {
+                            List<ParameterSyntax> parameters = new List<ParameterSyntax>();
+                            for (int i = 0; i < identifiersArray.Length; i++)
+                            {
+                                parameters.Add(SyntaxFactory.Parameter(SyntaxFactory.Identifier(identifiersArray[i])).WithType(SyntaxFactory.ParseTypeName(typesArray[i])));
+                            }
+                            var newMethodNode = methodNode.AddParameterListParameters(parameters.ToArray());
+                            node = node.ReplaceNode(methodNode, newMethodNode);
+                        }
+                    };
+                }
+                return node;
+            }
+            return AddParametersToMethod;
+        }
+
+
+        private MethodDeclarationSyntax GetMethodNode(ClassDeclarationSyntax node, string methodName)
+        {
+            var methodNodeList = node.DescendantNodes().OfType<MethodDeclarationSyntax>().Where(method => method.Identifier.Text == methodName);
+            if (methodNodeList != null && methodNodeList.Count() > 1)
+            {
+                return null;
+            }
+            return methodNodeList.FirstOrDefault();
         }
     }
 }
