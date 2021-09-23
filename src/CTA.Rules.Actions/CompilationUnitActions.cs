@@ -42,7 +42,7 @@ namespace CTA.Rules.Actions
 
                 allUsings = allUsings.Remove(removeItem);
                 
-                node = node.WithUsings(new SyntaxList<UsingDirectiveSyntax>(allUsings)).NormalizeWhitespace();
+                node = node.WithUsings(allUsings).NormalizeWhitespace();
                 return RemoveDirective(syntaxGenerator,node);
             }
             return RemoveDirective;
