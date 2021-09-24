@@ -32,15 +32,18 @@ namespace CTA.Rules.Actions
         {
             CompilationUnitSyntax RemoveDirective(SyntaxGenerator syntaxGenerator, CompilationUnitSyntax node)
             {
+                // remove duplicate directive references, don't use List based approach because
+                // since we will be replacing the node after each loop, it update text span which will not remove duplicate namespaces
                 var allUsings = node.Usings;
-                var removeList = allUsings.Where(u => @namespace == u.Name.ToString());
+                var removeItem = allUsings.FirstOrDefault(u => @namespace == u.Name.ToString());
 
-                foreach (var item in removeList)
-                {
-                    allUsings = allUsings.Remove(item);
-                }
+                if (removeItem == null)
+                    return node;
+
+                allUsings = allUsings.Remove(removeItem);
+                
                 node = node.WithUsings(allUsings).NormalizeWhitespace();
-                return node;
+                return RemoveDirective(syntaxGenerator,node);
             }
             return RemoveDirective;
         }
