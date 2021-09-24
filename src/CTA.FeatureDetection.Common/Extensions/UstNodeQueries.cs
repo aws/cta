@@ -120,7 +120,7 @@ namespace CTA.FeatureDetection.Common.Extensions
         /// <param name="interfaceName">Interface to query for</param>
         /// <returns>Whether or not a class inherits an interface</returns>
         public static bool InheritsInterface(this ClassDeclaration node, string interfaceName)
-            => node.Interfaces.Contains(interfaceName);
+            => node.BaseList.Any(b => b.Contains(interfaceName));
 
         /// <summary>
         /// Get all method declarations for a given node

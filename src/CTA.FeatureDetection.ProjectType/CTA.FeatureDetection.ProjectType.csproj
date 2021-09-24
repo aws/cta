@@ -6,7 +6,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CTA.FeatureDetection.Common\CTA.FeatureDetection.Common.csproj" />
-    <ProjectReference Include="..\CTA.Rules.Common\CTA.Rules.Common.csproj" />
   </ItemGroup>
 
   <ItemGroup>
