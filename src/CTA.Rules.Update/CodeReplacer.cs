@@ -136,6 +136,15 @@ namespace CTA.Rules.Update
                     {
                         File.WriteAllText(newConfigPath, newConfigFileText);
                     }
+
+                    var configFilePath = wcfServicePort.GetConfigFilePath();
+
+                    string backupFile = string.Concat(configFilePath, ".bak");
+                    if (File.Exists(backupFile))
+                    {
+                        File.Delete(backupFile);
+                    }
+                    File.Move(configFilePath, backupFile);
                 }
             }
             catch (Exception e)

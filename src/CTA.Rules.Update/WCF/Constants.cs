@@ -62,6 +62,9 @@ namespace CTA.Rules.Update.WCF
         public const string TransportMessageCredentialsMode = "TransportWithMessageCredential";
         public const string TransportMode = "Transport";
 
+        public const string AppConfig = "App.config";
+        public const string WebConfig = "web.config";
+
         public const int HttpDefaultPort = 8080;
         public const int HttpsDefaultPort = 8888;
         public const int NetTcpDefaultPort = 8000;

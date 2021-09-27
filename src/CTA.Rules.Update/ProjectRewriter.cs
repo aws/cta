@@ -83,7 +83,9 @@ namespace CTA.Rules.Update
             ProjectActions projectActions = new ProjectActions();
             try
             {
-                var allReferences = _sourceFileResults?.SelectMany(s => s.References).Distinct().Union(RulesEngineConfiguration.AdditionalReferences.Select(r => new Reference{ Assembly = r, Namespace = r }));
+                var allReferences = _sourceFileResults?.SelectMany(s => s.References)
+                        .Union(_sourceFileResults.SelectMany(s => s.Children.OfType<UsingDirective>())?.Select(u => new Reference() { Namespace = u.Identifier, Assembly = u.Identifier }).Distinct())
+                        .Union(RulesEngineConfiguration.AdditionalReferences.Select(r => new Reference { Assembly = r, Namespace = r }));
                 RulesFileLoader rulesFileLoader = new RulesFileLoader(allReferences, RulesEngineConfiguration.RulesDir, RulesEngineConfiguration.TargetVersions, string.Empty, RulesEngineConfiguration.AssemblyDir);
 
                 var projectRules = rulesFileLoader.Load();

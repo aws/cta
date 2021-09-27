@@ -79,6 +79,29 @@ namespace CTA.Rules.PortCore
         }
 
         /// <summary>
+        /// Get Config File Path for the Project.
+        /// </summary>
+        /// <returns>Config File Path</returns>
+        public string GetConfigFilePath()
+        {
+            var webConfig = WebConfigManager.LoadWebConfigAsXDocument(_projectPath);
+            var appConfig = WebConfigManager.LoadAppConfigAsXDocument(_projectPath);
+
+            if (webConfig.ContainsElement(Constants.SystemServiceModelElementPath))
+            {
+                return Path.Combine(_projectPath, Constants.WebConfig);
+            }
+            else if (appConfig.ContainsElement(Constants.SystemServiceModelElementPath))
+            {
+                return Path.Combine(_projectPath, Constants.AppConfig);
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
         /// Given existing template Program.cs Syntax Tree, Add configurations and generate new Syntax Tree.
         /// </summary>
         /// <param name="programTree">Syntax Tree for existing Program.cs Template</param>
