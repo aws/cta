@@ -233,6 +233,15 @@ namespace CTA.FeatureDetection.Common.WCFConfigUtils
             var webConfig = WebConfigManager.LoadWebConfigAsXDocument(project.ProjectRootPath);
             var appConfig = WebConfigManager.LoadAppConfigAsXDocument(project.ProjectRootPath);
 
+            if (webConfig.ContainsElement(Constants.WCFBindingElementPath))
+            {
+                BindingTagCheck(webConfig, bindingsTransportMap);
+            }
+            else if (appConfig.ContainsElement(Constants.WCFBindingElementPath))
+            {
+                BindingTagCheck(appConfig, bindingsTransportMap);
+            }
+
             if (webConfig.ContainsElement(Constants.WCFProtocolMappingElement))
             {
                 ProtocolTagCheck(webConfig, bindingsTransportMap);
