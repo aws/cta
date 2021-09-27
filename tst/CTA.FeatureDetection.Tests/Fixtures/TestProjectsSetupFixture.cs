@@ -25,6 +25,9 @@ namespace CTA.FeatureDetection.Tests
         private static readonly string _windowsAuthenticationDir = "WindowsAuthentication";
         private static readonly string _formsAuthenticationDir = "FormsAuthentication";
         private static readonly string _federatedAuthenticationDir = "FederatedAuthentication";
+        private static readonly string _wcfDir = "WCF";
+        private static readonly string _wcfConfigBasedProjectDir = "WCFConfigBasedProject";
+        private static readonly string _wcfCodeBasedProjectDir = "WCFCodeBasedProject";
         private static readonly string TestProjectDirectory = TestUtils.GetTestAssemblySourceDirectory(typeof(TestUtils));
         public static string ConfigFile => Path.Combine(TestProjectDirectory, "Examples", "Templates", "feature_config.json");
 
@@ -37,6 +40,8 @@ namespace CTA.FeatureDetection.Tests
         public static string WindowsAuthenticationSolutionName => "WindowsAuthentication.sln";
         public static string FormsAuthenticationSolutionName => "FormsAuthentication.sln";
         public static string FederatedAuthenticationSolutionName => "FederatedAuthentication.sln";
+        public static string CoreWCFServiceSolutionName => "WCFServer.sln";
+        public static string WCFClientSolutionName => "WCFClient.sln";
         public static string CoreMvcSolutionPath => Path.Combine(_targetDir, _coreMvcDir, CoreMvcSolutionName);
         public static string CoreWebApiSolutionPath => Path.Combine(_targetDir, _coreWebApiDir, CoreWebApiSolutionName);
         public static string EfSolutionPath => Path.Combine(_targetDir, _efDir, EfSolutionName);
@@ -46,6 +51,8 @@ namespace CTA.FeatureDetection.Tests
         public static string WindowsAuthenticationSolutionPath => Path.Combine(_targetDir, _windowsAuthenticationDir, WindowsAuthenticationSolutionName);
         public static string FormsAuthenticationSolutionPath => Path.Combine(_targetDir, _formsAuthenticationDir, FormsAuthenticationSolutionName);
         public static string FederatedAuthenticationSolutionPath => Path.Combine(_targetDir, _federatedAuthenticationDir, FederatedAuthenticationSolutionName);
+        public static string CoreWCFServiceSolutionPath => Path.Combine(_targetDir, _wcfDir, CoreWCFServiceSolutionName);
+        public static string WCFClientSolutionPath => Path.Combine(_targetDir, _wcfDir, WCFClientSolutionName);
         public static string CoreMvcProjectPath => Path.Combine(_targetDir, _coreMvcDir, "CoreMVC", "CoreMVC.csproj");
         public static string CoreWebApiProjectPath => Path.Combine(_targetDir, _coreWebApiDir, "CoreWebApi", "CoreWebApi.csproj");
         public static string Ef6ProjectPath => Path.Combine(_targetDir, _efDir, "EF6_Test", "EF6_Test.csproj");
@@ -55,6 +62,9 @@ namespace CTA.FeatureDetection.Tests
         public static string WindowsAuthenticationProjectPath => Path.Combine(_targetDir, _windowsAuthenticationDir, "WindowsAuthentication", "WindowsAuthentication.csproj");
         public static string FormsAuthenticationProjectPath => Path.Combine(_targetDir, _formsAuthenticationDir, _formsAuthenticationDir, "FormsAuthentication.csproj");
         public static string FederatedAuthenticationProjectPath => Path.Combine(_targetDir, _federatedAuthenticationDir, _federatedAuthenticationDir, "FederatedAuthentication.csproj");
+        public static string CoreWCFServiceConfigProjectPath => Path.Combine(_targetDir, _wcfDir, _wcfConfigBasedProjectDir, "WCFConfigBasedProject.csproj");
+        public static string CoreWCFServiceCodeProjectPath => Path.Combine(_targetDir, _wcfDir, _wcfCodeBasedProjectDir, "WCFCodeBasedProject.csproj");
+        public static string WCFClientProjectPath => Path.Combine(_targetDir, _wcfDir, "WCFClient.csproj");
         public static IEnumerable<AnalyzerResult> CoreMvcAnalyzerResults { get; private set; }
         public static IEnumerable<AnalyzerResult> CoreWebApiAnalyzerResults { get; private set; }
         public static IEnumerable<AnalyzerResult> EfAnalyzerResults { get; private set; }
@@ -64,6 +74,8 @@ namespace CTA.FeatureDetection.Tests
         public static IEnumerable<AnalyzerResult> WindowsAuthenticationAnalyzerResults { get; private set; }
         public static IEnumerable<AnalyzerResult> FormsAuthenticationAnalyzerResults { get; private set; }
         public static IEnumerable<AnalyzerResult> FederatedAuthenticationAnalyzerResults { get; private set; }
+        public static IEnumerable<AnalyzerResult> CoreWCFServiceAnalyzerResults { get; private set; }
+        public static IEnumerable<AnalyzerResult> WCFClientAnalyzerResults { get; private set; }
         public static FeatureDetector FeatureDetector { get; private set; }
         public static FeatureDetectionResult CoreMvcFeatureDetectionResult { get; private set; }
         public static FeatureDetectionResult CoreWebApiFeatureDetectionResult { get; private set; }
@@ -74,6 +86,9 @@ namespace CTA.FeatureDetection.Tests
         public static FeatureDetectionResult WindowsAuthenticationFeatureDetectionResult { get; private set; }
         public static FeatureDetectionResult FormsAuthenticationFeatureDetectionResult { get; private set; }
         public static FeatureDetectionResult FederatedAuthenticationFeatureDetectionResult { get; private set; }
+        public static FeatureDetectionResult CoreWCFServiceConfigFeatureDetectionResult { get; private set; }
+        public static FeatureDetectionResult CoreWCFServiceCodeFeatureDetectionResult { get; private set; }
+        public static FeatureDetectionResult WCFClientFeatureDetectionResult { get; private set; }
 
         [OneTimeSetUp]
         public void DownloadTestProjects()
@@ -95,6 +110,8 @@ namespace CTA.FeatureDetection.Tests
             var tempWindowsAuthenticationSolutionDir = GetSolutionDir(tempDownloadDir, WindowsAuthenticationSolutionName);
             var tempFormsAuthenticationSolutionDir = GetSolutionDir(tempDownloadDir, FormsAuthenticationSolutionName);
             var tempFederatedAuthenticationSolutionDir = GetSolutionDir(tempDownloadDir, FederatedAuthenticationSolutionName);
+            var tempCoreWCFServiceSolutionDir = GetSolutionDir(tempDownloadDir, CoreWCFServiceSolutionName);
+            var tempWCFClientSolutionDir = GetSolutionDir(tempDownloadDir, WCFClientSolutionName);
 
             // Copy solutions to a directory with a shorter path
             var destDir = "dest";
@@ -108,6 +125,8 @@ namespace CTA.FeatureDetection.Tests
             TestUtils.CopyDirectory(tempWindowsAuthenticationSolutionDir, new DirectoryInfo(Path.Combine(_targetDir, _windowsAuthenticationDir)));
             TestUtils.CopyDirectory(tempFormsAuthenticationSolutionDir, new DirectoryInfo(Path.Combine(_targetDir, _formsAuthenticationDir)));
             TestUtils.CopyDirectory(tempFederatedAuthenticationSolutionDir, new DirectoryInfo(Path.Combine(_targetDir, _federatedAuthenticationDir)));
+            TestUtils.CopyDirectory(tempCoreWCFServiceSolutionDir, new DirectoryInfo(Path.Combine(_targetDir, _wcfDir)));
+            TestUtils.CopyDirectory(tempWCFClientSolutionDir, new DirectoryInfo(Path.Combine(_targetDir, _wcfDir)));
 
             // Run source code analysis
             CoreMvcAnalyzerResults = AnalyzerResultsFactory.GetAnalyzerResults(CoreMvcSolutionPath);
@@ -119,6 +138,8 @@ namespace CTA.FeatureDetection.Tests
             WindowsAuthenticationAnalyzerResults = AnalyzerResultsFactory.GetAnalyzerResults(WindowsAuthenticationSolutionPath);
             FormsAuthenticationAnalyzerResults = AnalyzerResultsFactory.GetAnalyzerResults(FormsAuthenticationSolutionPath);
             FederatedAuthenticationAnalyzerResults = AnalyzerResultsFactory.GetAnalyzerResults(FederatedAuthenticationSolutionPath);
+            CoreWCFServiceAnalyzerResults = AnalyzerResultsFactory.GetAnalyzerResults(CoreWCFServiceSolutionPath);
+            WCFClientAnalyzerResults = AnalyzerResultsFactory.GetAnalyzerResults(WCFClientSolutionPath);
 
             // Detect features in each solution
             FeatureDetector = new FeatureDetector(ConfigFile);
@@ -131,6 +152,9 @@ namespace CTA.FeatureDetection.Tests
             WindowsAuthenticationFeatureDetectionResult = FeatureDetector.DetectFeaturesInProjects(WindowsAuthenticationAnalyzerResults)[WindowsAuthenticationProjectPath];
             FormsAuthenticationFeatureDetectionResult = FeatureDetector.DetectFeaturesInProjects(FormsAuthenticationAnalyzerResults)[FormsAuthenticationProjectPath];
             FederatedAuthenticationFeatureDetectionResult = FeatureDetector.DetectFeaturesInProjects(FederatedAuthenticationAnalyzerResults)[FederatedAuthenticationProjectPath];
+            CoreWCFServiceConfigFeatureDetectionResult = FeatureDetector.DetectFeaturesInProjects(CoreWCFServiceAnalyzerResults)[CoreWCFServiceConfigProjectPath];
+            CoreWCFServiceCodeFeatureDetectionResult = FeatureDetector.DetectFeaturesInProjects(CoreWCFServiceAnalyzerResults)[CoreWCFServiceCodeProjectPath];
+            WCFClientFeatureDetectionResult = FeatureDetector.DetectFeaturesInProjects(WCFClientAnalyzerResults)[WCFClientProjectPath];
         }
 
         [OneTimeTearDown]
