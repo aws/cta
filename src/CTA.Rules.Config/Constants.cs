@@ -34,7 +34,9 @@ namespace CTA.Rules.Config
         public const string S3RootUrl = "https://s3.us-west-2.amazonaws.com/aws.portingassistant.dotnet.datastore";
         public const string S3RecommendationsBucketUrl = S3RootUrl + "/recommendationsync/recommendation";
         public const string S3TemplatesBucketUrl = S3RootUrl + "/recommendationsync/Templates";
-        
+        public const string S3BetaRecommendationsBucketUrl = S3RootUrl + "/beta/recommendationsync/recommendation";
+        public const string S3BetaTemplatesBucketUrl = S3RootUrl + "/beta/recommendationsync/Templates";
+
 
         public const int ThreadCount = 10;
         public const int MaxRecursionDepth = 100000;
