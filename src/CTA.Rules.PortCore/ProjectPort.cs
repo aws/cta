@@ -79,6 +79,7 @@ namespace CTA.Rules.PortCore
                         ProjectReferences.Add(currentReference);
                     }
                 });
+                ProjectReferences.Add(Constants.ProjectRecommendationFile);
             }
 
             _solutionPort.DownloadRecommendationFiles(ProjectReferences);

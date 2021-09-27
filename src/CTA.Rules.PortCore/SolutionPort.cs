@@ -133,6 +133,7 @@ namespace CTA.Rules.PortCore
         public ProjectResult RunProject(AnalyzerResult analyzerResult, PortCoreConfiguration portCoreConfiguration)
         {
             var projectPort = new ProjectPort(analyzerResult, portCoreConfiguration, this);
+            portCoreConfiguration.AdditionalReferences.Add(Constants.ProjectRecommendationFile);
             var projectAnalysisResult = projectPort.AnalysisRun();
             var projectResult = projectPort.Run();
             _portSolutionResult.References.UnionWith(projectPort.ProjectReferences);
