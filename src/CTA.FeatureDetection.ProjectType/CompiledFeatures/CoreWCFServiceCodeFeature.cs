@@ -7,7 +7,7 @@ using CTA.FeatureDetection.Common.WCFConfigUtils;
 
 namespace CTA.FeatureDetection.ProjectType.CompiledFeatures
 {
-    class CoreWCFServiceCodeFeature : CompiledFeature
+    public class CoreWCFServiceCodeFeature : CompiledFeature
     {
         /// <summary>
         /// Determines if a project is a CoreWCF Compatible Code based Service based on the following :-

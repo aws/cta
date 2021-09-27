@@ -5,7 +5,7 @@ using CTA.Rules.Common.WebConfigManagement;
 
 namespace CTA.FeatureDetection.ProjectType.CompiledFeatures
 {
-    class WCFClientFeature : WebConfigFeature
+    public class WCFClientFeature : WebConfigFeature
     {
         /// <summary>
         /// Determines if a project is a WCF Client Project based on the following :-

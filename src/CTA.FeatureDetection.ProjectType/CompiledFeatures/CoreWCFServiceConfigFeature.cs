@@ -8,7 +8,7 @@ using CTA.Rules.Common.WebConfigManagement;
 
 namespace CTA.FeatureDetection.ProjectType.CompiledFeatures
 {
-    class CoreWCFServiceConfigFeature : WebConfigFeature
+    public class CoreWCFServiceConfigFeature : WebConfigFeature
     {
         /// <summary>
         /// Determines if a project is a CoreWCF Compatible Config based Service based on the following :-

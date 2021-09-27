@@ -4,7 +4,7 @@ using CTA.FeatureDetection.Common.Models.Features.Base;
 
 namespace CTA.FeatureDetection.ProjectType.CompiledFeatures
 {
-    class WCFServiceHostFeature : CompiledFeature
+    public class WCFServiceHostFeature : CompiledFeature
     {
         /// <summary>
         /// Determines if a project has ServiceHost References.
