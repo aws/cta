@@ -126,6 +126,20 @@ namespace CTA.Rules.Update
 
             try
             {
+                if (File.Exists(startupFile))
+                {
+                    var newStartupFileText = wcfServicePort.ReplaceStartupFile(startupFile);
+
+                    File.WriteAllText(startupFile, newStartupFileText);
+                }
+            }
+            catch (Exception e)
+            {
+                LogHelper.LogError("WCF Porting Error: Error while writing to Startup file: ", e.Message);
+            }
+
+            try
+            {
                 if (_projectConfiguration.ProjectType == ProjectType.WCFConfigBasedService)
                 {
                     var newConfigFileText = wcfServicePort.GetNewConfigFile();
@@ -145,20 +159,6 @@ namespace CTA.Rules.Update
                         File.Delete(backupFile);
                     }
                     File.Move(configFilePath, backupFile);
-                }
-            }
-            catch (Exception e)
-            {
-                LogHelper.LogError("WCF Porting Error: Error while writing to Startup.cs file: ", e.Message);
-            }
-
-            try
-            {
-                if (File.Exists(startupFile))
-                {
-                    var newStartupFileText = wcfServicePort.ReplaceStartupFile(startupFile);
-
-                    File.WriteAllText(startupFile, newStartupFileText);
                 }
             }
             catch (Exception e)
