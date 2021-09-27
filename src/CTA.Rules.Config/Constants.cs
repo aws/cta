@@ -91,6 +91,7 @@ namespace CTA.Rules.Config
         //Config migration
         public const string AppSettingsJson = "appsettings.json";
         public const string AppSettings = "appsettings";
+        public const string AppConfig = "App.config";
         public const string WebConfig = "web.config";
         public const string Name = "name";
         public const string ConnectionstringsLower = "connectionstrings";
@@ -111,7 +112,11 @@ namespace CTA.Rules.Config
             new List<string> {"mvc","appsettings.json"},
             new List<string> {"mvc","Program.cs"},
             new List<string> {"mvc","Startup.cs" },
-            new List<string> {"webclasslibrary","appsettings.json" }
+            new List<string> {"webclasslibrary","appsettings.json" },
+            new List<string> { "wcfcodebasedservice", "Program.cs"},
+            new List<string> { "wcfcodebasedservice", "Startup.cs"},
+            new List<string> { "wcfconfigbasedservice", "Program.cs"},
+            new List<string> { "wcfconfigbasedservice", "Startup.cs"}
         };
     }
 }

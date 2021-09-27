@@ -49,16 +49,6 @@ namespace CTA.FeatureDetection.Common.Extensions
             => project.SourceFileResults.SelectMany(r => r.AllClasses());
 
         /// <summary>
-        /// Gets all class declaration nodes in a ProjectWorkspace derived from a specified base type
-        /// </summary>
-        /// <param name="project">ProjectWorkspace to search</param>
-        /// <param name="baseTypeOriginalDefinition">ProjectWorkspace to search</param>
-        /// <returns>Collection of class declaration nodes in the project with the specified base type</returns>
-        public static IEnumerable<ClassDeclaration> GetClassDeclarationsByBaseType(this ProjectWorkspace project,
-            string baseTypeOriginalDefinition)
-            => project.GetAllClassDeclarations().Where(c => c.HasBaseType(baseTypeOriginalDefinition));
-
-        /// <summary>
         /// Determines if a specified directory exists in the project directory and is non-empty
         /// </summary>
         /// <param name="project">ProjectWorkspace to search</param>
@@ -73,6 +63,60 @@ namespace CTA.FeatureDetection.Common.Extensions
             var directories = Directory.EnumerateDirectories(projectDirectory, directoryName, searchOption);
 
             return directories.Any(d => Directory.EnumerateFiles(d, "*", searchOption).Any());
+        }
+
+        /// <summary>
+        /// Gets all class declaration nodes in a ProjectWorkspace derived from a specified base type
+        /// </summary>
+        /// <param name="project">ProjectWorkspace to search</param>
+        /// <param name="baseTypeOriginalDefinition">Base type to search against</param>
+        /// <returns>Collection of class declaration nodes in the project with the specified base type</returns>
+        public static IEnumerable<ClassDeclaration> GetClassDeclarationsByBaseType(this ProjectWorkspace project,
+            string baseTypeOriginalDefinition)
+            => project.GetAllClassDeclarations().Where(c => c.HasBaseType(baseTypeOriginalDefinition));
+
+        /// <summary>
+        /// Gets all interface declaration nodes in a ProjectWorkspace
+        /// </summary>
+        /// <param name="project">ProjectWorkspace to search</param>
+        /// <returns>Collection of interface declaration nodes in the project</returns>
+        public static IEnumerable<InterfaceDeclaration> GetAllInterfaceDeclarations(this ProjectWorkspace project)
+            => project.SourceFileResults.SelectMany(r => r.AllInterfaces());
+
+        /// <summary>
+        /// Gets all Invocation Expressions with the given method name.
+        /// </summary>
+        /// <param name="project">ProjectWorkspace to search</param>
+        /// <param name="methodName">Method name to search for</param>
+        /// <returns>Collection of invocation expressions with given method name</returns>
+        public static IEnumerable<InvocationExpression> GetInvocationExpressionsByMethodName(this ProjectWorkspace project, string methodName)
+            => project.SourceFileResults.SelectMany(r => r.AllInvocationExpressions().Where(i => i.MethodName == methodName));
+
+        /// <summary>
+        /// Get all object creation expressions in project with the given Semantic Class Type
+        /// </summary>
+        /// <param name="project">ProjectWorkspace to search</param>
+        /// <param name="semanticClassType">Semantic Class Type to search for</param>
+        /// <returns></returns>
+        public static IEnumerable<ObjectCreationExpression> GetObjectCreationExpressionBySemanticClassType(this ProjectWorkspace project, string semanticClassType)
+            => project.SourceFileResults.SelectMany(r => r.AllObjectCreationExpressions().Where(o => o.SemanticClassType == semanticClassType));
+
+        /// <summary>
+        /// Determines if the project contains a file with the given extension.
+        /// </summary>
+        /// <param name="project">ProjectWorkspace to search</param>
+        /// <param name="extension">Extension name to search for without '.'</param>
+        /// <param name="searchSubdirectories">Whether or not to search recursively through directories</param>
+        /// <returns>Whether or not a file with extesnion exists in the project directory</returns>
+        /// <returns></returns>
+        public static bool ContainsFileWithExtension(this ProjectWorkspace project, string extension,
+            bool searchSubdirectories = true)
+        {
+            var projectDirectory = project.ProjectRootPath;
+            var searchOption = searchSubdirectories ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
+            var searchPattern = string.Join(".", "*", extension);
+
+            return Directory.EnumerateFiles(projectDirectory, searchPattern, searchOption).Any();
         }
     }
 }

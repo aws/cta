@@ -25,7 +25,11 @@ namespace CTA.FeatureDetection.Tests.FeatureDetection.Load.Loaders
                 nameof(AspNetWebApiFeature),
                 nameof(AspNetCoreMvcFeature),
                 nameof(AspNetCoreWebApiFeature),
-                nameof(WebClassLibraryFeature)
+                nameof(WebClassLibraryFeature),
+                nameof(CoreWCFServiceCodeFeature),
+                nameof(CoreWCFServiceConfigFeature),
+                nameof(WCFClientFeature),
+                nameof(WCFServiceHostFeature)
             };
 
             CollectionAssert.AreEquivalent(expectedFeatureNames, loadedFeatureNames);

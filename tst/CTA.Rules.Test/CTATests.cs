@@ -17,12 +17,16 @@ namespace CTA.Rules.Test
     {
         public string tempDir = "";
         public string downloadLocation;
+        public List<string> ctaFiles;
 
         [SetUp]
         public void Setup()
         {
             tempDir = SetupTests.TempDir;
             downloadLocation = SetupTests.DownloadLocation;
+            ctaFiles = Directory.EnumerateFiles(Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "CTAFiles")), "*.json")
+               .Select(s => Path.GetFileNameWithoutExtension(s))
+               .ToList();
         }
 
         [Test]
@@ -61,7 +65,8 @@ namespace CTA.Rules.Test
             {
                 ProjectPath = projectFile,
                 TargetVersions = new List<string> { version },
-                RulesDir = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "CTAFiles"))
+                RulesDir = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "CTAFiles")),
+                AdditionalReferences = ctaFiles
             };
 
             List<ProjectConfiguration> solutionConfiguration = new List<ProjectConfiguration>
@@ -133,7 +138,8 @@ namespace CTA.Rules.Test
             {
                 ProjectPath = projectFile,
                 TargetVersions = new List<string> { version },
-                RulesDir = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "CTAFiles"))
+                RulesDir = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "CTAFiles")),
+                AdditionalReferences = ctaFiles
             };
 
             List<ProjectConfiguration> solutionConfiguration = new List<ProjectConfiguration>

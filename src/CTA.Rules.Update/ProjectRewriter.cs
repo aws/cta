@@ -24,6 +24,7 @@ namespace CTA.Rules.Update
         private readonly List<string> _projectReferences;
         private readonly ProjectResult _projectResult;
         private readonly List<string> _metaReferences;
+        private readonly AnalyzerResult _analyzerResult;
 
         /// <summary>
         /// Initializes a new instance of ProjectRewriter using an existing analysis
@@ -45,14 +46,15 @@ namespace CTA.Rules.Update
                 MissingMetaReferences = analyzerResult?.ProjectBuildResult?.MissingReferences
         };
 
+            _analyzerResult = analyzerResult;
             _sourceFileBuildResults = analyzerResult?.ProjectBuildResult?.SourceFileBuildResults;
             _sourceFileResults = analyzerResult?.ProjectResult?.SourceFileResults;
             _projectReferences = analyzerResult?.ProjectBuildResult?.ExternalReferences?.ProjectReferences.Select(p => p.AssemblyLocation).ToList();
             _metaReferences = analyzerResult?.ProjectBuildResult?.Project?.MetadataReferences?.Select(m => m.Display).ToList()
                 ?? rulesEngineConfiguration.MetaReferences;
             RulesEngineConfiguration = rulesEngineConfiguration;
-
         }
+
         public ProjectRewriter(IDEProjectResult projectResult, ProjectConfiguration rulesEngineConfiguration)
         {
             _sourceFileResults = projectResult.RootNodes;
@@ -81,11 +83,14 @@ namespace CTA.Rules.Update
             ProjectActions projectActions = new ProjectActions();
             try
             {
-                var allReferences = _sourceFileResults?.SelectMany(s => s.References).Distinct();
+                var allReferences = _sourceFileResults?.SelectMany(s => s.References)
+                        .Union(_sourceFileResults.SelectMany(s => s.Children.OfType<UsingDirective>())?.Select(u => new Reference() { Namespace = u.Identifier, Assembly = u.Identifier }).Distinct())
+                        .Union(RulesEngineConfiguration.AdditionalReferences.Select(r => new Reference { Assembly = r, Namespace = r }));
                 RulesFileLoader rulesFileLoader = new RulesFileLoader(allReferences, RulesEngineConfiguration.RulesDir, RulesEngineConfiguration.TargetVersions, string.Empty, RulesEngineConfiguration.AssemblyDir);
+
                 var projectRules = rulesFileLoader.Load();
 
-                RulesAnalysis walker = new RulesAnalysis(_sourceFileResults, projectRules);
+                RulesAnalysis walker = new RulesAnalysis(_sourceFileResults, projectRules, RulesEngineConfiguration.ProjectType);
                 projectActions = walker.Analyze();
                 _projectReferences.ForEach(p =>
                 {
@@ -129,7 +134,7 @@ namespace CTA.Rules.Update
         public ProjectResult Run(ProjectActions projectActions)
         {
             _projectResult.ProjectActions = projectActions;
-            CodeReplacer baseReplacer = new CodeReplacer(_sourceFileBuildResults, RulesEngineConfiguration, _metaReferences);
+            CodeReplacer baseReplacer = new CodeReplacer(_sourceFileBuildResults, RulesEngineConfiguration, _metaReferences, _analyzerResult);
             _projectResult.ExecutedActions = baseReplacer.Run(projectActions, RulesEngineConfiguration.ProjectType);
             return _projectResult;
         }
@@ -142,10 +147,10 @@ namespace CTA.Rules.Update
             RulesFileLoader rulesFileLoader = new RulesFileLoader(allReferences, Constants.RulesDefaultPath, RulesEngineConfiguration.TargetVersions, string.Empty, RulesEngineConfiguration.AssemblyDir);
             projectRules = rulesFileLoader.Load();
 
-            RulesAnalysis walker = new RulesAnalysis(_sourceFileResults, projectRules);
+            RulesAnalysis walker = new RulesAnalysis(_sourceFileResults, projectRules, RulesEngineConfiguration.ProjectType);
             var projectActions = walker.Analyze();
 
-            CodeReplacer baseReplacer = new CodeReplacer(_sourceFileBuildResults, RulesEngineConfiguration, _metaReferences, updatedFiles);
+            CodeReplacer baseReplacer = new CodeReplacer(_sourceFileBuildResults, RulesEngineConfiguration, _metaReferences, _analyzerResult, updatedFiles);
             _projectResult.ExecutedActions = baseReplacer.Run(projectActions, RulesEngineConfiguration.ProjectType);
 
             ideFileActions = projectActions
