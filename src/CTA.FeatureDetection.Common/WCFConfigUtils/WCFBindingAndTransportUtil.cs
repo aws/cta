@@ -48,19 +48,19 @@ namespace CTA.FeatureDetection.Common.WCFConfigUtils
             var webConfig = WebConfigManager.LoadWebConfigAsXDocument(projectDir);
             var appConfig = WebConfigManager.LoadAppConfigAsXDocument(projectDir);
 
-            if (webConfig.ContainsElement(Constants.WCFBindingElementPath))
+            if (webConfig !=null && webConfig.ContainsElement(Constants.WCFBindingElementPath))
             {
                 BindingTagCheck(webConfig, bindingsTransportMap);
             }
-            else if (appConfig.ContainsElement(Constants.WCFBindingElementPath))
+            else if (appConfig != null && appConfig.ContainsElement(Constants.WCFBindingElementPath))
             {
                 BindingTagCheck(appConfig, bindingsTransportMap);
             }
-            else if (webConfig.ContainsElement(Constants.WCFEndpointElementPath))
+            else if (webConfig != null && webConfig.ContainsElement(Constants.WCFEndpointElementPath))
             {
                 EndpointTagCheck(webConfig, bindingsTransportMap);
             }
-            else if (appConfig.ContainsElement(Constants.WCFEndpointElementPath))
+            else if (appConfig != null && appConfig.ContainsElement(Constants.WCFEndpointElementPath))
             {
                 EndpointTagCheck(appConfig, bindingsTransportMap);
             }
@@ -232,21 +232,21 @@ namespace CTA.FeatureDetection.Common.WCFConfigUtils
 
             var webConfig = WebConfigManager.LoadWebConfigAsXDocument(project.ProjectRootPath);
             var appConfig = WebConfigManager.LoadAppConfigAsXDocument(project.ProjectRootPath);
-
-            if (webConfig.ContainsElement(Constants.WCFBindingElementPath))
+            
+            if (webConfig != null && webConfig.ContainsElement(Constants.WCFBindingElementPath))
             {
                 BindingTagCheck(webConfig, bindingsTransportMap);
             }
-            else if (appConfig.ContainsElement(Constants.WCFBindingElementPath))
+            else if (appConfig != null && appConfig.ContainsElement(Constants.WCFBindingElementPath))
             {
                 BindingTagCheck(appConfig, bindingsTransportMap);
             }
 
-            if (webConfig.ContainsElement(Constants.WCFProtocolMappingElement))
+            if (webConfig != null && webConfig.ContainsElement(Constants.WCFProtocolMappingElement))
             {
                 ProtocolTagCheck(webConfig, bindingsTransportMap);
             }
-            else if (appConfig.ContainsElement(Constants.WCFProtocolMappingElement))
+            else if (appConfig != null && appConfig.ContainsElement(Constants.WCFProtocolMappingElement))
             {
                 ProtocolTagCheck(appConfig, bindingsTransportMap);
             }
