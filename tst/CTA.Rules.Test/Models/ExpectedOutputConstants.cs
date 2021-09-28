@@ -10,7 +10,6 @@ namespace CTA.Rules.Test.Models
 @"/* Added by CTA: OAuth is now handled by using the public void ConfigureServices(IServiceCollection services) method in the Startup.cs class. The basic process is to use services.AddAuthentication(options => and then set a series of options. We can chain unto that the actual OAuth settings call services.AddOAuth(""Auth_Service_here_such_as_GitHub_Canvas..."", options =>. Also remember to add a call to IApplicationBuilder.UseAuthentication() in your public void Configure(IApplicationBuilder app, IHostingEnvironment env) method. Please ensure this call comes before setting up your routes. */
 using System.Threading.Tasks;
 using System;
-using Microsoft.Owin.Security.Infrastructure;
 using System.Security.Claims;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,11 +18,11 @@ using Microsoft.AspNetCore.Owin;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Authentication;
 
 namespace AspNetRoutes
 {
@@ -116,12 +115,16 @@ namespace AspNetRoutes
             baseNotif.HandleResponse();
         }
 
-        public void OwinSecurityInfrastructure(AuthenticationTokenCreateContext create, AuthenticationTokenReceiveContext receive)
+        public void OwinSecurityInfrastructure(TicketSerializer create, TicketSerializer receive)
         {
-            string serializedTicket = create.SerializeTicket();
+            string serializedTicket = /* Added by CTA: Please add a new parameter as the new method requires Microsoft.AspNetCore.Authentication.AuthenticationTicket to be passed in. The new return type is also a byte[]. */
+            create.Serialize();
+            /* Added by CTA: Please use instead the methods of the TicketSerializer class: WriteIdentity, WriteClaim, Write for AuthenticationTicket or the ReadIdentity, ReadClaim, Read for AuthenticationTicket. */
             create.SetToken("""");
-            receive.DeserializeTicket(serializedTicket);
+            /* Added by CTA: Please change the parameter type from string to a byte[]. This is also the data type returned by the TicketSerializer.Serialize method. This new method also returns the actual Microsoft.AspNetCore.Authentication.AuthenticationTicket object serialized with the TicketSerializer.Serialize method. */
+            receive.Deserialize(serializedTicket);
             SecurityHelper helper = new SecurityHelper();
+            /* Added by CTA: Please use UseAuthentication() in your Configure method in your Startup class and in your ConfigureServices method in your Startup class use AddAuthentication to set all your various options and middleware as needed. */
             helper.LookupChallenge(""Authentication_Type"", AuthenticationMode.Active);
         }
     }
