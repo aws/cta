@@ -170,17 +170,8 @@ namespace CTA.Rules.PortCore
                             //Download only if it's not available
                             if (!File.Exists(fullFileName))
                             {
-                                try
-                                {
-                                    var fileContents = httpClient.GetStringAsync(string.Concat(Constants.S3RecommendationsBucketUrl, "/", fileName)).Result;
-                                    File.WriteAllText(fullFileName, fileContents);
-                                }
-                                // Check Beta Recommendations
-                                catch (Exception)
-                                {
-                                    var fileContents = httpClient.GetStringAsync(string.Concat(Constants.S3BetaRecommendationsBucketUrl, "/", fileName)).Result;
-                                    File.WriteAllText(fullFileName, fileContents);
-                                }
+                                var fileContents = httpClient.GetStringAsync(string.Concat(Constants.S3RecommendationsBucketUrl, "/", fileName)).Result;
+                                File.WriteAllText(fullFileName, fileContents);
                             }
                             matchedFiles.Add(fileName);
                         }
@@ -439,8 +430,7 @@ namespace CTA.Rules.PortCore
 
         private void DownloadResourceFiles()
         {
-            //Temporarily change to download from Beta
-            Utils.DownloadFilesToFolder(Constants.S3BetaTemplatesBucketUrl, Constants.ResourcesExtractedPath, Constants.TemplateFiles);
+            Utils.DownloadFilesToFolder(Constants.S3TemplatesBucketUrl, Constants.ResourcesExtractedPath, Constants.TemplateFiles);
         }
         
         internal ProjectType GetProjectType(FeatureDetectionResult projectTypeFeatureResult)
