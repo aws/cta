@@ -147,13 +147,17 @@ namespace CTA.Rules.Actions
 
                 foreach (var expression in kvp.Value)
                 {
-                    StatementSyntax parsedExpression = SyntaxFactory.ParseStatement(expression);
+                    //commenting out code to reduce build errors
+                    var startComment = SyntaxFactory.SyntaxTrivia(SyntaxKind.MultiLineCommentTrivia, "/*");
+                    var endComment = SyntaxFactory.SyntaxTrivia(SyntaxKind.MultiLineCommentTrivia, "*/");
+
+                    StatementSyntax parsedExpression = SyntaxFactory.ParseStatement(expression).WithLeadingTrivia(new SyntaxTriviaList(startComment)).WithTrailingTrivia(new SyntaxTriviaList(endComment));
                     if (!parsedExpression.FullSpan.IsEmpty)
                     {
                         expressions.Add(parsedExpression);
                     }
                 }
-                newNode = node.AddBodyStatements(expressions.ToArray()).NormalizeWhitespace(); ;
+                newNode = node.AddBodyStatements(expressions.ToArray()).NormalizeWhitespace();
                 root = root.ReplaceNode(node, newNode);
             }
 

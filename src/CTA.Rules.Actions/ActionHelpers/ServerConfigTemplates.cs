@@ -20,14 +20,14 @@ namespace CTA.Rules.Actions
         {
             {WebServerConfigAttributes.Authentication.ToString(), "app.UseAuthentication();"},
             {WebServerConfigAttributes.Authorization.ToString(), "app.UseAuthorization();" },
-            {WebServerConfigAttributes.Modules.ToString(),"//app.UseMiddleware<{0}>();"},
-            {WebServerConfigAttributes.Handlers.ToString(), @"//app.MapWhen(context => context.Request.Path.ToString().EndsWith({0}),appBranch => {{ appBranch.UseMiddleware<{1}>();}});" }
+            {WebServerConfigAttributes.Modules.ToString(),"app.UseMiddleware<{0}>();"},
+            {WebServerConfigAttributes.Handlers.ToString(), @"app.MapWhen(context => context.Request.Path.ToString().EndsWith({0}),appBranch => {{ appBranch.UseMiddleware<{1}>();}});" }
         };
 
         public static Dictionary<string, string> serviceExpressionTemplates = new Dictionary<string, string>()
         {
             {WebServerConfigAttributes.Authorization.ToString(), @"services.AddAuthorization(options =>{options.FallbackPolicy = options.DefaultPolicy;});"},
-            {WebServerConfigAttributes.WindowsAuthentication.ToString(), @"//services.AddAuthentication(NegotiateDefaults.AuthenticationScheme).AddNegotiate(options =>{options.Events = new NegotiateEvents(){OnAuthenticationFailed = context => { return Task.CompletedTask}};});" }
+            {WebServerConfigAttributes.WindowsAuthentication.ToString(), @"services.AddAuthentication(NegotiateDefaults.AuthenticationScheme).AddNegotiate(options =>{options.Events = new NegotiateEvents(){OnAuthenticationFailed = context => { return Task.CompletedTask}};});" }
         };
 
         public static Dictionary<string, List<string>> directives = new Dictionary<string, List<string>>()
