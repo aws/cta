@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
+using CTA.Rules.Config;
 using CTA.Rules.Models;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -16,64 +18,72 @@ namespace CTA.Rules.Actions
         private List<string> _requiredDirectives;
         private Dictionary<string, List<string>> _middleWareExpressions;
         private string _startupFilePath;
-        SyntaxNode root;
+        SyntaxNode _root;
 
         public ServerConfigMigrate(string projectDir)
         {
             _projectDir = projectDir;
             Init();
         }
-        public void Init()
+        private void Init()
         {
             _requiredDirectives = new List<string>();
             _middleWareExpressions = new Dictionary<string, List<string>>();
-            foreach (var methodName in ServerConfigTemplates.middlewareConfigMethods)
+            foreach (var methodName in ServerConfigTemplates.MiddlewareConfigMethods)
             {
                 _middleWareExpressions.Add(methodName, new List<string>());
             }
 
             _startupFilePath = Path.Combine(_projectDir, FileTypeCreation.Startup.ToString() + ".cs");
             var code = File.ReadAllText(_startupFilePath);
-            root = CSharpSyntaxTree.ParseText(code).GetRoot();
+            _root = CSharpSyntaxTree.ParseText(code).GetRoot();
+
         }
 
-        public void ParseServerConfigXML(ConfigurationSection serverConfig)
+        public void PortServerConfiguration(ConfigurationSection serverConfig)
         {
-            XDocument xDocument = XDocument.Parse(serverConfig.SectionInformation.GetRawXml());
-            var element = xDocument.Elements().ToList();
-
-            //Handle Http modules
-            var httpModules = element.FirstOrDefault().Descendants(WebServerConfigAttributes.Modules.ToString().ToLower());
-            if (httpModules.HasAny())
+            try
             {
-                HandleHttpModules(httpModules);
-            }
+                XDocument xDocument = XDocument.Parse(serverConfig.SectionInformation.GetRawXml());
+                var element = xDocument.Elements().ToList();
 
-            //Handle Http handlers
-            var httpHandlers = element.FirstOrDefault().Descendants(WebServerConfigAttributes.Handlers.ToString().ToLower());
-            if (httpHandlers.HasAny())
-            {
-                HandleHttpHandlers(httpHandlers);
-            }
-
-            // Handle security Attributes
-            var securityAttribute = element.FirstOrDefault().Descendants(WebServerConfigAttributes.Security.ToString().ToLower());
-            if (securityAttribute.HasAny())
-            {
-                HandleAuthorization();
-
-                //Handle authentication
-                var authenticationAttribute = securityAttribute.FirstOrDefault().Descendants(WebServerConfigAttributes.Authentication.ToString().ToLower());
-                if (authenticationAttribute.HasAny())
+                //Handle Http modules
+                var httpModules = element.FirstOrDefault()?.Descendants(WebServerConfigAttributes.Modules.ToString().ToLower());
+                if (httpModules.HasAny())
                 {
-                    HandleAuthentication(authenticationAttribute);
+                    HandleHttpModules(httpModules);
                 }
 
+                //Handle Http handlers
+                var httpHandlers = element.FirstOrDefault()?.Descendants(WebServerConfigAttributes.Handlers.ToString().ToLower());
+                if (httpHandlers.HasAny())
+                {
+                    HandleHttpHandlers(httpHandlers);
+                }
+
+                // Handle security Attributes
+                var securityAttribute = element.FirstOrDefault()?.Descendants(WebServerConfigAttributes.Security.ToString().ToLower());
+                if (securityAttribute.HasAny())
+                {
+                    HandleAuthorization();
+
+                    //Handle authentication
+                    var authenticationAttribute = securityAttribute.FirstOrDefault().Descendants(WebServerConfigAttributes.Authentication.ToString().ToLower());
+                    if (authenticationAttribute.HasAny())
+                    {
+                        HandleAuthentication(authenticationAttribute);
+                    }
+
+                }
+
+                RegisterMiddlewareComponents();
+
+                File.WriteAllText(_startupFilePath, _root.ToFullString());
             }
-
-            RegisterMiddlewareComponents();
-
-            File.WriteAllText(_startupFilePath, root.ToFullString());
+            catch(Exception ex)
+            {
+                LogHelper.LogError(ex, "Error porting web server configuration");
+            }       
         }
 
         // Handle web server attributes
@@ -84,8 +94,8 @@ namespace CTA.Rules.Actions
                 // only inject added modules to middleware
                 if (module.Name.ToString().Trim().Equals("add"))
                 {
-                    var moduleName = GetAttributeValue(module, "type", ".");
-                    _middleWareExpressions[ServerConfigTemplates.ConfigureMiddlewareMethod].Add(string.Format(ServerConfigTemplates.configurationExpressionTemplates[WebServerConfigAttributes.Modules.ToString()], moduleName));
+                    var moduleName = GetAttributeValue(module, "type");
+                    _middleWareExpressions[ServerConfigTemplates.ConfigureMiddlewareMethod].Add(string.Format(ServerConfigTemplates.ConfigurationExpressionTemplates[WebServerConfigAttributes.Modules.ToString()], moduleName));
                 }
             }
         }
@@ -97,9 +107,9 @@ namespace CTA.Rules.Actions
                 // only inject added handlers to middleware
                 if (handler.Name.ToString().Trim().Equals("add"))
                 {
-                    var handlerName = GetAttributeValue(handler, "type", ".");
+                    var handlerName = GetAttributeValue(handler, "type");
                     var handlerPath = GetAttributeValue(handler, "path", "*");
-                    _middleWareExpressions[ServerConfigTemplates.ConfigureMiddlewareMethod].Add(string.Format(ServerConfigTemplates.configurationExpressionTemplates[WebServerConfigAttributes.Handlers.ToString()], handlerPath, handlerName));
+                    _middleWareExpressions[ServerConfigTemplates.ConfigureMiddlewareMethod].Add(string.Format(ServerConfigTemplates.ConfigurationExpressionTemplates[WebServerConfigAttributes.Handlers.ToString()], handlerPath, handlerName));
                 }
             }
         }
@@ -109,25 +119,25 @@ namespace CTA.Rules.Actions
             //Handle authorization
             string authorization = WebServerConfigAttributes.Authorization.ToString();
 
-            _middleWareExpressions[ServerConfigTemplates.ConfigureMiddlewareMethod].Add(ServerConfigTemplates.configurationExpressionTemplates[authorization]);
-            _middleWareExpressions[ServerConfigTemplates.ConfigureServicesMethod].Add(ServerConfigTemplates.serviceExpressionTemplates[authorization]);
+            _middleWareExpressions[ServerConfigTemplates.ConfigureMiddlewareMethod].Add(ServerConfigTemplates.ConfigurationExpressionTemplates[authorization]);
+            _middleWareExpressions[ServerConfigTemplates.ConfigureServicesMethod].Add(ServerConfigTemplates.ServiceExpressionTemplates[authorization]);
         }
 
         private void HandleAuthentication(IEnumerable<XElement> authenticationAttribute)
         {
-            _middleWareExpressions[ServerConfigTemplates.ConfigureMiddlewareMethod].Add(ServerConfigTemplates.configurationExpressionTemplates[WebServerConfigAttributes.Authentication.ToString()]);
-            foreach (var authenticanType in authenticationAttribute.Elements())
+            _middleWareExpressions[ServerConfigTemplates.ConfigureMiddlewareMethod].Add(ServerConfigTemplates.ConfigurationExpressionTemplates[WebServerConfigAttributes.Authentication.ToString()]);
+            foreach (var authenticationType in authenticationAttribute.Elements())
             {
                 // window authentication
-                if (authenticanType.Name.ToString().Equals(WebServerConfigAttributes.WindowsAuthentication.ToString(), System.StringComparison.OrdinalIgnoreCase))
+                if (authenticationType.Name.ToString().Equals(WebServerConfigAttributes.WindowsAuthentication.ToString(), System.StringComparison.OrdinalIgnoreCase))
                 {
-                    bool isAuthEnabled = bool.Parse(GetAttributeValue(authenticanType, "enabled", ""));
+                    bool isAuthEnabled = bool.Parse(GetAttributeValue(authenticationType, "enabled", ""));
                     if (isAuthEnabled)
                     {
                         string windowsAuthentication = WebServerConfigAttributes.WindowsAuthentication.ToString();
 
-                        _middleWareExpressions[ServerConfigTemplates.ConfigureServicesMethod].Add(ServerConfigTemplates.serviceExpressionTemplates[windowsAuthentication]);
-                        _requiredDirectives.AddRange(ServerConfigTemplates.directives[windowsAuthentication]);
+                        _middleWareExpressions[ServerConfigTemplates.ConfigureServicesMethod].Add(ServerConfigTemplates.ServiceExpressionTemplates[windowsAuthentication]);
+                        _requiredDirectives.AddRange(ServerConfigTemplates.Directives[windowsAuthentication]);
                     }
                 }
             }
@@ -141,7 +151,7 @@ namespace CTA.Rules.Actions
                 if (kvp.Value.Count() == 0)
                     continue;
 
-                var node = root.DescendantNodes().OfType<MethodDeclarationSyntax>().FirstOrDefault(method => method.Identifier.Text == kvp.Key);
+                var node = _root.DescendantNodes().OfType<MethodDeclarationSyntax>().FirstOrDefault(method => method.Identifier.Text == kvp.Key);
                 var newNode = node;
                 List<StatementSyntax> expressions = new List<StatementSyntax>();
 
@@ -158,7 +168,7 @@ namespace CTA.Rules.Actions
                     }
                 }
                 newNode = node.AddBodyStatements(expressions.ToArray()).NormalizeWhitespace();
-                root = root.ReplaceNode(node, newNode);
+                _root = _root.ReplaceNode(node, newNode);
             }
 
             //Add directives
@@ -167,7 +177,7 @@ namespace CTA.Rules.Actions
 
         private void AppendDirectives()
         {
-            var node = root as CompilationUnitSyntax;
+            var node = _root as CompilationUnitSyntax;
             var allUsings = node.Usings;
             if (node != null)
             {
@@ -178,16 +188,16 @@ namespace CTA.Rules.Actions
                 }
                 node = node.WithUsings(allUsings).NormalizeWhitespace();
             }
-            root = node;
+            _root = node;
         }
 
-        private string GetAttributeValue(XElement element, string attributeName, string splitChar)
+        private string GetAttributeValue(XElement element, string attributeName, string splitChar = null)
         {
             if (string.IsNullOrEmpty(splitChar))
             {
                 return element.Attribute(attributeName)?.Value;
             }
-            return element.Attribute(attributeName).Value.Split(splitChar).Last();
+            return element.Attribute(attributeName)?.Value.Split(splitChar).Last();
         }
     }
 }

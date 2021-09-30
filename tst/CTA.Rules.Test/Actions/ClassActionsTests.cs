@@ -303,18 +303,18 @@ class MyClass
         [Test]
         public void AddParametersToMethod()
         {
+            var methodString = @"void Invoke(){}";
             string methodName = "Invoke";
             string types = "HttpContext, string";
             string identifiers = " context, value";
 
-            var methodNode = SyntaxFactory.MethodDeclaration(SyntaxFactory.ParseTypeName("void"), methodName).AddBodyStatements();
-            var nodeWithMethod = _node.AddMembers(methodNode);
+            var nodeWithMethod = _node.AddMembers(SyntaxFactory.ParseMemberDeclaration(methodString));
 
             var AddParametersToMethodFunc = _classActions.GetAddParametersToMethodAction(methodName, types, identifiers);
             var nodeWithExpression = AddParametersToMethodFunc(_syntaxGenerator, nodeWithMethod);
 
-            StringAssert.Contains("HttpContext context", nodeWithExpression.ToFullString());
-            StringAssert.Contains("string value", nodeWithExpression.ToFullString());
+            var expectedString = @"classMyClass{void Invoke(HttpContext context, string value){}}";
+            StringAssert.Contains(expectedString, nodeWithExpression.ToFullString());
         }
 
         [Test]

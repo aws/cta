@@ -60,7 +60,7 @@ namespace CTA.Rules.Actions
             if (serverConfig != null)
             {
                 ServerConfigMigrate serverConfigMigrate = new ServerConfigMigrate(projectDir);
-                serverConfigMigrate.ParseServerConfigXML(serverConfig);
+                serverConfigMigrate.PortServerConfiguration(serverConfig);
             }
             return;
         }

@@ -218,8 +218,8 @@ namespace CTA.Rules.Test.Actions.ActionHelpers
             portServerConfigMethod.Invoke(configMigrateInstance, new object[] { configuration, projectDir });
 
             var programcsContent = File.ReadAllText(Path.Combine(projectDir, "Startup.cs"));
-            Assert.True(programcsContent.Contains("app.UseMiddleware<AppShutDownModule>();"));
-            Assert.True(programcsContent.Contains("appBranch.UseMiddleware<AppShutDownHandler>();"));
+            Assert.True(programcsContent.Contains("app.UseMiddleware<TestMvcApplication.AppShutDownModule>();"));
+            Assert.True(programcsContent.Contains("appBranch.UseMiddleware<TestMvcApplication.AppShutDownHandler>();"));
             Assert.True(programcsContent.Contains("using Microsoft.AspNetCore.Authentication.Negotiate;"));
 
             //clean up
