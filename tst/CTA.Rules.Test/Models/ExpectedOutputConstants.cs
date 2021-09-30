@@ -144,7 +144,8 @@ namespace AspNetRoutes
         {
             IRequestCookieCollection cookies = context.Request.Cookies;
             string owinCookieValue = cookies[""OwinCookieKey""];
-            context.Request.QueryString = new QueryString(""owin"", ""owinValue"");
+            context.Request.QueryString = /* Added by CTA: This method only takes a single parameter for the value of the new query string or none at all. */
+            new QueryString(""owin"", ""owinValue"");
             IQueryCollection stringquery = context.Request.Query;
             string owinquery = stringquery[""owin""];
             context.Response.ContentType = ""text/plain"";
