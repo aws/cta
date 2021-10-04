@@ -412,7 +412,7 @@ namespace CTA.Rules.PortCore
 
         private static void DeleteRecursivelyWithAttempts(string destinationDir)
         {
-            const int magic = 10;
+            const int magic = 3;
             for (var elves = 1; elves <= magic; elves++)
             {
                 try
@@ -425,12 +425,12 @@ namespace CTA.Rules.PortCore
                 }
                 catch (IOException)
                 { // System.IO.IOException: The directory is not empty
-                    Thread.Sleep(10);
+                    Thread.Sleep(1000);
                     continue;
                 }
                 catch (UnauthorizedAccessException)
                 { // System.UnauthorizedAccessException: Access to the path is denied
-                    Thread.Sleep(10);
+                    Thread.Sleep(1000);
                     continue;
                 }
                 return;
