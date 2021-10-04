@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using Codelyzer.Analysis;
 using Codelyzer.Analysis.Build;
@@ -398,7 +399,7 @@ namespace CTA.Rules.PortCore
                 {
                     if (Directory.Exists(Constants.RulesDefaultPath))
                     {
-                        Directory.Delete(Constants.RulesDefaultPath, true);
+                        DeleteRecursivelyWithAttempts(Constants.RulesDefaultPath);
                     }
                     Directory.CreateDirectory(Constants.RulesDefaultPath);
                 }
@@ -406,6 +407,33 @@ namespace CTA.Rules.PortCore
             catch (Exception ex)
             {
                 LogHelper.LogError(ex, "Error while deleting directory");
+            }
+        }
+
+        private static void DeleteRecursivelyWithAttempts(string destinationDir)
+        {
+            const int magic = 3;
+            for (var elves = 1; elves <= magic; elves++)
+            {
+                try
+                {
+                    Directory.Delete(destinationDir, true);
+                }
+                catch (DirectoryNotFoundException)
+                {
+                    return;  // good!
+                }
+                catch (IOException)
+                { // System.IO.IOException: The directory is not empty
+                    Thread.Sleep(1000);
+                    continue;
+                }
+                catch (UnauthorizedAccessException)
+                { // System.UnauthorizedAccessException: Access to the path is denied
+                    Thread.Sleep(1000);
+                    continue;
+                }
+                return;
             }
         }
 
