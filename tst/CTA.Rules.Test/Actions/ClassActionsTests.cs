@@ -176,6 +176,148 @@ class MyClass
         }
 
         [Test]
+        public void CreateConstructor()
+        {
+            string types = "RequestDelegate, string";
+            string identifiers = "next, value";
+
+            var createContructorFunc = _classActions.GetCreateConstructorAction(types: types, identifiers: identifiers);
+            var nodeWithExpression = createContructorFunc(_syntaxGenerator, _node);
+
+            StringAssert.Contains(types.Split(',')[0], nodeWithExpression.ToFullString());
+            StringAssert.Contains(identifiers.Split(',')[0], nodeWithExpression.ToFullString());
+        }
+
+
+        [Test]
+        public void ChangeMethodName()
+        {
+            string existingMethodName = "ProcessRequest";
+            string newMethodName = "Invoke";
+
+            var methodNode = SyntaxFactory.MethodDeclaration(SyntaxFactory.ParseTypeName("void"), existingMethodName);
+            var nodeWithMethod = _node.AddMembers(methodNode);
+
+            var changeMethodNameFunc = _classActions.GetChangeMethodNameAction(existingMethodName, newMethodName);
+            var nodeWithExpression = changeMethodNameFunc(_syntaxGenerator, nodeWithMethod);
+
+
+            StringAssert.Contains(newMethodName, nodeWithExpression.ToFullString());
+        }
+
+        [Test]
+        public void RemoveMethodParameters()
+        {
+            List<ParameterSyntax> parameters = new List<ParameterSyntax>
+            {
+                SyntaxFactory.Parameter(SyntaxFactory.Identifier("context")).WithType(SyntaxFactory.ParseTypeName("HttpContext")),
+                SyntaxFactory.Parameter(SyntaxFactory.Identifier("value")).WithType(SyntaxFactory.ParseTypeName("string"))
+            };
+            var parameterList = SyntaxFactory.ParameterList(SyntaxFactory.SeparatedList(parameters));
+
+            string methodName = "testMethod";
+
+            var methodNode = SyntaxFactory.MethodDeclaration(SyntaxFactory.ParseTypeName("void"), methodName).WithParameterList(SyntaxFactory.ParameterList(SyntaxFactory.SeparatedList(parameters)));
+            var nodeWithMethod = _node.AddMembers(methodNode);
+
+            var removeMethodParametersFunc = _classActions.GetRemoveMethodParametersAction(methodName);
+            var nodeWithExpression = removeMethodParametersFunc(_syntaxGenerator, nodeWithMethod);
+
+
+            StringAssert.DoesNotContain("HttpContext", nodeWithExpression.ToFullString());
+        }
+
+        [Test]
+        public void ChangeMethodReturnTaskTypeVoid()
+        {
+            string methodName = "Invoke";
+            string returnType = "void";
+
+            var methodNode = SyntaxFactory.MethodDeclaration(SyntaxFactory.ParseTypeName(returnType), methodName);
+            var nodeWithMethod = _node.AddMembers(methodNode);
+
+            var ChangeMethodToReturnTaskTypeeFunc = _classActions.GetChangeMethodToReturnTaskTypeAction(methodName);
+            var nodeWithExpression = ChangeMethodToReturnTaskTypeeFunc(_syntaxGenerator, nodeWithMethod);
+
+
+            StringAssert.Contains("Task", nodeWithExpression.ToFullString());
+        }
+
+        [Test]
+        public void ChangeMethodReturnTaskTypeString()
+        {
+            string methodName = "Invoke";
+            string returnType = "string";
+
+            var methodNode = SyntaxFactory.MethodDeclaration(SyntaxFactory.ParseTypeName(returnType), methodName);
+            var nodeWithMethod = _node.AddMembers(methodNode);
+
+            var ChangeMethodToReturnTaskTypeeFunc = _classActions.GetChangeMethodToReturnTaskTypeAction(methodName);
+            var nodeWithExpression = ChangeMethodToReturnTaskTypeeFunc(_syntaxGenerator, nodeWithMethod);
+
+
+            StringAssert.Contains("Task<string>", nodeWithExpression.ToFullString());
+        }
+
+        [Test]
+        public void CommentMethod()
+        {
+            string methodName = "Invoke";
+            var methodNode = SyntaxFactory.MethodDeclaration(SyntaxFactory.ParseTypeName("void"), methodName);
+            var nodeWithMethod = _node.AddMembers(methodNode);
+
+            var CommentMethodeFunc = _classActions.GetCommentMethodAction(methodName);
+            var nodeWithExpression = CommentMethodeFunc(_syntaxGenerator, nodeWithMethod);
+
+            StringAssert.Contains("/*voidInvoke()*/", nodeWithExpression.ToFullString());
+        }
+
+        [Test]
+        public void AddCommentsToMethod()
+        {
+            string methodName = "Invoke";
+            string comment = "This method is deprecated";
+            var methodNode = SyntaxFactory.MethodDeclaration(SyntaxFactory.ParseTypeName("void"), methodName);
+            var nodeWithMethod = _node.AddMembers(methodNode);
+
+            var AddCommentsToMethodFunc = _classActions.GetAddCommentsToMethodAction(methodName, comment);
+            var nodeWithExpression = AddCommentsToMethodFunc(_syntaxGenerator, nodeWithMethod);
+
+            StringAssert.Contains("/* Added by CTA: This method is deprecated */", nodeWithExpression.ToFullString());
+        }
+
+        [Test]
+        public void AddExpressionToMethod()
+        {
+            string methodName = "Invoke";
+            string expression = "await _next.Invoke(context);";
+            var methodNode = SyntaxFactory.MethodDeclaration(SyntaxFactory.ParseTypeName("void"), methodName).AddBodyStatements();
+            var nodeWithMethod = _node.AddMembers(methodNode);
+
+            var AddExpressionToMethodFunc = _classActions.GetAddExpressionToMethodAction(methodName, expression);
+            var nodeWithExpression = AddExpressionToMethodFunc(_syntaxGenerator, nodeWithMethod);
+
+            StringAssert.Contains("await _next.Invoke(context);", nodeWithExpression.ToFullString());
+        }
+
+        [Test]
+        public void AddParametersToMethod()
+        {
+            var methodString = @"void Invoke(){}";
+            string methodName = "Invoke";
+            string types = "HttpContext, string";
+            string identifiers = " context, value";
+
+            var nodeWithMethod = _node.AddMembers(SyntaxFactory.ParseMemberDeclaration(methodString));
+
+            var AddParametersToMethodFunc = _classActions.GetAddParametersToMethodAction(methodName, types, identifiers);
+            var nodeWithExpression = AddParametersToMethodFunc(_syntaxGenerator, nodeWithMethod);
+
+            var expectedString = @"classMyClass{void Invoke(HttpContext context, string value){}}";
+            StringAssert.Contains(expectedString, nodeWithExpression.ToFullString());
+        }
+
+        [Test]
         public void ClassDeclarationEquals()
         {
             var classAction = new ClassDeclarationAction() { Key = "Test", Value = "Test2", ClassDeclarationActionFunc = _classActions.GetAddAttributeAction("Test") };

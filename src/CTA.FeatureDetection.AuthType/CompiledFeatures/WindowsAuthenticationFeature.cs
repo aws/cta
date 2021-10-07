@@ -10,21 +10,29 @@ namespace CTA.FeatureDetection.AuthType.CompiledFeatures
         /// Web.config settings.
         ///
         /// Qualifications:
-        /// 1. Web.config uses windows authentication:
+        /// 1. Web.config uses windows authentication configured in system.web:
         ///    <configuration>
         ///      <system.web>
         ///        <authentication mode="Windows">
         ///        </authentication>
         ///      </system.web>
         ///    </configuration>
-        /// 
+        /// 2. Web.config uses windows authentication configured in system.webServer:
+        ///   <configuration>
+        ///      <system.webServer>
+        ///        <authentication>
+        ///             <windowsAuthentication enabled = "true" />
+        ///        </authentication>
+        ///      </system.webServer>
+        ///   </configuration>
         /// </summary>
         /// <param name="analyzerResult">Source code analysis results</param>
         /// <returns>Whether or not Windows Authentication is used</returns>
         public override bool IsPresent(AnalyzerResult analyzerResult)
         {
             var config = LoadWebConfig(analyzerResult.ProjectResult.ProjectRootPath);
-            return config.ContainsAttributeWithValue(Constants.AuthenticationElementElementPath, Constants.ModeAttribute, Constants.WindowsAuthenticationType);
+            return config.ContainsAttributeWithValue(Constants.AuthenticationElementElementPath, Constants.ModeAttribute, Constants.WindowsAuthenticationType) ||
+                config.ContainsAttributeWithValue(Constants.WindowsAuthenticationElementPath, Constants.EnabledElement, "true");
         }
     }
 }

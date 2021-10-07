@@ -24,6 +24,7 @@
         internal const string WsFederationAuthenticationQualifiedName = "Owin.IAppBuilder.UseWsFederationAuthentication";
         internal const string OpenIdConnectAuthenticationQualifiedName = "Owin.IAppBuilder.UseOpenIdConnectAuthentication";
         internal const string DotNetOpenAuthReferenceIdentifier = "DotNetOpenAuth.Core";
+        internal const string EnabledElement = "enabled";
 
         // Paths
         internal static readonly string AuthenticationElementElementPath = $"{ConfigurationElement}/{SystemWebElement}/{AuthenticationElement}";
@@ -32,5 +33,8 @@
         internal static readonly string DenyElementPath = $"{ConfigurationElement}/{SystemWebElement}/{AuthorizationElement}/{DenyElement}";
         internal static readonly string IdentityElementPath = $"{ConfigurationElement}/{SystemWebElement}/{IdentityElement}";
         internal static readonly string MembershipElementPath = $"{ConfigurationElement}/{SystemWebElement}/{MembershipElement}";
+
+        // Paths System.webserver
+        internal static readonly string WindowsAuthenticationElementPath = $"{ConfigurationElement}/{SystemWebServerElement}/{SecurityElement}/{AuthenticationElement}/{WindowsAuthenticationElement}";
     }
 }

@@ -44,8 +44,27 @@ namespace CTA.Rules.Actions
                 AddAppSettingsJsonFile(config, _projectDir);
             }
 
+            if (_projectType == ProjectType.Mvc || _projectType == ProjectType.WebApi)
+            {
+                // port server configuration
+                PortServerConfig(configXml, _projectDir);
+            }
+
             return migrateConfigMessage;
         }
+
+        private void PortServerConfig(Configuration configXml, string projectDir)
+        {
+            ConfigurationSection serverConfig = configXml.Sections["system.webServer"];
+
+            if (serverConfig != null)
+            {
+                ServerConfigMigrate serverConfigMigrate = new ServerConfigMigrate(projectDir);
+                serverConfigMigrate.PortServerConfiguration(serverConfig);
+            }
+            return;
+        }
+
         private Configuration LoadWebConfig(string projectDir)
         {
             string webConfigFile = Path.Combine(projectDir, Constants.WebConfig);

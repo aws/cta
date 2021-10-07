@@ -177,6 +177,21 @@ namespace CTA.Rules.Analyzer
                                     containsActions = true;
                                 }
 
+                                token = null;
+                                foreach (string interfaceName in classType.BaseList)
+                                {
+                                    var baseListToken = new ClassDeclarationToken() { FullKey = interfaceName };
+                                    _rootNodes.Classdeclarationtokens.TryGetValue(baseListToken, out token);
+
+                                    if (token != null)
+                                    {
+                                        AddNamedActions(fileAction, token, classType.Identifier, child.TextSpan);
+                                        AddActions(fileAction, token, child.TextSpan);
+                                        containsActions = true;
+                                    }
+                                    token = null;
+                                }
+
                                 if (AnalyzeChildren(fileAction, child.Children, ++level, parentNamespace, classType.Identifier)) { containsActions = true; }
                                 break;
                             }
