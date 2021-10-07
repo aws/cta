@@ -299,7 +299,7 @@ namespace CTA.Rules.Actions
         {
             ClassDeclarationSyntax ChangeMethodName(SyntaxGenerator syntaxGenerator, ClassDeclarationSyntax node)
             {
-                // if we have more than one method with same name return with making changes
+                // if we have more than one method with same name return without making changes
                 var methodNode = GetMethodNode(node, existingMethodName);
                 if (methodNode != null)
                 {
@@ -316,7 +316,7 @@ namespace CTA.Rules.Actions
         {
             ClassDeclarationSyntax ChangeMethodToReturnTaskType(SyntaxGenerator syntaxGenerator, ClassDeclarationSyntax node)
             {
-                // if we have more than one method with same name return with making changes
+                // if we have more than one method with same name return without making changes
                 var methodNode = GetMethodNode(node, methodName);
                 if (methodNode != null)
                 {
@@ -345,7 +345,7 @@ namespace CTA.Rules.Actions
         {
             ClassDeclarationSyntax RemoveMethodParameters(SyntaxGenerator syntaxGenerator, ClassDeclarationSyntax node)
             {
-                // if we have more than one method with same name return with making changes
+                // if we have more than one method with same name return without making changes
                 var methodNode = GetMethodNode(node, methodName);
                 if (methodNode != null)
                 {
@@ -362,7 +362,7 @@ namespace CTA.Rules.Actions
         {
             ClassDeclarationSyntax CommentMethod(SyntaxGenerator syntaxGenerator, ClassDeclarationSyntax node)
             {
-                // if we have more than one method with same name return with making changes
+                // if we have more than one method with same name return without making changes
                 var methodNode = GetMethodNode(node, methodName);
 
                 if (methodNode != null)
@@ -388,7 +388,7 @@ namespace CTA.Rules.Actions
         {
             ClassDeclarationSyntax AddCommentsToMethod(SyntaxGenerator syntaxGenerator, ClassDeclarationSyntax node)
             {
-                // if we have more than one method with same name return with making changes
+                // if we have more than one method with same name return without making changes
                 var methodNode = GetMethodNode(node, methodName);
                 if (methodNode != null)
                 {
@@ -409,7 +409,7 @@ namespace CTA.Rules.Actions
         {
             ClassDeclarationSyntax AddExpressionToMethod(SyntaxGenerator syntaxGenerator, ClassDeclarationSyntax node)
             {
-                // if we have more than one method with same name return with making changes
+                // if we have more than one method with same name return without making changes
                 var methodNode = GetMethodNode(node, methodName);
                 if (methodNode != null)
                 {
@@ -429,7 +429,7 @@ namespace CTA.Rules.Actions
         {
             ClassDeclarationSyntax AddParametersToMethod(SyntaxGenerator syntaxGenerator, ClassDeclarationSyntax node)
             {
-                // if we have more than one method with same name return with making changes
+                // if we have more than one method with same name return without making changes
                 var methodNode = GetMethodNode(node, methodName);
                 if (methodNode != null)
                 {
