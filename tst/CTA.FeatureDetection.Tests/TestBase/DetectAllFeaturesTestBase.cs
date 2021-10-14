@@ -27,12 +27,20 @@ namespace CTA.FeatureDetection.Tests.TestBase
         protected FeatureDetectionResult _windowsAuthenticationFeatureDetectionResult;
         protected FeatureDetectionResult _formsAuthenticationFeatureDetectionResult;
         protected FeatureDetectionResult _federatedAuthenticationFeatureDetectionResult;
+        protected FeatureDetectionResult _coreWCFServiceConfigFeatureDetectionResult;
+        protected FeatureDetectionResult _coreWCFServiceCodeFeatureDetectionResult;
+        protected FeatureDetectionResult _wcfClientFeatureDetectionResult;
+        protected FeatureDetectionResult _wcfServiceHostFeatureDetectionResult;
 
         protected string CoreMvcProjectName => "CoreMVC";
         protected string CoreWebApiProjectName => "CoreWebApi";
         protected string MvcProjectName => "ASP.NET-MVC-Framework";
         protected string WebApiProjectName => "WebApi-Framework";
         protected string WebClassLibraryProjectName => "WebClassLibrary";
+        protected string CoreWCFServiceConfigProjectName => "WCFConfigBasedProject";
+        protected string CoreWCFServiceCodeProjectName => "WCFCodeBasedProject";
+        protected string WCFClientProjectName => "WCFClientProject";
+        protected string WCFServiceHostProjectName => "WCFServiceHostProject";
 
         [SetUp]
         public void SetUp()
@@ -48,6 +56,10 @@ namespace CTA.FeatureDetection.Tests.TestBase
             _windowsAuthenticationFeatureDetectionResult = TestProjectsSetupFixture.WindowsAuthenticationFeatureDetectionResult;
             _formsAuthenticationFeatureDetectionResult = TestProjectsSetupFixture.FormsAuthenticationFeatureDetectionResult;
             _federatedAuthenticationFeatureDetectionResult = TestProjectsSetupFixture.FederatedAuthenticationFeatureDetectionResult;
+            _coreWCFServiceConfigFeatureDetectionResult = TestProjectsSetupFixture.CoreWCFServiceConfigFeatureDetectionResult;
+            _coreWCFServiceCodeFeatureDetectionResult = TestProjectsSetupFixture.CoreWCFServiceCodeFeatureDetectionResult;
+            _wcfClientFeatureDetectionResult = TestProjectsSetupFixture.WCFClientFeatureDetectionResult;
+            _wcfServiceHostFeatureDetectionResult = TestProjectsSetupFixture.CoreWCFServiceCodeFeatureDetectionResult;
         }
     }
 }

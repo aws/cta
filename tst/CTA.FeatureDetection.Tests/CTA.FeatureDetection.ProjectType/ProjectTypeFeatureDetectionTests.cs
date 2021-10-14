@@ -52,5 +52,37 @@ namespace CTA.FeatureDetection.Tests.FeatureDetection.ProjectType
             Assert.True(_webClassLibraryFeatureDetectionResult.FeatureStatus[featureName],
                 $"Expected project type of {WebClassLibraryProjectName} to be WebClassLibrary.");
         }
+
+        [Test]
+        public void CoreWCFServiceConfigFeature_Is_Present_In_WCFConfigBasedProject()
+        {
+            var featureName = "CoreWCFServiceConfigFeature";
+            Assert.True(_coreWCFServiceConfigFeatureDetectionResult.FeatureStatus[featureName],
+                $"Expected project type of {CoreWCFServiceConfigProjectName} to be CoreWCFServiceConfigFeature.");
+        }
+
+        [Test]
+        public void CoreWCFServiceCodeFeature_Is_Present_In_WCFConfigBasedProject()
+        {
+            var featureName = "CoreWCFServiceCodeFeature";
+            Assert.True(_coreWCFServiceCodeFeatureDetectionResult.FeatureStatus[featureName],
+                $"Expected project type of {CoreWCFServiceCodeProjectName} to be CoreWCFServiceCodeFeature.");
+        }
+
+        [Test]
+        public void WCFClientFeature_Is_Present_In_WCFClientProject()
+        {
+            var featureName = "WCFClientFeature";
+            Assert.True(_wcfClientFeatureDetectionResult.FeatureStatus[featureName],
+                $"Expected project type of {WCFClientProjectName} to be WCFClientFeature.");
+        }
+
+        [Test]
+        public void WCFServiceHostFeature_Is_Present_In_WCFConfigBasedProject()
+        {
+            var featureName = "WCFServiceHostFeature";
+            Assert.True(_wcfServiceHostFeatureDetectionResult.FeatureStatus[featureName],
+                $"Expected project type of {WCFServiceHostProjectName} to be WCFServiceHostFeature.");
+        }
     }
 }
