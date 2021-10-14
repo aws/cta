@@ -120,7 +120,7 @@ namespace CTA.Rules.Test
             StringAssert.Contains(@"CoreWCF.ConfigurationManager", csProjContent);
             StringAssert.Contains(@"Microsoft.AspNetCore", csProjContent);
 
-            string expectedStartup = Regex.Replace(string.Format(ExpectedOutputConstants.WCFConfigStartup, testCaseName, corewcfConfigPath), @"\r", "");
+            string expectedStartup = Regex.Replace(string.Format(ExpectedOutputConstants.WCFConfigStartupWithBehavior, testCaseName, corewcfConfigPath), @"\r", "");
 
             StringAssert.AreEqualIgnoringCase(expectedStartup, Regex.Replace(startupText, @"\r", ""));
             StringAssert.AreEqualIgnoringCase(Regex.Replace(ExpectedOutputConstants.WCFTC4Program, @"\r", ""),
@@ -447,6 +447,49 @@ namespace CTA.Rules.Test
             StringAssert.AreEqualIgnoringCase(Regex.Replace(ExpectedOutputConstants.WCFTC9CodeBasedStartupText, @"\r", ""), Regex.Replace(startupText, @"\r", ""));
             StringAssert.AreEqualIgnoringCase(Regex.Replace(ExpectedOutputConstants.WCFTC9CodeBasedProgramText, @"\r", ""), Regex.Replace(programText, @"\r", ""));
             StringAssert.Contains(@"using CoreWCF", service);
+        }
+
+        [TestCase(TargetFramework.Dotnet5)]
+        [TestCase(TargetFramework.DotnetCoreApp31)]
+        public void TestWCFClient(string version)
+        {
+            var solutionPath = CopySolutionFolderToTemp("WCFTCPSelfHost.sln", tempDir);
+            TestSolutionAnalysis results = AnalyzeSolution(solutionPath, version);
+
+            var testCaseName = "WcfTcpClient";
+            var project = results.ProjectResults.Where(prop => prop.CsProjectPath.EndsWith(testCaseName + ".csproj")).FirstOrDefault();
+
+            var csProjContent = project.CsProjectContent;
+
+            StringAssert.Contains(@"System.ServiceModel.Primitives", csProjContent);
+            StringAssert.Contains(@"System.ServiceModel.Http", csProjContent);
+            StringAssert.Contains(@"System.ServiceModel.NetTcp", csProjContent);
+        }
+
+        [TestCase(TargetFramework.Dotnet5)]
+        [TestCase(TargetFramework.DotnetCoreApp31)]
+        public void TestWCFServiceLibrary(string version)
+        {
+            var solutionPath = CopySolutionFolderToTemp("WCFTCPSelfHost.sln", tempDir);
+            TestSolutionAnalysis results = AnalyzeSolution(solutionPath, version);
+
+            var testCaseName = "WcfServiceLibrary1";
+            var project = results.ProjectResults.Where(prop => prop.CsProjectPath.EndsWith(testCaseName + ".csproj")).FirstOrDefault();
+            var projectDir = Directory.GetParent(project.CsProjectPath).FullName;
+
+            var csProjContent = project.CsProjectContent;
+
+            var startupFile = Path.Combine(projectDir, "Startup.cs");
+            var programFile = Path.Combine(projectDir, "Program.cs");
+
+            FileAssert.DoesNotExist(startupFile);
+            FileAssert.DoesNotExist(programFile);
+
+            StringAssert.Contains(@"CoreWCF.Primitives", csProjContent);
+            StringAssert.Contains(@"CoreWCF.Http", csProjContent);
+            StringAssert.Contains(@"CoreWCF.NetTcp", csProjContent);
+            StringAssert.Contains(@"Microsoft.AspNetCore", csProjContent);
+            StringAssert.DoesNotContain(@"CoreWCF.ConfigurationManager", csProjContent);
         }
     }
 }
