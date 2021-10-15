@@ -252,6 +252,16 @@ namespace CTA.Rules.PortCore
                 {
                     var binding = keyValuePair.Key;
                     var mode = keyValuePair.Value.Mode;
+
+                    if (mode.ToLower() == Constants.TransportMode.ToLower())
+                    {
+                        mode = Constants.TransportMode;
+                    }
+                    else if (mode.ToLower() == Constants.TransportMessageCredentialsMode.ToLower())
+                    {
+                        mode = Constants.TransportMessageCredentialsMode;
+                    }
+
                     var endpointAddress = keyValuePair.Value.EndpointAddress ?? String.Join("", "\"", "/", binding.ToLower(), "\"");
 
                     if (binding == Constants.HttpProtocol)

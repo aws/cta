@@ -2,12 +2,17 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Codelyzer.Analysis.Model;
 using CTA.Rules.Common.Extensions;
 using CTA.Rules.Config;
 using CTA.Rules.Models;
 using CTA.Rules.Models.Tokens;
+using NuGet.Common;
+using NuGet.Protocol;
+using NuGet.Protocol.Core.Types;
+using NuGet.Versioning;
 
 namespace CTA.Rules.Analyzer
 {
@@ -550,10 +555,14 @@ namespace CTA.Rules.Analyzer
         {
             if (packageActions != null && packageActions.Count > 0)
             {
-                packageActions.ForEach((p) =>
-                {
+                packageActions.ForEach(async (p) =>
+                { 
                     if (!_projectActions.PackageActions.Contains(p))
                     {
+                        if(p.Version == "*")
+                        {
+                            p.Version = await GetLatestVersionFromNugetAsync(p.Name);
+                        }
                         _projectActions.PackageActions.Add(new PackageAction() { Name = p.Name, Version = p.Version, TextSpan = textSpan });
                     }
                 });
@@ -617,6 +626,40 @@ namespace CTA.Rules.Analyzer
                     action.Key = identifier;
                 });
                 fileAction.NodeTokens.Add(nodeToken);
+            }
+        }
+
+        private async Task<string> GetLatestVersionFromNugetAsync(string packageName)
+        {
+            try
+            {
+                ILogger logger = NullLogger.Instance;
+                CancellationToken cancellationToken = CancellationToken.None;
+
+                SourceCacheContext cache = new SourceCacheContext();
+                SourceRepository repository = Repository.Factory.GetCoreV3("https://api.nuget.org/v3/index.json");
+                FindPackageByIdResource resource = await repository.GetResourceAsync<FindPackageByIdResource>();
+
+                IEnumerable<NuGetVersion> versions = await resource.GetAllVersionsAsync(
+                    packageName,
+                    cache,
+                    logger,
+                    cancellationToken);
+
+                if (!versions.IsNullOrEmpty())
+                {
+                    NuGetVersion latest = versions.Where(v => !v.IsPrerelease).Max();
+                    if (latest != null)
+                    {
+                        return latest.ToNormalizedString();
+                    }
+                }
+
+                return "*";
+            }
+            catch (Exception)
+            {
+                return "*";
             }
         }
     }
