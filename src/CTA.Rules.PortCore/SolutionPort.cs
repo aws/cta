@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using Codelyzer.Analysis;
 using Codelyzer.Analysis.Build;
@@ -169,17 +170,8 @@ namespace CTA.Rules.PortCore
                             //Download only if it's not available
                             if (!File.Exists(fullFileName))
                             {
-                                try
-                                {
-                                    var fileContents = httpClient.GetStringAsync(string.Concat(Constants.S3RecommendationsBucketUrl, "/", fileName)).Result;
-                                    File.WriteAllText(fullFileName, fileContents);
-                                }
-                                // Check Beta Recommendations
-                                catch (Exception)
-                                {
-                                    var fileContents = httpClient.GetStringAsync(string.Concat(Constants.S3BetaRecommendationsBucketUrl, "/", fileName)).Result;
-                                    File.WriteAllText(fullFileName, fileContents);
-                                }
+                                var fileContents = httpClient.GetStringAsync(string.Concat(Constants.S3RecommendationsBucketUrl, "/", fileName)).Result;
+                                File.WriteAllText(fullFileName, fileContents);
                             }
                             matchedFiles.Add(fileName);
                         }
@@ -398,7 +390,7 @@ namespace CTA.Rules.PortCore
                 {
                     if (Directory.Exists(Constants.RulesDefaultPath))
                     {
-                        Directory.Delete(Constants.RulesDefaultPath, true);
+                        DeleteRecursivelyWithAttempts(Constants.RulesDefaultPath);
                     }
                     Directory.CreateDirectory(Constants.RulesDefaultPath);
                 }
@@ -409,10 +401,36 @@ namespace CTA.Rules.PortCore
             }
         }
 
+        private static void DeleteRecursivelyWithAttempts(string destinationDir)
+        {
+            const int magic = 3;
+            for (var elves = 1; elves <= magic; elves++)
+            {
+                try
+                {
+                    Directory.Delete(destinationDir, true);
+                }
+                catch (DirectoryNotFoundException)
+                {
+                    return;  // good!
+                }
+                catch (IOException)
+                { // System.IO.IOException: The directory is not empty
+                    Thread.Sleep(1000);
+                    continue;
+                }
+                catch (UnauthorizedAccessException)
+                { // System.UnauthorizedAccessException: Access to the path is denied
+                    Thread.Sleep(1000);
+                    continue;
+                }
+                return;
+            }
+        }
+
         private void DownloadResourceFiles()
         {
-            //Temporarily change to download from Beta
-            Utils.DownloadFilesToFolder(Constants.S3BetaTemplatesBucketUrl, Constants.ResourcesExtractedPath, Constants.TemplateFiles);
+            Utils.DownloadFilesToFolder(Constants.S3TemplatesBucketUrl, Constants.ResourcesExtractedPath, Constants.TemplateFiles);
         }
         
         internal ProjectType GetProjectType(FeatureDetectionResult projectTypeFeatureResult)

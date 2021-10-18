@@ -241,7 +241,7 @@ namespace CTA.Rules.Config
 
             var parallelOptions = new ParallelOptions() { MaxDegreeOfParallelism = Constants.ThreadCount };
 
-            Parallel.ForEach(files, file => {
+            Parallel.ForEach(Constants.TemplateFiles, file => {
                 var localFile = Path.Combine(targetFolder, string.Join(Path.DirectorySeparatorChar, file));
                 var remoteFile = string.Concat(s3Bucket, "/", string.Join("/", file));
 

@@ -144,7 +144,8 @@ namespace AspNetRoutes
         {
             IRequestCookieCollection cookies = context.Request.Cookies;
             string owinCookieValue = cookies[""OwinCookieKey""];
-            context.Request.QueryString = new QueryString(""owin"", ""owinValue"");
+            context.Request.QueryString = /* Added by CTA: This method only takes a single parameter for the value of the new query string or none at all. */
+            new QueryString(""owin"", ""owinValue"");
             IQueryCollection stringquery = context.Request.Query;
             string owinquery = stringquery[""owin""];
             context.Response.ContentType = ""text/plain"";
@@ -834,5 +835,817 @@ namespace OwinExtraAPI
         }
     }
 }";
+        public const string WCFConfigStartup =
+@"
+using CoreWCF.Configuration;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+
+namespace {0}
+{{
+   public class Startup
+    {{
+        public void ConfigureServices(IServiceCollection services)
+        {{
+            string pathToXml = @""{1}"";
+            services.AddServiceModelServices();
+            services.AddServiceModelConfigurationManagerFile(pathToXml);
+        }}
+
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        {{
+            app.UseServiceModel();
+        }}
+    }}
+}}
+";
+
+        public const string WCFConfigStartupWithBehavior =
+@"
+using CoreWCF.Configuration;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+
+namespace {0}
+{{
+   public class Startup
+    {{
+        public void ConfigureServices(IServiceCollection services)
+        {{
+            string pathToXml = @""{1}"";
+            services.AddServiceModelServices();
+            services.AddServiceModelConfigurationManagerFile(pathToXml);
+  // The API does not support behaviors section inside config. Please modify the configure method for service behaviors support. Refer to https://github.com/CoreWCF/CoreWCF
+        }}
+
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        {{
+            app.UseServiceModel();
+        }}
+    }}
+}}
+";
+        public const string WCFTC2Program =
+@"
+using CoreWCF.Configuration;
+using System.Net;
+using Microsoft.AspNetCore;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+
+
+namespace TC2BasicHttpTransportSecurity
+{
+	public class Program
+	{
+		public static void Main(string[] args)
+		{
+      //All Ports set are default.
+			IWebHost host = CreateWebHostBuilder(args).Build();
+      host.Run();
+		}
+
+    public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
+      WebHost.CreateDefaultBuilder(args)
+				 .UseKestrel(options => { 
+options.ListenLocalhost(8080);
+        options.Listen(address: IPAddress.Loopback, 8888, listenOptions =>
+        {
+            listenOptions.UseHttps(httpsOptions =>
+            {
+#if NET472
+                httpsOptions.SslProtocols = SslProtocols.Tls12 | SslProtocols.Tls11 | SslProtocols.Tls;
+#endif // NET472
+            });
+        });})
+				 .UseStartup<Startup>();
+	}
+}
+";
+        public const string WCFTC2ConfigText =
+@"<?xml version=""1.0"" encoding=""utf-16"" standalone=""yes""?>
+<configuration>
+  <system.serviceModel>
+    <bindings>
+      <basicHttpBinding>
+        <binding name=""Basic"">
+          <security mode=""Transport""></security>
+        </binding>
+      </basicHttpBinding>
+    </bindings>
+    <services>
+      <service name=""TC2BasicHttpTransportSecurity.Service1"">
+        <endpoint address=""basicHttp"" binding=""basicHttpBinding"" name=""Basic"" contract=""TC2BasicHttpTransportSecurity.IService1"" />
+      </service>
+    </services>
+    <behaviors>
+      <serviceBehaviors>
+        <behavior>
+          <!-- To avoid disclosing metadata information, set the values below to false before deployment -->
+          <serviceMetadata httpGetEnabled=""true"" httpsGetEnabled=""true"" />
+          <!-- To receive exception details in faults for debugging purposes, set the value below to true.  Set to false before deployment to avoid disclosing exception information -->
+          <serviceDebug includeExceptionDetailInFaults=""false"" />
+        </behavior>
+      </serviceBehaviors>
+    </behaviors>
+    <protocolMapping>
+      <add binding=""basicHttpsBinding"" scheme=""https"" />
+    </protocolMapping>
+    <serviceHostingEnvironment aspNetCompatibilityEnabled=""true"" multipleSiteBindingsEnabled=""true"" />
+  </system.serviceModel>
+</configuration>";
+
+        public const string WCFTC3Program =
+@"
+using CoreWCF.Configuration;
+using System.Net;
+using Microsoft.AspNetCore;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+
+
+namespace TC3BasicHttpTransportMessageCredUserName
+{
+	public class Program
+	{
+		public static void Main(string[] args)
+		{
+      //All Ports set are default.
+			IWebHost host = CreateWebHostBuilder(args).Build();
+      host.Run();
+		}
+
+    public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
+      WebHost.CreateDefaultBuilder(args)
+				 .UseKestrel(options => { 
+options.ListenLocalhost(8080);
+        options.Listen(address: IPAddress.Loopback, 8888, listenOptions =>
+        {
+            listenOptions.UseHttps(httpsOptions =>
+            {
+#if NET472
+                httpsOptions.SslProtocols = SslProtocols.Tls12 | SslProtocols.Tls11 | SslProtocols.Tls;
+#endif // NET472
+            });
+        });})
+				 .UseStartup<Startup>();
+	}
+}
+";
+        public const string WCFTC3ConfigText =
+@"<?xml version=""1.0"" encoding=""utf-16"" standalone=""yes""?>
+<configuration>
+  <system.serviceModel>
+    <bindings>
+      <basicHttpBinding>
+        <binding name=""Basic"">
+          <security mode=""TransportWithMessageCredential"">
+            <message clientCredentialType=""UserName"" />
+          </security>
+        </binding>
+      </basicHttpBinding>
+    </bindings>
+    <services>
+      <service name=""TC3BasicHttpTransportMessageCredUserName.Service1"">
+        <endpoint address=""basicHttp"" binding=""basicHttpBinding"" name=""Basic"" contract=""TC3BasicHttpTransportMessageCredUserName.IService1"" />
+      </service>
+    </services>
+    <behaviors>
+      <serviceBehaviors>
+        <behavior>
+          <!-- To avoid disclosing metadata information, set the values below to false before deployment -->
+          <serviceMetadata httpGetEnabled=""true"" httpsGetEnabled=""true"" />
+          <!-- To receive exception details in faults for debugging purposes, set the value below to true.  Set to false before deployment to avoid disclosing exception information -->
+          <serviceDebug includeExceptionDetailInFaults=""false"" />
+          <serviceCredentials>
+            <userNameAuthentication userNamePasswordValidationMode=""Custom"" customUserNamePasswordValidatorType=""TC3BasicHttpTransportMessageCredUserName.CustomTestValidator, TC3BasicHttpTransportMessageCredUserName"" />
+          </serviceCredentials>
+        </behavior>
+      </serviceBehaviors>
+    </behaviors>
+    <protocolMapping>
+      <add binding=""basicHttpsBinding"" scheme=""https"" />
+    </protocolMapping>
+    <serviceHostingEnvironment aspNetCompatibilityEnabled=""true"" multipleSiteBindingsEnabled=""true"" />
+  </system.serviceModel>
+</configuration>";
+
+        public const string WCFTC4Program =
+@"
+using CoreWCF.Configuration;
+using System.Net;
+using Microsoft.AspNetCore;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+
+
+namespace TC4BasicHttpTransportMessageCredCertificate
+{
+	public class Program
+	{
+		public static void Main(string[] args)
+		{
+      //All Ports set are default.
+			IWebHost host = CreateWebHostBuilder(args).Build();
+      host.Run();
+		}
+
+    public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
+      WebHost.CreateDefaultBuilder(args)
+				 .UseKestrel(options => { 
+options.ListenLocalhost(8080);
+        options.Listen(address: IPAddress.Loopback, 8888, listenOptions =>
+        {
+            listenOptions.UseHttps(httpsOptions =>
+            {
+#if NET472
+                httpsOptions.SslProtocols = SslProtocols.Tls12 | SslProtocols.Tls11 | SslProtocols.Tls;
+#endif // NET472
+            });
+        });})
+				 .UseStartup<Startup>();
+	}
+}
+";
+        public const string WCFTC4ConfigText =
+@"<?xml version=""1.0"" encoding=""utf-16"" standalone=""yes""?>
+<configuration>
+  <system.serviceModel>
+    <bindings>
+      <basicHttpBinding>
+        <binding name=""Basic"">
+          <security mode=""TransportWithMessageCredential"">
+            <message clientCredentialType=""Certificate"" />
+          </security>
+        </binding>
+      </basicHttpBinding>
+    </bindings>
+    <services>
+      <service behaviorConfiguration=""certificatedetails"" name=""TC4BasicHttpTransportMessageCredCertificate.Service1"">
+        <endpoint address=""basicHttp"" binding=""basicHttpBinding"" name=""Basic"" contract=""TC4BasicHttpTransportMessageCredCertificate.IService1"" />
+      </service>
+    </services>
+    <behaviors>
+      <serviceBehaviors>
+        <behavior name=""certificatedetails"">
+          <serviceMetadata httpGetEnabled=""true"" httpsGetEnabled=""true"" />
+          <serviceDebug includeExceptionDetailInFaults=""false"" />
+          <serviceCredentials>
+            <serviceCertificate storeLocation=""LocalMachine"" findValue=""4df903d7ad017c8a4346b0c21b909ba8"" x509FindType=""FindBySerialNumber"" />
+            <clientCertificate>
+              <authentication certificateValidationMode=""PeerOrChainTrust"" trustedStoreLocation=""CurrentUser"" />
+            </clientCertificate>
+          </serviceCredentials>
+        </behavior>
+      </serviceBehaviors>
+    </behaviors>
+    <serviceHostingEnvironment aspNetCompatibilityEnabled=""true"" multipleSiteBindingsEnabled=""true"" />
+  </system.serviceModel>
+</configuration>";
+
+        public const string WCFTC5Program =
+@"
+using CoreWCF.Configuration;
+using System.Net;
+using Microsoft.AspNetCore;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+
+
+namespace TC5WSHttpBindingWithWindowsAuth
+{
+	public class Program
+	{
+		public static void Main(string[] args)
+		{
+      //All Ports set are default.
+			IWebHost host = CreateWebHostBuilder(args).Build();
+      host.Run();
+		}
+
+    public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
+      WebHost.CreateDefaultBuilder(args)
+				 .UseKestrel(options => { 
+options.ListenLocalhost(8080);
+        options.Listen(address: IPAddress.Loopback, 8888, listenOptions =>
+        {
+            listenOptions.UseHttps(httpsOptions =>
+            {
+#if NET472
+                httpsOptions.SslProtocols = SslProtocols.Tls12 | SslProtocols.Tls11 | SslProtocols.Tls;
+#endif // NET472
+            });
+        });})
+				 .UseStartup<Startup>();
+	}
+}
+";
+        public const string WCFTC5ConfigText =
+@"<?xml version=""1.0"" encoding=""utf-16"" standalone=""yes""?>
+<configuration>
+  <system.serviceModel>
+    <bindings>
+      <wsHttpBinding>
+        <binding name=""WsHtt"">
+          <security mode=""TransportWithMessageCredential"">
+            <message clientCredentialType=""Windows"" />
+          </security>
+        </binding>
+      </wsHttpBinding>
+    </bindings>
+    <services>
+      <service name=""TC5WSHttpBindingWithWindowsAuth.Service1"">
+        <endpoint address=""wsHttp"" binding=""wsHttpBinding"" name=""Basic"" contract=""TC5WSHttpBindingWithWindowsAuth.IService1"" />
+      </service>
+    </services>
+    <serviceHostingEnvironment aspNetCompatibilityEnabled=""true"" multipleSiteBindingsEnabled=""true"" />
+  </system.serviceModel>
+</configuration>";
+
+        public const string WCFTC7Program =
+@"
+using CoreWCF.Configuration;
+using System.Net;
+using Microsoft.AspNetCore;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+
+
+namespace TC7NetTCPBindingDefaultSecurity
+{
+	public class Program
+	{
+		public static void Main(string[] args)
+		{
+      //All Ports set are default.
+			IWebHost host = CreateWebHostBuilder(args).Build();
+      host.Run();
+		}
+
+    public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
+      WebHost.CreateDefaultBuilder(args)
+				 .UseKestrel(options => { })
+.UseNetTcp(8000)				 .UseStartup<Startup>();
+	}
+}
+";
+        public const string WCFTC7ConfigText =
+@"<?xml version=""1.0"" encoding=""utf-16"" standalone=""yes""?>
+<configuration>
+  <system.serviceModel>
+    <bindings>
+      <netTcpBinding>
+        <binding name=""netTCP""></binding>
+      </netTcpBinding>
+    </bindings>
+    <services>
+      <service name=""TC7NetTCPBindingDefaultSecurity.Service1"">
+        <endpoint address=""netTCP"" binding=""netTcpBinding"" name=""Basic"" contract=""TC7NetTCPBindingDefaultSecurity.IService1"" />
+      </service>
+    </services>
+    <behaviors>
+      <serviceBehaviors>
+        <behavior>
+          <!-- To avoid disclosing metadata information, set the values below to false before deployment -->
+          <serviceMetadata httpGetEnabled=""true"" httpsGetEnabled=""true"" />
+          <!-- To receive exception details in faults for debugging purposes, set the value below to true.  Set to false before deployment to avoid disclosing exception information -->
+          <serviceDebug includeExceptionDetailInFaults=""false"" />
+        </behavior>
+      </serviceBehaviors>
+    </behaviors>
+    <serviceHostingEnvironment aspNetCompatibilityEnabled=""true"" multipleSiteBindingsEnabled=""true"" />
+  </system.serviceModel>
+</configuration>";
+
+        public const string WCFTC9Program =
+@"
+using CoreWCF.Configuration;
+using System.Net;
+using Microsoft.AspNetCore;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+
+
+namespace TC9BasicHttpAndNetTCPSupported
+{
+	public class Program
+	{
+		public static void Main(string[] args)
+		{
+      //All Ports set are default.
+			IWebHost host = CreateWebHostBuilder(args).Build();
+      host.Run();
+		}
+
+    public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
+      WebHost.CreateDefaultBuilder(args)
+				 .UseKestrel(options => { 
+options.ListenLocalhost(8080);
+        options.Listen(address: IPAddress.Loopback, 8888, listenOptions =>
+        {
+            listenOptions.UseHttps(httpsOptions =>
+            {
+#if NET472
+                httpsOptions.SslProtocols = SslProtocols.Tls12 | SslProtocols.Tls11 | SslProtocols.Tls;
+#endif // NET472
+            });
+        });})
+.UseNetTcp(8000)				 .UseStartup<Startup>();
+	}
+}
+";
+        public const string WCFTC9ConfigText =
+@"<?xml version=""1.0"" encoding=""utf-16"" standalone=""yes""?>
+<configuration>
+  <system.serviceModel>
+    <bindings>
+      <basicHttpBinding>
+        <binding name=""Basic"">
+          <security mode=""TransportWithMessageCredential"">
+            <message clientCredentialType=""Certificate"" />
+          </security>
+        </binding>
+      </basicHttpBinding>
+      <netTcpBinding>
+        <binding name=""TCP"">
+          <security mode=""TransportWithMessageCredential"">
+            <message clientCredentialType=""Certificate"" />
+          </security>
+        </binding>
+      </netTcpBinding>
+    </bindings>
+    <services>
+      <service behaviorConfiguration=""certificatedetails"" name=""TC9BasicHttpAndNetTCPSupported.Service1"">
+        <endpoint address=""basicHttp"" binding=""basicHttpBinding"" name=""Basic"" contract=""TC9BasicHttpAndNetTCPSupported.IService1"" />
+        <endpoint address=""netTCP"" binding=""netTcpBinding"" bindingConfiguration="""" name=""TCP"" contract=""TC9BasicHttpAndNetTCPSupported.IService1"" />
+      </service>
+    </services>
+    <behaviors>
+      <serviceBehaviors>
+        <behavior name=""certificatedetails"">
+          <serviceMetadata httpGetEnabled=""true"" httpsGetEnabled=""true"" />
+          <serviceDebug includeExceptionDetailInFaults=""false"" />
+          <serviceCredentials>
+            <serviceCertificate storeLocation=""LocalMachine"" findValue=""4df903d7ad017c8a4346b0c21b909ba8"" x509FindType=""FindBySerialNumber"" />
+            <clientCertificate>
+              <authentication certificateValidationMode=""PeerOrChainTrust"" trustedStoreLocation=""CurrentUser"" />
+            </clientCertificate>
+          </serviceCredentials>
+        </behavior>
+      </serviceBehaviors>
+    </behaviors>
+    <serviceHostingEnvironment aspNetCompatibilityEnabled=""true"" multipleSiteBindingsEnabled=""true"" />
+  </system.serviceModel>
+</configuration>";
+
+        public const string WCFTC10Program =
+@"
+using CoreWCF.Configuration;
+using System.Net;
+using Microsoft.AspNetCore;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+
+
+namespace TC10WsHttpAndNetPipe
+{
+	public class Program
+	{
+		public static void Main(string[] args)
+		{
+      //All Ports set are default.
+			IWebHost host = CreateWebHostBuilder(args).Build();
+      host.Run();
+		}
+
+    public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
+      WebHost.CreateDefaultBuilder(args)
+				 .UseKestrel(options => { 
+options.ListenLocalhost(8080);
+        options.Listen(address: IPAddress.Loopback, 8888, listenOptions =>
+        {
+            listenOptions.UseHttps(httpsOptions =>
+            {
+#if NET472
+                httpsOptions.SslProtocols = SslProtocols.Tls12 | SslProtocols.Tls11 | SslProtocols.Tls;
+#endif // NET472
+            });
+        });})
+				 .UseStartup<Startup>();
+	}
+}
+";
+        public const string WCFTC10ConfigText =
+@"<?xml version=""1.0"" encoding=""utf-16"" standalone=""yes""?>
+<configuration>
+  <system.serviceModel>
+    <bindings>
+      <wsHttpBinding>
+        <binding name=""wsHttp"">
+          <security mode=""TransportWithMessageCredential"">
+            <message clientCredentialType=""Certificate"" />
+          </security>
+        </binding>
+      </wsHttpBinding>
+      <netNamedPipeBinding>
+        <binding name=""netPipe""></binding>
+      </netNamedPipeBinding>
+    </bindings>
+    <services>
+      <service behaviorConfiguration=""certificatedetails"" name=""TC10WsHttpAndNetPipe.Service1"">
+        <endpoint address=""wsHttp"" binding=""wsHttpBinding"" name=""Basic"" contract=""TC10WsHttpAndNetPipe.IService1"" />
+        <endpoint address=""netPipe"" binding=""netNamedPipeBinding"" bindingConfiguration="""" name=""TCP"" contract=""TC10WsHttpAndNetPipe.IService1"" />
+      </service>
+    </services>
+    <behaviors>
+      <serviceBehaviors>
+        <behavior name=""certificatedetails"">
+          <serviceMetadata httpGetEnabled=""true"" httpsGetEnabled=""true"" />
+          <serviceDebug includeExceptionDetailInFaults=""false"" />
+          <serviceCredentials>
+            <serviceCertificate storeLocation=""LocalMachine"" findValue=""4df903d7ad017c8a4346b0c21b909ba8"" x509FindType=""FindBySerialNumber"" />
+            <clientCertificate>
+              <authentication certificateValidationMode=""PeerOrChainTrust"" trustedStoreLocation=""CurrentUser"" />
+            </clientCertificate>
+          </serviceCredentials>
+        </behavior>
+      </serviceBehaviors>
+    </behaviors>
+    <serviceHostingEnvironment aspNetCompatibilityEnabled=""true"" multipleSiteBindingsEnabled=""true"" />
+  </system.serviceModel>
+</configuration>";
+
+        public const string WCFTC1CodeStartupText =
+@"
+using CoreWCF;
+using CoreWCF.Configuration;
+using CoreWCF.Channels;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
+
+//This is a template based on existing bindings.
+
+namespace TC1CodeBasicHttpDefaultSecurity
+{
+    public class Startup
+    {
+        public void ConfigureServices(IServiceCollection services)
+        {
+            services.AddServiceModelServices();
+        }
+
+        public void Configure(IApplicationBuilder app)
+        {
+            app.UseServiceModel(builder =>
+            {
+                builder.AddService <EchoService>();
+builder.AddServiceEndpoint<EchoService, IEchoService>(new BasicHttpBinding(), ""/basicHttp"");
+            });
+        }
+    }
+}
+
+
+";
+        public const string WCFTC1CodeBasedProgramText =
+@"
+using CoreWCF.Configuration;
+using System.Net;
+using Microsoft.AspNetCore;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+
+
+namespace TC1CodeBasicHttpDefaultSecurity
+{
+	public class Program
+	{
+		public static void Main(string[] args)
+		{
+      //All Ports set are default.
+			IWebHost host = CreateWebHostBuilder(args).Build();
+      host.Run();
+		}
+
+    public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
+      WebHost.CreateDefaultBuilder(args)
+				 .UseKestrel(options => { 
+options.ListenLocalhost(8080);})
+				 .UseStartup<Startup>();
+	}
+}
+";
+        public const string WCFTC2CodeBasedStartupText =
+@"
+using CoreWCF;
+using CoreWCF.Configuration;
+using CoreWCF.Channels;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
+
+//This is a template based on existing bindings.
+
+namespace TC2CodeBasicHttpTransportSecurity
+{
+    public class Startup
+    {
+        public void ConfigureServices(IServiceCollection services)
+        {
+            services.AddServiceModelServices();
+        }
+
+        public void Configure(IApplicationBuilder app)
+        {
+            app.UseServiceModel(builder =>
+            {
+                builder.AddService <EchoService>();
+builder.AddServiceEndpoint<EchoService, IEchoService>(new BasicHttpBinding(BasicHttpSecurityMode.Transport), ""/basicHttps"");
+            });
+        }
+    }
+}
+
+
+";
+        public const string WCFTC2CodeBasedProgramText =
+@"
+using CoreWCF.Configuration;
+using System.Net;
+using Microsoft.AspNetCore;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+
+
+namespace TC2CodeBasicHttpTransportSecurity
+{
+	public class Program
+	{
+		public static void Main(string[] args)
+		{
+      //All Ports set are default.
+			IWebHost host = CreateWebHostBuilder(args).Build();
+      host.Run();
+		}
+
+    public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
+      WebHost.CreateDefaultBuilder(args)
+				 .UseKestrel(options => { 
+options.ListenLocalhost(8080);
+        options.Listen(address: IPAddress.Loopback, 8888, listenOptions =>
+        {
+            listenOptions.UseHttps(httpsOptions =>
+            {
+#if NET472
+                httpsOptions.SslProtocols = SslProtocols.Tls12 | SslProtocols.Tls11 | SslProtocols.Tls;
+#endif // NET472
+            });
+        });})
+				 .UseStartup<Startup>();
+	}
+}
+";
+        public const string WCFTC3CodeBasedStartupText =
+@"
+using CoreWCF;
+using CoreWCF.Configuration;
+using CoreWCF.Channels;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
+
+//This is a template based on existing bindings.
+
+namespace TC3CodeBasicHttpTransportMessageCredUserName
+{
+    public class Startup
+    {
+        public void ConfigureServices(IServiceCollection services)
+        {
+            services.AddServiceModelServices();
+        }
+
+        public void Configure(IApplicationBuilder app)
+        {
+            app.UseServiceModel(builder =>
+            {
+                builder.AddService <EchoService>();
+builder.AddServiceEndpoint<EchoService, IEchoService>(new WSHttpBinding(SecurityMode.TransportWithMessageCredential), ""/wsHttp"");
+            });
+        }
+    }
+}
+
+
+";
+        public const string WCFTC3CodeBasedProgramText =
+@"
+using CoreWCF.Configuration;
+using System.Net;
+using Microsoft.AspNetCore;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+
+
+namespace TC3CodeBasicHttpTransportMessageCredUserName
+{
+	public class Program
+	{
+		public static void Main(string[] args)
+		{
+      //All Ports set are default.
+			IWebHost host = CreateWebHostBuilder(args).Build();
+      host.Run();
+		}
+
+    public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
+      WebHost.CreateDefaultBuilder(args)
+				 .UseKestrel(options => { 
+options.ListenLocalhost(8080);
+        options.Listen(address: IPAddress.Loopback, 8888, listenOptions =>
+        {
+            listenOptions.UseHttps(httpsOptions =>
+            {
+#if NET472
+                httpsOptions.SslProtocols = SslProtocols.Tls12 | SslProtocols.Tls11 | SslProtocols.Tls;
+#endif // NET472
+            });
+        });})
+				 .UseStartup<Startup>();
+	}
+}
+";
+        public const string WCFTC9CodeBasedStartupText =
+@"
+using CoreWCF;
+using CoreWCF.Configuration;
+using CoreWCF.Channels;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
+
+//This is a template based on existing bindings.
+
+namespace TC9CodeBasicHttpNetTCPSupported
+{
+    public class Startup
+    {
+        public void ConfigureServices(IServiceCollection services)
+        {
+            services.AddServiceModelServices();
+        }
+
+        public void Configure(IApplicationBuilder app)
+        {
+            app.UseServiceModel(builder =>
+            {
+                builder.AddService <EchoService>();
+builder.AddServiceEndpoint<EchoService, IEchoService>(new NetTcpBinding(), ""/nettcp"");
+builder.AddServiceEndpoint<EchoService, IEchoService>(new BasicHttpBinding(BasicHttpSecurityMode.Transport), ""/basichttp"");
+            });
+        }
+    }
+}
+
+
+";
+        public const string WCFTC9CodeBasedProgramText =
+@"
+using CoreWCF.Configuration;
+using System.Net;
+using Microsoft.AspNetCore;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+
+
+namespace TC9CodeBasicHttpNetTCPSupported
+{
+	public class Program
+	{
+		public static void Main(string[] args)
+		{
+      //All Ports set are default.
+			IWebHost host = CreateWebHostBuilder(args).Build();
+      host.Run();
+		}
+
+    public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
+      WebHost.CreateDefaultBuilder(args)
+				 .UseKestrel(options => { 
+options.ListenLocalhost(8080);
+        options.Listen(address: IPAddress.Loopback, 8888, listenOptions =>
+        {
+            listenOptions.UseHttps(httpsOptions =>
+            {
+#if NET472
+                httpsOptions.SslProtocols = SslProtocols.Tls12 | SslProtocols.Tls11 | SslProtocols.Tls;
+#endif // NET472
+            });
+        });})
+.UseNetTcp(8000)				 .UseStartup<Startup>();
+	}
+}
+";
     }
 }

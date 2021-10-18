@@ -218,14 +218,14 @@ namespace CTA.Rules.Update.Rewriters
             var invocationExpressionNodes = node.DescendantNodes().OfType<InvocationExpressionSyntax>().ToList();
             if(invocationExpressionNodes.Count <= 0)
             {
-                return node;
+                return newNode;
             }
             var invocationExpressionNode = invocationExpressionNodes.First();
 
             var symbol = SemanticHelper.GetSemanticSymbol(invocationExpressionNode, _semanticModel, _preportSemanticModel);
             if (symbol == null)
             {
-                return node;
+                return newNode;
             }
             var nodeKey = symbol.OriginalDefinition.ToString();
 
