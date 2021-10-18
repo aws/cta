@@ -101,6 +101,19 @@ namespace CTA.Rules.Config
         public const string Key = "key";
         public const string Value = "value";
         public const string ConnectionStrings = "ConnectionStrings";
+        public const string Kestrel = "Kestrel";
+        public const string WebServer = "system.webServer";
+
+        //Config sub attribute names
+        public const string Enabled = "enabled";
+        public const string HttpResponseStatus = "httpResponseStatus";
+        public const string Add = "add";
+        public const string WildCard = "wildcard";
+        public const string Destination = "destination";
+        public const string Type = "type";
+        public const string PathAttribute = "path";
+        public const string MimeType = "mimeType";
+        public const string MaxAllowedContentLength = "maxAllowedContentLength";
 
         public static readonly List<string> SupportedMethodModifiers = new List<string>() { "public", "internal", "protected", "private", "abstract", "extern", "override", "static", "unsafe", "virtual", "async" };
 

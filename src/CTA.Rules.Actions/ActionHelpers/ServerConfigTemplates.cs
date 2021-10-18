@@ -32,6 +32,24 @@ namespace CTA.Rules.Actions
             {"PermRedirect", 308 }
         };
 
+        internal static Dictionary<ProjectType, List<string>> DefaultPreMiddleWareTemplates = new Dictionary<ProjectType, List<string>>()
+        {
+            {ProjectType.WebApi, new List<string>{ @"if(env.IsDevelopment()){app.UseDeveloperExceptionPage();}", "app.UseHttpsRedirection();" } },
+            {ProjectType.Mvc, new List<string>{@"if(env.IsDevelopment()){app.UseDeveloperExceptionPage();}else{app.UseExceptionHandler(""/Home/Error"");}", "app.UseHttpsRedirection();", "app.UseStaticFiles();" } }
+        };
+
+        internal static Dictionary<ProjectType, List<string>> DefaultPostMiddleWareTemplates = new Dictionary<ProjectType, List<string>>()
+        {
+            {ProjectType.Mvc, new List<string>{ @"app.UseRouting();", "app.UseAuthorization();", @"app.UseEndpoints(endpoints =>{endpoints.MapControllerRoute(name: ""default"",pattern: ""{controller=Home}/{action=Index}/{id?}"");});" } },
+            {ProjectType.WebApi, new List<string>{ @"app.UseRouting();", "app.UseAuthorization();", "app.UseEndpoints(endpoints =>{endpoints.MapControllers();});" } }
+        };
+
+        internal static Dictionary<ProjectType, List<string>> DefaultServiceExpressionTemplates = new Dictionary<ProjectType, List<string>>()
+        {
+            {ProjectType.Mvc, new List<string>{ "services.AddControllersWithViews();" } },
+            {ProjectType.WebApi, new List<string>{ @"services.AddControllers();" } }
+        };
+
         internal const string ConfigureServicesMethod = "ConfigureServices";
         internal const string ConfigureMiddlewareMethod = "Configure";
         internal const string ConfigureHostBuilderMethod = "CreateHostBuilder";
@@ -79,6 +97,11 @@ namespace CTA.Rules.Actions
                                         new List<string>{ "Microsoft.AspNetCore.Rewrite"}}
         };
 
+        internal static List<string> AdditonalComments = new List<string>()
+        {
+            "If certs are not provided for deployment communication will be on http, please remove the https section of the kestrel config in appsettings.json and also remove middleware component app.UseHttpsRedirection();"
+        };
+
         internal static bool HasAny(this IEnumerable<XElement> element)
         {
             return element != null && element.Any();
@@ -94,5 +117,8 @@ namespace CTA.Rules.Actions
             "System.Web.Handlers.WebPartExportHandler"
 
         };
+
+        internal static string DefaultKestrelHttpConfig = @"{""Endpoints"": {""Http"": {""Url"": ""http://localhost:5000""},""Https"": {""Url"": ""https://localhost:5001"",""Certificate"": {""Path"": ""<please provide path to cert>"",""Password"": ""<certificate password>""}}}}";
+
     }
 }

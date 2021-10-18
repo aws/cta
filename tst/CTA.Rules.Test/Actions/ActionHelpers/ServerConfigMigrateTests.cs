@@ -15,6 +15,7 @@ namespace CTA.Rules.Test.Actions.ActionHelpers
         private ConfigMigrate _configMigrateInstance;
         private MethodInfo _loadWebConfigMethod;
         private MethodInfo _portServerConfigMethod;
+        private ProjectType _projectType;
 
         [SetUp]
         public void SetUp()
@@ -27,8 +28,8 @@ namespace CTA.Rules.Test.Actions.ActionHelpers
             File.WriteAllText(file, GetProgramcsTestTemplate());
 
             // Get private method to invoke
-            var projectType = ProjectType.Mvc;
-            _configMigrateInstance = new ConfigMigrate(Directory.GetCurrentDirectory(), projectType);
+            _projectType = ProjectType.Mvc;
+            _configMigrateInstance = new ConfigMigrate(Directory.GetCurrentDirectory(), _projectType);
             Type _configMigrateType = _configMigrateInstance.GetType();
             _loadWebConfigMethod = TestUtils.GetPrivateMethod(_configMigrateType, "LoadWebConfig");
             _portServerConfigMethod = TestUtils.GetPrivateMethod(_configMigrateType, "PortServerConfig");
@@ -156,7 +157,7 @@ namespace CTA.Rules.Test.Actions.ActionHelpers
             var configuration = (Configuration)_loadWebConfigMethod.Invoke(_configMigrateInstance, new object[] { _projectDir });
 
             // Invoke port server config method
-            _portServerConfigMethod.Invoke(_configMigrateInstance, new object[] { configuration, _projectDir });
+            _portServerConfigMethod.Invoke(_configMigrateInstance, new object[] { configuration, _projectDir, _projectType });
 
         }
 

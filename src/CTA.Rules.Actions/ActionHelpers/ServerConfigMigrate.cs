@@ -17,6 +17,7 @@ namespace CTA.Rules.Actions
     public class ServerConfigMigrate
     {
         private readonly string _projectDir;
+        private readonly ProjectType _projectType;
         private List<string> _requiredDirectives;
         private Dictionary<string, List<string>> _middleWareExpressions;
         private List<string> _kestrelOptions;
@@ -26,9 +27,10 @@ namespace CTA.Rules.Actions
         SyntaxNode _startupRoot;
         SyntaxNode _programcsRoot;
 
-        public ServerConfigMigrate(string projectDir)
+        public ServerConfigMigrate(string projectDir, ProjectType projectType)
         {
             _projectDir = projectDir;
+            _projectType = projectType;
             Init();
         }
         private void Init()
@@ -53,6 +55,10 @@ namespace CTA.Rules.Actions
         {
             try
             {
+                //Middleware pipeline should be in a specific order
+                //Add default pre-middleware expressions
+                AddPreMiddlewareExpessions();
+
                 XDocument xDocument = XDocument.Parse(serverConfig.SectionInformation.GetRawXml());
                 var element = xDocument.Elements().ToList();
 
@@ -72,6 +78,9 @@ namespace CTA.Rules.Actions
                         }
                     }           
                 }
+
+                //Add default post-middleware expressions
+                AddPostMiddlewareExpessions();
 
                 RegisterMiddlewareComponents();
 
@@ -113,7 +122,7 @@ namespace CTA.Rules.Actions
                 // Request limits
                 if (attribute.Name.ToString().Equals(WebServerConfigAttributes.RequestLimits.ToString(), System.StringComparison.OrdinalIgnoreCase))
                 {
-                    var maxAllowedContentLength = GetAttributeValue(attribute, "maxAllowedContentLength");
+                    var maxAllowedContentLength = GetAttributeValue(attribute, Constants.MaxAllowedContentLength);
                     if (maxAllowedContentLength != null)
                     {
                         _kestrelOptions.Add(string.Format(ServerConfigTemplates.KestrelOptionsTemplates[WebServerConfigAttributes.RequestLimits.ToString()], Int64.Parse(maxAllowedContentLength)));
@@ -126,20 +135,20 @@ namespace CTA.Rules.Actions
         private void HandleHttpRedirect(XElement httpRedirectElement)
         {
             StringBuilder sb = new StringBuilder("new RewriteOptions()");
-            bool isRedirectionEnabled = bool.Parse(GetAttributeValue(httpRedirectElement, "enabled"));
+            bool isRedirectionEnabled = bool.Parse(GetAttributeValue(httpRedirectElement, Constants.Enabled));
             if (!isRedirectionEnabled)
                 return;
 
-            string responeStatus = GetAttributeValue(httpRedirectElement, "httpResponseStatus");
+            string responeStatus = GetAttributeValue(httpRedirectElement, Constants.HttpResponseStatus);
             //default response code
             int responseStatusCode = responeStatus != null ? ServerConfigTemplates.HttpResponseStatus[responeStatus] : 302;
 
             foreach (var element in httpRedirectElement.Elements())
             {
-                if (element.Name.ToString().Trim().Equals("add"))
+                if (element.Name.ToString().Trim().Equals(Constants.Add))
                 {
-                    var wildcard = GetAttributeValue(element, "wildcard");
-                    var destinationUrl = GetAttributeValue(element, "destination");
+                    var wildcard = GetAttributeValue(element, Constants.WildCard);
+                    var destinationUrl = GetAttributeValue(element, Constants.Destination);
 
                     sb.Append(string.Format(ServerConfigTemplates.addRedirectTemplate, wildcard, destinationUrl, responseStatusCode));
                 }
@@ -155,9 +164,9 @@ namespace CTA.Rules.Actions
             foreach (var module in httpModuleElement.Elements())
             {
                 // only inject added modules to middleware
-                if (module.Name.ToString().Trim().Equals("add"))
+                if (module.Name.ToString().Trim().Equals(Constants.Add))
                 {
-                    var moduleName = GetAttributeValue(module, "type");
+                    var moduleName = GetAttributeValue(module, Constants.Type);
                     _middleWareExpressions[ServerConfigTemplates.ConfigureMiddlewareMethod].Add(string.Format(ServerConfigTemplates.ConfigurationExpressionTemplates[WebServerConfigAttributes.Modules.ToString()], moduleName));
                 }
             }
@@ -169,10 +178,10 @@ namespace CTA.Rules.Actions
             foreach (var handler in httpHandlerElement.Elements())
             {
                 // only inject added handlers to middleware
-                if (handler.Name.ToString().Trim().Equals("add"))
+                if (handler.Name.ToString().Trim().Equals(Constants.Add))
                 {
-                    var handlerName = GetAttributeValue(handler, "type");
-                    var handlerPath = GetAttributeValue(handler, "path", "*");
+                    var handlerName = GetAttributeValue(handler, Constants.Type);
+                    var handlerPath = GetAttributeValue(handler, Constants.PathAttribute, "*");
                     if(!ServerConfigTemplates.UnsupportedHandlers.Contains(handlerName.Trim()))
                         _middleWareExpressions[ServerConfigTemplates.ConfigureMiddlewareMethod].Add(string.Format(ServerConfigTemplates.ConfigurationExpressionTemplates[WebServerConfigAttributes.Handlers.ToString()], handlerPath, handlerName));
                 }
@@ -193,10 +202,10 @@ namespace CTA.Rules.Actions
                     foreach (var mimeType in mimeTypes.Elements())
                     {
                         // only inject added mimeTypes to middleware
-                        if (mimeType.Name.ToString().Trim().Equals("add"))
+                        if (mimeType.Name.ToString().Trim().Equals(Constants.Add))
                         {
-                            var mimeTypeSupported = GetAttributeValue(mimeType, "mimeType");
-                            bool isMimeTypeEnabled = bool.Parse(GetAttributeValue(mimeType, "enabled"));
+                            var mimeTypeSupported = GetAttributeValue(mimeType, Constants.MimeType);
+                            bool isMimeTypeEnabled = bool.Parse(GetAttributeValue(mimeType, Constants.Enabled));
                             if (isMimeTypeEnabled)
                             {
                                 mimeTypeList.Add(mimeTypeSupported);
@@ -230,7 +239,7 @@ namespace CTA.Rules.Actions
                 // window authentication
                 if (authenticationType.Name.ToString().Equals(WebServerConfigAttributes.WindowsAuthentication.ToString(), System.StringComparison.OrdinalIgnoreCase))
                 {
-                    bool isAuthEnabled = bool.Parse(GetAttributeValue(authenticationType, "enabled", ""));
+                    bool isAuthEnabled = bool.Parse(GetAttributeValue(authenticationType, Constants.Enabled, ""));
                     if (isAuthEnabled)
                     {
                         string windowsAuthentication = WebServerConfigAttributes.WindowsAuthentication.ToString();
@@ -264,7 +273,8 @@ namespace CTA.Rules.Actions
                         expressions.Add(parsedExpression);
                     }
                 }
-                newNode = node.AddBodyStatements(expressions.ToArray()).NormalizeWhitespace();
+                BlockSyntax nodeBody = SyntaxFactory.Block(expressions.ToArray());
+                newNode = node.WithBody(nodeBody).NormalizeWhitespace();
                 _startupRoot = _startupRoot.ReplaceNode(node, newNode);
             }
 
@@ -292,6 +302,32 @@ namespace CTA.Rules.Actions
                 node = node.WithUsings(allUsings).NormalizeWhitespace();
             }
             _startupRoot = node;
+        }
+
+        private void AddPreMiddlewareExpessions()
+        {
+            if(_projectType == ProjectType.Mvc)
+            {
+                _middleWareExpressions[ServerConfigTemplates.ConfigureMiddlewareMethod].AddRange(ServerConfigTemplates.DefaultPreMiddleWareTemplates[ProjectType.Mvc]);
+                _middleWareExpressions[ServerConfigTemplates.ConfigureServicesMethod].AddRange(ServerConfigTemplates.DefaultServiceExpressionTemplates[ProjectType.Mvc]);
+            }
+            else if(_projectType == ProjectType.WebApi)
+            {
+                _middleWareExpressions[ServerConfigTemplates.ConfigureMiddlewareMethod].AddRange(ServerConfigTemplates.DefaultPreMiddleWareTemplates[ProjectType.WebApi]);
+                _middleWareExpressions[ServerConfigTemplates.ConfigureServicesMethod].AddRange(ServerConfigTemplates.DefaultServiceExpressionTemplates[ProjectType.WebApi]);
+            }
+        }
+
+        private void AddPostMiddlewareExpessions()
+        {
+            if (_projectType == ProjectType.Mvc)
+            {
+                _middleWareExpressions[ServerConfigTemplates.ConfigureMiddlewareMethod].AddRange(ServerConfigTemplates.DefaultPostMiddleWareTemplates[ProjectType.Mvc]);
+            }
+            else if (_projectType == ProjectType.WebApi)
+            {
+                _middleWareExpressions[ServerConfigTemplates.ConfigureMiddlewareMethod].AddRange(ServerConfigTemplates.DefaultPostMiddleWareTemplates[ProjectType.WebApi]);
+            }
         }
 
         private void AddKestrelOptions()
@@ -322,6 +358,8 @@ namespace CTA.Rules.Actions
                 sb.Append("Add the following nuget package references ");
                 sb.Append(string.Join(",", _addNugetReference));
             }
+            sb.Append(".");
+            sb.Append(string.Join(".", ServerConfigTemplates.AdditonalComments));
 
             SyntaxTriviaList currentTrivia = _startupRoot.GetLeadingTrivia();    
             currentTrivia = currentTrivia.Add(SyntaxFactory.SyntaxTrivia(SyntaxKind.MultiLineCommentTrivia, string.Format(Constants.CommentFormat, sb.ToString())));

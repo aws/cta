@@ -303,8 +303,9 @@ namespace CTA.Rules.Actions
                 var methodNode = GetMethodNode(node, existingMethodName);
                 if (methodNode != null)
                 {
-                    var newMethodNode = methodNode;
-                    newMethodNode = newMethodNode.WithIdentifier(SyntaxFactory.Identifier(newMethodName)).NormalizeWhitespace();
+                    MethodDeclarationActions methodActions = new MethodDeclarationActions();
+                    var changeMethodNameFunc = methodActions.GetChangeMethodNameAction(newMethodName);
+                    var newMethodNode = changeMethodNameFunc(syntaxGenerator, methodNode);
                     node = node.ReplaceNode(methodNode, newMethodNode);
                 }
                 return node;
@@ -320,21 +321,10 @@ namespace CTA.Rules.Actions
                 var methodNode = GetMethodNode(node, methodName);
                 if (methodNode != null)
                 {
-                    TypeSyntax asyncReturnType;
-
-                    if (methodNode.ReturnType.ToFullString().Trim().Equals("void", StringComparison.OrdinalIgnoreCase))
-                    {
-                        asyncReturnType = SyntaxFactory.IdentifierName("Task").WithTrailingTrivia(SyntaxFactory.Space);
-                    }
-                    else
-                    {
-                        var currentTrivia = methodNode.ReturnType.GetTrailingTrivia();
-                        asyncReturnType = SyntaxFactory.GenericName(SyntaxFactory.Identifier("Task")).WithTypeArgumentList(SyntaxFactory.TypeArgumentList(SyntaxFactory.SingletonSeparatedList(methodNode.ReturnType.WithoutTrailingTrivia()))).WithTrailingTrivia(currentTrivia);
-                    }
-
-                    var newMethodNode = methodNode.WithReturnType(asyncReturnType);
+                    MethodDeclarationActions methodActions = new MethodDeclarationActions();
+                    var changeMethodToReturnTaskTypeActionFunc = methodActions.GetChangeMethodToReturnTaskTypeAction(methodName);
+                    var newMethodNode = changeMethodToReturnTaskTypeActionFunc(syntaxGenerator, methodNode);
                     node = node.ReplaceNode(methodNode, newMethodNode);
-
                 }
                 return node;
             }
@@ -349,8 +339,9 @@ namespace CTA.Rules.Actions
                 var methodNode = GetMethodNode(node, methodName);
                 if (methodNode != null)
                 {
-                    List<ParameterSyntax> parameters = new List<ParameterSyntax>();
-                    var newMethodNode = methodNode.WithParameterList(SyntaxFactory.ParameterList(SyntaxFactory.SeparatedList(parameters))).NormalizeWhitespace();
+                    MethodDeclarationActions methodActions = new MethodDeclarationActions();
+                    var removeMethodParametersActionFunc = methodActions.GetRemoveMethodParametersAction();
+                    var newMethodNode = removeMethodParametersActionFunc(syntaxGenerator, methodNode);
                     node = node.ReplaceNode(methodNode, newMethodNode);
                 }
                 return node;
@@ -367,17 +358,10 @@ namespace CTA.Rules.Actions
 
                 if (methodNode != null)
                 {
-                    var startComment = SyntaxFactory.SyntaxTrivia(SyntaxKind.MultiLineCommentTrivia, "/*");
-                    var endComment = SyntaxFactory.SyntaxTrivia(SyntaxKind.MultiLineCommentTrivia, "*/");
-
-                    var newMethodNode = methodNode.WithLeadingTrivia(new SyntaxTriviaList(startComment)).WithTrailingTrivia(new SyntaxTriviaList(endComment));
+                    MethodDeclarationActions methodActions = new MethodDeclarationActions();
+                    var commentMethodAction = methodActions.GetCommentMethodAction(comment);
+                    var newMethodNode = commentMethodAction(syntaxGenerator, methodNode);
                     node = node.ReplaceNode(methodNode, newMethodNode);
-
-                    if (!string.IsNullOrWhiteSpace(comment))
-                    {
-                        var addCommentsToMethodFunc = GetAddCommentsToMethodAction(methodName, comment);
-                        return addCommentsToMethodFunc(syntaxGenerator, node);
-                    }
                 }
                 return node;
             }
@@ -394,9 +378,9 @@ namespace CTA.Rules.Actions
                 {
                     if (!string.IsNullOrWhiteSpace(comment))
                     {
-                        SyntaxTriviaList currentTrivia = methodNode.GetLeadingTrivia();
-                        currentTrivia = currentTrivia.Insert(0, SyntaxFactory.SyntaxTrivia(SyntaxKind.MultiLineCommentTrivia, string.Format(Constants.CommentFormat, comment)));
-                        var newMethodNode = methodNode.WithLeadingTrivia(currentTrivia).NormalizeWhitespace();
+                        MethodDeclarationActions methodActions = new MethodDeclarationActions();
+                        var addCommentActionFunc = methodActions.GetAddCommentAction(comment);
+                        var newMethodNode = addCommentActionFunc(syntaxGenerator, methodNode);
                         node = node.ReplaceNode(methodNode, newMethodNode);
                     }
                 }
@@ -413,12 +397,10 @@ namespace CTA.Rules.Actions
                 var methodNode = GetMethodNode(node, methodName);
                 if (methodNode != null)
                 {
-                    StatementSyntax parsedExpression = SyntaxFactory.ParseStatement(expression);
-                    if (!parsedExpression.FullSpan.IsEmpty)
-                    {
-                        var newMethodNode = methodNode.AddBodyStatements(new StatementSyntax[] { parsedExpression }).NormalizeWhitespace();
-                        node = node.ReplaceNode(methodNode, newMethodNode);
-                    }
+                    MethodDeclarationActions methodActions = new MethodDeclarationActions();
+                    var addExpressionToMethodAction = methodActions.GetAddExpressionToMethodAction(expression);
+                    var newMethodNode = addExpressionToMethodAction(syntaxGenerator, methodNode);
+                    node = node.ReplaceNode(methodNode, newMethodNode);
                 }
                 return node;
             }
@@ -433,22 +415,10 @@ namespace CTA.Rules.Actions
                 var methodNode = GetMethodNode(node, methodName);
                 if (methodNode != null)
                 {
-                    if (!string.IsNullOrWhiteSpace(identifiers) && !string.IsNullOrWhiteSpace(types))
-                    {
-                        var identifiersArray = identifiers.Split(',', StringSplitOptions.RemoveEmptyEntries);
-                        var typesArray = types.Split(',', StringSplitOptions.RemoveEmptyEntries);
-
-                        if (identifiersArray.Length == typesArray.Length)
-                        {
-                            List<ParameterSyntax> parameters = new List<ParameterSyntax>();
-                            for (int i = 0; i < identifiersArray.Length; i++)
-                            {
-                                parameters.Add(SyntaxFactory.Parameter(SyntaxFactory.Identifier(identifiersArray[i])).WithType(SyntaxFactory.ParseTypeName(typesArray[i])));
-                            }
-                            var newMethodNode = methodNode.AddParameterListParameters(parameters.ToArray());
-                            node = node.ReplaceNode(methodNode, newMethodNode);
-                        }
-                    };
+                    MethodDeclarationActions methodActions = new MethodDeclarationActions();
+                    var addParametersToMethodAction = methodActions.GetAddParametersToMethodAction(types, identifiers);
+                    var newMethodNode = addParametersToMethodAction(syntaxGenerator, methodNode);
+                    node = node.ReplaceNode(methodNode, newMethodNode);
                 }
                 return node;
             }
