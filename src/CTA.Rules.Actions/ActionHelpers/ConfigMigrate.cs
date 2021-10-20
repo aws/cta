@@ -44,8 +44,27 @@ namespace CTA.Rules.Actions
                 AddAppSettingsJsonFile(config, _projectDir);
             }
 
+            if (_projectType == ProjectType.Mvc || _projectType == ProjectType.WebApi)
+            {
+                // port server configuration
+                PortServerConfig(configXml, _projectDir, _projectType);
+            }
+
             return migrateConfigMessage;
         }
+
+        private void PortServerConfig(Configuration configXml, string projectDir, ProjectType projectType)
+        {
+            ConfigurationSection serverConfig = configXml.Sections[Constants.WebServer];
+
+            if (serverConfig != null)
+            {
+                ServerConfigMigrate serverConfigMigrate = new ServerConfigMigrate(projectDir, projectType);
+                serverConfigMigrate.PortServerConfiguration(serverConfig);
+            }
+            return;
+        }
+
         private Configuration LoadWebConfig(string projectDir)
         {
             string webConfigFile = Path.Combine(projectDir, Constants.WebConfig);
@@ -73,15 +92,21 @@ namespace CTA.Rules.Actions
         /// <returns>A JSON object representing the appSettings.json file </returns>
         private JObject ProcessWebConfig(Configuration webConfig, string templateContent)
         {
+            JObject defaultContent = JsonConvert.DeserializeObject<JObject>(templateContent);
             var connectionStringsObjects = GetConnectionStrings(webConfig);
             var appSettingsObjects = GetAppSettingObjects(webConfig);
+            var kestrelHttpConfig = ServerConfigTemplates.DefaultKestrelHttpConfig;
+
+            if(!string.IsNullOrEmpty(kestrelHttpConfig))
+            {
+                var kestrelConfigJobj = JObject.Parse(kestrelHttpConfig);
+                defaultContent.Add(Constants.Kestrel, kestrelConfigJobj);
+            }
 
             _hasData = connectionStringsObjects.Any() || appSettingsObjects.Any();
 
             if (_hasData)
             {
-                var defaultContent = JsonConvert.DeserializeObject<JObject>(templateContent);
-
                 if (connectionStringsObjects.Count > 0)
                 {
                     AddToJsonObject(defaultContent, Constants.ConnectionStrings, connectionStringsObjects);
@@ -90,12 +115,8 @@ namespace CTA.Rules.Actions
                 {
                     AddToJsonObject(defaultContent, Constants.AppSettings, appSettingsObjects);
                 }
-                return defaultContent;
             }
-            else
-            {
-                return null;
-            }
+            return defaultContent;
         }
 
         /// <summary>

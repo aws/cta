@@ -37,4 +37,21 @@
         Startup,
         Program
     }
+    public enum WebServerConfigAttributes
+    {
+        Authorization,
+        Authentication,
+        Modules,
+        Handlers,
+        Security,
+        HttpCompression,
+        HttpRedirect,
+        AnonymousAuthentication,
+        WindowsAuthentication,
+        FormsAuthentication,
+        BasicAuthentication,
+        DigestAuthentication,
+        RequestFiltering,
+        RequestLimits
+    }
 }
