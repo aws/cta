@@ -254,7 +254,7 @@ namespace CTA.Rules.Update
                             runResult = projectLevelAction.ProjectFileActionFunc(_projectConfiguration.ProjectPath,
                                 projectType,
                                 _projectConfiguration.TargetVersions,
-                                projectActions.PackageActions.Distinct().ToDictionary(p => p.Name, p => p.Version),
+                                projectActions.PackageActions.GroupBy(g => g.Name).FirstOrDefault().ToDictionary(p => p.Name, p => p.Version),
                                 projectActions.ProjectReferenceActions.ToList(),
                                 _metadataReferences);
                         }
