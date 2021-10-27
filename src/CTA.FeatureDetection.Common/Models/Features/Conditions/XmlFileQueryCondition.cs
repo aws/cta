@@ -61,7 +61,15 @@ namespace CTA.FeatureDetection.Common.Models.Features.Conditions
             {
                 try
                 {
-                    filesAsXDocuments[fileFound] = XDocument.Load(fileFound);
+                    if(File.Exists(fileFound))
+                    {
+                        string fileContent = File.ReadAllText(fileFound);
+                        // fileFound could be an empty file we should check to see if the file is non-empty and starts with a < for a potentially valid XML file
+                        if (!string.IsNullOrEmpty(fileContent) && fileContent.TrimStart().StartsWith("<"))
+                        {
+                            filesAsXDocuments[fileFound] = XDocument.Parse(fileContent);
+                        }
+                    }
                 }
                 catch (XmlException ex)
                 {
