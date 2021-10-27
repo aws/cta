@@ -61,7 +61,11 @@ namespace CTA.FeatureDetection.Common.Models.Features.Conditions
             {
                 try
                 {
-                    filesAsXDocuments[fileFound] = XDocument.Load(fileFound);
+                    // App.config could be an empty file we should check to see if the file is non-empty and starts with a < for a potentially valid XML file
+                    if (!string.IsNullOrEmpty(fileFound) && fileFound.TrimStart().StartsWith("<"))
+                    {
+                        filesAsXDocuments[fileFound] = XDocument.Load(fileFound);
+                    }
                 }
                 catch (XmlException ex)
                 {
