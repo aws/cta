@@ -27,6 +27,7 @@ namespace CTA.WebForms2Blazor.Tests.FileConverters
         public static string TestContentPlaceHolderControlFilePath;
         public static string TestContentControlFilePath;
         public static string TestSiteMasterFilePath;
+        public static string TestDirectiveFilePath;
         public static string TestAreaFullPath;
 
         private WorkspaceManagerService _blazorWorkspaceManager;
@@ -51,6 +52,7 @@ namespace CTA.WebForms2Blazor.Tests.FileConverters
                 Path.Combine(TestFilesDirectoryPath, "ContentPlaceHolderControlOnly.aspx");
             TestContentControlFilePath = Path.Combine(TestFilesDirectoryPath, "ContentControlOnly.aspx");
             TestSiteMasterFilePath = Path.Combine(TestFilesDirectoryPath, "SampleSiteMasterFile.Master");
+            TestDirectiveFilePath = Path.Combine(TestFilesDirectoryPath, "DirectiveOnly.aspx");
             TestAreaFullPath = Path.Combine(TestProjectPath, TestFilesDirectoryPath);
             
             _blazorWorkspaceManager = new WorkspaceManagerService();

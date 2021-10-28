@@ -11,6 +11,7 @@ namespace CTA.WebForms2Blazor.Tests.DirectiveConverters
     {
         private const string TestPath = "Default.aspx";
         private const string TestDirectiveName = "Page";
+        private const string TestProjectName = "eShopOnBlazor";
 
         private const string TestDirectiveMasterPageFileAttribute = "Page MasterPageFile=\"~/directory/TestMasterPage.Master\"";
         private const string TestDirectiveInheritsAttribute = "Page Inherits=\"TestBaseClass\"";
@@ -30,7 +31,7 @@ namespace CTA.WebForms2Blazor.Tests.DirectiveConverters
         [Test]
         public void ConvertDirective_Properly_Executes_Directive_General_Conversion()
         {
-            Assert.AreEqual(ExpectedPageDirective, _directiveConverter.ConvertDirective(TestDirectiveName, TestDirectiveName, TestPath, new ViewImportService()));
+            Assert.AreEqual(ExpectedPageDirective, _directiveConverter.ConvertDirective(TestDirectiveName, TestDirectiveName, TestPath, TestProjectName, new ViewImportService()));
         }
 
         [Test]
@@ -38,7 +39,7 @@ namespace CTA.WebForms2Blazor.Tests.DirectiveConverters
         {
             var expectedText = ExpectedPageDirective + ExpectedMasterPageFileDirective;
 
-            Assert.AreEqual(expectedText, _directiveConverter.ConvertDirective(TestDirectiveName, TestDirectiveMasterPageFileAttribute, TestPath, new ViewImportService()));
+            Assert.AreEqual(expectedText, _directiveConverter.ConvertDirective(TestDirectiveName, TestDirectiveMasterPageFileAttribute, TestPath, TestProjectName, new ViewImportService()));
         }
 
         [Test]
@@ -46,7 +47,7 @@ namespace CTA.WebForms2Blazor.Tests.DirectiveConverters
         {
             var expectedText = ExpectedPageDirective + ExpectedInheritsDirective;
 
-            Assert.AreEqual(expectedText, _directiveConverter.ConvertDirective(TestDirectiveName, TestDirectiveInheritsAttribute, TestPath, new ViewImportService()));
+            Assert.AreEqual(expectedText, _directiveConverter.ConvertDirective(TestDirectiveName, TestDirectiveInheritsAttribute, TestPath, TestProjectName, new ViewImportService()));
         }
     }
 }

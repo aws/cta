@@ -364,7 +364,52 @@ namespace CTA.WebForms2Blazor.Tests.FileConverters
             Assert.AreEqual(expectedContents, fileContents);
             Assert.AreEqual(relativePath, fi.RelativePath);
         }
+        
+        [Test]
+        public async Task TestViewFileConverter_Converts_Directives()
+        {
+            FileConverter fc = new ViewFileConverter(FileConverterSetupFixture.TestProjectPath, 
+                FileConverterSetupFixture.TestDirectiveFilePath,
+                new ViewImportService(), new TaskManagerService());
+            
+            IEnumerable<FileInformation> fileList = await fc.MigrateFileAsync();
+            FileInformation fi = fileList.Single();
+            
+            byte[] bytes = fi.FileBytes;
+            var fileContents = Encoding.UTF8.GetString(bytes);
+            
+            string newPath = Path.Combine(FileConverterSetupFixture.TestFilesDirectoryPath, "DirectiveOnly.razor");
+            string relativePath = Path.GetRelativePath(FileConverterSetupFixture.TestProjectPath, newPath);
+            relativePath = Path.Combine("Pages", relativePath);
 
+            string expectedContents =  @"@using CTA.WebForms2Blazor.Tests.CustomControls
+@using eShopOnBlazor
+<!-- Cannot convert file name to namespace, file path Footer.ascx does not have a directory -->
+<!-- Register Src=""Footer.ascx"" TagName=""Footer1"" TagPrefix=""TFooter1"" -->
+@page ""/TestingArea/TestFiles/DirectiveOnly""
+@layout Site
+@inherits eShopLegacyWebForms._Default
+<!-- Conversion of Title attribute (value: ""Home Page"") for Page directive not currently supported -->
+<!-- Conversion of AutoEventWireup attribute (value: ""true"") for Page directive not currently supported -->
+@namespace Replace_this_with_code_behind_namespace
+@inherits LayoutComponentBase
+<!-- Conversion of autoeventwireup attribute (value: ""true"") for Master directive not currently supported -->
+<!-- Conversion of inherits attribute (value: ""eShopLegacyWebForms.SiteMaster"") for Master directive not currently supported -->
+<!-- Conversion of AutoEventWireup attribute (value: ""true"") for Control directive not currently supported -->
+
+<div>
+    <Counter IncrementAmount=""10""></Counter>
+    <Foobar></Foobar>
+</div>
+
+";
+
+            Assert.AreEqual(expectedContents, fileContents);
+            Assert.AreEqual(relativePath, fi.RelativePath);
+        }
+
+        // This is a full view layer migration test; any features added later may cause this test to fail
+        // and thus expectedContents might need to be updated in order for the test to be accurate
         [Test]
         public async Task TestViewFileConverter_DefaultAspx()
         {
@@ -376,7 +421,80 @@ namespace CTA.WebForms2Blazor.Tests.FileConverters
             
             byte[] bytes = fi.FileBytes;
             var fileContents = Encoding.UTF8.GetString(bytes);
+
+            var expectedContents = @"@page ""/TestingArea/TestFiles/SampleViewFile""
+@layout Site
+@inherits eShopLegacyWebForms._Default
+<!-- Conversion of Title attribute (value: ""Home Page"") for Page directive not currently supported -->
+<!-- Conversion of AutoEventWireup attribute (value: ""true"") for Page directive not currently supported -->
+@using CTA.WebForms2Blazor.Tests
+@using CTA.WebForms2Blazor.Tests
+
+
+    <div>
+        <GridView @ref=""GridView1"" AutoGenerateColumns=""false"" ItemType=""PleaseReplaceWithActualItemTypeHere"">
+            <Columns>
+                <BoundField DataField=""Name"" HeaderText=""First Name"" ItemType=""PleaseReplaceWithActualItemTypeHere""></BoundField>
+                <BoundField DataField=""LastName"" HeaderText=""Last Name"" ItemType=""PleaseReplaceWithActualItemTypeHere""></BoundField>
+                <BoundField DataField=""Position"" HeaderText=""Person Type"" ItemType=""PleaseReplaceWithActualItemTypeHere""></BoundField>
+            </Columns>
+        </GridView>
+    </div>
+
+    <div class=""esh-table"">
+        <p class=""esh-link-wrapper"">
+            <a runat=""server"" href=""@(RouteUrl.RouteName=CreateProductRoute)"" class=""btn esh-button esh-button-primary"">
+                Create New
+            </a>
+        </p>
+
+        <ListView @ref=""productList"" ItemPlaceholderID=""itemPlaceHolder"" ItemType=""eShopLegacyWebForms.Models.CatalogItem"" Context=""Item"">
+            <EmptyDataTemplate>
+                <table>
+                    <tr>
+                        <td>No data was returned.</td>
+                    </tr>
+                </table>
+            </EmptyDataTemplate>
+            <LayoutTemplate Context=""itemPlaceHolder"">
+                <table class=""table"">
+                    <thead>
+                        <tr class=""esh-table-header"">
+                            <th></th>
+                            <th>Name</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @itemPlaceHolder
+                    </tbody>
+                </table>
+            </LayoutTemplate>
+            <ItemTemplate>
+                <tr>
+                    <td>
+                        <image class=""esh-thumbnail"" src='/Pics/@(Item.PictureFileName)'></image>
+                    </td>
+                    <td>
+                        <p>@(Item.Name)</p>
+                    </td>
+                    <td>
+                        <a href='@(GetRouteUrl(""EditProductRoute"", new {id =Item.Id}))' class=""esh-table-link"">
+                            Edit
+                        </a>
+                    </td>
+                </tr>
+            </ItemTemplate>
+        </ListView>
+    </div>
+
+    <div class=""esh-pager"">
+        <Counter IncrementAmount=""10""></Counter>
+        <footer></footer>
+    </div>
+
+";
             
+            Assert.AreEqual(expectedContents, fileContents);
         }
 
         [Test]

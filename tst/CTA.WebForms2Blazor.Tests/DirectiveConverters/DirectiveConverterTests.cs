@@ -11,6 +11,7 @@ namespace CTA.WebForms2Blazor.Tests.DirectiveConverters
     {
         private const string TestPath = "UControl.ascx";
         private const string TestDirectiveName = "DirectiveName";
+        private const string TestProjectName = "eShopOnBlazor";
 
         private const string TestDirective1Attribute = "DirectiveName Attr1=\"value1\"";
         private const string TestDirective2Attributes = "DirectiveName Attr1=\"value1\" Attr2=\"value2\"";
@@ -30,7 +31,7 @@ namespace CTA.WebForms2Blazor.Tests.DirectiveConverters
         [Test]
         public void ConvertDirective_Properly_Constructs_General_Directive_Unknown_Comment()
         {
-            Assert.AreEqual(ExpectedUnknownDirectiveComment, _directiveConverter.ConvertDirective(TestDirectiveName, TestDirectiveName, TestPath, new ViewImportService()));
+            Assert.AreEqual(ExpectedUnknownDirectiveComment, _directiveConverter.ConvertDirective(TestDirectiveName, TestDirectiveName, TestPath, TestProjectName, new ViewImportService()));
         }
 
         [Test]
@@ -38,7 +39,7 @@ namespace CTA.WebForms2Blazor.Tests.DirectiveConverters
         {
             var expectedText = ExpectedUnknownDirectiveComment + ExpectedUnknownAttributeComment1;
 
-            Assert.AreEqual(expectedText, _directiveConverter.ConvertDirective(TestDirectiveName, TestDirective1Attribute, TestPath, new ViewImportService()));
+            Assert.AreEqual(expectedText, _directiveConverter.ConvertDirective(TestDirectiveName, TestDirective1Attribute, TestPath, TestProjectName, new ViewImportService()));
         }
 
         [Test]
@@ -46,7 +47,7 @@ namespace CTA.WebForms2Blazor.Tests.DirectiveConverters
         {
             var expectedText = ExpectedUnknownDirectiveComment + ExpectedUnknownAttributeComment1 + ExpectedUnknownAttributeComment2;
 
-            Assert.AreEqual(expectedText, _directiveConverter.ConvertDirective(TestDirectiveName, TestDirective2Attributes, TestPath, new ViewImportService()));
+            Assert.AreEqual(expectedText, _directiveConverter.ConvertDirective(TestDirectiveName, TestDirective2Attributes, TestPath, TestProjectName, new ViewImportService()));
         }
     }
 }
