@@ -385,6 +385,7 @@ namespace CTA.WebForms2Blazor.Tests.FileConverters
             string expectedContents =  @"@using CTA.WebForms2Blazor.Tests.CustomControls
 @using eShopOnBlazor
 <!-- Cannot convert file name to namespace, file path Footer.ascx does not have a directory -->
+<!-- Register Src=""Footer.ascx"" TagName=""Footer1"" TagPrefix=""TFooter1"" -->
 @page ""/TestingArea/TestFiles/DirectiveOnly""
 @layout Site
 @inherits eShopLegacyWebForms._Default
@@ -399,8 +400,10 @@ namespace CTA.WebForms2Blazor.Tests.FileConverters
 <div>
     <Counter IncrementAmount=""10""></Counter>
     <Foobar></Foobar>
-</div>";
-            
+</div>
+
+";
+
             Assert.AreEqual(expectedContents, fileContents);
             Assert.AreEqual(relativePath, fi.RelativePath);
         }

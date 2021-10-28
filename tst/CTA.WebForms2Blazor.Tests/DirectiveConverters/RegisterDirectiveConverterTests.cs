@@ -24,8 +24,9 @@ namespace CTA.WebForms2Blazor.Tests.DirectiveConverters
             "@using eShopOnBlazor.CustomControls";
         private const string ExpectedDifferentTagName = 
             "@using eShopOnBlazor";
-        private const string ExpectedIncorrectSource =
-            "<!-- Cannot convert file name to namespace, file path Footer.ascx does not have a directory -->";
+        private readonly string ExpectedIncorrectSource =
+            @$"<!-- Cannot convert file name to namespace, file path Footer.ascx does not have a directory -->
+<!-- {TestIncorrectSource} -->";
         
         private readonly RegisteredUserControls _testUserControls = new RegisteredUserControls();
         
