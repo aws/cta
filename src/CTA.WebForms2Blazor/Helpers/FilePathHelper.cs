@@ -2,8 +2,6 @@
 using System.IO;
 using CTA.FeatureDetection.Common.Extensions;
 using CTA.WebForms2Blazor.Extensions;
-using System.Linq;
-using System.Text;
 
 namespace CTA.WebForms2Blazor.Helpers
 {
@@ -11,8 +9,6 @@ namespace CTA.WebForms2Blazor.Helpers
     {
         private const string FileNameDoesNotContainExtensionError = 
             "Cannot alter file name, file name {0} does not end with extension {1}";
-        private const string FileNameDoesNotContainDirectoryError =
-            "Cannot convert file name to namespace, file path {0} does not have a directory";
         
         public static string AlterFileName(string oldFilePath, string newFileName = null, string oldExtension = null, string newExtension = null)
         {
@@ -36,14 +32,14 @@ namespace CTA.WebForms2Blazor.Helpers
             return newFileNameWithExtension;
         }
 
-        public static (string, bool) RelativeFilePathToNamespace(string filePath, string projectName)
+        public static string GetNamespaceFromRelativeFilePath(string filePath, string projectName)
         {
-            string res = filePath.RemoveOuterQuotes();
-            res = Path.GetDirectoryName(res);
+            var cleanedFilePath = filePath.RemoveOuterQuotes();
+            var directoryName = Path.GetDirectoryName(cleanedFilePath);
 
-            return res.IsNullOrEmpty()
-                ? (string.Format(FileNameDoesNotContainDirectoryError, filePath), false)
-                : (res.Replace("~", projectName).Replace("/", "."), true);
+            return string.IsNullOrEmpty(directoryName)
+                ? directoryName
+                : directoryName.Replace("~", projectName).Replace(Path.DirectorySeparatorChar.ToString(), ".");
         }
 
         public static string RemoveDuplicateDirectories(string filePath)
