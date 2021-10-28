@@ -11,5 +11,11 @@
 
             return input;
         }
+
+        public static string ConvertToRazorComment(this string input)
+        {
+            var commentContent = input ?? string.Empty;
+            return string.Format(Constants.MarkupCommentTemplate, commentContent);
+        }
     }
 }
