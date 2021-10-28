@@ -14,6 +14,8 @@ namespace CTA.WebForms2Blazor.DirectiveConverters
     {
         private readonly RegisteredUserControls _registeredUserControls;
         private const string IncorrectRegisterDirectiveWarning = "<!-- Register directive missing TagName or TagPrefix -->";
+        private const string FileNameDoesNotContainDirectoryErrorTemplate =
+            "<!-- Cannot convert file name to namespace, file path {0} does not have a directory -->";
         private const string ControlTagName = "TagName";
         private const string ControlTagPrefix = "TagPrefix";
         private const string ControlSourceFile = "Src";
@@ -40,8 +42,8 @@ namespace CTA.WebForms2Blazor.DirectiveConverters
 
         private protected override IEnumerable<DirectiveMigrationResult> GetMigratedAttributes(string directiveString, string directiveName, string projectName)
         {
-            Dictionary<string, string> attrMap = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase);
-            List<DirectiveMigrationResult> migratedDirectives = new List<DirectiveMigrationResult>();
+            var attrMap = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase);
+            var migratedDirectives = new List<DirectiveMigrationResult>();
             
             var attrMatches = AttributeSplitRegex.Matches(directiveString);
             foreach (Match match in attrMatches)
@@ -53,27 +55,37 @@ namespace CTA.WebForms2Blazor.DirectiveConverters
 
             if (attrMap.ContainsKey(ControlTagName) && attrMap.ContainsKey(ControlTagPrefix))
             {
-                string oldControlName = attrMap[ControlTagPrefix] + ":" + attrMap[ControlTagName];
-                string newControlName = Path.GetFileNameWithoutExtension(attrMap[ControlSourceFile]);
+                var oldControlName = attrMap[ControlTagPrefix] + ":" + attrMap[ControlTagName];
+                var newControlName = Path.GetFileNameWithoutExtension(attrMap[ControlSourceFile]);
                 _registeredUserControls.UserControlRulesMap[oldControlName] = new UserControlConverter(newControlName);
 
                 //_registeredUserControls.UserControlRulesMap.Add(oldControlName, new UserControlConverter(newControlName));
-
-                var res = FilePathHelper.RelativeFilePathToNamespace(attrMap[ControlSourceFile], projectName);
-                string namespaceName = res.Item1;
-                bool isValid = res.Item2;
-                string content = $"@using {namespaceName}";
-                if (!isValid)
+                var filePath = attrMap[ControlSourceFile];
+                var blazorNamespace = FilePathHelper.GetNamespaceFromRelativeFilePath(filePath, projectName);
+                
+                if(string.IsNullOrEmpty(blazorNamespace))
                 {
-                    content = $"<!-- {namespaceName} -->";
+                    var errorMessageCommentString = string.Format(FileNameDoesNotContainDirectoryErrorTemplate, filePath);
+                    var commentedDirectiveString = directiveString.ConvertToRazorComment();
+                    var content = Utilities.SeparateStringsWithNewLine(errorMessageCommentString, commentedDirectiveString);
+
+                    migratedDirectives.Add(new DirectiveMigrationResult(DirectiveMigrationResultType.Comment,
+                        content));
                 }
-                migratedDirectives.Add(new DirectiveMigrationResult(DirectiveMigrationResultType.GeneralDirective,
-                    content));
+                else
+                {
+                    var content = $"@using {blazorNamespace}";
+                    migratedDirectives.Add(new DirectiveMigrationResult(DirectiveMigrationResultType.GeneralDirective,
+                        content));
+                }
             }
             else
             {
+                var commentedDirectiveString = directiveString.ConvertToRazorComment();
+                var content = Utilities.SeparateStringsWithNewLine(IncorrectRegisterDirectiveWarning, commentedDirectiveString);
+
                 migratedDirectives.Add(new DirectiveMigrationResult(DirectiveMigrationResultType.Comment,
-                    IncorrectRegisterDirectiveWarning));
+                    content));
             }
             
             return migratedDirectives;
