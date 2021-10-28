@@ -12,6 +12,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="NuGet.Protocol" Version="5.11.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\CTA.Rules.Config\CTA.Rules.Config.csproj" />
     <ProjectReference Include="..\CTA.Rules.Metrics\CTA.Rules.Metrics.csproj" />
     <ProjectReference Include="..\CTA.Rules.Models\CTA.Rules.Models.csproj" />
