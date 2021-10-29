@@ -62,50 +62,50 @@
       },
       "Codelyzer.Analysis": {
         "type": "Transitive",
-        "resolved": "1.8.6-alpha-g9e86b89892",
-        "contentHash": "/pklno4phgzLyp//2pWcJ9sVquz6gX1pxt1+xgVkSs7Hpr4qoPBrbw+ssHQMZ7pcrkBBxBFZgn2IK5yFNc6KAA==",
+        "resolved": "1.8.7-alpha-g7bc6017e57",
+        "contentHash": "cff48nL5IYyPn462yY8/WhDorceHdZ5mnk3Tfe8uF0e8BS1vnMqG5M3rJ1i+Dl8dB8YuTX7Ntn5hr5B/P/8brg==",
         "dependencies": {
-          "Codelyzer.Analysis.Build": "1.8.6-alpha-g9e86b89892",
-          "Codelyzer.Analysis.CSharp": "1.8.6-alpha-g9e86b89892",
+          "Codelyzer.Analysis.Build": "1.8.7-alpha-g7bc6017e57",
+          "Codelyzer.Analysis.CSharp": "1.8.7-alpha-g7bc6017e57",
           "CommandLineParser": "2.8.0",
           "Microsoft.Extensions.Logging.Console": "5.0.0"
         }
       },
       "Codelyzer.Analysis.Build": {
         "type": "Transitive",
-        "resolved": "1.8.6-alpha-g9e86b89892",
-        "contentHash": "0bUr2kcDNeAB8fp8TRpAZeuUY6m2OpaTprYUeBDEb7lBv8YjXBAvms2TxgpRv018yfL9JxKYv6RQj/sAI0P6Kw==",
+        "resolved": "1.8.7-alpha-g7bc6017e57",
+        "contentHash": "uhccnecQU+15l9PBRYiMBI9DyN3m9Bfc4+O5AJNVtGNTKQY0q4UFnloZiIzT3q2lkLEgMY0ZRo1JjybYfxJ3mg==",
         "dependencies": {
           "Buildalyzer": "3.2.2",
           "Buildalyzer.Logger": "3.2.2",
           "Buildalyzer.Workspaces": "3.2.2",
-          "Codelyzer.Analysis.CSharp": "1.8.6-alpha-g9e86b89892",
+          "Codelyzer.Analysis.CSharp": "1.8.7-alpha-g7bc6017e57",
           "Microsoft.Extensions.Logging": "5.0.0",
           "NuGet.Packaging": "5.11.0"
         }
       },
       "Codelyzer.Analysis.Common": {
         "type": "Transitive",
-        "resolved": "1.8.6-alpha-g9e86b89892",
-        "contentHash": "ngudprdwra/aH0UAoAcmppUY/SLt/fyoG53ncrvpjDE2x4VElByt9Jy7mFA1IV9vQLYn6wKCmtRfWtTohrXAdA==",
+        "resolved": "1.8.7-alpha-g7bc6017e57",
+        "contentHash": "8l5rx16rbhGNwyBkFnNbofxWCa1U+rhsTOrY2MwZiqToELlCNlmDjuLBg3mMgSV0B88vfgbqTzzQ0nbalKoKGA==",
         "dependencies": {
-          "Codelyzer.Analysis.Model": "1.8.6-alpha-g9e86b89892",
+          "Codelyzer.Analysis.Model": "1.8.7-alpha-g7bc6017e57",
           "Newtonsoft.Json": "13.0.1"
         }
       },
       "Codelyzer.Analysis.CSharp": {
         "type": "Transitive",
-        "resolved": "1.8.6-alpha-g9e86b89892",
-        "contentHash": "PGI4fTvLml+O/oTDF8t/jf2RQSeHUlJ5PjoqaRAfAKdJZpRVgjUCaf77sdfTkffp3riVthmZtVM4lLUcysYQNg==",
+        "resolved": "1.8.7-alpha-g7bc6017e57",
+        "contentHash": "nzbIYkUYiowvsL9U9nWKm4iBxN/BazcqlJnHo0YUMwCcAW9UyCGEAVumbaOYQO/JCOHXYKpKVkYkDKKSlezwvA==",
         "dependencies": {
-          "Codelyzer.Analysis.Common": "1.8.6-alpha-g9e86b89892",
-          "Codelyzer.Analysis.Model": "1.8.6-alpha-g9e86b89892"
+          "Codelyzer.Analysis.Common": "1.8.7-alpha-g7bc6017e57",
+          "Codelyzer.Analysis.Model": "1.8.7-alpha-g7bc6017e57"
         }
       },
       "Codelyzer.Analysis.Model": {
         "type": "Transitive",
-        "resolved": "1.8.6-alpha-g9e86b89892",
-        "contentHash": "Q1RtEoZURN89PQSHgAMpSHoXU11gVrKCReyM2cc23HxgjvZWj5OFh+hUK58/0vsBw3JrmRe5H5a8rSgAdiIZlw==",
+        "resolved": "1.8.7-alpha-g7bc6017e57",
+        "contentHash": "c1LIaVoIVpBHsvAy7oVJ9rHAFlJoqPnxoX1eboEr3qYRM5ZQqFtb/juV4qajwAyWe4BT0YZeuqWi8bW+ctPovg==",
         "dependencies": {
           "Microsoft.CodeAnalysis": "3.11.0",
           "Microsoft.CodeAnalysis.CSharp": "3.11.0",
@@ -1737,8 +1737,8 @@
       "cta.rules.config": {
         "type": "Project",
         "dependencies": {
-          "Codelyzer.Analysis": "1.8.6-alpha-g9e86b89892",
-          "Codelyzer.Analysis.Model": "1.8.6-alpha-g9e86b89892",
+          "Codelyzer.Analysis": "1.8.7-alpha-g7bc6017e57",
+          "Codelyzer.Analysis.Model": "1.8.7-alpha-g7bc6017e57",
           "Microsoft.Extensions.Logging": "5.0.0",
           "Microsoft.Extensions.Logging.Abstractions": "5.0.0",
           "Microsoft.Extensions.Logging.Console": "5.0.0",
