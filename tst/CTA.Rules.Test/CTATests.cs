@@ -208,6 +208,65 @@ namespace CTA.Rules.Test
             StringAssert.Contains(@"SomethingElse storeDB", shoppingCartControllerText);
         }
 
+
+        [Test]
+        public void TestMonolithReplacements()
+        {
+            //We don't care about version for CTA-only rules:
+            string version = "net5.0";
+
+            var solutionPath = CopySolutionFolderToTemp("MvcMusicStore.sln", downloadLocation);
+            var solutionDir = Directory.GetParent(solutionPath).FullName;
+
+            FileAssert.Exists(solutionPath);
+
+
+            string projectFile = Directory.EnumerateFiles(solutionDir, "*.csproj", SearchOption.AllDirectories).FirstOrDefault();
+            FileAssert.Exists(projectFile);
+
+            ProjectConfiguration projectConfiguration = new ProjectConfiguration()
+            {
+                ProjectPath = projectFile,
+                TargetVersions = new List<string> { version },
+                RulesDir = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "CTAFiles")),
+                AdditionalReferences = ctaFiles
+            };
+
+            List<ProjectConfiguration> solutionConfiguration = new List<ProjectConfiguration>
+            {
+                projectConfiguration
+            };
+
+            SolutionRewriter solutionRewriter = new SolutionRewriter(solutionPath, solutionConfiguration);
+            var analysisRunResult = solutionRewriter.AnalysisRun();
+            StringBuilder str = new StringBuilder();
+            foreach (var k in analysisRunResult.ProjectResults)
+            {
+                str.AppendLine(k.ProjectFile);
+                str.AppendLine(k.ProjectActions.ToString());
+            }
+
+            var analysisResult = str.ToString();
+            StringAssert.Contains("HtmlEncoder", analysisResult);
+
+            solutionRewriter.Run(analysisRunResult.ProjectResults.ToDictionary(p => p.ProjectFile, p => p.ProjectActions));
+
+            string projectDir = Directory.GetParent(projectFile).FullName;
+
+            var accountControllerText = File.ReadAllText(Path.Combine(projectDir, "Controllers", "AccountController.cs"));
+            var checkoutControllerText = File.ReadAllText(Path.Combine(projectDir, "Controllers", "CheckoutController.cs"));
+            var shoppingCartControllerText = File.ReadAllText(Path.Combine(projectDir, "Controllers", "ShoppingCartController.cs"));
+            var storeManagerControllerText = File.ReadAllText(Path.Combine(projectDir, "Controllers", "StoreManagerController.cs"));
+            var musicStoreEntitiesText = File.ReadAllText(Path.Combine(projectDir, "Models", "MusicStoreEntities.cs"));
+            var shoppingCartText = File.ReadAllText(Path.Combine(projectDir, "Models", "ShoppingCart.cs"));
+
+            var shoppingCartRemoveViewModel = File.ReadAllText(Path.Combine(projectDir, "ViewModels", "ShoppingCartRemoveViewModel.cs"));
+            var shoppingCartViewModel = File.ReadAllText(Path.Combine(projectDir, "ViewModels", "ShoppingCartViewModel.cs"));
+
+
+            
+        }
+
         [Test]
         public void ConvertHierarchicalToNamespaceFile()
         {
