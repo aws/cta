@@ -34,7 +34,7 @@ namespace CTA.FeatureDetection.Common.Models.Features.Base
 
         public override int GetHashCode()
         {
-            return (Name != null ? StringComparer.OrdinalIgnoreCase.GetHashCode(Name) : 0);
+            return HashCode.Combine(Name);
         }
     }
 }

@@ -11,8 +11,6 @@
 
 
   <ItemGroup>
-    <PackageReference Include="Codelyzer.Analysis" Version="1.6.5-alpha-g229faeaa7f" />
-    <PackageReference Include="Codelyzer.Analysis.Model" Version="1.6.5-alpha-g229faeaa7f" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
   </ItemGroup>
 
@@ -24,7 +22,7 @@
 
 
   <ItemGroup>
-    <PackageReference Update="Nerdbank.GitVersioning" Version="3.4.194" />
+    <PackageReference Update="Nerdbank.GitVersioning" Version="3.4.240" />
   </ItemGroup>
 
 </Project>

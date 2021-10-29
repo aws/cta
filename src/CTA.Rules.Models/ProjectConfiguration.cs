@@ -10,6 +10,7 @@ namespace CTA.Rules.Models
         {
             TargetVersions = new List<string> { Constants.DefaultCoreVersion };
             PackageReferences = new Dictionary<string, Tuple<string, string>>();
+            AdditionalReferences = new List<string>();
         }
         public string ProjectPath;
         public List<string> TargetVersions;
@@ -21,5 +22,6 @@ namespace CTA.Rules.Models
         public bool PortCode = true;
         public ProjectType ProjectType = ProjectType.ClassLibrary;
         public List<string> MetaReferences;
+        public List<string> AdditionalReferences;
     }
 }

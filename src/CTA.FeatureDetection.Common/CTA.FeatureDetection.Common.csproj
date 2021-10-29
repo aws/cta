@@ -8,17 +8,14 @@
   <ItemGroup>
     <Compile Remove="Extensions\NamedTypeSymbolExtensions.cs" />
   </ItemGroup>
-  
-  <ItemGroup>
-    <PackageReference Include="Codelyzer.Analysis" Version="1.6.5-alpha-g229faeaa7f" />
-  </ItemGroup>
-  
+    
   <ItemGroup>    
+    <ProjectReference Include="..\CTA.Rules.Common\CTA.Rules.Common.csproj" />    
     <ProjectReference Include="..\CTA.Rules.Config\CTA.Rules.Config.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Update="Nerdbank.GitVersioning" Version="3.4.194" />
+    <PackageReference Update="Nerdbank.GitVersioning" Version="3.4.240" />
   </ItemGroup>
 
 </Project>

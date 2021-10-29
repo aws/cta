@@ -12,6 +12,7 @@ namespace CTA.Rules.Actions
 {
     public class ConfigMigrate
     {
+        private const string ConfigFoundMessage = "Found and migrated settings from web.config";
         private readonly string _projectDir;
         private readonly ProjectType _projectType;
         private bool _hasData;
@@ -38,24 +39,41 @@ namespace CTA.Rules.Actions
         /// <summary>
         /// Migrates the web.config file, if it exists
         /// </summary>
-        /// <param name="projectDir">Directory of the project</param>
-        /// <param name="projectType">Type of the project</param>
         private string MigrateWebConfig()
         {
-            var isConfigFound = string.Empty;
+            var migrateConfigMessage = string.Empty;
 
             var configXml = LoadWebConfig(_projectDir);
-            if (configXml == null) { return isConfigFound; }
+            if (configXml == null) { return migrateConfigMessage; }
 
-            var config = ProcessWebConfig(configXml, TemplateHelper.GetTemplateFileContent("", _projectType, Constants.AppSettingsJson));
+            var config = ProcessWebConfig(configXml, TemplateHelper.GetTemplateFileContent(string.Empty, _projectType, Constants.AppSettingsJson));
             if (_hasData)
             {
-                isConfigFound = "Found and migrated settings from web.config";
+                migrateConfigMessage = ConfigFoundMessage;
                 AddAppSettingsJsonFile(config, _projectDir);
             }
 
-            return isConfigFound;
+            if (_projectType == ProjectType.Mvc || _projectType == ProjectType.WebApi)
+            {
+                // port server configuration
+                PortServerConfig(configXml, _projectDir, _projectType);
+            }
+
+            return migrateConfigMessage;
         }
+
+        private void PortServerConfig(Configuration configXml, string projectDir, ProjectType projectType)
+        {
+            ConfigurationSection serverConfig = configXml.Sections[Constants.WebServer];
+
+            if (serverConfig != null)
+            {
+                ServerConfigMigrate serverConfigMigrate = new ServerConfigMigrate(projectDir, projectType);
+                serverConfigMigrate.PortServerConfiguration(serverConfig);
+            }
+            return;
+        }
+
         private Configuration LoadWebConfig(string projectDir)
         {
             string webConfigFile = Path.Combine(projectDir, Constants.WebConfig);
@@ -83,15 +101,21 @@ namespace CTA.Rules.Actions
         /// <returns>A JSON object representing the appSettings.json file </returns>
         private JObject ProcessWebConfig(Configuration webConfig, string templateContent)
         {
+            JObject defaultContent = JsonConvert.DeserializeObject<JObject>(templateContent);
             var connectionStringsObjects = GetConnectionStrings(webConfig);
             var appSettingsObjects = GetAppSettingObjects(webConfig);
+            var kestrelHttpConfig = ServerConfigTemplates.DefaultKestrelHttpConfig;
+
+            if(!string.IsNullOrEmpty(kestrelHttpConfig))
+            {
+                var kestrelConfigJobj = JObject.Parse(kestrelHttpConfig);
+                defaultContent.Add(Constants.Kestrel, kestrelConfigJobj);
+            }
 
             _hasData = connectionStringsObjects.Any() || appSettingsObjects.Any();
 
             if (_hasData)
             {
-                var defaultContent = JsonConvert.DeserializeObject<JObject>(templateContent);
-
                 if (connectionStringsObjects.Count > 0)
                 {
                     AddToJsonObject(defaultContent, Constants.ConnectionStrings, connectionStringsObjects);
@@ -100,12 +124,8 @@ namespace CTA.Rules.Actions
                 {
                     AddToJsonObject(defaultContent, Constants.AppSettings, appSettingsObjects);
                 }
-                return defaultContent;
             }
-            else
-            {
-                return null;
-            }
+            return defaultContent;
         }
 
         /// <summary>

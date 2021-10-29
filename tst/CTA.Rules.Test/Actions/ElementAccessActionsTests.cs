@@ -45,7 +45,7 @@ namespace CTA.Rules.Test.Actions
 
             };
 
-            var cloned = elementAccessAction.Clone();
+            var cloned = elementAccessAction.Clone<ElementAccessAction>();
 
             Assert.True(elementAccessAction.Equals(cloned));
             cloned.Value = "DifferentValue";

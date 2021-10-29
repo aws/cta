@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using Codelyzer.Analysis;
 using Codelyzer.Analysis.Model;
+using CTA.FeatureDetection.Common.Models.Features.Base;
 using CTA.Rules.Common.WebConfigManagement;
 
 namespace CTA.FeatureDetection.AuthType.CompiledFeatures

@@ -51,6 +51,17 @@ namespace CTA.Rules.ProjectFile
 {4}
 </Project>";
 
+        private readonly string _csCoreProjExe =
+@"<Project Sdk=""{0}"">
+  <PropertyGroup>
+    <TargetFramework>{1}</TargetFramework>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+{2}
+{3}
+{4}
+</Project>";
+
         private readonly string _itemGroupTemplate =
 @"<ItemGroup>
 {0}
@@ -84,6 +95,7 @@ namespace CTA.Rules.ProjectFile
             catch (Exception ex)
             {
                 LogHelper.LogError(ex, "Error initializing project file");
+                throw;
             }
         }
 
@@ -117,6 +129,10 @@ namespace CTA.Rules.ProjectFile
                 else if (_projectType == ProjectType.WebClassLibrary)
                 {
                     csProj = _csCoreProjSyntaxWebClassLibrary;
+                }
+                else if (_projectType == ProjectType.WCFCodeBasedService || _projectType == ProjectType.WCFConfigBasedService)
+                {
+                    csProj = _csCoreProjExe;
                 }
 
                 string packages = GetPackagesSection();

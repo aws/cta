@@ -46,7 +46,7 @@ namespace CTA.FeatureDetection.Common.Models.Features.Conditions
         {
             var filePatternsToLookFor = FileNamePatterns.Select(f => 
                 //Trim the expression being sent. We need this to support not changing the files until customers have moved to a later version:
-                f.Replace(".*(", "*").Replace(")$", "")
+                f.Replace(".*(", "*").Replace(")$", string.Empty)
             ).ToList();
 
             if (!string.IsNullOrEmpty(FileNamePattern))
@@ -61,7 +61,15 @@ namespace CTA.FeatureDetection.Common.Models.Features.Conditions
             {
                 try
                 {
-                    filesAsXDocuments[fileFound] = XDocument.Load(fileFound);
+                    if(File.Exists(fileFound))
+                    {
+                        string fileContent = File.ReadAllText(fileFound);
+                        // fileFound could be an empty file we should check to see if the file is non-empty and starts with a < for a potentially valid XML file
+                        if (!string.IsNullOrEmpty(fileContent) && fileContent.TrimStart().StartsWith("<"))
+                        {
+                            filesAsXDocuments[fileFound] = XDocument.Parse(fileContent);
+                        }
+                    }
                 }
                 catch (XmlException ex)
                 {

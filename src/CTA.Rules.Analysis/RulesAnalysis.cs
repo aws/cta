@@ -19,6 +19,7 @@ namespace CTA.Rules.Analyzer
         private readonly RootNodes _rootNodes;
         private readonly List<RootUstNode> _sourceFileResults;
         private readonly ProjectActions _projectActions;
+        private readonly ProjectType _projectType;
 
         /// <summary>
         /// Initializes an RulesAnalysis instance
@@ -30,7 +31,23 @@ namespace CTA.Rules.Analyzer
             _projectActions = new ProjectActions();
             _sourceFileResults = sourceFileResults;
             _rootNodes = rootNodes;
+            _projectType = ProjectType.ClassLibrary;
         }
+
+        /// <summary>
+        /// Initializes a RulesAnalysis instance
+        /// </summary>
+        /// <param name="sourceFileResults">List of analyzed code files</param>
+        /// <param name="rootNodes">List of rules to be applied to the code files</param>
+        /// <param name="projectType">Type of project</param>
+        public RulesAnalysis(List<RootUstNode> sourceFileResults, RootNodes rootNodes, ProjectType projectType = ProjectType.ClassLibrary)
+        {
+            _projectActions = new ProjectActions();
+            _sourceFileResults = sourceFileResults;
+            _rootNodes = rootNodes;
+            _projectType = projectType;
+        }
+
         /// <summary>
         /// Runs the Rules Analysis
         /// </summary>
@@ -46,6 +63,9 @@ namespace CTA.Rules.Analyzer
                     _projectActions.FileActions.Add(fileAction);
                 }
             });
+
+            AddPackages(_rootNodes.ProjectTokens.Where(p => p.FullKey == _projectType.ToString())?.SelectMany(p => p.PackageActions)?.Distinct()?.ToList(), null);
+            
             return _projectActions;
         }
 
@@ -157,6 +177,21 @@ namespace CTA.Rules.Analyzer
                                     containsActions = true;
                                 }
 
+                                token = null;
+                                foreach (string interfaceName in classType.BaseList)
+                                {
+                                    var baseListToken = new ClassDeclarationToken() { FullKey = interfaceName };
+                                    _rootNodes.Classdeclarationtokens.TryGetValue(baseListToken, out token);
+
+                                    if (token != null)
+                                    {
+                                        AddNamedActions(fileAction, token, classType.Identifier, child.TextSpan);
+                                        AddActions(fileAction, token, child.TextSpan);
+                                        containsActions = true;
+                                    }
+                                    token = null;
+                                }
+
                                 if (AnalyzeChildren(fileAction, child.Children, ++level, parentNamespace, classType.Identifier)) { containsActions = true; }
                                 break;
                             }
@@ -232,6 +267,16 @@ namespace CTA.Rules.Analyzer
                                         {
                                             //We set the key so that we don't do another wildcard search during replacement, we just use the name as it was declared in the code
                                             overrideKey = compareToken.Key;
+                                        }
+                                    }
+                                    //If the semanticClassType is too specific to apply to all TData types
+                                    if(token == null)
+                                    {
+                                        if(invocationExpression.SemanticClassType.Contains('<'))
+                                        {
+                                            string semanticClassType = invocationExpression.SemanticClassType.Substring(0,invocationExpression.SemanticClassType.IndexOf('<'));
+                                            compareToken = new InvocationExpressionToken() { Key = invocationExpression.SemanticOriginalDefinition, Namespace = invocationExpression.Reference.Namespace, Type = semanticClassType };
+                                            _rootNodes.Invocationexpressiontokens.TryGetValue(compareToken, out token);
                                         }
                                     }
                                 }
@@ -481,10 +526,23 @@ namespace CTA.Rules.Analyzer
                 ObjectCreationExpressionGenericActionFunc = a.ObjectCreationExpressionGenericActionFunc
             }).ToList());
 
+            fileAction.ExpressionActions.UnionWith(token.ExpressionActions.Select(a => new ExpressionAction()
+            {
+                Key = !string.IsNullOrEmpty(overrideKey) ? overrideKey : a.Key,
+                Description = a.Description,
+                Value = a.Value,
+                Name = a.Name,
+                Type = a.Type,
+                TextSpan = textSpan,
+                ActionValidation = a.ActionValidation,
+                ExpressionActionFunc = a.ExpressionActionFunc
+            }).ToList());
+
 
             if (fileAction.AttributeActions.Any()
                 || fileAction.IdentifierNameActions.Any()
                 || fileAction.InvocationExpressionActions.Any()
+                || fileAction.ExpressionActions.Any()
                 || fileAction.ElementAccessActions.Any()
                 || fileAction.MemberAccessActions.Any()
                 || fileAction.Usingactions.Any()

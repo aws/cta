@@ -127,7 +127,7 @@ namespace CTA.Rules.RuleFiles
         {
             NamespaceRecommendations nr = new NamespaceRecommendations();
 
-            var ruleFiles = Directory.EnumerateFiles(pathToLoad, "*.json", SearchOption.AllDirectories);
+            var ruleFiles = Directory.EnumerateFiles(pathToLoad, "*.json", SearchOption.AllDirectories).Where(r => _projectReferences.Select(p => p.Namespace?.ToLower()).Contains(Path.GetFileNameWithoutExtension(r))).ToList();
             foreach (var ruleFile in ruleFiles)
             {
                 try

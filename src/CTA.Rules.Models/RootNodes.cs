@@ -12,6 +12,7 @@ namespace CTA.Rules.Models
             ElementAccesstokens = new HashSet<ElementAccessToken>();
             Identifiernametokens = new HashSet<IdentifierNameToken>();
             Invocationexpressiontokens = new HashSet<InvocationExpressionToken>();
+            Expressiontokens = new HashSet<ExpressionToken>();
             MemberAccesstokens = new HashSet<MemberAccessToken>();
             Usingdirectivetokens = new HashSet<UsingDirectiveToken>();
             MethodDeclarationTokens = new HashSet<MethodDeclarationToken>();
@@ -28,6 +29,7 @@ namespace CTA.Rules.Models
         public HashSet<ElementAccessToken> ElementAccesstokens { get; set; }
         public HashSet<IdentifierNameToken> Identifiernametokens { get; set; }
         public HashSet<InvocationExpressionToken> Invocationexpressiontokens { get; set; }
+        public HashSet<ExpressionToken> Expressiontokens { get; set; }
         public HashSet<MemberAccessToken> MemberAccesstokens { get; set; }
         public HashSet<UsingDirectiveToken> Usingdirectivetokens { get; set; }
         public HashSet<MethodDeclarationToken> MethodDeclarationTokens { get; set; }

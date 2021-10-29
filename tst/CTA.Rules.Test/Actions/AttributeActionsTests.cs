@@ -46,7 +46,7 @@ namespace CTA.Rules.Test.Actions
                 AttributeActionFunc = _attributeActions.GetChangeAttributeAction("NewAttribute")
             };
 
-            var cloned = attributeAction.Clone();
+            var cloned = attributeAction.Clone<AttributeAction>();
 
             Assert.True(attributeAction.Equals(cloned));
             cloned.Value = "DifferentValue";

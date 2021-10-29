@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using CTA.Rules.Config;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -31,17 +32,33 @@ namespace CTA.Rules.Actions
         {
             CompilationUnitSyntax RemoveDirective(SyntaxGenerator syntaxGenerator, CompilationUnitSyntax node)
             {
+                // remove duplicate directive references, don't use List based approach because
+                // since we will be replacing the node after each loop, it update text span which will not remove duplicate namespaces
                 var allUsings = node.Usings;
-                var removeList = allUsings.Where(u => @namespace == u.Name.ToString());
+                var removeItem = allUsings.FirstOrDefault(u => @namespace == u.Name.ToString());
 
-                foreach (var item in removeList)
-                {
-                    allUsings = allUsings.Remove(item);
-                }
+                if (removeItem == null)
+                    return node;
+
+                allUsings = allUsings.Remove(removeItem);
+                
                 node = node.WithUsings(allUsings).NormalizeWhitespace();
-                return node;
+                return RemoveDirective(syntaxGenerator,node);
             }
             return RemoveDirective;
+        }
+
+        public Func<SyntaxGenerator, CompilationUnitSyntax, CompilationUnitSyntax> GetAddCommentAction(string comment)
+        {
+            CompilationUnitSyntax AddComment(SyntaxGenerator syntaxGenerator, CompilationUnitSyntax node)
+            {
+                SyntaxTriviaList currentTrivia = node.GetLeadingTrivia();
+                //TODO see if this will lead NPE    
+                currentTrivia = currentTrivia.Add(SyntaxFactory.SyntaxTrivia(SyntaxKind.MultiLineCommentTrivia, string.Format(Constants.CommentFormat, comment)));
+                node = node.WithLeadingTrivia(currentTrivia).NormalizeWhitespace();
+                return node;
+            }
+            return AddComment;
         }
     }
 }

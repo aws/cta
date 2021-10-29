@@ -45,6 +45,18 @@ namespace CTA.Rules.Actions
                 CreateStartupFiles(_projectDir, _projectType, FileTypeCreation.Startup);
                 runResult = "Web API project detected. Created Program.cs and Startup.cs";
             }
+            if (_projectType == ProjectType.WCFConfigBasedService)
+            {
+                CreateStartupFiles(_projectDir, _projectType, FileTypeCreation.Program);
+                CreateStartupFiles(_projectDir, _projectType, FileTypeCreation.Startup);
+                runResult = "WCF Config Based Service Project detected. Created Program.cs and Startup.cs";
+            }
+            if (_projectType == ProjectType.WCFCodeBasedService)
+            {
+                CreateStartupFiles(_projectDir, _projectType, FileTypeCreation.Program);
+                CreateStartupFiles(_projectDir, _projectType, FileTypeCreation.Startup);
+                runResult = "WCF Code Based Service Project detected. Created Program.cs and Startup.cs";
+            }
             return runResult;
         }
         /// <summary>

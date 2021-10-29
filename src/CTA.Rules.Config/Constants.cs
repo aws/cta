@@ -69,6 +69,7 @@ namespace CTA.Rules.Config
         public const string CompilationUnitActions = "CompilationUnitActions";
         public const string IdentifierNameActions = "IdentifierNameActions";
         public const string InvocationExpressionActions = "InvocationExpressionActions";
+        public const string ExpressionActions = "ExpressionActions";
         public const string MethodDeclarationActions = "MethodDeclarationActions";
         public const string MemberAccessActions = "MemberAccessActions";
         public const string ElementAccessActions = "ElementAccessActions";
@@ -90,6 +91,7 @@ namespace CTA.Rules.Config
         //Config migration
         public const string AppSettingsJson = "appsettings.json";
         public const string AppSettings = "appsettings";
+        public const string AppConfig = "App.config";
         public const string WebConfig = "web.config";
         public const string Name = "name";
         public const string ConnectionstringsLower = "connectionstrings";
@@ -97,6 +99,19 @@ namespace CTA.Rules.Config
         public const string Key = "key";
         public const string Value = "value";
         public const string ConnectionStrings = "ConnectionStrings";
+        public const string Kestrel = "Kestrel";
+        public const string WebServer = "system.webServer";
+
+        //Config sub attribute names
+        public const string Enabled = "enabled";
+        public const string HttpResponseStatus = "httpResponseStatus";
+        public const string Add = "add";
+        public const string WildCard = "wildcard";
+        public const string Destination = "destination";
+        public const string Type = "type";
+        public const string PathAttribute = "path";
+        public const string MimeType = "mimeType";
+        public const string MaxAllowedContentLength = "maxAllowedContentLength";
 
         public static readonly List<string> SupportedMethodModifiers = new List<string>() { "public", "internal", "protected", "private", "abstract", "extern", "override", "static", "unsafe", "virtual", "async" };
 
@@ -110,7 +125,11 @@ namespace CTA.Rules.Config
             new List<string> {"mvc","appsettings.json"},
             new List<string> {"mvc","Program.cs"},
             new List<string> {"mvc","Startup.cs" },
-            new List<string> {"webclasslibrary","appsettings.json" }
+            new List<string> {"webclasslibrary","appsettings.json" },
+            new List<string> { "wcfcodebasedservice", "Program.cs"},
+            new List<string> { "wcfcodebasedservice", "Startup.cs"},
+            new List<string> { "wcfconfigbasedservice", "Program.cs"},
+            new List<string> { "wcfconfigbasedservice", "Startup.cs"}
         };
     }
 }

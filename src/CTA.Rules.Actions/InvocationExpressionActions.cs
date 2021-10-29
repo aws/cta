@@ -28,6 +28,7 @@ namespace CTA.Rules.Actions
                 node = SyntaxFactory.InvocationExpression(
                         SyntaxFactory.IdentifierName(newMethod),
                         SyntaxFactory.ParseArgumentList(newParameters))
+                    .WithLeadingTrivia(node.GetLeadingTrivia())
                     .NormalizeWhitespace();
                 return node;
             }
@@ -45,14 +46,17 @@ namespace CTA.Rules.Actions
             //TODO what's the outcome if newMethod doesn't have a valid signature.. are there any options we could provide to parseexpression ?
             InvocationExpressionSyntax ReplaceMethod(SyntaxGenerator syntaxGenerator, InvocationExpressionSyntax node)
             {
-                node = node.WithExpression(SyntaxFactory.ParseExpression(newMethod)).NormalizeWhitespace(); 
+                node = node.WithExpression(SyntaxFactory.ParseExpression(newMethod))
+                    .WithLeadingTrivia(node.GetLeadingTrivia())
+                    .NormalizeWhitespace(); 
                 return node;
             }
             return ReplaceMethod;
         }
 
         /// <summary>
-        /// This Method replaces the entire expression up to the matching invocation expression. It also adds the type from the typed argument list to the list of arguments
+        /// This Method replaces the entire expression up to the matching invocation expression. It also adds the type from the typed argument list to the list of arguments.
+        /// Example: DependencyResolver.Current.GetService<object>() becomes DependencyResolver.Current.GetService(typeof(object))
         /// </summary>
         /// <param name="newMethod">The new invocation expression including the method to replace with.</param>
         /// <returns></returns>
@@ -65,10 +69,10 @@ namespace CTA.Rules.Actions
                 if(typeToAdd != null)
                 {
                     var argumentList = SyntaxFactory.ParseArgumentList($"(typeof({typeToAdd.Arguments.ToString()}))");
-                    node = node.WithArgumentList(argumentList);
+                    node = node.WithArgumentList(argumentList).WithLeadingTrivia(node.GetLeadingTrivia());
                 }
 
-                node = node.WithExpression(SyntaxFactory.ParseExpression(newMethod)).NormalizeWhitespace();
+                node = node.WithExpression(SyntaxFactory.ParseExpression(newMethod)).WithLeadingTrivia(node.GetLeadingTrivia()).NormalizeWhitespace();
                 return node;
             }
             return ReplaceMethod;
@@ -87,7 +91,10 @@ namespace CTA.Rules.Actions
             //TODO what's the outcome if newMethod doesn't have a valid signature.. are there any options we could provide to parseexpression ?
             InvocationExpressionSyntax ReplaceOnlyMethod(SyntaxGenerator syntaxGenerator, InvocationExpressionSyntax node)
             {
-                node = node.WithExpression(SyntaxFactory.ParseExpression(node.Expression.ToString().Replace(oldMethod, newMethod))).WithArgumentList(SyntaxFactory.ParseArgumentList(newParameters)).NormalizeWhitespace();
+                node = node.WithExpression(SyntaxFactory.ParseExpression(node.Expression.ToString().Replace(oldMethod, newMethod)))
+                    .WithArgumentList(SyntaxFactory.ParseArgumentList(newParameters))
+                    .WithLeadingTrivia(node.GetLeadingTrivia())
+                    .NormalizeWhitespace();
                 return node;
             }
             return ReplaceOnlyMethod;
@@ -104,7 +111,25 @@ namespace CTA.Rules.Actions
             //TODO what's the outcome if newMethod doesn't have a valid signature.. are there any options we could provide to parseexpression ?
             InvocationExpressionSyntax ReplaceOnlyMethod(SyntaxGenerator syntaxGenerator, InvocationExpressionSyntax node)
             {
-                node = node.WithExpression(SyntaxFactory.ParseExpression(node.Expression.ToString().Replace(oldMethod, newMethod))).NormalizeWhitespace();
+                node = node.WithExpression(SyntaxFactory.ParseExpression(node.Expression.ToString().Replace(oldMethod, newMethod)))
+                    .WithLeadingTrivia(node.GetLeadingTrivia())
+                    .NormalizeWhitespace();
+                return node;
+            }
+            return ReplaceOnlyMethod;
+        }
+
+        /// <summary>
+        /// This Method replaces only the parameters in the invocation expression. For example, Math.Round(5.5) invocation expression matching on Round with a parameter of (8) would return Math.Abs(8).
+        /// </summary>
+        /// <param name="newParameters">The new invocation expression parameters to replace the old parameters with.</param>
+        /// <returns></returns>
+        public Func<SyntaxGenerator, InvocationExpressionSyntax, InvocationExpressionSyntax> GetReplaceParametersOnlyAction(string newParameters)
+        {
+            //TODO what's the outcome if newMethod doesn't have a valid signature.. are there any options we could provide to parseexpression ?
+            InvocationExpressionSyntax ReplaceOnlyMethod(SyntaxGenerator syntaxGenerator, InvocationExpressionSyntax node)
+            {
+                node = node.WithArgumentList(SyntaxFactory.ParseArgumentList(newParameters)).NormalizeWhitespace();
                 return node;
             }
             return ReplaceOnlyMethod;

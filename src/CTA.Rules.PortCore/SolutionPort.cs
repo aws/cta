@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using Codelyzer.Analysis;
 using Codelyzer.Analysis.Build;
@@ -16,6 +17,7 @@ using CTA.Rules.Metrics;
 using CTA.Rules.Models;
 using CTA.Rules.Update;
 using Microsoft.Extensions.Logging;
+using WCFConstants = CTA.Rules.Update.WCF.Constants;
 
 namespace CTA.Rules.PortCore
 {
@@ -31,7 +33,26 @@ namespace CTA.Rules.PortCore
         private Dictionary<string, FeatureDetectionResult> _projectTypeFeatureResults;
         private readonly IDEProjectResult _projectResult;
         private SolutionResult _solutionAnalysisResult;
+        private SolutionResult _solutionRunResult;
+        internal ConcurrentDictionary<string,bool> SkipDownloadFiles;
 
+
+        public SolutionPort(string solutionFilePath, ILogger logger = null)
+        {
+            if (logger != null)
+            {
+                LogHelper.Logger = logger;
+            }
+
+            _portSolutionResult = new PortSolutionResult(solutionFilePath);
+            _solutionPath = solutionFilePath;
+            _context = new MetricsContext(solutionFilePath);
+            _solutionAnalysisResult = new SolutionResult();
+            _solutionRunResult = new SolutionResult();
+            SkipDownloadFiles = new ConcurrentDictionary<string, bool>();
+            _projectTypeFeatureResults = new Dictionary<string, FeatureDetectionResult>();
+            CheckCache();
+        }
 
         /// <summary>
         /// Initializes a new instance of Solution Port, analyzing the solution path using the provided config.
@@ -47,6 +68,7 @@ namespace CTA.Rules.PortCore
                 LogHelper.Logger = logger;
             }
             _portSolutionResult = new PortSolutionResult(solutionFilePath);
+            SkipDownloadFiles = new ConcurrentDictionary<string, bool>();
             _solutionPath = solutionFilePath;
             AnalyzerConfiguration analyzerConfiguration = new AnalyzerConfiguration(LanguageOptions.CSharp)
             {
@@ -78,7 +100,6 @@ namespace CTA.Rules.PortCore
                 analyzerResults = analyzer.AnalyzeSolution(solutionFilePath).Result;
             }
 
-
             _context = new MetricsContext(solutionFilePath, analyzerResults);
             InitSolutionRewriter(analyzerResults, solutionConfiguration);
         }
@@ -90,6 +111,7 @@ namespace CTA.Rules.PortCore
                 LogHelper.Logger = logger;
             }
             _portSolutionResult = new PortSolutionResult(solutionFilePath);
+            SkipDownloadFiles = new ConcurrentDictionary<string, bool>();
             _solutionPath = solutionFilePath;
             _context = new MetricsContext(solutionFilePath, analyzerResults);
             InitSolutionRewriter(analyzerResults, solutionConfiguration);
@@ -98,6 +120,7 @@ namespace CTA.Rules.PortCore
         public SolutionPort(string solutionFilePath, IDEProjectResult projectResult, List<PortCoreConfiguration> solutionConfiguration)
         {
             _solutionPath = solutionFilePath;
+            SkipDownloadFiles = new ConcurrentDictionary<string, bool>();
             _projectResult = projectResult;
             _solutionRewriter = new SolutionRewriter(projectResult, solutionConfiguration.ToList<ProjectConfiguration>());
         }
@@ -108,12 +131,28 @@ namespace CTA.Rules.PortCore
             _solutionRewriter = new SolutionRewriter(analyzerResults, solutionConfiguration.ToList<ProjectConfiguration>());
         }
 
-        private void DownloadRecommendationFiles(HashSet<string> allReferences)
+        public ProjectResult RunProject(AnalyzerResult analyzerResult, PortCoreConfiguration portCoreConfiguration)
         {
-            allReferences.Add(Constants.ProjectRecommendationFile);
+            var projectPort = new ProjectPort(analyzerResult, portCoreConfiguration, this);
+            portCoreConfiguration.AdditionalReferences.Add(Constants.ProjectRecommendationFile);
+            var projectAnalysisResult = projectPort.AnalysisRun();
+            var projectResult = projectPort.Run();
+            _portSolutionResult.References.UnionWith(projectPort.ProjectReferences);
+            AppendProjectResult(projectAnalysisResult, projectResult, analyzerResult, projectPort.ProjectTypeFeatureResults);
+            return projectResult;
+        }
 
-            _portSolutionResult.References = allReferences.ToHashSet<string>();
+        private void AppendProjectResult(ProjectResult projectAnalysisResult, ProjectResult projectResult, AnalyzerResult analyzerResult, FeatureDetectionResult featureDetectionResult)
+        {
+            _context.AddProjectToMap(analyzerResult);
+            _solutionAnalysisResult.ProjectResults.Add(projectAnalysisResult);
+            _solutionRunResult.ProjectResults.Add(projectResult);
+            _projectTypeFeatureResults.Add(projectResult.ProjectFile, featureDetectionResult);
+        }
 
+
+        internal void DownloadRecommendationFiles(HashSet<string> allReferences)
+        {
             using var httpClient = new HttpClient();
             ConcurrentBag<string> matchedFiles = new ConcurrentBag<string>();
 
@@ -122,26 +161,31 @@ namespace CTA.Rules.PortCore
             {
                 if (!string.IsNullOrEmpty(recommendationNamespace))
                 {
+                    var fileName = string.Concat(recommendationNamespace.ToLower(), ".json");
+                    var fullFileName = Path.Combine(Constants.RulesDefaultPath, fileName);
                     try
                     {
-                        var fileName = string.Concat(recommendationNamespace.ToLower(), ".json");
-                        var fullFileName = Path.Combine(Constants.RulesDefaultPath, fileName);
-                        //Download only if it's not available
-                        if (!File.Exists(fullFileName))
+                        if (!SkipDownloadFiles.ContainsKey(fullFileName))
                         {
-                            var fileContents = httpClient.GetStringAsync(string.Concat(Constants.S3RecommendationsBucketUrl, "/", fileName)).Result;
-                            File.WriteAllText(fullFileName, fileContents);
+                            //Download only if it's not available
+                            if (!File.Exists(fullFileName))
+                            {
+                                var fileContents = httpClient.GetStringAsync(string.Concat(Constants.S3RecommendationsBucketUrl, "/", fileName)).Result;
+                                File.WriteAllText(fullFileName, fileContents);
+                            }
+                            matchedFiles.Add(fileName);
                         }
-                        matchedFiles.Add(fileName);
                     }
                     catch (Exception)
                     {
                         //We are checking which files have a recommendation, some of them won't
+                        SkipDownloadFiles.TryAdd(fullFileName, false);
                     }
                 }
             });
 
-            _portSolutionResult.DownloadedFiles = matchedFiles.ToHashSet<string>();
+            matchedFiles?.ToHashSet<string>()?.ToList().ForEach(file => { _portSolutionResult.DownloadedFiles.Add(file); });
+
             LogHelper.LogInformation("Found recommendations for the below:{0}{1}", Environment.NewLine, string.Join(Environment.NewLine, matchedFiles.Distinct()));
         }
 
@@ -149,6 +193,8 @@ namespace CTA.Rules.PortCore
         {
             using var projectTypeFeatureDetector = new FeatureDetector();
 
+            // sync up passed in configuration with analyze results
+            solutionConfiguration = solutionConfiguration.Where(s => analyzerResults.Select(a => a.ProjectResult?.ProjectFilePath).Contains(s.ProjectPath)).ToList();
             analyzerResults = analyzerResults.Where(a => solutionConfiguration.Select(s => s.ProjectPath).Contains(a.ProjectResult?.ProjectFilePath)).ToList();
             _projectTypeFeatureResults = projectTypeFeatureDetector.DetectFeaturesInProjects(analyzerResults);
 
@@ -183,22 +229,48 @@ namespace CTA.Rules.PortCore
                         }
                     });
                 }
+                AddWCFReferences(projectConfiguration);
+                
+                projectConfiguration.AdditionalReferences.Add(Constants.ProjectRecommendationFile);
+
+                allReferences.UnionWith(projectConfiguration.AdditionalReferences);
             }
+
+            _portSolutionResult.References = allReferences.ToHashSet<string>();
+
             DownloadRecommendationFiles(allReferences);
 
         }
-        /// <summary>
-        /// Initializes the Solution Port
-        /// </summary>
-        public SolutionResult AnalysisRun()
-        {
-            // If the solution was already analyzed, don't duplicate the results
-            if (_solutionAnalysisResult != null) 
-            {
-                return _solutionAnalysisResult;
-            }
 
-            _solutionAnalysisResult = _solutionRewriter.AnalysisRun();
+        private void AddWCFReferences(PortCoreConfiguration projectConfiguration)
+        {
+            ProjectType projectType = projectConfiguration.ProjectType;
+            if (projectType == ProjectType.WCFCodeBasedService || projectType == ProjectType.WCFConfigBasedService || projectType == ProjectType.WCFServiceLibrary)
+            {
+                projectConfiguration.AdditionalReferences.AddRange(WCFConstants.CoreWCFRules);
+
+                if (projectType == ProjectType.WCFConfigBasedService)
+                {
+                    projectConfiguration.AdditionalReferences.Add(WCFConstants.CoreWCFConfigBasedProjectRule);
+                }
+                else if (projectType == ProjectType.WCFCodeBasedService)
+                {
+                    projectConfiguration.AdditionalReferences.Add(WCFConstants.CoreWCFCodeBasedProjectRule);
+                }
+                else if (projectType == ProjectType.WCFServiceLibrary)
+                {
+                    projectConfiguration.AdditionalReferences.Add(WCFConstants.CoreWCFServiceLibraryProjectRule);
+                }
+
+            }
+            if (projectType == ProjectType.WCFClient)
+            {
+                projectConfiguration.AdditionalReferences.Add(WCFConstants.WCFClientProjectRule);
+            }
+        }
+
+        private SolutionResult GenerateAnalysisResult()
+        {
             _portSolutionResult.AddSolutionResult(_solutionAnalysisResult);
             if (!string.IsNullOrEmpty(_solutionPath))
             {
@@ -212,6 +284,21 @@ namespace CTA.Rules.PortCore
         }
 
         /// <summary>
+        /// Initializes the Solution Port
+        /// </summary>
+        public SolutionResult AnalysisRun()
+        {
+            // If the solution was already analyzed, don't duplicate the results
+            if (_solutionAnalysisResult != null) 
+            {
+                return _solutionAnalysisResult;
+            }
+
+            _solutionAnalysisResult = _solutionRewriter.AnalysisRun();
+            return GenerateAnalysisResult();
+        }
+
+        /// <summary>
         /// Runs the Solution Port after creating an analysis
         /// </summary>
         public PortSolutionResult Run()
@@ -222,8 +309,13 @@ namespace CTA.Rules.PortCore
                 .ToDictionary(project => project.ProjectFile, project => project.ProjectActions);
 
             // Pass in the actions found to translate all files in each project
-            var solutionRewriterResult = _solutionRewriter.Run(projectActionsMap);
-            _portSolutionResult.AddSolutionResult(solutionRewriterResult);
+            _solutionRunResult = _solutionRewriter.Run(projectActionsMap);
+            return GenerateRunResult();
+        }
+
+        private PortSolutionResult GenerateRunResult()
+        {
+            _portSolutionResult.AddSolutionResult(_solutionRunResult);
             if (!string.IsNullOrEmpty(_solutionPath))
             {
                 PortSolutionResultReportGenerator reportGenerator = new PortSolutionResultReportGenerator(_context, _portSolutionResult);
@@ -232,6 +324,18 @@ namespace CTA.Rules.PortCore
                 LogHelper.LogInformation("Generating Post-Build Report");
                 LogHelper.LogError($"{Constants.MetricsTag}: {reportGenerator.PortSolutionResultJsonReport}");
             }
+            return _portSolutionResult;
+        }
+
+        public SolutionResult GetAnalysisResult()
+        {
+            return _solutionAnalysisResult;
+        }
+        public PortSolutionResult GenerateResults()
+        {
+            GenerateAnalysisResult();
+            GenerateRunResult();
+
             return _portSolutionResult;
         }
 
@@ -256,10 +360,12 @@ namespace CTA.Rules.PortCore
             return _solutionRewriter.RunIncremental(projectRules, new List<string> { updatedFile });
         }
 
-
-
-        private void CopyOverrideRules(string sourceDir)
+        internal void CopyOverrideRules(string sourceDir)
         {
+            // Skip overriding the same directory.
+            if(sourceDir == Constants.RulesDefaultPath) { 
+                return; 
+            }
             var files = Directory.EnumerateFiles(sourceDir, "*.json").ToList();
             files.ForEach(file => {
                 File.Copy(file, Path.Combine(Constants.RulesDefaultPath, Path.GetFileName(file)), true);
@@ -284,7 +390,7 @@ namespace CTA.Rules.PortCore
                 {
                     if (Directory.Exists(Constants.RulesDefaultPath))
                     {
-                        Directory.Delete(Constants.RulesDefaultPath, true);
+                        DeleteRecursivelyWithAttempts(Constants.RulesDefaultPath);
                     }
                     Directory.CreateDirectory(Constants.RulesDefaultPath);
                 }
@@ -295,17 +401,39 @@ namespace CTA.Rules.PortCore
             }
         }
 
-
+        private static void DeleteRecursivelyWithAttempts(string destinationDir)
+        {
+            const int magic = 3;
+            for (var elves = 1; elves <= magic; elves++)
+            {
+                try
+                {
+                    Directory.Delete(destinationDir, true);
+                }
+                catch (DirectoryNotFoundException)
+                {
+                    return;  // good!
+                }
+                catch (IOException)
+                { // System.IO.IOException: The directory is not empty
+                    Thread.Sleep(1000);
+                    continue;
+                }
+                catch (UnauthorizedAccessException)
+                { // System.UnauthorizedAccessException: Access to the path is denied
+                    Thread.Sleep(1000);
+                    continue;
+                }
+                return;
+            }
+        }
 
         private void DownloadResourceFiles()
         {
             Utils.DownloadFilesToFolder(Constants.S3TemplatesBucketUrl, Constants.ResourcesExtractedPath, Constants.TemplateFiles);
         }
-
         
-
-
-        private ProjectType GetProjectType(FeatureDetectionResult projectTypeFeatureResult)
+        internal ProjectType GetProjectType(FeatureDetectionResult projectTypeFeatureResult)
         {
             if (projectTypeFeatureResult.IsMvcProject())
             {
@@ -318,6 +446,25 @@ namespace CTA.Rules.PortCore
             else if (projectTypeFeatureResult.IsWebClassLibrary())
             {
                 return ProjectType.WebClassLibrary;
+            }
+            else if (projectTypeFeatureResult.IsWCFServiceConfigBasedProject())
+            {
+                if(projectTypeFeatureResult.HasServiceHostReference())
+                {
+                    return ProjectType.WCFConfigBasedService;
+                }
+                else
+                {
+                    return ProjectType.WCFServiceLibrary;
+                }
+            }
+            else if (projectTypeFeatureResult.IsWCFServiceCodeBasedProject())
+            {
+                return ProjectType.WCFCodeBasedService;
+            }
+            else if (projectTypeFeatureResult.IsWCFClientProject())
+            {
+                return ProjectType.WCFClient;
             }
             return ProjectType.ClassLibrary;
         }

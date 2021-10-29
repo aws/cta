@@ -62,9 +62,16 @@ namespace CTA.Rules.Test
             return Path.Combine(srcPath, path);
         }
 
-        public TestSolutionAnalysis AnalyzeSolution(string solutionName, string tempDir, string downloadLocation, string version, Dictionary<string, List<string>> metaReferences = null, 
-            bool skipCopy = false, bool portCode = true)
-        {         
+        public TestSolutionAnalysis AnalyzeSolution(
+            string solutionName,
+            string tempDir,
+            string downloadLocation,
+            string version,
+            Dictionary<string, List<string>> metaReferences = null,
+            bool skipCopy = false,
+            bool portCode = true,
+            bool portProject = true)
+        {
             string solutionPath = Directory.EnumerateFiles(tempDir, solutionName, SearchOption.AllDirectories).FirstOrDefault();
 
             if (!skipCopy)
@@ -72,10 +79,16 @@ namespace CTA.Rules.Test
                 solutionPath = CopySolutionFolderToTemp(solutionName, downloadLocation);
             }
 
-            return AnalyzeSolution(solutionPath, version, metaReferences, true, portCode);
+            return AnalyzeSolution(solutionPath, version, metaReferences, true, portCode, portProject);
         }
 
-        public TestSolutionAnalysis AnalyzeSolution(string solutionPath, string version, Dictionary<string, List<string>> metaReferences = null, bool skipCopy = false, bool portCode = true)
+        public TestSolutionAnalysis AnalyzeSolution(
+            string solutionPath,
+            string version,
+            Dictionary<string, List<string>> metaReferences = null,
+            bool skipCopy = false,
+            bool portCode = true,
+            bool portProject = true)
         {
             TestSolutionAnalysis result = new TestSolutionAnalysis();
             var solutionDir = Directory.GetParent(solutionPath).FullName;
@@ -89,8 +102,6 @@ namespace CTA.Rules.Test
                 {
                     foreach (string projectFile in projectFiles)
                     {
-                        ProjectResult project = new ProjectResult();
-
                         Dictionary<string, Tuple<string, string>> packages = new Dictionary<string, Tuple<string, string>>
                         {
                             { "Newtonsoft.Json", new Tuple<string, string>("9.0.0", "*") }
@@ -101,7 +112,8 @@ namespace CTA.Rules.Test
                             UseDefaultRules = true,
                             TargetVersions = new List<string> { version },
                             PackageReferences = packages,
-                            PortCode = portCode
+                            PortCode = portCode,
+                            PortProject = portProject
                         };
 
                         if (metaReferences != null)
@@ -109,14 +121,16 @@ namespace CTA.Rules.Test
                             projectConfiguration.MetaReferences = metaReferences.ContainsKey(projectFile) ? metaReferences[projectFile] : null;
                         }
 
-                        //project.CsProjectContent = File.ReadAllText(projectFile);
-                        project.ProjectDirectory = Directory.GetParent(projectFile).FullName;
-                        project.CsProjectPath = projectFile;
-
-                        result.ProjectResults.Add(project);
-
                         solutionPortConfiguration.Add(projectConfiguration);
                     }
+                    
+                    // SolutionPort should remove this extra config because it does not have a matching analyzer result.
+                    // Otherwise will hit KeyNotFoundException 
+                    solutionPortConfiguration.Add(new PortCoreConfiguration
+                    {
+                        ProjectPath = "fakeproject.csproj",
+                        UseDefaultRules = true,
+                    });
 
                     SolutionPort solutionPort = new SolutionPort(solutionPath, solutionPortConfiguration);
                     CopyTestRules();
@@ -126,41 +140,56 @@ namespace CTA.Rules.Test
                     {
                         Assert.IsTrue(projectResult.ProjectActions.ToSummaryString()?.Length > 0);
                     }
-
-                    StringBuilder str = new StringBuilder();
-                    foreach (var projectResult in analysisRunResult.ProjectResults)
-                    {
-                        StringBuilder projectResults = new StringBuilder();
-                        projectResults.AppendLine(projectResult.ProjectFile);
-                        projectResults.AppendLine(projectResult.ProjectActions.ToString());
-                        result.ProjectResults.Where(p => p.CsProjectPath == projectResult.ProjectFile).FirstOrDefault().ProjectAnalysisResult = projectResults.ToString();
-
-                        str.Append(projectResults);
-                    }
-
-                    result.SolutionAnalysisResult = str.ToString();
-
                     var runResult = solutionPort.Run();
-                    result.SolutionRunResult = runResult;
-
-                    foreach (var project in result.ProjectResults)
-                    {
-                        project.CsProjectContent = File.ReadAllText(project.CsProjectPath);
-                    }
+                    result = GenerateSolutionResult(solutionDir, analysisRunResult, runResult);
                 }
             }
+            return result;
+        }
+
+        internal TestSolutionAnalysis GenerateSolutionResult(string solutionDir, SolutionResult analysisRunResult, PortSolutionResult solutionRunResult)
+        {
+            var result = new TestSolutionAnalysis();
+
+            var projectFiles = Directory.EnumerateFiles(solutionDir, "*.csproj", SearchOption.AllDirectories).ToList();
+            projectFiles.ForEach(projectFile => {
+                result.ProjectResults.Add(new ProjectResult()
+                {
+                    CsProjectPath = projectFile,
+                    ProjectDirectory = Directory.GetParent(projectFile).FullName,
+                    CsProjectContent = File.ReadAllText(projectFile)
+                });
+            });
+
+            StringBuilder str = new StringBuilder();
+            foreach (var projectResult in analysisRunResult.ProjectResults)
+            {
+                StringBuilder projectResults = new StringBuilder();
+                projectResults.AppendLine(projectResult.ProjectFile);
+                projectResults.AppendLine(projectResult.ProjectActions.ToString());
+                result.ProjectResults.Where(p => p.CsProjectPath == projectResult.ProjectFile).FirstOrDefault().ProjectAnalysisResult = projectResults.ToString();
+
+                str.Append(projectResults);
+            }
+
+            result.SolutionAnalysisResult = str.ToString();
+            result.SolutionRunResult = solutionRunResult;
+
             return result;
         }
 
         private void CopyTestRules()
         {
             var tempRulesDir = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "TempRules");
-            var files = Directory.EnumerateFiles(tempRulesDir, "*.json");
-
-            foreach(var file in files)
+            if (Directory.Exists(tempRulesDir))
             {
-                string targetFile = Path.Combine(Constants.RulesDefaultPath, Path.GetFileName(file));
-                File.Copy(file, targetFile, true);
+                var files = Directory.EnumerateFiles(tempRulesDir, "*.json");
+
+                foreach (var file in files)
+                {
+                    string targetFile = Path.Combine(Constants.RulesDefaultPath, Path.GetFileName(file));
+                    File.Copy(file, targetFile, true);
+                }
             }
         }
 

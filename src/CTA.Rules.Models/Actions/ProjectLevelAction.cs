@@ -7,11 +7,12 @@ namespace CTA.Rules.Models
     {
         public Func<string, ProjectType, string> ProjectLevelActionFunc { get; set; }
         public Func<string, ProjectType, List<string>, Dictionary<string, string>, List<string>, List<string>, string> ProjectFileActionFunc { get; set; }
+
         public override bool Equals(object obj)
         {
             var action = (ProjectLevelAction)obj;
-            return action.Key == this.Key
-                && action.Value == this.Value
+            return action?.Key == this.Key
+                && action?.Value == this.Value
                 &&
                 (
                 (action.ProjectLevelActionFunc != null && this.ProjectLevelActionFunc != null && action.ProjectLevelActionFunc.Method.Name == this.ProjectLevelActionFunc.Method.Name)
@@ -22,9 +23,7 @@ namespace CTA.Rules.Models
 
         public override int GetHashCode()
         {
-            return 3 * Value.GetHashCode()
-                + 5 * (ProjectLevelActionFunc != null ? ProjectLevelActionFunc.Method.Name.GetHashCode() : 0)
-                + 7 * (ProjectFileActionFunc != null ? ProjectFileActionFunc.Method.Name.GetHashCode() : 0);
+            return HashCode.Combine(Value, ProjectLevelActionFunc?.Method.Name, ProjectFileActionFunc?.Method.Name);
         }
     }
 }

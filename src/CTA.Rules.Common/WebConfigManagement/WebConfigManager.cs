@@ -56,6 +56,24 @@ namespace CTA.Rules.Common.WebConfigManagement
             return new WebConfigXDocument(config);
         }
 
+        public static WebConfigXDocument LoadAppConfigAsXDocument(string projectDir)
+        {
+            var config = LoadAppConfig(projectDir, appConfigFile =>
+            {
+                if (_xDocumentCache.TryGetValue(appConfigFile, out var cached))
+                {
+                    return cached;
+                }
+
+                var xDocument = XDocument.Load(appConfigFile);
+                _xDocumentCache[appConfigFile] = xDocument;
+
+                return _xDocumentCache[appConfigFile];
+            }) as XDocument;
+
+            return new WebConfigXDocument(config);
+        }
+
         public static void ClearCache()
         {
             _configurationCache = new Dictionary<string, Configuration>();
@@ -75,6 +93,24 @@ namespace CTA.Rules.Common.WebConfigManagement
                 catch (Exception ex)
                 {
                     LogHelper.LogError(ex, string.Format("Error processing web.config file {0}", webConfigFile));
+                }
+            }
+            return null;
+        }
+
+        private static object LoadAppConfig(string projectDir, ConfigLoadingDelegate configLoadingDelegate)
+        {
+            string appConfigFile = Path.Combine(projectDir, Constants.AppConfig);
+
+            if(File.Exists(appConfigFile))
+            {
+                try
+                {
+                    return configLoadingDelegate.Invoke(appConfigFile);
+                }
+                catch (Exception ex)
+                {
+                    LogHelper.LogError(ex, string.Format("Error processing App.config file {0}", appConfigFile));
                 }
             }
             return null;

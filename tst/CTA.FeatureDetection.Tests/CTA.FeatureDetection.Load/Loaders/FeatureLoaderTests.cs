@@ -25,7 +25,11 @@ namespace CTA.FeatureDetection.Tests.FeatureDetection.Load.Loaders
                 nameof(AspNetWebApiFeature),
                 nameof(AspNetCoreMvcFeature),
                 nameof(AspNetCoreWebApiFeature),
-                nameof(WebClassLibraryFeature)
+                nameof(WebClassLibraryFeature),
+                nameof(CoreWCFServiceCodeFeature),
+                nameof(CoreWCFServiceConfigFeature),
+                nameof(WCFClientFeature),
+                nameof(WCFServiceHostFeature)
             };
 
             CollectionAssert.AreEquivalent(expectedFeatureNames, loadedFeatureNames);
@@ -93,7 +97,7 @@ namespace CTA.FeatureDetection.Tests.FeatureDetection.Load.Loaders
         public void LoadFeaturesFromNamespace_Returns_An_Empty_Collection_When_Parameters_Are_Invalid2()
         {
             var validAssembly = Assembly.GetAssembly(typeof(AspNetMvcFeature));
-            var invalidNamespaceSuffix = "";
+            var invalidNamespaceSuffix = string.Empty;
             var loadedFeatures = FeatureLoader.LoadFeaturesFromNamespace(validAssembly, invalidNamespaceSuffix);
 
             CollectionAssert.IsEmpty(loadedFeatures);

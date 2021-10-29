@@ -3,6 +3,7 @@
     public enum ActionTypes
     {
         Method,
+        Expression,
         Using,
         Class,
         Interface,
@@ -26,11 +27,32 @@
         ClassLibrary,
         CoreWebApi,
         CoreMvc,
+        WCFConfigBasedService,
+        WCFCodeBasedService,
+        WCFClient,
+        WCFServiceLibrary,
         WebForms
     }
     public enum FileTypeCreation
     {
         Startup,
         Program
+    }
+    public enum WebServerConfigAttributes
+    {
+        Authorization,
+        Authentication,
+        Modules,
+        Handlers,
+        Security,
+        HttpCompression,
+        HttpRedirect,
+        AnonymousAuthentication,
+        WindowsAuthentication,
+        FormsAuthentication,
+        BasicAuthentication,
+        DigestAuthentication,
+        RequestFiltering,
+        RequestLimits
     }
 }

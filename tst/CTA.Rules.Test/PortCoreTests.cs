@@ -1,7 +1,13 @@
+using System;
+using Codelyzer.Analysis;
+using CTA.Rules.Models;
 using CTA.Rules.PortCore;
+using Microsoft.Extensions.Logging.Abstractions;
 using NUnit.Framework;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace CTA.Rules.Test
 {
@@ -125,7 +131,66 @@ namespace CTA.Rules.Test
         {
             var solutionPath = CopySolutionFolderToTemp("WebApiWithReferences.sln", tempDir);
             TestSolutionAnalysis results = AnalyzeSolution(solutionPath, version);
-            
+
+            ValidateWebApiWithReferences(results);
+        }
+
+        [TestCase(TargetFramework.DotnetCoreApp31)]
+        public async Task TestWebApiWithReferencesUsingGenerator(string version)
+        {
+            var solutionPath = CopySolutionFolderToTemp("WebApiWithReferences.sln", tempDir);
+
+            AnalyzerConfiguration configuration = new AnalyzerConfiguration(LanguageOptions.CSharp)
+            {
+                ExportSettings =
+                {
+                    GenerateJsonOutput = false,
+                    OutputPath = @"/tmp/UnitTests"
+                },
+
+                MetaDataSettings =
+                {
+                    LiteralExpressions = true,
+                    MethodInvocations = true,
+                    Annotations = true,
+                    DeclarationNodes = true,
+                    LocationData = false,
+                    ReferenceData = true,
+                    LoadBuildData = true,
+                    ElementAccess = true,
+                    MemberAccess = true
+                }
+            };
+
+            CodeAnalyzer analyzer = CodeAnalyzerFactory.GetAnalyzer(configuration, NullLogger.Instance);
+            SolutionPort solutionPort = new SolutionPort(solutionPath);
+
+            var resultEnumerator = analyzer.AnalyzeSolutionGeneratorAsync(solutionPath).GetAsyncEnumerator();
+
+            while (await resultEnumerator.MoveNextAsync())
+            {
+                using var result = resultEnumerator.Current;
+                PortCoreConfiguration projectConfiguration = new PortCoreConfiguration()
+                {
+                    ProjectPath = result.ProjectResult.ProjectFilePath,
+                    IsMockRun = false,
+                    UseDefaultRules = true,
+                    PortCode = true,
+                    PortProject = true,
+                    TargetVersions = new List<string> { version }
+                };
+
+                solutionPort.RunProject(result, projectConfiguration);
+            }
+            var portSolutionResult = solutionPort.GenerateResults();
+            var testSolutionResult = GenerateSolutionResult(Path.GetDirectoryName(solutionPath), solutionPort.GetAnalysisResult(), portSolutionResult);
+
+            ValidateWebApiWithReferences(testSolutionResult);
+        }
+
+        private void ValidateWebApiWithReferences(TestSolutionAnalysis results)
+        {
+
             StringAssert.Contains("IActionResult", results.SolutionAnalysisResult);
             StringAssert.Contains("Startup", results.SolutionAnalysisResult);
 
@@ -199,8 +264,8 @@ namespace CTA.Rules.Test
             var solutionPath = CopySolutionFolderToTemp("MvcMusicStore.sln", tempDir);
             TestSolutionAnalysis results = AnalyzeSolution(solutionPath, version);
 
-            ValidateMvcMusicStore(results, version);            
-        }        
+            ValidateMvcMusicStore(results, version);
+        }
 
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.DotnetCoreApp31)]
@@ -213,6 +278,65 @@ namespace CTA.Rules.Test
             TestSolutionAnalysis results = AnalyzeSolution(solutionPath, version, metaReferences, true);
 
             ValidateMvcMusicStore(results, version);
+        }
+
+        [TestCase(TargetFramework.Dotnet5)]
+        [TestCase(TargetFramework.DotnetCoreApp31)]
+        public void TestMvcMusicStoreWithoutProjectPort(string version)
+        {
+            var solutionPath = CopySolutionFolderToTemp("MvcMusicStore.sln", tempDir);
+            var analyzerResults = GenerateSolutionAnalysis(solutionPath);
+
+            var metaReferences = analyzerResults.ToDictionary(a => a.ProjectResult.ProjectFilePath, a => a.ProjectBuildResult.Project.MetadataReferences.Select(m => m.Display).ToList());
+            TestSolutionAnalysis results = AnalyzeSolution(solutionPath, version, metaReferences, true, false, false);
+
+            ValidateMvcMusicStoreSolutionRunResultNodeTokenDeepClone(results);
+        }
+
+        private void ValidateMvcMusicStoreSolutionRunResultNodeTokenDeepClone(TestSolutionAnalysis results)
+        {
+            var fileActions = results.SolutionRunResult.ProjectResults.FirstOrDefault().ProjectActions.FileActions;
+            // Before we change NodeToken Clone from shallow clone to deep
+            // clone, all the items in FileActions list refers to the same
+            // NodeToken object of a specific type, any TextChange object
+            // being added to the NodeToken.TextChanges list through one
+            // NodeToken reference in a FileAction object gets propogated
+            // to all the other NodeToken references retained by other
+            // FileAction objects. Thats why we were seeing 11 * 2 = 22
+            // TextChange objects in each FileAction.NodeTokens.TextChanges
+            // for this test project. Where:
+            // 
+            // 11 is the count of FileAction list
+            // 2 is the count of TextChanges each FileAction.NodeTokens has
+            // 
+            // After updating the Clone method to deep clone, we are seeing
+            // 2 TextChange objects in each FileAction.NodeTokens.TextChanges
+            // list, which is correct and expected.
+            var expectedNodeTokenTextChangesCounts = new Dictionary<string, int>()
+            {
+                ["Global.asax.cs"] = 2,
+                ["CheckoutController.cs"] = 2,
+                ["HomeController.cs"] = 2,
+                ["AccountController.cs"] = 2,
+                ["StoreController.cs"] = 2,
+                ["StoreManagerController.cs"] = 2,
+                ["AccountModels.cs"] = 2,
+                ["Album.cs"] = 2,
+                ["MusicStoreEntities.cs"] = 2,
+                ["ShoppingCartController.cs"] = 2,
+                ["Order.cs"] = 2,
+                ["ShoppingCart.cs"] = 2,
+            };
+            expectedNodeTokenTextChangesCounts.ToList().ForEach(
+                expected =>
+                {
+                    Assert.AreEqual(
+                        expected.Value,
+                        fileActions.FirstOrDefault(
+                            action => action.FilePath.Contains(expected.Key))
+                        .NodeTokens.First().TextChanges.Count);
+                }
+            );
         }
 
         private void ValidateMvcMusicStore(TestSolutionAnalysis results, string version)
@@ -362,6 +486,26 @@ namespace CTA.Rules.Test
             StringAssert.Contains("TryUpdateModelAsync", homeController);
         }
 
+        [TestCase(TargetFramework.Dotnet5)]
+        public void TestMemoryUsageForMvcWebApiSolution(string version)
+        {
+            // This upper limit was chosen by taking the avg memory consumption of this
+            // this test over 10 executions, then increasing the limit by ~50%
+            var expectedUpperLimitMemoryUsageKb = 30000;
+
+            // Before the execution
+            GC.Collect();
+            var kbBeforeExecution = GC.GetTotalMemory(false) / 1024;
+
+            // Run analysis and porting
+            AnalyzeSolution("SampleMvcWebApp.sln", tempDir, downloadLocation, version);
+
+            // Calculate the memory difference
+            var kbAfterExecution = GC.GetTotalMemory(false) / 1024;
+            var kbDifference = kbAfterExecution - kbBeforeExecution;
+
+            Assert.LessOrEqual(kbDifference, expectedUpperLimitMemoryUsageKb);
+        }
 
         private void ValidateConfig(string controllerText)
         {
