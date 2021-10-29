@@ -36,6 +36,19 @@
               ]
             }
           ]
+        },
+        {
+          "Key": "StoreManagerController",
+          "FullKey": "MvcMusicStore.Controllers.StoreManagerController",
+          "KeyType": "ClassName",
+          "Actions": [
+            {
+              "Name": "ReplacePublicMethodBodies",
+              "Type": "Class",
+              "Value": "return Content(CreateRequest());",
+              "Description": "Import System"
+            }
+          ]
         }
       ]
     },

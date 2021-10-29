@@ -425,6 +425,34 @@ namespace CTA.Rules.Actions
             return AddParametersToMethod;
         }
 
+        public Func<SyntaxGenerator, ClassDeclarationSyntax, ClassDeclarationSyntax> GetReplacePublicMethodBodiesAction(string expression)
+        {
+            ClassDeclarationSyntax ReplaceMethodModifiers(SyntaxGenerator syntaxGenerator, ClassDeclarationSyntax node)
+            {
+                var allMembers = node.Members.ToList();
+                var allMethods = allMembers.OfType<MethodDeclarationSyntax>().Where(m => m.Modifiers.Any(mod => mod.Text == "public"));
+                var newMethods = new MemberDeclarationSyntax[allMethods.Count()];
+                int counter = 0;
+                foreach (var method in allMethods)
+                {
+                    //ActionResult is a catch all return type
+                    string returnType = method.Modifiers.Any(mod => mod.Text == "async") ? "Task<ActionResult>" : "ActionResult";
+
+                    var newMethod = method.WithBody(null);
+                    newMethod = newMethod.WithExpressionBody(SyntaxFactory.ArrowExpressionClause(SyntaxFactory.ParseExpression(expression)));
+                    newMethod = newMethod.WithReturnType(SyntaxFactory.ParseTypeName(returnType));
+                    newMethod = newMethod.NormalizeWhitespace();
+                    newMethods[counter] = newMethod;
+                    counter++;
+                }
+
+                node = node.RemoveNodes(allMethods, SyntaxRemoveOptions.KeepNoTrivia);
+                node = node.AddMembers(newMethods);
+
+                return node;
+            }
+            return ReplaceMethodModifiers;
+        }
 
         private MethodDeclarationSyntax GetMethodNode(ClassDeclarationSyntax node, string methodName)
         {
