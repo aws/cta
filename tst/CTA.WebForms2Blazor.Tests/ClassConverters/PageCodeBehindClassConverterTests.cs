@@ -55,11 +55,7 @@ namespace TestNamespace
     public class TestPageClass : ComponentBase, IDisposable
     {
         private int thousands = 2000;
-        public bool MyBoolProperty
-        {
-            get;
-            set;
-        }
+        public bool MyBoolProperty { get; set; }
 
         public void TestMethod1()
         {

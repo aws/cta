@@ -400,9 +400,7 @@ namespace CTA.WebForms2Blazor.Tests.FileConverters
 <div>
     <Counter IncrementAmount=""10""></Counter>
     <Foobar></Foobar>
-</div>
-
-";
+</div>";
 
             Assert.AreEqual(expectedContents, fileContents);
             Assert.AreEqual(relativePath, fi.RelativePath);

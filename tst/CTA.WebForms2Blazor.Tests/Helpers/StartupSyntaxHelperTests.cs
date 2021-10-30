@@ -28,28 +28,16 @@ namespace CTA.WebForms2Blazor.Tests.Helpers
         private const string ExpectedConfigureServicesAddServerSideBlazorCall = "services.AddServerSideBlazor();";
 
         private static string ExpectedConfigPropertyDeclarationFullText =>
-$@"{ExpectedConfigPropertyDeclaration}
-{{
-    get;
-}}";
+$@"{ExpectedConfigPropertyDeclaration} {{ get; }}";
         private static string ExpectedEnvPropertyDeclarationFullText =>
-$@"{ExpectedEnvPropertyDeclaration}
-{{
-    get;
-}}";
+$@"{ExpectedEnvPropertyDeclaration} {{ get; }}";
 
         private static string ExpectedBasicStartupClassText =>
 $@"{ExpectedStartupClassSignature}
 {{
-    {ExpectedConfigPropertyDeclaration}
-    {{
-        get;
-    }}
+    {ExpectedConfigPropertyDeclaration} {{ get; }}
 
-    {ExpectedEnvPropertyDeclaration}
-    {{
-        get;
-    }}
+    {ExpectedEnvPropertyDeclaration} {{ get; }}
 
     {ExpectedBasicStartupConstructorSignature}
     {{
@@ -82,20 +70,11 @@ $@"{ExpectedStartupClassSignature}
 $@"{ExpectedStartupClassSignature}
 {{
     {SyntaxHelperSetupFixture.AdditionalFieldText}
-    {ExpectedConfigPropertyDeclaration}
-    {{
-        get;
-    }}
+    {ExpectedConfigPropertyDeclaration} {{ get; }}
 
-    {ExpectedEnvPropertyDeclaration}
-    {{
-        get;
-    }}
+    {ExpectedEnvPropertyDeclaration} {{ get; }}
 
-    {SyntaxHelperSetupFixture.AdditionalPropertyText}
-    {{
-        get;
-    }}
+    {SyntaxHelperSetupFixture.AdditionalPropertyText} {{ get; }}
 
     {ExpectedBasicStartupConstructorSignature}
     {{

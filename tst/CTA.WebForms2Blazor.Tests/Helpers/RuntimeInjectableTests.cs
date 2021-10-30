@@ -18,22 +18,9 @@ namespace CTA.WebForms2Blazor.Tests.Helpers
         private static string TestInjectablePublicField => $"public {TestInjectableTypeName} {TestInjectableNameCamelCase};";
         private static string TestInjectablePublicReadonlyField => $"public readonly {TestInjectableTypeName} {TestInjectableNameCamelCase};";
 
-        private static string TestInjectablePropertyGetterFullText =>
-$@"{TestInjectablePropertyGetter}
-{{
-    get;
-}}";
-        private static string TestInjectablePropertySetterFullText =>
-$@"{TestInjectablePropertyGetter}
-{{
-    set;
-}}";
-        private static string TestInjectablePropertyGetterSetterFullText =>
-$@"{TestInjectablePropertyGetter}
-{{
-    get;
-    set;
-}}";
+        private static string TestInjectablePropertyGetterFullText => $@"{TestInjectablePropertyGetter} {{ get; }}";
+        private static string TestInjectablePropertySetterFullText => $@"{TestInjectablePropertyGetter} {{ set; }}";
+        private static string TestInjectablePropertyGetterSetterFullText => $@"{TestInjectablePropertyGetter} {{ get; set; }}";
 
         private RuntimeInjectable _testRuntimeInjectable;
 

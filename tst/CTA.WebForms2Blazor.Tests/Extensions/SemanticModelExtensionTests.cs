@@ -117,7 +117,7 @@ namespace CTA.WebForms2Blazor.Tests.Extensions
             var classSymbol = model.GetDeclaredSymbol(testClass1Declaration);
             var requiredNamespaces = model.GetNamespacesReferencedByType(testClass1Declaration);
 
-            Assert.False(requiredNamespaces.Contains(classSymbol.ContainingNamespace));
+            Assert.False(requiredNamespaces.Contains(classSymbol?.ContainingNamespace));
         }
 
         [Test]

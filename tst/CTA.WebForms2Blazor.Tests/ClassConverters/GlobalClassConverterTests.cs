@@ -56,21 +56,11 @@ namespace ProjectNamespace
     public class Startup
     {
         private int y = 11;
-        public IConfiguration Configuration
-        {
-            get;
-        }
+        public IConfiguration Configuration { get; }
 
-        public IWebHostEnvironment Env
-        {
-            get;
-        }
+        public IWebHostEnvironment Env { get; }
 
-        public int Z
-        {
-            get;
-            set;
-        }
+        public int Z { get; set; }
 
         public Startup(IConfiguration configuration, IWebHostEnvironment env)
         {

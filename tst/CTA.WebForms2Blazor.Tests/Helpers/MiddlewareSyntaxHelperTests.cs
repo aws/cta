@@ -47,10 +47,7 @@ $@"{ExpectedMiddlewareClassSignature}
 {{
     {ExpectedDelegateFieldDeclarationText}
     {SyntaxHelperSetupFixture.AdditionalFieldText}
-    {SyntaxHelperSetupFixture.AdditionalPropertyText}
-    {{
-        get;
-    }}
+    {SyntaxHelperSetupFixture.AdditionalPropertyText} {{ get; }}
 
     {ExpectedMiddlewareConstructorSignature}
     {{
