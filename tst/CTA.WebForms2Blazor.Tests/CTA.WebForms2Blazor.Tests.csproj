@@ -2,25 +2,18 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-	  <IsTestProject>True</IsTestProject>
-	  
-    <IsPackable>false</IsPackable>
+	  <IsTestProject>true</IsTestProject>
+	  <IsPackable>false</IsPackable>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-  </PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="nunit" Version="3.13.2" />
+		<PackageReference Include="NUnit3TestAdapter" Version="4.0.0" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.11.0" />
+	</ItemGroup>
 
   <ItemGroup>
     <Compile Remove="TestingArea\TestFiles\SampleCodeFile.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="HtmlAgilityPack" Version="1.11.34" />
-    <PackageReference Include="NUnit" Version="3.13.1" />
-    <PackageReference Include="NUnit3TestAdapter" Version="3.17.0" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.8.3" />
-	<PackageReference Include="Microsoft.CodeAnalysis.Workspaces.Common" Version="3.8.0" />
   </ItemGroup>
 
   <ItemGroup>
