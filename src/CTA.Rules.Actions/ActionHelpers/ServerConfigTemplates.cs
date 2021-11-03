@@ -118,7 +118,7 @@ namespace CTA.Rules.Actions
 
         };
 
-        internal static string DefaultKestrelHttpConfig = @"{""Endpoints"": {""Http"": {""Url"": ""http://localhost:5000""},""Https"": {""Url"": ""https://localhost:5001"",""Certificate"": {""Path"": ""<please provide path to cert>"",""Password"": ""<certificate password>""}}}}";
+        internal static string DefaultKestrelHttpConfig = @"{""Endpoints"": {""Http"": {""Url"": ""http://0.0.0.0:80""},""Https"": {""Url"": ""https://0.0.0.0:443"",""Certificate"": {""Path"": ""<please provide path to cert>"",""Password"": ""<certificate password>""}}}}";
 
     }
 }
