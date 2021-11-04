@@ -6,6 +6,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Editing;
 using NUnit.Framework;
 using System.Collections.Generic;
+using System.IO;
 
 namespace CTA.Rules.Test.Actions
 {
@@ -315,6 +316,41 @@ class MyClass
 
             var expectedString = @"classMyClass{void Invoke(HttpContext context, string value){}}";
             StringAssert.Contains(expectedString, nodeWithExpression.ToFullString());
+        }
+
+        [Test]
+        public void ReplacePublicMethodsBody()
+        {
+            string newBody = "return Content(CreateRequest());";
+            var methodString1 = @"public async Task<string> SuperStringAsyncMethod(){ var hello = ""hello world!""}";
+            var methodString2 = @"public string SuperStringMethod(){ var hello = ""hello world again?!""}";
+            var methodString3 = @"private string SuperDontTouchMethod(){ var hello = ""Not hello world!""}";
+            var nodeWithMethods = _node.AddMembers(SyntaxFactory.ParseMemberDeclaration(methodString1));
+            nodeWithMethods = nodeWithMethods.AddMembers(SyntaxFactory.ParseMemberDeclaration(methodString2));
+            nodeWithMethods = nodeWithMethods.AddMembers(SyntaxFactory.ParseMemberDeclaration(methodString3));
+
+            var ReplacePublicMethodsBodyFunc = _classActions.GetReplacePublicMethodsBodyAction(newBody);
+            var newNode = ReplacePublicMethodsBodyFunc(_syntaxGenerator, nodeWithMethods);
+
+            var expectedString = @"classMyClass{/* Added by CTA: Modified to call the extracted logic. */
+public async Task<ActionResult> SuperStringAsyncMethod() =>  return  Content ( CreateRequest ( ) ) ; /* Added by CTA: Modified to call the extracted logic. */
+public ActionResult SuperStringMethod() =>  return  Content ( CreateRequest ( ) ) ; private string SuperDontTouchMethod(){ var hello = ""Not hello world!""}}";
+            StringAssert.Contains(expectedString, newNode.ToFullString());
+        }
+
+        [Test]
+        public void CreateMonolithService()
+        {
+            string namespaceString = "Monolith.Service";
+            string projectDir = "\\Users\\boudreaj\\Source\\Repos";
+            string filePath = projectDir + "\\MonolithService.cs";
+
+            var CreateMonolithServiceFunc = _classActions.GetCreateMonolithServiceAction(namespaceString, projectDir);
+            var newNode = CreateMonolithServiceFunc(_syntaxGenerator, _node);
+
+            Assert.IsTrue(File.Exists(filePath));
+            File.Delete(filePath);
+            Assert.IsFalse(File.Exists(filePath));
         }
 
         [Test]

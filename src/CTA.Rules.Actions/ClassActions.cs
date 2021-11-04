@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using CTA.Rules.Config;
+using CTA.Rules.Models;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -425,29 +427,57 @@ namespace CTA.Rules.Actions
             return AddParametersToMethod;
         }
 
-        public Func<SyntaxGenerator, ClassDeclarationSyntax, ClassDeclarationSyntax> GetReplacePublicMethodBodiesAction(string expression)
+        public Func<SyntaxGenerator, ClassDeclarationSyntax, ClassDeclarationSyntax> GetReplacePublicMethodsBodyAction(string expression)
         {
             ClassDeclarationSyntax ReplaceMethodModifiers(SyntaxGenerator syntaxGenerator, ClassDeclarationSyntax node)
             {
                 var allMembers = node.Members.ToList();
                 var allMethods = allMembers.OfType<MethodDeclarationSyntax>().Where(m => m.Modifiers.Any(mod => mod.Text == "public"));
-                var newMethods = new MemberDeclarationSyntax[allMethods.Count()];
-                int counter = 0;
-                foreach (var method in allMethods)
-                {
-                    //ActionResult is a catch all return type
-                    string returnType = method.Modifiers.Any(mod => mod.Text == "async") ? "Task<ActionResult>" : "ActionResult";
 
-                    var newMethod = method.WithBody(null);
-                    newMethod = newMethod.WithExpressionBody(SyntaxFactory.ArrowExpressionClause(SyntaxFactory.ParseExpression(expression)));
-                    newMethod = newMethod.WithReturnType(SyntaxFactory.ParseTypeName(returnType));
+                while(allMethods != null && allMethods.Count() > 0)
+                {
+                    var method = allMethods.FirstOrDefault();
+                    //ActionResult is a catch all return type
+                    MethodDeclarationActions methodActions = new MethodDeclarationActions();
+                    var addCommentActionFunc = methodActions.GetAddCommentAction("Modified to call the extracted logic.");
+                    var newMethod = addCommentActionFunc(syntaxGenerator, method);
+
+                    bool asyncCheck = method.Modifiers.Any(mod => mod.Text == "async");
+                    string returnType = asyncCheck ? "Task<ActionResult>" : "ActionResult";
+                    var newExpression = expression;
+                    if (expression.Contains("MonolithService.CreateRequest"))
+                    {
+                        newExpression = expression.Insert((asyncCheck ? expression.IndexOf("MonolithService") : expression.IndexOf("CreateRequest()")+ "CreateRequest()".Length), (asyncCheck ? "await " : ".Result"));
+                    }
+
+                    newMethod = newMethod.WithBody(null).WithLeadingTrivia(newMethod.GetLeadingTrivia());
+                    newMethod = newMethod.WithBody(SyntaxFactory.Block(SyntaxFactory.ParseStatement(newExpression))).WithLeadingTrivia(newMethod.GetLeadingTrivia());
+                    newMethod = newMethod.WithReturnType(SyntaxFactory.ParseTypeName(returnType)).WithLeadingTrivia(newMethod.GetLeadingTrivia());
                     newMethod = newMethod.NormalizeWhitespace();
-                    newMethods[counter] = newMethod;
-                    counter++;
+
+                    node = node.ReplaceNode(method, newMethod.WithLeadingTrivia(newMethod.GetLeadingTrivia()));
+
+                    allMembers = node.Members.ToList();
+                    allMethods = allMembers.OfType<MethodDeclarationSyntax>().Where(m => m.Modifiers.Any(mod => mod.Text == "public") && !m.GetLeadingTrivia().ToFullString().Contains("Modified to call the extracted logic."));
                 }
 
-                node = node.RemoveNodes(allMethods, SyntaxRemoveOptions.KeepNoTrivia);
-                node = node.AddMembers(newMethods);
+                return node;
+            }
+            return ReplaceMethodModifiers;
+        }
+
+        public Func<SyntaxGenerator, ClassDeclarationSyntax, ClassDeclarationSyntax> GetCreateMonolithServiceAction(string namespaceString, string projectDir)
+        {
+            ClassDeclarationSyntax ReplaceMethodModifiers(SyntaxGenerator syntaxGenerator, ClassDeclarationSyntax node)
+            {
+                var file = Path.Combine(projectDir, string.Concat(FileTypeCreation.MonolithService.ToString(), ".cs"));
+                if (File.Exists(file))
+                {
+                    File.Move(file, string.Concat(file, ".bak"));
+                }
+                File.WriteAllText(file, TemplateHelper.GetTemplateFileContent(namespaceString, ProjectType.MonolithService, FileTypeCreation.MonolithService.ToString() + ".cs"));
+
+                LogHelper.LogInformation(string.Format("Created {0}.cs file using {1} template", FileTypeCreation.MonolithService.ToString(), ProjectType.MonolithService.ToString()));
 
                 return node;
             }
