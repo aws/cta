@@ -268,54 +268,6 @@ namespace CTA.Rules.Test
         }
 
         [Test]
-        public void TestMonolithSpecific()
-        {
-            //We don't care about version for CTA-only rules:
-            string version = "net5.0";
-
-            var solutionPath = CopySolutionFolderToTemp("Modernize.Web.sln", downloadLocation);
-            var solutionDir = Directory.GetParent(solutionPath).FullName;
-
-            FileAssert.Exists(solutionPath);
-
-
-            string projectFile = Directory.EnumerateFiles(solutionDir + "\\Modernize.Web.Mvc", "*.csproj", SearchOption.AllDirectories).FirstOrDefault();
-            FileAssert.Exists(projectFile);
-
-            ProjectConfiguration projectConfiguration = new ProjectConfiguration()
-            {
-                ProjectPath = projectFile,
-                TargetVersions = new List<string> { version },
-                RulesDir = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "CTAFiles")),
-                AdditionalReferences = { "project.specific" }
-            };
-
-            List<ProjectConfiguration> solutionConfiguration = new List<ProjectConfiguration>
-            {
-                projectConfiguration
-            };
-
-            SolutionRewriter solutionRewriter = new SolutionRewriter(solutionPath, solutionConfiguration);
-            var analysisRunResult = solutionRewriter.AnalysisRun();
-            StringBuilder str = new StringBuilder();
-            foreach (var k in analysisRunResult.ProjectResults)
-            {
-                str.AppendLine(k.ProjectFile);
-                str.AppendLine(k.ProjectActions.ToString());
-            }
-
-            var analysisResult = str.ToString();
-
-            solutionRewriter.Run(analysisRunResult.ProjectResults.ToDictionary(p => p.ProjectFile, p => p.ProjectActions));
-
-            var accountControllerText = File.ReadAllText(Path.Combine(solutionDir, "Modernize.Web.Mvc\\Controllers", "CustomersController.cs"));
-
-            Assert.NotNull(accountControllerText);
-            Assert.IsNotEmpty(accountControllerText);
-
-        }
-
-        [Test]
         public void ConvertHierarchicalToNamespaceFile()
         {
             var dir = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "CTAFiles");
