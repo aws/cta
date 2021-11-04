@@ -348,8 +348,8 @@ public ActionResult SuperStringMethod()
         public void CreateMonolithService()
         {
             string namespaceString = "Monolith.Service";
-            string projectDir = "\\Users\\boudreaj\\Source\\Repos";
-            string filePath = projectDir + "\\MonolithService.cs";
+            string projectDir = "";
+            string filePath = projectDir + "MonolithService.cs";
 
             var CreateMonolithServiceFunc = _classActions.GetCreateMonolithServiceAction(namespaceString, projectDir);
             var newNode = CreateMonolithServiceFunc(_syntaxGenerator, _node);
