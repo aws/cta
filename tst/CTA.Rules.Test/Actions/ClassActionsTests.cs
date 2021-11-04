@@ -321,7 +321,7 @@ class MyClass
         [Test]
         public void ReplacePublicMethodsBody()
         {
-            string newBody = "return Content(CreateRequest());";
+            string newBody = "return Content(MonolithService.CreateRequest());";
             var methodString1 = @"public async Task<string> SuperStringAsyncMethod(){ var hello = ""hello world!""}";
             var methodString2 = @"public string SuperStringMethod(){ var hello = ""hello world again?!""}";
             var methodString3 = @"private string SuperDontTouchMethod(){ var hello = ""Not hello world!""}";
@@ -333,8 +333,14 @@ class MyClass
             var newNode = ReplacePublicMethodsBodyFunc(_syntaxGenerator, nodeWithMethods);
 
             var expectedString = @"classMyClass{/* Added by CTA: Modified to call the extracted logic. */
-public async Task<ActionResult> SuperStringAsyncMethod() =>  return  Content ( CreateRequest ( ) ) ; /* Added by CTA: Modified to call the extracted logic. */
-public ActionResult SuperStringMethod() =>  return  Content ( CreateRequest ( ) ) ; private string SuperDontTouchMethod(){ var hello = ""Not hello world!""}}";
+public async Task<ActionResult> SuperStringAsyncMethod()
+{
+    return Content(await MonolithService.CreateRequest());
+}/* Added by CTA: Modified to call the extracted logic. */
+public ActionResult SuperStringMethod()
+{
+    return Content(MonolithService.CreateRequest().Result);
+}private string SuperDontTouchMethod(){ var hello = ""Not hello world!""}}";
             StringAssert.Contains(expectedString, newNode.ToFullString());
         }
 
