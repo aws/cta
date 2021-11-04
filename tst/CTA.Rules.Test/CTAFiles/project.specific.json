@@ -43,13 +43,22 @@
           "KeyType": "ClassName",
           "Actions": [
             {
-              "Name": "ReplacePublicMethodBodies",
+              "Name": "ReplacePublicMethodsBody",
               "Type": "Class",
-              "Value": "return Content(CreateRequest());",
+              "Value": "return Content(MonolithService.CreateRequest());",
               "Description": "Import System"
+            },
+            {
+              "Name": "CreateMonolithService",
+              "Type": "Class",
+              "Value": {
+                "namespaceString": "MvcMusicStore.Controllers",
+                "projectDir": "C:\\Users\\boudreaj\\Source\\Repos"
+              },
+              "Description": "Create service class."
             }
           ]
-        }
+        },
       ]
     },
     {

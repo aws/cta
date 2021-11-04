@@ -30,12 +30,14 @@
         WCFConfigBasedService,
         WCFCodeBasedService,
         WCFClient,
-        WCFServiceLibrary
+        WCFServiceLibrary,
+        MonolithService
     }
     public enum FileTypeCreation
     {
         Startup,
-        Program
+        Program,
+        MonolithService
     }
     public enum WebServerConfigAttributes
     {
