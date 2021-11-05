@@ -37,14 +37,56 @@ namespace CTA.Rules.Test.Actions
 
 
         [Test]
-        public void InvocationExpressionEquals()
+        public void ExpressionActionAddComment()
         {
-            var expressionAction = new ExpressionAction() { Key = "Test", Value = "Test2", ExpressionActionFunc = _expressionActions.GetAddCommentAction("Test") };
-            var cloned = expressionAction.Clone<ExpressionAction>();
-            Assert.True(expressionAction.Equals(cloned));
+            var comment = "Super comment";
+            var expressionAction = SyntaxFactory.ExpressionStatement(SyntaxFactory.ParseExpression("var t = 1+5"));
 
-            cloned.Value = "DifferentValue";
-            Assert.False(expressionAction.Equals(cloned));
+            var addCommentFunc = _expressionActions.GetAddCommentAction(comment);
+            var newNode = addCommentFunc(_syntaxGenerator, expressionAction);
+
+            var expectedResult = @"/* Added by CTA: Super comment */
+var t  =  1 + 5 ;";
+            Assert.AreEqual(expectedResult, newNode.ToFullString());
+        }
+
+        [Test]
+        public void ObjectCreationAddComment()
+        {
+            var comment = "Super comment";
+            var objectnode = _syntaxGenerator.ObjectCreationExpression(SyntaxFactory.ParseTypeName("StringBuilder"))
+                    .NormalizeWhitespace() as ObjectCreationExpressionSyntax;
+
+            objectnode = objectnode.AddArgumentListArguments(SyntaxFactory.Argument(
+                SyntaxFactory.LiteralExpression(
+                    SyntaxKind.StringLiteralExpression,
+                    SyntaxFactory.Literal(
+                        SyntaxFactory.TriviaList(),
+                        "\"SomeText\"",
+                        "\"SomeText\"",
+                        SyntaxFactory.TriviaList()))));
+
+            var addCommentFunc = _expressionActions.GetAddCommentAction(comment);
+            var newNode = addCommentFunc(_syntaxGenerator, objectnode);
+
+            var expectedResult = @"/* Added by CTA: Super comment */
+new StringBuilder(""SomeText"")";
+            Assert.AreEqual(expectedResult, newNode.ToFullString());
+        }
+
+        [Test]
+        public void InvocationExpressionAddComment()
+        {
+            var comment = "Super comment";
+            var invocationNode = SyntaxFactory.ParseExpression("/* Comment */ Math.Abs(-1)") as InvocationExpressionSyntax;
+
+            var addCommentFunc = _expressionActions.GetAddCommentAction(comment);
+            var newNode = addCommentFunc(_syntaxGenerator, invocationNode);
+
+            var expectedResult = @"/* Comment */
+/* Added by CTA: Super comment */
+Math.Abs(-1)";
+            Assert.AreEqual(expectedResult, newNode.ToFullString());
         }
     }
 }
