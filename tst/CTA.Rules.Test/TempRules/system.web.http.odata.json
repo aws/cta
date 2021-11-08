@@ -1,0 +1,83 @@
+{
+  "Name": "System.Web.Http.OData",
+  "Version": "1.0.0",
+  "Packages": [
+    {
+      "Name": "System.Web.Http.OData",
+      "Type": "Nuget"
+    }
+  ],
+  "Recommendations": [
+    {
+      "Type": "Attribute",
+      "Name": "EnableQuery",
+      "Value": "System.Web.Http.OData.EnableQueryAttribute.EnableQueryAttribute()",
+      "KeyType": "Name",
+      "ContainingType": "EnableQueryAttribute",
+      "RecommendedActions": [
+        {
+          "Source": "Amazon",
+          "Preferred": "Yes",
+          "TargetFrameworks": [
+            {
+              "Name": "netcoreapp3.1",
+              "TargetCPU": [
+                "x86",
+                "x64",
+                "ARM32",
+                "ARM64"
+              ]
+            },
+            {
+              "Name": "net5.0",
+              "TargetCPU": [
+                "x86",
+                "x64",
+                "ARM32",
+                "ARM64"
+              ]
+            },
+            {
+              "Name": "net6.0",
+              "TargetCPU": [
+                "x86",
+                "x64",
+                "ARM32",
+                "ARM64"
+              ]
+            }
+          ],
+          "Description": "Replace System.Web.Http.OData namespace with Microsoft.AspNet.OData. In addition, package Microsoft.AspNetCore.OData will be added to the project file.",
+          "Actions": [
+            {
+              "Name": "RemoveDirective",
+              "Type": "Using",
+              "Value": "System.Web.Http.OData",
+              "Description": "Remove System.Web.Http.OData namespace.",
+              "ActionValidation": {
+                "Contains": "",
+                "NotContains": "using System.Web.Http.OData;"
+              }
+            },
+            {
+              "Name": "AddDirective",
+              "Type": "Using",
+              "Value": "Microsoft.AspNetCore.OData.Query",
+              "Description": "Add Microsoft.AspNetCore.OData.Query namespace.",
+              "ActionValidation": {
+                "Contains": "using Microsoft.AspNetCore.OData.Query;",
+                "NotContains": ""
+              }
+            },
+            {
+              "Name": "AddPackage",
+              "Type": "Package",
+              "Value": "Microsoft.AspNetCore.OData",
+              "Description": "Add reference to Microsoft.AspNetCore.OData."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
