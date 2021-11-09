@@ -21,6 +21,7 @@ namespace CTA.FeatureDetection.Tests
         private static readonly string _efDir = "Ef";
         private static readonly string _mvcDir = "Mvc";
         private static readonly string _webApiDir = "WebApi";
+        private static readonly string _webFormsDir = "WebForms";
         private static readonly string _webClassLibraryDir = "WebClassLibrary";
         private static readonly string _windowsAuthenticationDir = "WindowsAuthentication";
         private static readonly string _formsAuthenticationDir = "FormsAuthentication";
@@ -36,6 +37,7 @@ namespace CTA.FeatureDetection.Tests
         public static string EfSolutionName => "EF6_Test.sln";
         public static string MvcSolutionName => "ASP.NET-MVC-Framework.sln";
         public static string WebApiSolutionName => "WebApi-Framework.sln";
+        public static string WebFormsSolutionName => "ASP.NET-WebForms.sln";
         public static string WebClassLibrarySolutionName => "WebClassLibrary.sln";
         public static string WindowsAuthenticationSolutionName => "WindowsAuthentication.sln";
         public static string FormsAuthenticationSolutionName => "FormsAuthentication.sln";
@@ -46,6 +48,7 @@ namespace CTA.FeatureDetection.Tests
         public static string CoreWebApiSolutionPath => Path.Combine(_targetDir, _coreWebApiDir, CoreWebApiSolutionName);
         public static string EfSolutionPath => Path.Combine(_targetDir, _efDir, EfSolutionName);
         public static string MvcSolutionPath => Path.Combine(_targetDir, _mvcDir, MvcSolutionName);
+        public static string WebFormsSolutionPath => @"D:\TestRepos\TestProjects\net472\FeatureDetection\WebForms\ASP.NET-WebForms.sln";
         public static string WebApiSolutionPath => Path.Combine(_targetDir, _webApiDir, WebApiSolutionName);
         public static string WebClassLibrarySolutionPath => Path.Combine(_targetDir, _webClassLibraryDir, WebClassLibrarySolutionName);
         public static string WindowsAuthenticationSolutionPath => Path.Combine(_targetDir, _windowsAuthenticationDir, WindowsAuthenticationSolutionName);
@@ -65,12 +68,14 @@ namespace CTA.FeatureDetection.Tests
         public static string CoreWCFServiceConfigProjectPath => Path.Combine(_targetDir, _wcfDir, _wcfConfigBasedProjectDir, "WCFConfigBasedProject.csproj");
         public static string CoreWCFServiceCodeProjectPath => Path.Combine(_targetDir, _wcfDir, _wcfCodeBasedProjectDir, "WCFCodeBasedProject.csproj");
         public static string WCFClientProjectPath => Path.Combine(_targetDir, _wcfDir, "WCFClient.csproj");
+        public static string WebFormsProjectPath => @"D:\TestRepos\TestProjects\net472\FeatureDetection\WebForms\ASP.NET-WebForms\ASP.NET-WebForms.csproj";
         public static IEnumerable<AnalyzerResult> CoreMvcAnalyzerResults { get; private set; }
         public static IEnumerable<AnalyzerResult> CoreWebApiAnalyzerResults { get; private set; }
         public static IEnumerable<AnalyzerResult> EfAnalyzerResults { get; private set; }
         public static IEnumerable<AnalyzerResult> MvcAnalyzerResults { get; private set; }
         public static IEnumerable<AnalyzerResult> WebApiAnalyzerResults { get; private set; }
         public static IEnumerable<AnalyzerResult> WebClassLibraryAnalyzerResults { get; private set; }
+        public static IEnumerable<AnalyzerResult> WebFormsAnalyzerResults { get; private set; }
         public static IEnumerable<AnalyzerResult> WindowsAuthenticationAnalyzerResults { get; private set; }
         public static IEnumerable<AnalyzerResult> FormsAuthenticationAnalyzerResults { get; private set; }
         public static IEnumerable<AnalyzerResult> FederatedAuthenticationAnalyzerResults { get; private set; }
@@ -81,6 +86,7 @@ namespace CTA.FeatureDetection.Tests
         public static FeatureDetectionResult CoreWebApiFeatureDetectionResult { get; private set; }
         public static FeatureDetectionResult Ef6FeatureDetectionResult { get; private set; }
         public static FeatureDetectionResult MvcFeatureDetectionResult { get; private set; }
+        public static FeatureDetectionResult WebFormsFeatureDetectionResult { get; private set; }
         public static FeatureDetectionResult WebApiFeatureDetectionResult { get; private set; }
         public static FeatureDetectionResult WebClassLibraryFeatureDetectionResult { get; private set; }
         public static FeatureDetectionResult WindowsAuthenticationFeatureDetectionResult { get; private set; }
@@ -106,6 +112,7 @@ namespace CTA.FeatureDetection.Tests
             var tempEfSolutionDir = GetSolutionDir(tempDownloadDir, EfSolutionName);
             var tempMvcSolutionDir = GetSolutionDir(tempDownloadDir, MvcSolutionName);
             var tempWebApiSolutionDir = GetSolutionDir(tempDownloadDir, WebApiSolutionName);
+            var tempWebFormsSolutionDir = GetSolutionDir(tempDownloadDir, WebFormsSolutionName);
             var tempWebClassLibrarySolutionDir = GetSolutionDir(tempDownloadDir, WebClassLibrarySolutionName);
             var tempWindowsAuthenticationSolutionDir = GetSolutionDir(tempDownloadDir, WindowsAuthenticationSolutionName);
             var tempFormsAuthenticationSolutionDir = GetSolutionDir(tempDownloadDir, FormsAuthenticationSolutionName);
@@ -121,6 +128,7 @@ namespace CTA.FeatureDetection.Tests
             TestUtils.CopyDirectory(tempEfSolutionDir, new DirectoryInfo(Path.Combine(_targetDir, _efDir)));
             TestUtils.CopyDirectory(tempMvcSolutionDir, new DirectoryInfo(Path.Combine(_targetDir, _mvcDir)));
             TestUtils.CopyDirectory(tempWebApiSolutionDir, new DirectoryInfo(Path.Combine(_targetDir, _webApiDir)));
+            TestUtils.CopyDirectory(tempWebFormsSolutionDir, new DirectoryInfo(Path.Combine(_targetDir, _webFormsDir)));
             TestUtils.CopyDirectory(tempWebClassLibrarySolutionDir, new DirectoryInfo(Path.Combine(_targetDir, _webClassLibraryDir)));
             TestUtils.CopyDirectory(tempWindowsAuthenticationSolutionDir, new DirectoryInfo(Path.Combine(_targetDir, _windowsAuthenticationDir)));
             TestUtils.CopyDirectory(tempFormsAuthenticationSolutionDir, new DirectoryInfo(Path.Combine(_targetDir, _formsAuthenticationDir)));
@@ -134,6 +142,7 @@ namespace CTA.FeatureDetection.Tests
             EfAnalyzerResults = AnalyzerResultsFactory.GetAnalyzerResults(EfSolutionPath);
             MvcAnalyzerResults = AnalyzerResultsFactory.GetAnalyzerResults(MvcSolutionPath);
             WebApiAnalyzerResults = AnalyzerResultsFactory.GetAnalyzerResults(WebApiSolutionPath);
+            WebFormsAnalyzerResults = AnalyzerResultsFactory.GetAnalyzerResults(WebFormsSolutionPath);
             WebClassLibraryAnalyzerResults = AnalyzerResultsFactory.GetAnalyzerResults(WebClassLibrarySolutionPath);
             WindowsAuthenticationAnalyzerResults = AnalyzerResultsFactory.GetAnalyzerResults(WindowsAuthenticationSolutionPath);
             FormsAuthenticationAnalyzerResults = AnalyzerResultsFactory.GetAnalyzerResults(FormsAuthenticationSolutionPath);
@@ -147,6 +156,7 @@ namespace CTA.FeatureDetection.Tests
             CoreWebApiFeatureDetectionResult = FeatureDetector.DetectFeaturesInProjects(CoreWebApiAnalyzerResults)[CoreWebApiProjectPath];
             Ef6FeatureDetectionResult = FeatureDetector.DetectFeaturesInProjects(EfAnalyzerResults)[Ef6ProjectPath];
             MvcFeatureDetectionResult = FeatureDetector.DetectFeaturesInProjects(MvcAnalyzerResults)[MvcProjectPath];
+            WebFormsFeatureDetectionResult = FeatureDetector.DetectFeaturesInProjects(WebFormsAnalyzerResults)[WebFormsProjectPath];
             WebApiFeatureDetectionResult = FeatureDetector.DetectFeaturesInProjects(WebApiAnalyzerResults)[WebApiProjectPath];
             WebClassLibraryFeatureDetectionResult = FeatureDetector.DetectFeaturesInProjects(WebClassLibraryAnalyzerResults)[WebClassLibraryProjectPath];
             WindowsAuthenticationFeatureDetectionResult = FeatureDetector.DetectFeaturesInProjects(WindowsAuthenticationAnalyzerResults)[WindowsAuthenticationProjectPath];

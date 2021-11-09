@@ -18,9 +18,12 @@
         public const string MvcNugetReferenceIdentifier = "Microsoft.AspNet.Mvc";
         public const string MvcReferenceIdentifier = "System.Web.Mvc";
         public const string MvcViewsDirectory = "Views";
+        public const string WebFormsScriptManagerIdentifier = "Microsoft.AspNet.ScriptManager.WebForms";
+        public const string WebFormsWebOptimizationIdentifier = "Microsoft.AspNet.Web.Optimization.WebForms";
 
         public const string AspNetMvcFeatureName = "AspNetMvcFeature";
         public const string AspNetWebApiFeatureName = "AspNetWebApiFeature";
+        public const string AspNetWebFormsFeatureName = "AspNetWebFormsFeature";
         public const string WebClassLibraryFeatureName = "WebClassLibraryFeature";
         public const string AspNetCoreMvcFeatureName = "AspNetCoreMvcFeature";
         public const string AspNetCoreWebApiFeatureName = "AspNetCoreWebApiFeature";
@@ -44,6 +47,7 @@
         internal const string AddElement = "add";
         internal const string ServiceHostClass = "ServiceHost";
         internal const string SvcExtension = "svc";
+        internal const string AspxExtension = "aspx";
 
         internal const string ConfigurationElement = "configuration";
         internal static readonly string WCFClientElementPath = $"{ConfigurationElement}/{SystemServiceModelElement}/{WCFClientElement}";
