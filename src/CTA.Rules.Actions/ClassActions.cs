@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using CTA.Rules.Config;
 using CTA.Rules.Models;
 using Microsoft.CodeAnalysis;
@@ -466,10 +467,11 @@ namespace CTA.Rules.Actions
             return ReplaceMethodModifiers;
         }
 
-        public Func<SyntaxGenerator, ClassDeclarationSyntax, ClassDeclarationSyntax> GetCreateMonolithServiceAction(string namespaceString, string projectDir)
+        public Func<SyntaxGenerator, ClassDeclarationSyntax, ClassDeclarationSyntax> GetCreateMonolithServiceAction(string namespaceString)
         {
             ClassDeclarationSyntax ReplaceMethodModifiers(SyntaxGenerator syntaxGenerator, ClassDeclarationSyntax node)
             {
+                var projectDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
                 var file = Path.Combine(projectDir, string.Concat(FileTypeCreation.MonolithService.ToString(), ".cs"));
                 if (File.Exists(file))
                 {
