@@ -48,7 +48,7 @@ namespace CTA.FeatureDetection.Tests
         public static string CoreWebApiSolutionPath => Path.Combine(_targetDir, _coreWebApiDir, CoreWebApiSolutionName);
         public static string EfSolutionPath => Path.Combine(_targetDir, _efDir, EfSolutionName);
         public static string MvcSolutionPath => Path.Combine(_targetDir, _mvcDir, MvcSolutionName);
-        public static string WebFormsSolutionPath => @"D:\TestRepos\TestProjects\net472\FeatureDetection\WebForms\ASP.NET-WebForms.sln";
+        public static string WebFormsSolutionPath => Path.Combine(_targetDir, _webFormsDir, WebFormsSolutionName);
         public static string WebApiSolutionPath => Path.Combine(_targetDir, _webApiDir, WebApiSolutionName);
         public static string WebClassLibrarySolutionPath => Path.Combine(_targetDir, _webClassLibraryDir, WebClassLibrarySolutionName);
         public static string WindowsAuthenticationSolutionPath => Path.Combine(_targetDir, _windowsAuthenticationDir, WindowsAuthenticationSolutionName);
@@ -68,7 +68,7 @@ namespace CTA.FeatureDetection.Tests
         public static string CoreWCFServiceConfigProjectPath => Path.Combine(_targetDir, _wcfDir, _wcfConfigBasedProjectDir, "WCFConfigBasedProject.csproj");
         public static string CoreWCFServiceCodeProjectPath => Path.Combine(_targetDir, _wcfDir, _wcfCodeBasedProjectDir, "WCFCodeBasedProject.csproj");
         public static string WCFClientProjectPath => Path.Combine(_targetDir, _wcfDir, "WCFClient.csproj");
-        public static string WebFormsProjectPath => @"D:\TestRepos\TestProjects\net472\FeatureDetection\WebForms\ASP.NET-WebForms\ASP.NET-WebForms.csproj";
+        public static string WebFormsProjectPath => Path.Combine(_targetDir, _webFormsDir, "ASP.NET-WebForms", "ASP.NET-WebForms.csproj");
         public static IEnumerable<AnalyzerResult> CoreMvcAnalyzerResults { get; private set; }
         public static IEnumerable<AnalyzerResult> CoreWebApiAnalyzerResults { get; private set; }
         public static IEnumerable<AnalyzerResult> EfAnalyzerResults { get; private set; }
