@@ -51,10 +51,7 @@
             {
               "Name": "CreateMonolithService",
               "Type": "Class",
-              "Value": {
-                "namespaceString": "MvcMusicStore.Controllers",
-                "projectDir": "C:\\Users\\boudreaj\\Source\\Repos"
-              },
+              "Value": "MvcMusicStore.Controllers",
               "Description": "Create service class."
             }
           ]
