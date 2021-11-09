@@ -116,13 +116,13 @@ namespace CTA.Rules.Test
             //When running it the first time
             if (string.IsNullOrEmpty(solutionDir))
             {
-                Assert.AreEqual(webApiProjectActions.Count, 4);
+                Assert.AreEqual(4, webApiProjectActions.Count);
             }
 
             //When running the second time
             else
             {
-                Assert.AreEqual(webApiProjectActions.Count, 2);
+                Assert.AreEqual(2, webApiProjectActions.Count);
             }
             return Directory.GetParent(results.SolutionRunResult.SolutionPath).FullName;
         }
@@ -253,9 +253,9 @@ namespace CTA.Rules.Test
             var webApiProjectActions = results.SolutionRunResult.ProjectResults.First(p => p.ProjectFile.EndsWith("WebApiWithReferences.csproj"))
                 .ExecutedActions.First(a => a.Key == "Project").Value;
 
-            Assert.AreEqual(classlibrary1Actions.Count, 2);
-            Assert.AreEqual(classlibrary2Actions.Count, 2);
-            Assert.AreEqual(webApiProjectActions.Count, 4);
+            Assert.AreEqual(2, classlibrary1Actions.Count);
+            Assert.AreEqual(2, classlibrary2Actions.Count);
+            Assert.AreEqual(4, webApiProjectActions.Count);
         }
 
         [TestCase(TargetFramework.Dotnet6)]
@@ -402,7 +402,7 @@ namespace CTA.Rules.Test
             var mvcProjectActions = results.SolutionRunResult.ProjectResults.First(p => p.ProjectFile.EndsWith("MvcMusicStore.csproj"))
                 .ExecutedActions.First(a => a.Key == "Project").Value;
 
-            Assert.AreEqual(mvcProjectActions.Count, 4);
+            Assert.AreEqual(4, mvcProjectActions.Count);
         }
 
         [TestCase(TargetFramework.Dotnet6)]
@@ -477,7 +477,7 @@ namespace CTA.Rules.Test
 
             TestSolutionAnalysis results = AnalyzeSolution("BuildableWebApi.sln", tempDir, downloadLocation, version);
             var buildErrors = GetSolutionBuildErrors(results.SolutionRunResult.SolutionPath);
-            Assert.AreEqual(buildErrors.Count, 0);
+            Assert.AreEqual(0, buildErrors.Count);
         }
 
         [TestCase(TargetFramework.Dotnet6)]
