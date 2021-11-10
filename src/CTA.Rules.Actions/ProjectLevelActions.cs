@@ -56,18 +56,7 @@ namespace CTA.Rules.Actions
             return func;
         }
 
-        public Func<string, ProjectType, string> GetCreateNet3FolderHierarchyAction(string _)
-        {
-            static string func(string projectDir, ProjectType projectType)
-            {
-                FolderUpdate folderUpdate = new FolderUpdate(projectDir, projectType);
-                return folderUpdate.Run();
-            }
-
-            return func;
-        }
-
-        public Func<string, ProjectType, string> GetCreateNet5FolderHierarchyAction(string _)
+        public Func<string, ProjectType, string> GetCreateNetCoreFolderHierarchyAction(string _)
         {
             static string func(string projectDir, ProjectType projectType)
             {
