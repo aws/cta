@@ -20,6 +20,7 @@ namespace CTA.Rules.Test
             downloadLocation = SetupTests.DownloadLocation;
         }
 
+        [TestCase(TargetFramework.Dotnet6)]
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.DotnetCoreApp31)]
         public void TestAspNetRoutes(string version)
@@ -42,7 +43,10 @@ namespace CTA.Rules.Test
 
             StringAssert.Contains(@"Microsoft.AspNetCore.Owin", csProjContent);
             StringAssert.Contains(@"Microsoft.AspNetCore.Diagnostics", csProjContent);
-            StringAssert.Contains(version == TargetFramework.Dotnet5 ? @"Microsoft.AspNetCore.Authentication.Google" : @"<PackageReference Include=""Microsoft.AspNetCore.Authentication.Google"" Version=""3.1.18"" />", csProjContent);
+            StringAssert.Contains(new[] { TargetFramework.Dotnet5, TargetFramework.Dotnet6 }.Contains(version) 
+                ? @"Microsoft.AspNetCore.Authentication.Google" 
+                : @"<PackageReference Include=""Microsoft.AspNetCore.Authentication.Google"" Version=""3.1.18"" />", 
+                csProjContent);
 
             //Check that correct version is used
             Assert.True(csProjContent.IndexOf(string.Concat(">", version, "<")) > 0);
@@ -50,6 +54,7 @@ namespace CTA.Rules.Test
 
 
 
+        [TestCase(TargetFramework.Dotnet6)]
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.DotnetCoreApp31)]
         public void TestBranchingPipelines(string version)
@@ -77,6 +82,7 @@ namespace CTA.Rules.Test
             //FileAssert.Exists(Path.Combine(projectDir, "Program.cs")); // This should be added but class library does not do this
         }
 
+        [TestCase(TargetFramework.Dotnet6)]
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.DotnetCoreApp31)]
         public void TestEmbedded(string version)
@@ -102,6 +108,7 @@ namespace CTA.Rules.Test
             Assert.True(csProjContent.IndexOf(string.Concat(">", version, "<")) > 0);
         }
 
+        [TestCase(TargetFramework.Dotnet6)]
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.DotnetCoreApp31)]
         public void TestCustomServer(string version)
@@ -145,7 +152,7 @@ namespace CTA.Rules.Test
             Assert.True(customProjContent.IndexOf(string.Concat(">", version, "<")) > 0);
         }
 
-
+        [TestCase(TargetFramework.Dotnet6)]
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.DotnetCoreApp31)]
         public void TestHelloWorld(string version)
@@ -168,6 +175,7 @@ namespace CTA.Rules.Test
             Assert.True(csProjContent.IndexOf(string.Concat(">", version, "<")) > 0);
         }
 
+        [TestCase(TargetFramework.Dotnet6)]
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.DotnetCoreApp31)]
         public void TestHelloWorldRawOwin(string version)
@@ -187,6 +195,7 @@ namespace CTA.Rules.Test
             Assert.True(csProjContent.IndexOf(string.Concat(">", version, "<")) > 0);
         }
 
+        [TestCase(TargetFramework.Dotnet6)]
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.DotnetCoreApp31)]
         public void TestOwinSelfHostSample(string version)
@@ -210,6 +219,7 @@ namespace CTA.Rules.Test
             Assert.True(csProjContent.IndexOf(string.Concat(">", version, "<")) > 0);
         }
 
+        [TestCase(TargetFramework.Dotnet6)]
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.DotnetCoreApp31)]
         public void TestSignalR(string version)
@@ -234,6 +244,7 @@ namespace CTA.Rules.Test
             Assert.True(csProjContent.IndexOf(string.Concat(">", version, "<")) > 0);
         }
 
+        [TestCase(TargetFramework.Dotnet6)]
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.DotnetCoreApp31)]
         public void TestStaticFilesSample(string version)
@@ -260,6 +271,7 @@ namespace CTA.Rules.Test
             Assert.True(csProjContent.IndexOf(string.Concat(">", version, "<")) > 0);
         }
 
+        [TestCase(TargetFramework.Dotnet6)]
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.DotnetCoreApp31)]
         public void TestWebApi(string version)
@@ -273,14 +285,17 @@ namespace CTA.Rules.Test
             StringAssert.AreEqualIgnoringCase(ExpectedOutputConstants.OwinWebApiStartup, startupText);
 
             //Check that package has been added:
-            StringAssert.Contains(version == TargetFramework.Dotnet5 ? @"Microsoft.AspNetCore.Authentication.OpenIdConnect" : @"<PackageReference Include=""Microsoft.AspNetCore.Authentication.OpenIdConnect"" Version=""3.1.15"" />", csProjContent);
+            StringAssert.Contains(new []{TargetFramework.Dotnet5, TargetFramework.Dotnet6}.Contains(version) 
+                ? @"Microsoft.AspNetCore.Authentication.OpenIdConnect" 
+                : @"<PackageReference Include=""Microsoft.AspNetCore.Authentication.OpenIdConnect"" Version=""3.1.15"" />", 
+                csProjContent);
             StringAssert.Contains(@"Microsoft.AspNetCore.Diagnostics", csProjContent);
 
             //Check that correct version is used
             Assert.True(csProjContent.IndexOf(string.Concat(">", version, "<")) > 0);
         }
 
-
+        [TestCase(TargetFramework.Dotnet6)]
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.DotnetCoreApp31)]
         public void TestWebSocketSample(string version)
@@ -316,6 +331,7 @@ namespace CTA.Rules.Test
             Assert.True(serverProjContent.IndexOf(string.Concat(">", version, "<")) > 0);
         }
 
+        [TestCase(TargetFramework.Dotnet6)]
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.DotnetCoreApp31)]
         public void TestOwinExtraAPI(string version)
@@ -333,6 +349,7 @@ namespace CTA.Rules.Test
             Assert.True(csProjContent.IndexOf(string.Concat(">", version, "<")) > 0);
         }
 
+        [TestCase(TargetFramework.Dotnet6)]
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.DotnetCoreApp31)]
         public void TestOwinParadise(string version)

@@ -23,8 +23,9 @@ namespace CTA.Rules.Test
 
         protected static class TargetFramework
         {
-            public const string Dotnet5 = "net5.0";
             public const string DotnetCoreApp31 = "netcoreapp3.1";
+            public const string Dotnet5 = "net5.0";
+            public const string Dotnet6 = "net6.0";
         }
 
         protected void Setup(System.Type type)
