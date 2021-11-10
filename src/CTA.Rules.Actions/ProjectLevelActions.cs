@@ -94,18 +94,22 @@ namespace CTA.Rules.Actions
         {
             string func(string projectDir, ProjectType projectType)
             {
-                var file = Path.Combine(projectDir, string.Concat(FileTypeCreation.MonolithService.ToString(), ".cs"));
-                if (File.Exists(file))
+                if(projectDir != null && projectDir.Length > 0)
                 {
-                    if (File.Exists(string.Concat(file, ".bak")))
+                    projectDir = projectDir.Substring(0, projectDir.LastIndexOf("\\") + 1);
+                    var file = Path.Combine(projectDir, string.Concat(FileTypeCreation.MonolithService.ToString(), ".cs"));
+                    if (File.Exists(file))
                     {
-                        File.Delete(string.Concat(file, ".bak"));
+                        if (File.Exists(string.Concat(file, ".bak")))
+                        {
+                            File.Delete(string.Concat(file, ".bak"));
+                        }
+                        File.Move(file, string.Concat(file, ".bak"));
                     }
-                    File.Move(file, string.Concat(file, ".bak"));
-                }
-                File.WriteAllText(file, TemplateHelper.GetTemplateFileContent(namespaceString, ProjectType.MonolithService, FileTypeCreation.MonolithService.ToString() + ".cs"));
+                    File.WriteAllText(file, TemplateHelper.GetTemplateFileContent(namespaceString, ProjectType.MonolithService, FileTypeCreation.MonolithService.ToString() + ".cs"));
 
-                LogHelper.LogInformation(string.Format("Created {0}.cs file using {1} template", FileTypeCreation.MonolithService.ToString(), ProjectType.MonolithService.ToString()));
+                    LogHelper.LogInformation(string.Format("Created {0}.cs file using {1} template", FileTypeCreation.MonolithService.ToString(), ProjectType.MonolithService.ToString()));
+                }
 
                 return "";
             }

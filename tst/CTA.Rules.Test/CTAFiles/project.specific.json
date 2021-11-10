@@ -1,6 +1,20 @@
 {
   "NameSpaces": [
     {
+      "namespace": "Project",
+      "Assembly": "Project",
+      "Reference": "Project",
+      "Type": "Project",
+      "Actions": [
+        {
+          "Name": "CreateMonolithService",
+          "Type": "Project",
+          "Value": "Modernize.Web.Mvc.Controllers",
+          "Description": "Create service class."
+        }
+      ]
+    },
+    {
       "Namespace": "Modernize.Web.Mvc.Controllers",
       "Assembly": "Modernize.Web.Mvc",
       "Classes": [
@@ -47,12 +61,6 @@
               "Type": "Class",
               "Value": "return Content(MonolithService.CreateRequest());",
               "Description": "Import System"
-            },
-            {
-              "Name": "CreateMonolithService",
-              "Type": "Project",
-              "Value": "Modernize.Web.Mvc.Controllers",
-              "Description": "Create service class."
             }
           ]
         }
@@ -72,12 +80,6 @@
               "Type": "Class",
               "Value": "return Content(MonolithService.CreateRequest());",
               "Description": "Import System"
-            },
-            {
-              "Name": "CreateMonolithService",
-              "Type": "Project",
-              "Value": "Modernize.Web.Mvc.Controllers",
-              "Description": "Create service class."
             },
             {
               "Name": "AddDirective",
