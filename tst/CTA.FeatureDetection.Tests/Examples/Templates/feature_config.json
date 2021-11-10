@@ -22,6 +22,10 @@
                   "ClassName": "AspNetCoreMvcFeature"
                 },
                 {
+                  "Name": "AspNetWebFormsFeature",
+                  "ClassName": "AspNetWebFormsFeature"
+                },
+                {
                   "Name": "AspNetCoreWebApiFeature",
                   "ClassName": "AspNetCoreWebApiFeature"
                 },

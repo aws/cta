@@ -84,5 +84,13 @@ namespace CTA.FeatureDetection.Tests.FeatureDetection.ProjectType
             Assert.True(_wcfServiceHostFeatureDetectionResult.FeatureStatus[featureName],
                 $"Expected project type of {WCFServiceHostProjectName} to be WCFServiceHostFeature.");
         }
+
+        [Test]
+        public void AspnetWebFormsFeature_Is_Present_In_WebForms_Project()
+        {
+            var featureName = "AspNetWebFormsFeature";
+            Assert.True(_webFormsFeatureDetectionResult.FeatureStatus[featureName],
+                $"Expected project type of {WebFormsProjectName} to be WebForms.");
+        }
     }
 }
