@@ -27,6 +27,7 @@ namespace CTA.Rules.Update
         /// <param name="solutionConfiguration">Configuration for each project in solution to be built</param>
         public SolutionRewriter(string solutionFilePath, List<ProjectConfiguration> solutionConfiguration)
         {
+            DownloadResourceFiles();
             _solutionResult = new SolutionResult();
             AnalyzerConfiguration analyzerConfiguration = new AnalyzerConfiguration(LanguageOptions.CSharp)
             {
@@ -56,6 +57,7 @@ namespace CTA.Rules.Update
         /// <param name="solutionConfiguration">Configuration for each project in the solution</param>
         public SolutionRewriter(List<AnalyzerResult> analyzerResults, List<ProjectConfiguration> solutionConfiguration)
         {
+            DownloadResourceFiles();
             _solutionResult = new SolutionResult();
             _rulesRewriters = new List<ProjectRewriter>();
             InitializeProjects(analyzerResults, solutionConfiguration);
@@ -63,6 +65,7 @@ namespace CTA.Rules.Update
 
         public SolutionRewriter(IDEProjectResult projectResult, List<ProjectConfiguration> solutionConfiguration)
         {
+            DownloadResourceFiles();
             _rulesRewriters = new List<ProjectRewriter>()
             {
                 new ProjectRewriter(projectResult, solutionConfiguration.FirstOrDefault(s => s.ProjectPath == projectResult.ProjectPath))
@@ -145,6 +148,11 @@ namespace CTA.Rules.Update
                     _rulesRewriters.Add(rulesRewriter);
                 }
             }
+        }
+
+        private void DownloadResourceFiles()
+        {
+            Utils.DownloadFilesToFolder(Constants.S3TemplatesBucketUrl, Constants.ResourcesExtractedPath, Constants.TemplateFiles);
         }
     }
 }
