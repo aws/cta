@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using CTA.Rules.Config;
 using CTA.Rules.Models;
 using Microsoft.CodeAnalysis;
 
@@ -86,6 +87,28 @@ namespace CTA.Rules.Actions
                 return configMigrate.Run();
             }
 
+            return func;
+        }
+
+        public Func<string, ProjectType, string> GetCreateMonolithServiceAction(string namespaceString)
+        {
+            string func(string projectDir, ProjectType projectType)
+            {
+                var file = Path.Combine(projectDir, string.Concat(FileTypeCreation.MonolithService.ToString(), ".cs"));
+                if (File.Exists(file))
+                {
+                    if (File.Exists(string.Concat(file, ".bak")))
+                    {
+                        File.Delete(string.Concat(file, ".bak"));
+                    }
+                    File.Move(file, string.Concat(file, ".bak"));
+                }
+                File.WriteAllText(file, TemplateHelper.GetTemplateFileContent(namespaceString, ProjectType.MonolithService, FileTypeCreation.MonolithService.ToString() + ".cs"));
+
+                LogHelper.LogInformation(string.Format("Created {0}.cs file using {1} template", FileTypeCreation.MonolithService.ToString(), ProjectType.MonolithService.ToString()));
+
+                return "";
+            }
             return func;
         }
     }

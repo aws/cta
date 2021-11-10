@@ -1,8 +1,8 @@
 {
   "NameSpaces": [
     {
-      "Namespace": "MvcMusicStore.Controllers",
-      "Assembly": "MvcMusicStore",
+      "Namespace": "Modernize.Web.Mvc.Controllers",
+      "Assembly": "Modernize.Web.Mvc",
       "Classes": [
         {
           "Key": "ShoppingCartController",
@@ -38,8 +38,8 @@
           ]
         },
         {
-          "Key": "StoreManagerController",
-          "FullKey": "MvcMusicStore.Controllers.StoreManagerController",
+          "Key": "ProductsController",
+          "FullKey": "Modernize.Web.Mvc.Controllers.ProductsController",
           "KeyType": "ClassName",
           "Actions": [
             {
@@ -50,12 +50,43 @@
             },
             {
               "Name": "CreateMonolithService",
-              "Type": "Class",
-              "Value": "MvcMusicStore.Controllers",
+              "Type": "Project",
+              "Value": "Modernize.Web.Mvc.Controllers",
               "Description": "Create service class."
             }
           ]
-        },
+        }
+      ]
+    },
+    {
+      "Namespace": "Modernize.Web.Mvc",
+      "Assembly": "Modernize.Web.Mvc",
+      "Classes": [
+        {
+          "Key": "CustomersController",
+          "FullKey": "Modernize.Web.Mvc.CustomersController",
+          "KeyType": "ClassName",
+          "Actions": [
+            {
+              "Name": "ReplacePublicMethodsBody",
+              "Type": "Class",
+              "Value": "return Content(MonolithService.CreateRequest());",
+              "Description": "Import System"
+            },
+            {
+              "Name": "CreateMonolithService",
+              "Type": "Project",
+              "Value": "Modernize.Web.Mvc.Controllers",
+              "Description": "Create service class."
+            },
+            {
+              "Name": "AddDirective",
+              "Type": "Using",
+              "Value": "Modernize.Web.Mvc.Controllers",
+              "Description": "Ensures it uses directive for service."
+            }
+          ]
+        }
       ]
     },
     {
@@ -76,7 +107,10 @@
             {
               "Name": "ReplaceIdentifierInsideClass",
               "Type": "Identifier",
-              "Value": {"Identifier": "SomethingElse","ClassFullKey": "MvcMusicStore.Controllers.ShoppingCartController"},
+              "Value": {
+                "Identifier": "SomethingElse",
+                "ClassFullKey": "MvcMusicStore.Controllers.ShoppingCartController"
+              },
               "Description": "Replace object type ShoppingCartViewModel with SomethingElse"
             }
           ]

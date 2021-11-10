@@ -467,25 +467,6 @@ namespace CTA.Rules.Actions
             return ReplaceMethodModifiers;
         }
 
-        public Func<SyntaxGenerator, ClassDeclarationSyntax, ClassDeclarationSyntax> GetCreateMonolithServiceAction(string namespaceString)
-        {
-            ClassDeclarationSyntax ReplaceMethodModifiers(SyntaxGenerator syntaxGenerator, ClassDeclarationSyntax node)
-            {
-                var projectDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-                var file = Path.Combine(projectDir, string.Concat(FileTypeCreation.MonolithService.ToString(), ".cs"));
-                if (File.Exists(file))
-                {
-                    File.Move(file, string.Concat(file, ".bak"));
-                }
-                File.WriteAllText(file, TemplateHelper.GetTemplateFileContent(namespaceString, ProjectType.MonolithService, FileTypeCreation.MonolithService.ToString() + ".cs"));
-
-                LogHelper.LogInformation(string.Format("Created {0}.cs file using {1} template", FileTypeCreation.MonolithService.ToString(), ProjectType.MonolithService.ToString()));
-
-                return node;
-            }
-            return ReplaceMethodModifiers;
-        }
-
         private MethodDeclarationSyntax GetMethodNode(ClassDeclarationSyntax node, string methodName)
         {
             var methodNodeList = node.DescendantNodes().OfType<MethodDeclarationSyntax>().Where(method => method.Identifier.Text == methodName);
