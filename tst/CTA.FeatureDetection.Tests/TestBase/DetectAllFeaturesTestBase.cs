@@ -13,6 +13,7 @@ namespace CTA.FeatureDetection.Tests.TestBase
     {
         protected static IEnumerable<AnalyzerResult> EfAnalyzerResults => TestProjectsSetupFixture.EfAnalyzerResults;
         protected static IEnumerable<AnalyzerResult> MvcAnalyzerResults => TestProjectsSetupFixture.MvcAnalyzerResults;
+        protected static IEnumerable<AnalyzerResult> WebFormsAnalyzerResults => TestProjectsSetupFixture.WebFormsAnalyzerResults;
         protected static IEnumerable<AnalyzerResult> WebApiAnalyzerResults => TestProjectsSetupFixture.WebApiAnalyzerResults;
         protected static IEnumerable<AnalyzerResult> WebClassLibraryAnalyzerResults => TestProjectsSetupFixture.WebClassLibraryAnalyzerResults;
         protected static FeatureDetector FeatureDetector { get; private set; }
@@ -22,6 +23,7 @@ namespace CTA.FeatureDetection.Tests.TestBase
         protected FeatureDetectionResult _coreWebApiFeatureDetectionResult;
         protected FeatureDetectionResult _ef6FeatureDetectionResult;
         protected FeatureDetectionResult _mvcFeatureDetectionResult;
+        protected FeatureDetectionResult _webFormsFeatureDetectionResult;
         protected FeatureDetectionResult _webApiFeatureDetectionResult;
         protected FeatureDetectionResult _webClassLibraryFeatureDetectionResult;
         protected FeatureDetectionResult _windowsAuthenticationFeatureDetectionResult;
@@ -35,6 +37,7 @@ namespace CTA.FeatureDetection.Tests.TestBase
         protected string CoreMvcProjectName => "CoreMVC";
         protected string CoreWebApiProjectName => "CoreWebApi";
         protected string MvcProjectName => "ASP.NET-MVC-Framework";
+        protected string WebFormsProjectName => "ASP.NET-WebForms";
         protected string WebApiProjectName => "WebApi-Framework";
         protected string WebClassLibraryProjectName => "WebClassLibrary";
         protected string CoreWCFServiceConfigProjectName => "WCFConfigBasedProject";
@@ -51,6 +54,7 @@ namespace CTA.FeatureDetection.Tests.TestBase
             _coreWebApiFeatureDetectionResult = TestProjectsSetupFixture.CoreWebApiFeatureDetectionResult;
             _ef6FeatureDetectionResult = TestProjectsSetupFixture.Ef6FeatureDetectionResult;
             _mvcFeatureDetectionResult = TestProjectsSetupFixture.MvcFeatureDetectionResult;
+            _webFormsFeatureDetectionResult = TestProjectsSetupFixture.WebFormsFeatureDetectionResult;
             _webApiFeatureDetectionResult = TestProjectsSetupFixture.WebApiFeatureDetectionResult;
             _webClassLibraryFeatureDetectionResult = TestProjectsSetupFixture.WebClassLibraryFeatureDetectionResult;
             _windowsAuthenticationFeatureDetectionResult = TestProjectsSetupFixture.WindowsAuthenticationFeatureDetectionResult;
