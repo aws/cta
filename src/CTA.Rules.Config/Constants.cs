@@ -115,6 +115,17 @@ namespace CTA.Rules.Config
 
         public static readonly List<string> SupportedMethodModifiers = new List<string>() { "public", "internal", "protected", "private", "abstract", "extern", "override", "static", "unsafe", "virtual", "async" };
 
+        //Monolith code constants
+        public const string Await = "await";
+        public const string TaskActionResult = "Task<ActionResult>";
+        public const string ActionResult = "ActionResult";
+        public const string CreateRequest = "CreateRequest(this.ControllerContext, HttpContext, Request)";
+        public const string Async = "async";
+        public const string Public = "public";
+        public const string DotResult = ".Result";
+        public const string MonolithService = "MonolithService";
+        public const string MonolithServiceComment = "Modified to call the extracted logic.";
+
 
         public static readonly List<List<string>> TemplateFiles = new List<List<string>>() {
             new List<string> {"default.json"},

@@ -9,7 +9,10 @@
         {
           "Name": "CreateMonolithService",
           "Type": "Project",
-          "Value": "Modernize.Web.Mvc.Controllers",
+          "Value": {
+            "namespaceString": "Modernize.Web.Mvc.Controllers",
+            "projectName": "Modernize.Web.Mvc"
+          },
           "Description": "Create service class."
         }
       ]
@@ -19,39 +22,6 @@
       "Assembly": "Modernize.Web.Mvc",
       "Classes": [
         {
-          "Key": "ShoppingCartController",
-          "FullKey": "MvcMusicStore.Controllers.ShoppingCartController",
-          "KeyType": "ClassName",
-          "Actions": [
-            {
-              "Name": "AddDirective",
-              "Type": "Using",
-              "Value": "System",
-              "Description": "Import System"
-            },
-            {
-              "Name": "AddMethod",
-              "Type": "Class",
-              "Value": "public int PickRandomNumberRange(int min, int max){return new Random().Next(min, max);}",
-              "Description": "Add method to pick random number"
-            }
-          ],
-          "ObjectCreations": [
-            {
-              "Key": "new MusicStoreEntities()",
-              "FullKey": "new MusicStoreEntities();",
-              "Actions": [
-                {
-                  "Name": "ReplaceObjectinitialization",
-                  "Type": "ObjectCreation",
-                  "Value": "Something.Something()",
-                  "Description": "Replace ObjectCreation"
-                }
-              ]
-            }
-          ]
-        },
-        {
           "Key": "ProductsController",
           "FullKey": "Modernize.Web.Mvc.Controllers.ProductsController",
           "KeyType": "ClassName",
@@ -59,7 +29,7 @@
             {
               "Name": "ReplacePublicMethodsBody",
               "Type": "Class",
-              "Value": "return Content(MonolithService.CreateRequest());",
+              "Value": "return Content(MonolithService.CreateRequest(this.ControllerContext, HttpContext, Request));",
               "Description": "Import System"
             }
           ]
@@ -78,7 +48,7 @@
             {
               "Name": "ReplacePublicMethodsBody",
               "Type": "Class",
-              "Value": "return Content(MonolithService.CreateRequest());",
+              "Value": "return Content(MonolithService.CreateRequest(this.ControllerContext, HttpContext, Request));",
               "Description": "Import System"
             },
             {
@@ -86,34 +56,6 @@
               "Type": "Using",
               "Value": "Modernize.Web.Mvc.Controllers",
               "Description": "Ensures it uses directive for service."
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "Namespace": "MvcMusicStore.Models",
-      "Assembly": "MvcMusicStore",
-      "Classes": [
-        {
-          "Key": "MusicStoreEntities",
-          "FullKey": "MvcMusicStore.Models.MusicStoreEntities",
-          "KeyType": "Identifier",
-          "Actions": [
-            {
-              "Name": "ReplaceIdentifierInsideClass",
-              "Type": "Identifier",
-              "Value": "{\"Identifier\": \"SomethingElse\",\"ClassFullKey\": \"MvcMusicStore.Controllers.ShoppingCartController\"}",
-              "Description": "Replace object type ShoppingCartViewModel with SomethingElse"
-            },
-            {
-              "Name": "ReplaceIdentifierInsideClass",
-              "Type": "Identifier",
-              "Value": {
-                "Identifier": "SomethingElse",
-                "ClassFullKey": "MvcMusicStore.Controllers.ShoppingCartController"
-              },
-              "Description": "Replace object type ShoppingCartViewModel with SomethingElse"
             }
           ]
         }

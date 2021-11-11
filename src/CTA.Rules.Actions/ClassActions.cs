@@ -433,22 +433,22 @@ namespace CTA.Rules.Actions
             ClassDeclarationSyntax ReplaceMethodModifiers(SyntaxGenerator syntaxGenerator, ClassDeclarationSyntax node)
             {
                 var allMembers = node.Members.ToList();
-                var allMethods = allMembers.OfType<MethodDeclarationSyntax>().Where(m => m.Modifiers.Any(mod => mod.Text == "public"));
+                var allMethods = allMembers.OfType<MethodDeclarationSyntax>().Where(m => m.Modifiers.Any(mod => mod.Text == Constants.Public));
 
                 while(allMethods != null && allMethods.Count() > 0)
                 {
                     var method = allMethods.FirstOrDefault();
                     //ActionResult is a catch all return type
                     MethodDeclarationActions methodActions = new MethodDeclarationActions();
-                    var addCommentActionFunc = methodActions.GetAddCommentAction("Modified to call the extracted logic.");
+                    var addCommentActionFunc = methodActions.GetAddCommentAction(Constants.MonolithServiceComment);
                     var newMethod = addCommentActionFunc(syntaxGenerator, method);
 
-                    bool asyncCheck = method.Modifiers.Any(mod => mod.Text == "async");
-                    string returnType = asyncCheck ? "Task<ActionResult>" : "ActionResult";
+                    bool asyncCheck = method.Modifiers.Any(mod => mod.Text == Constants.Async);
+                    string returnType = asyncCheck ? Constants.TaskActionResult : Constants.ActionResult;
                     var newExpression = expression;
-                    if (expression.Contains("MonolithService.CreateRequest"))
+                    if (expression.Contains(Constants.MonolithService + "." + Constants.CreateRequest))
                     {
-                        newExpression = expression.Insert((asyncCheck ? expression.IndexOf("MonolithService") : expression.IndexOf("CreateRequest()")+ "CreateRequest()".Length), (asyncCheck ? "await " : ".Result"));
+                        newExpression = expression.Insert((asyncCheck ? expression.IndexOf(Constants.MonolithService) : expression.IndexOf(Constants.CreateRequest)+ Constants.CreateRequest.Length), (asyncCheck ? Constants.Await + " " : Constants.DotResult));
                     }
 
                     newMethod = newMethod.WithBody(null).WithLeadingTrivia(newMethod.GetLeadingTrivia());
@@ -459,7 +459,7 @@ namespace CTA.Rules.Actions
                     node = node.ReplaceNode(method, newMethod.WithLeadingTrivia(newMethod.GetLeadingTrivia()));
 
                     allMembers = node.Members.ToList();
-                    allMethods = allMembers.OfType<MethodDeclarationSyntax>().Where(m => m.Modifiers.Any(mod => mod.Text == "public") && !m.GetLeadingTrivia().ToFullString().Contains("Modified to call the extracted logic."));
+                    allMethods = allMembers.OfType<MethodDeclarationSyntax>().Where(m => m.Modifiers.Any(mod => mod.Text == Constants.Public) && !m.GetLeadingTrivia().ToFullString().Contains(Constants.MonolithServiceComment));
                 }
 
                 return node;

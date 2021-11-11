@@ -253,6 +253,7 @@ namespace CTA.Rules.Test
 
             string projectDir = Directory.GetParent(projectFile).FullName;
 
+            var projectFileText = File.ReadAllText(projectFile);
             var customerControllerText = File.ReadAllText(Path.Combine(projectDir, "Controllers", "CustomersController.cs"));
             var productControllerText = File.ReadAllText(Path.Combine(projectDir, "Controllers", "ProductsController.cs"));
 
@@ -265,9 +266,6 @@ namespace CTA.Rules.Test
 
             //var shoppingCartRemoveViewModel = File.ReadAllText(Path.Combine(projectDir, "ViewModels", "ShoppingCartRemoveViewModel.cs"));
             //var shoppingCartViewModel = File.ReadAllText(Path.Combine(projectDir, "ViewModels", "ShoppingCartViewModel.cs"));
-
-
-
         }
 
         [Test]
