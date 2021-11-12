@@ -337,11 +337,11 @@ class MyClass
             var expectedString = @"classMyClass{/* Added by CTA: Modified to call the extracted logic. */
 public async Task<ActionResult> SuperStringAsyncMethod()
 {
-    return Content(await MonolithService.CreateRequest());
+    return Content(await MonolithService.CreateRequestAsync());
 }/* Added by CTA: Modified to call the extracted logic. */
 public ActionResult SuperStringMethod()
 {
-    return Content(MonolithService.CreateRequest().Result);
+    return Content(MonolithService.CreateRequest());
 }private string SuperDontTouchMethod(){ var hello = ""Not hello world!""}}";
             StringAssert.Contains(expectedString, newNode.ToFullString());
         }

@@ -119,8 +119,10 @@ namespace CTA.Rules.Config
         public const string Await = "await";
         public const string TaskActionResult = "Task<ActionResult>";
         public const string ActionResult = "ActionResult";
-        public const string CreateRequest = "CreateRequest(this.ControllerContext, HttpContext, Request)";
-        public const string Async = "async";
+        public const string CreateRequest = "CreateRequest";
+        public const string CreateRequestParameters = "(this.ControllerContext, HttpContext, Request)";
+        public const string AsyncModifier = "async";
+        public const string AsyncWord = "Async";
         public const string Public = "public";
         public const string DotResult = ".Result";
         public const string MonolithService = "MonolithService";

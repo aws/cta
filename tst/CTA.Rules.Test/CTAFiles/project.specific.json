@@ -10,52 +10,27 @@
           "Name": "CreateMonolithService",
           "Type": "Project",
           "Value": {
-            "namespaceString": "Modernize.Web.Mvc.Controllers",
-            "projectName": "Modernize.Web.Mvc"
+            "namespaceString": "MvcMusicStore.Controllers",
+            "projectName": "MvcMusicStore"
           },
           "Description": "Create service class."
         }
       ]
     },
     {
-      "Namespace": "Modernize.Web.Mvc.Controllers",
-      "Assembly": "Modernize.Web.Mvc",
+      "Namespace": "MvcMusicStore.Controllers",
+      "Assembly": "MvcMusicStore",
       "Classes": [
         {
-          "Key": "ProductsController",
-          "FullKey": "Modernize.Web.Mvc.Controllers.ProductsController",
+          "Key": "StoreManagerController",
+          "FullKey": "MvcMusicStore.Controllers.StoreManagerController",
           "KeyType": "ClassName",
           "Actions": [
             {
               "Name": "ReplacePublicMethodsBody",
               "Type": "Class",
               "Value": "return Content(MonolithService.CreateRequest(this.ControllerContext, HttpContext, Request));",
-              "Description": "Import System"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "Namespace": "Modernize.Web.Mvc",
-      "Assembly": "Modernize.Web.Mvc",
-      "Classes": [
-        {
-          "Key": "CustomersController",
-          "FullKey": "Modernize.Web.Mvc.CustomersController",
-          "KeyType": "ClassName",
-          "Actions": [
-            {
-              "Name": "ReplacePublicMethodsBody",
-              "Type": "Class",
-              "Value": "return Content(MonolithService.CreateRequest(this.ControllerContext, HttpContext, Request));",
-              "Description": "Import System"
-            },
-            {
-              "Name": "AddDirective",
-              "Type": "Using",
-              "Value": "Modernize.Web.Mvc.Controllers",
-              "Description": "Ensures it uses directive for service."
+              "Description": "Replace method body with http request to extracted service."
             }
           ]
         }

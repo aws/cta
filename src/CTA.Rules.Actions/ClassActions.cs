@@ -443,12 +443,13 @@ namespace CTA.Rules.Actions
                     var addCommentActionFunc = methodActions.GetAddCommentAction(Constants.MonolithServiceComment);
                     var newMethod = addCommentActionFunc(syntaxGenerator, method);
 
-                    bool asyncCheck = method.Modifiers.Any(mod => mod.Text == Constants.Async);
+                    bool asyncCheck = method.Modifiers.Any(mod => mod.Text == Constants.AsyncModifier);
                     string returnType = asyncCheck ? Constants.TaskActionResult : Constants.ActionResult;
                     var newExpression = expression;
-                    if (expression.Contains(Constants.MonolithService + "." + Constants.CreateRequest))
+                    if (expression.Contains(Constants.MonolithService + "." + Constants.CreateRequest) && asyncCheck)
                     {
-                        newExpression = expression.Insert((asyncCheck ? expression.IndexOf(Constants.MonolithService) : expression.IndexOf(Constants.CreateRequest)+ Constants.CreateRequest.Length), (asyncCheck ? Constants.Await + " " : Constants.DotResult));
+                        newExpression = expression.Insert(expression.IndexOf(Constants.MonolithService), Constants.Await + " ");
+                        newExpression = newExpression.Insert(newExpression.IndexOf(Constants.CreateRequest) + Constants.CreateRequest.Length, Constants.AsyncWord);
                     }
 
                     newMethod = newMethod.WithBody(null).WithLeadingTrivia(newMethod.GetLeadingTrivia());

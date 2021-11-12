@@ -215,13 +215,13 @@ namespace CTA.Rules.Test
             //We don't care about version for CTA-only rules:
             string version = "net5.0";
 
-            var solutionPath = CopySolutionFolderToTemp("Modernize.Web.sln", downloadLocation);
+            var solutionPath = CopySolutionFolderToTemp("MvcMusicStore.sln", downloadLocation);
             var solutionDir = Directory.GetParent(solutionPath).FullName;
 
             FileAssert.Exists(solutionPath);
 
 
-            string projectFile = Directory.EnumerateFiles(solutionDir, "Modernize.Web.Mvc.csproj", SearchOption.AllDirectories).FirstOrDefault();
+            string projectFile = Directory.EnumerateFiles(solutionDir, "*.csproj", SearchOption.AllDirectories).FirstOrDefault();
             FileAssert.Exists(projectFile);
 
             ProjectConfiguration projectConfiguration = new ProjectConfiguration()
@@ -254,18 +254,12 @@ namespace CTA.Rules.Test
             string projectDir = Directory.GetParent(projectFile).FullName;
 
             var projectFileText = File.ReadAllText(projectFile);
-            var customerControllerText = File.ReadAllText(Path.Combine(projectDir, "Controllers", "CustomersController.cs"));
-            var productControllerText = File.ReadAllText(Path.Combine(projectDir, "Controllers", "ProductsController.cs"));
 
-            //var storeManagerControllerText = File.ReadAllText(Path.Combine(projectDir, "Controllers", "StoreManagerController.cs"));
-            //var accountControllerText = File.ReadAllText(Path.Combine(projectDir, "Controllers", "AccountController.cs"));
-            //var checkoutControllerText = File.ReadAllText(Path.Combine(projectDir, "Controllers", "CheckoutController.cs"));
-            //var shoppingCartControllerText = File.ReadAllText(Path.Combine(projectDir, "Controllers", "ShoppingCartController.cs"));
-            //var musicStoreEntitiesText = File.ReadAllText(Path.Combine(projectDir, "Models", "MusicStoreEntities.cs"));
-            //var shoppingCartText = File.ReadAllText(Path.Combine(projectDir, "Models", "ShoppingCart.cs"));
+            var storeManagerControllerText = File.ReadAllText(Path.Combine(projectDir, "Controllers", "StoreManagerController.cs"));
 
-            //var shoppingCartRemoveViewModel = File.ReadAllText(Path.Combine(projectDir, "ViewModels", "ShoppingCartRemoveViewModel.cs"));
-            //var shoppingCartViewModel = File.ReadAllText(Path.Combine(projectDir, "ViewModels", "ShoppingCartViewModel.cs"));
+            FileAssert.Exists(Path.Combine(projectDir, Constants.MonolithService + ".cs"));
+            StringAssert.Contains(@"return Content(MonolithService.CreateRequest(this.ControllerContext, HttpContext, Request));", storeManagerControllerText);
+
         }
 
         [Test]
