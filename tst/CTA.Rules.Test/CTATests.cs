@@ -259,7 +259,6 @@ namespace CTA.Rules.Test
 
             FileAssert.Exists(Path.Combine(projectDir, Constants.MonolithService + ".cs"));
             StringAssert.Contains(@"return Content(MonolithService.CreateRequest(this.ControllerContext, HttpContext, Request));", storeManagerControllerText);
-
         }
 
         [Test]
