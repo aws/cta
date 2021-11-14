@@ -119,8 +119,9 @@ namespace CTA.Rules.Config
         public const string Await = "await";
         public const string TaskActionResult = "Task<ActionResult>";
         public const string ActionResult = "ActionResult";
+        public const string TaskIHttpActionResult = "Task<IHttpActionResult>";
+        public const string IHttpActionResult = "IHttpActionResult";
         public const string CreateRequest = "CreateRequest";
-        public const string CreateRequestParameters = "(this.ControllerContext, HttpContext, Request)";
         public const string AsyncModifier = "async";
         public const string AsyncWord = "Async";
         public const string Public = "public";

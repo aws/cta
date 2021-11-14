@@ -428,7 +428,7 @@ namespace CTA.Rules.Actions
             return AddParametersToMethod;
         }
 
-        public Func<SyntaxGenerator, ClassDeclarationSyntax, ClassDeclarationSyntax> GetReplacePublicMethodsBodyAction(string expression)
+        public Func<SyntaxGenerator, ClassDeclarationSyntax, ClassDeclarationSyntax> GetReplaceMvcControllerMethodsBodyAction(string expression)
         {
             ClassDeclarationSyntax ReplaceMethodModifiers(SyntaxGenerator syntaxGenerator, ClassDeclarationSyntax node)
             {
@@ -445,6 +445,45 @@ namespace CTA.Rules.Actions
 
                     bool asyncCheck = method.Modifiers.Any(mod => mod.Text == Constants.AsyncModifier);
                     string returnType = asyncCheck ? Constants.TaskActionResult : Constants.ActionResult;
+                    var newExpression = expression;
+                    if (expression.Contains(Constants.MonolithService + "." + Constants.CreateRequest) && asyncCheck)
+                    {
+                        newExpression = expression.Insert(expression.IndexOf(Constants.MonolithService), Constants.Await + " ");
+                        newExpression = newExpression.Insert(newExpression.IndexOf(Constants.CreateRequest) + Constants.CreateRequest.Length, Constants.AsyncWord);
+                    }
+
+                    newMethod = newMethod.WithBody(null).WithLeadingTrivia(newMethod.GetLeadingTrivia());
+                    newMethod = newMethod.WithBody(SyntaxFactory.Block(SyntaxFactory.ParseStatement(newExpression))).WithLeadingTrivia(newMethod.GetLeadingTrivia());
+                    newMethod = newMethod.WithReturnType(SyntaxFactory.ParseTypeName(returnType)).WithLeadingTrivia(newMethod.GetLeadingTrivia());
+                    newMethod = newMethod.NormalizeWhitespace();
+
+                    node = node.ReplaceNode(method, newMethod.WithLeadingTrivia(newMethod.GetLeadingTrivia()));
+
+                    allMembers = node.Members.ToList();
+                    allMethods = allMembers.OfType<MethodDeclarationSyntax>().Where(m => m.Modifiers.Any(mod => mod.Text == Constants.Public) && !m.GetLeadingTrivia().ToFullString().Contains(Constants.MonolithServiceComment));
+                }
+
+                return node;
+            }
+            return ReplaceMethodModifiers;
+        }
+        public Func<SyntaxGenerator, ClassDeclarationSyntax, ClassDeclarationSyntax> GetReplaceWebApiControllerMethodsBodyAction(string expression)
+        {
+            ClassDeclarationSyntax ReplaceMethodModifiers(SyntaxGenerator syntaxGenerator, ClassDeclarationSyntax node)
+            {
+                var allMembers = node.Members.ToList();
+                var allMethods = allMembers.OfType<MethodDeclarationSyntax>().Where(m => m.Modifiers.Any(mod => mod.Text == Constants.Public));
+
+                while (allMethods != null && allMethods.Count() > 0)
+                {
+                    var method = allMethods.FirstOrDefault();
+                    MethodDeclarationActions methodActions = new MethodDeclarationActions();
+                    var addCommentActionFunc = methodActions.GetAddCommentAction(Constants.MonolithServiceComment);
+                    var newMethod = addCommentActionFunc(syntaxGenerator, method);
+
+                    bool asyncCheck = method.Modifiers.Any(mod => mod.Text == Constants.AsyncModifier);
+                    //IHttpActionResult is a catch all return type
+                    string returnType = asyncCheck ? Constants.TaskIHttpActionResult : Constants.IHttpActionResult;
                     var newExpression = expression;
                     if (expression.Contains(Constants.MonolithService + "." + Constants.CreateRequest) && asyncCheck)
                     {

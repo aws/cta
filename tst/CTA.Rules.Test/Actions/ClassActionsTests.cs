@@ -331,7 +331,7 @@ class MyClass
             nodeWithMethods = nodeWithMethods.AddMembers(SyntaxFactory.ParseMemberDeclaration(methodString2));
             nodeWithMethods = nodeWithMethods.AddMembers(SyntaxFactory.ParseMemberDeclaration(methodString3));
 
-            var ReplacePublicMethodsBodyFunc = _classActions.GetReplacePublicMethodsBodyAction(newBody);
+            var ReplacePublicMethodsBodyFunc = _classActions.GetReplaceMvcControllerMethodsBodyAction(newBody);
             var newNode = ReplacePublicMethodsBodyFunc(_syntaxGenerator, nodeWithMethods);
 
             var expectedString = @"classMyClass{/* Added by CTA: Modified to call the extracted logic. */
