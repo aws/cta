@@ -444,7 +444,13 @@ namespace CTA.Rules.Actions
                     var newMethod = addCommentActionFunc(syntaxGenerator, method);
 
                     bool asyncCheck = method.Modifiers.Any(mod => mod.Text == Constants.AsyncModifier);
-                    string returnType = asyncCheck ? Constants.TaskActionResult : Constants.ActionResult;
+                    bool voidReturn = method.Modifiers.Any(mod => mod.Text == Constants.VoidModifier);
+                    string returnType = "";
+                    if (!voidReturn)
+                    {
+                        returnType = asyncCheck ? Constants.TaskActionResult : Constants.ActionResult;
+                    }
+                    
                     var newExpression = expression;
                     if (expression.Contains(Constants.MonolithService + "." + Constants.CreateRequest) && asyncCheck)
                     {
@@ -454,7 +460,10 @@ namespace CTA.Rules.Actions
 
                     newMethod = newMethod.WithBody(null).WithLeadingTrivia(newMethod.GetLeadingTrivia());
                     newMethod = newMethod.WithBody(SyntaxFactory.Block(SyntaxFactory.ParseStatement(newExpression))).WithLeadingTrivia(newMethod.GetLeadingTrivia());
-                    newMethod = newMethod.WithReturnType(SyntaxFactory.ParseTypeName(returnType)).WithLeadingTrivia(newMethod.GetLeadingTrivia());
+                    if (!string.IsNullOrEmpty(returnType))
+                    {
+                        newMethod = newMethod.WithReturnType(SyntaxFactory.ParseTypeName(returnType)).WithLeadingTrivia(newMethod.GetLeadingTrivia());
+                    }
                     newMethod = newMethod.NormalizeWhitespace();
 
                     node = node.ReplaceNode(method, newMethod.WithLeadingTrivia(newMethod.GetLeadingTrivia()));

@@ -123,6 +123,7 @@ namespace CTA.Rules.Config
         public const string IHttpActionResult = "IHttpActionResult";
         public const string CreateRequest = "CreateRequest";
         public const string AsyncModifier = "async";
+        public const string VoidModifier = "void";
         public const string AsyncWord = "Async";
         public const string Public = "public";
         public const string DotResult = ".Result";
