@@ -27,9 +27,9 @@
           "KeyType": "ClassName",
           "Actions": [
             {
-              "Name": "ReplacePublicMethodsBody",
+              "Name": "ReplaceMvcControllerMethodsBody",
               "Type": "Class",
-              "Value": "return Content(MonolithService.CreateRequest(this.ControllerContext, HttpContext, Request));",
+              "Value": "return Content(MonolithService.CreateRequest(Request, this.ControllerContext.RouteData));",
               "Description": "Replace method body with http request to extracted service."
             }
           ]
