@@ -45,20 +45,19 @@ namespace CTA.Rules.Test
 
         }
 
-        [Test]
-        public void TestSampleWebApiSolution()
+        private TestSolutionAnalysis runCTAFile(string solutionName, string projectName) 
         {
             //We don't care about version for CTA-only rules:
             string version = "net5.0";
 
 
-            var solutionPath = CopySolutionFolderToTemp("WebApiWithReferences.sln", downloadLocation);
+            var solutionPath = CopySolutionFolderToTemp(solutionName, downloadLocation);
             var solutionDir = Directory.GetParent(solutionPath).FullName;
 
             FileAssert.Exists(solutionPath);
 
             //Sample Web API has only one project:
-            string projectFile = Directory.EnumerateFiles(solutionDir, "WebApiWithReferences.csproj", SearchOption.AllDirectories).FirstOrDefault();
+            string projectFile = Directory.EnumerateFiles(solutionDir, projectName, SearchOption.AllDirectories).FirstOrDefault();
             FileAssert.Exists(projectFile);
 
             ProjectConfiguration projectConfiguration = new ProjectConfiguration()
@@ -82,18 +81,36 @@ namespace CTA.Rules.Test
                 str.AppendLine(projectResult.ProjectFile);
                 str.AppendLine(projectResult.ProjectActions.ToString());
             }
-
-
             var analysisResult = str.ToString();
-            StringAssert.Contains("IActionResult", analysisResult);
-
-
             solutionRewriter.Run(analysisRunResult.ProjectResults.ToDictionary(p => p.ProjectFile, p => p.ProjectActions));
 
-            string projectDir = Directory.GetParent(projectFile).FullName;
+            TestSolutionAnalysis result = new TestSolutionAnalysis()
+            {
+                SolutionAnalysisResult = analysisResult,
+                ProjectResults = new List<ProjectResult>()
+                {
+                    new ProjectResult()
+                    {
+                        ProjectAnalysisResult = analysisResult,
+                        CsProjectPath = projectFile,
+                        ProjectDirectory = Directory.GetParent(projectFile).FullName,
+                        CsProjectContent = File.ReadAllText(projectFile)
+        }
+                }
+            };
 
-            var homeControllerText = File.ReadAllText(Path.Combine(projectDir, "Controllers", "HouseController.cs"));
-            var iHouseRepositoryText = File.ReadAllText(Path.Combine(projectDir, "Repositories", "IHouseRepository.cs"));
+            return result;
+        }
+
+        [Test]
+        public void TestSampleWebApiSolution()
+        {
+            var results = runCTAFile("MvcMusicStore.sln", "*.csproj").ProjectResults.FirstOrDefault();
+
+            StringAssert.Contains("IActionResult", results.ProjectAnalysisResult);
+
+            var homeControllerText = File.ReadAllText(Path.Combine(results.ProjectDirectory, "Controllers", "HouseController.cs"));
+            var iHouseRepositoryText = File.ReadAllText(Path.Combine(results.ProjectDirectory, "Repositories", "IHouseRepository.cs"));
             //Check that namespace has been added
             StringAssert.Contains(@"Microsoft.AspNetCore.Mvc", homeControllerText);
 
@@ -121,57 +138,19 @@ namespace CTA.Rules.Test
         [Test]
         public void TestMvcMusicStore()
         {
-            //We don't care about version for CTA-only rules:
-            string version = "net5.0";
+            var results = runCTAFile("MvcMusicStore.sln", "*.csproj").ProjectResults.FirstOrDefault();
 
-            var solutionPath = CopySolutionFolderToTemp("MvcMusicStore.sln", downloadLocation);
-            var solutionDir = Directory.GetParent(solutionPath).FullName;
+            StringAssert.Contains("HtmlEncoder", results.ProjectAnalysisResult);
 
-            FileAssert.Exists(solutionPath);
+            var accountControllerText = File.ReadAllText(Path.Combine(results.ProjectDirectory, "Controllers", "AccountController.cs"));
+            var checkoutControllerText = File.ReadAllText(Path.Combine(results.ProjectDirectory, "Controllers", "CheckoutController.cs"));
+            var shoppingCartControllerText = File.ReadAllText(Path.Combine(results.ProjectDirectory, "Controllers", "ShoppingCartController.cs"));
+            var storeManagerControllerText = File.ReadAllText(Path.Combine(results.ProjectDirectory, "Controllers", "StoreManagerController.cs"));
+            var musicStoreEntitiesText = File.ReadAllText(Path.Combine(results.ProjectDirectory, "Models", "MusicStoreEntities.cs"));
+            var shoppingCartText = File.ReadAllText(Path.Combine(results.ProjectDirectory, "Models", "ShoppingCart.cs"));
 
-
-            //Sample Web API has only one project:
-            string projectFile = Directory.EnumerateFiles(solutionDir, "*.csproj", SearchOption.AllDirectories).FirstOrDefault();
-            FileAssert.Exists(projectFile);
-
-            ProjectConfiguration projectConfiguration = new ProjectConfiguration()
-            {
-                ProjectPath = projectFile,
-                TargetVersions = new List<string> { version },
-                RulesDir = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "CTAFiles")),
-                AdditionalReferences = ctaFiles
-            };
-
-            List<ProjectConfiguration> solutionConfiguration = new List<ProjectConfiguration>
-            {
-                projectConfiguration
-            };
-
-            SolutionRewriter solutionRewriter = new SolutionRewriter(solutionPath, solutionConfiguration);
-            var analysisRunResult = solutionRewriter.AnalysisRun();
-            StringBuilder str = new StringBuilder();
-            foreach (var k in analysisRunResult.ProjectResults)
-            {
-                str.AppendLine(k.ProjectFile);
-                str.AppendLine(k.ProjectActions.ToString());
-            }
-
-            var analysisResult = str.ToString();
-            StringAssert.Contains("HtmlEncoder", analysisResult);
-
-            solutionRewriter.Run(analysisRunResult.ProjectResults.ToDictionary(p => p.ProjectFile, p => p.ProjectActions));
-
-            string projectDir = Directory.GetParent(projectFile).FullName;
-
-            var accountControllerText = File.ReadAllText(Path.Combine(projectDir, "Controllers", "AccountController.cs"));
-            var checkoutControllerText = File.ReadAllText(Path.Combine(projectDir, "Controllers", "CheckoutController.cs"));
-            var shoppingCartControllerText = File.ReadAllText(Path.Combine(projectDir, "Controllers", "ShoppingCartController.cs"));
-            var storeManagerControllerText = File.ReadAllText(Path.Combine(projectDir, "Controllers", "StoreManagerController.cs"));
-            var musicStoreEntitiesText = File.ReadAllText(Path.Combine(projectDir, "Models", "MusicStoreEntities.cs"));
-            var shoppingCartText = File.ReadAllText(Path.Combine(projectDir, "Models", "ShoppingCart.cs"));
-
-            var shoppingCartRemoveViewModel = File.ReadAllText(Path.Combine(projectDir, "ViewModels", "ShoppingCartRemoveViewModel.cs"));
-            var shoppingCartViewModel = File.ReadAllText(Path.Combine(projectDir, "ViewModels", "ShoppingCartViewModel.cs"));
+            var shoppingCartRemoveViewModel = File.ReadAllText(Path.Combine(results.ProjectDirectory, "ViewModels", "ShoppingCartRemoveViewModel.cs"));
+            var shoppingCartViewModel = File.ReadAllText(Path.Combine(results.ProjectDirectory, "ViewModels", "ShoppingCartViewModel.cs"));
 
 
             //Check that namespace was added
@@ -210,55 +189,25 @@ namespace CTA.Rules.Test
 
 
         [Test]
-        public void TestMonolithReplacements()
+        public void TestMonolithReplacementsMVC()
         {
-            //We don't care about version for CTA-only rules:
-            string version = "net5.0";
+            var results = runCTAFile("MvcMusicStore.sln", "*.csproj").ProjectResults.FirstOrDefault();
 
-            var solutionPath = CopySolutionFolderToTemp("MvcMusicStore.sln", downloadLocation);
-            var solutionDir = Directory.GetParent(solutionPath).FullName;
+            var storeManagerControllerText = File.ReadAllText(Path.Combine(results.ProjectDirectory, "Controllers", "StoreManagerController.cs"));
 
-            FileAssert.Exists(solutionPath);
-
-
-            string projectFile = Directory.EnumerateFiles(solutionDir, "*.csproj", SearchOption.AllDirectories).FirstOrDefault();
-            FileAssert.Exists(projectFile);
-
-            ProjectConfiguration projectConfiguration = new ProjectConfiguration()
-            {
-                ProjectPath = projectFile,
-                TargetVersions = new List<string> { version },
-                RulesDir = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "CTAFiles")),
-                AdditionalReferences = ctaFiles
-            };
-
-            List<ProjectConfiguration> solutionConfiguration = new List<ProjectConfiguration>
-            {
-                projectConfiguration
-            };
-
-            SolutionRewriter solutionRewriter = new SolutionRewriter(solutionPath, solutionConfiguration);
-            var analysisRunResult = solutionRewriter.AnalysisRun();
-            StringBuilder str = new StringBuilder();
-            foreach (var k in analysisRunResult.ProjectResults)
-            {
-                str.AppendLine(k.ProjectFile);
-                str.AppendLine(k.ProjectActions.ToString());
-            }
-
-            var analysisResult = str.ToString();
-            //StringAssert.Contains("HtmlEncoder", analysisResult);
-
-            solutionRewriter.Run(analysisRunResult.ProjectResults.ToDictionary(p => p.ProjectFile, p => p.ProjectActions));
-
-            string projectDir = Directory.GetParent(projectFile).FullName;
-
-            var projectFileText = File.ReadAllText(projectFile);
-
-            var storeManagerControllerText = File.ReadAllText(Path.Combine(projectDir, "Controllers", "StoreManagerController.cs"));
-
-            FileAssert.Exists(Path.Combine(projectDir, Constants.MonolithService + ".cs"));
+            FileAssert.Exists(Path.Combine(results.ProjectDirectory, Constants.MonolithService + ".cs"));
             StringAssert.Contains(@"return Content(MonolithService.CreateRequest(Request, this.ControllerContext.RouteData));", storeManagerControllerText);
+        }
+
+        [Test]
+        public void TestMonolithReplacementsWebAPI()
+        {
+            var results = runCTAFile("SampleWebApi.sln", "*.csproj").ProjectResults.FirstOrDefault();
+
+            var houseControllerText = File.ReadAllText(Path.Combine(results.ProjectDirectory, "Controllers", "HouseController.cs"));
+
+            FileAssert.Exists(Path.Combine(results.ProjectDirectory, Constants.MonolithService + ".cs"));
+            StringAssert.Contains(@"return Content(MonolithService.CreateRequest(Request, this.ControllerContext.RouteData));", houseControllerText);
         }
 
         [Test]

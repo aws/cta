@@ -18,6 +18,23 @@
       ]
     },
     {
+      "namespace": "Project",
+      "Assembly": "Project",
+      "Reference": "Project",
+      "Type": "Project",
+      "Actions": [
+        {
+          "Name": "CreateMonolithService",
+          "Type": "Project",
+          "Value": {
+            "namespaceString": "SampleWebApi.Controllers",
+            "projectName": "SampleWebApi"
+          },
+          "Description": "Create service class."
+        }
+      ]
+    },
+    {
       "Namespace": "MvcMusicStore.Controllers",
       "Assembly": "MvcMusicStore",
       "Classes": [
@@ -98,6 +115,25 @@
                 "ClassFullKey": "MvcMusicStore.Controllers.ShoppingCartController"
               },
               "Description": "Replace object type ShoppingCartViewModel with SomethingElse"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Namespace": "SampleWebApi.Controllers",
+      "Assembly": "SampleWebApi",
+      "Classes": [
+        {
+          "Key": "HouseController",
+          "FullKey": "SampleWebApi.Controllers.HouseController",
+          "KeyType": "ClassName",
+          "Actions": [
+            {
+              "Name": "ReplaceWebApiControllerMethodsBody",
+              "Type": "Class",
+              "Value": "return Content(MonolithService.CreateRequest(Request, this.ControllerContext.RouteData));",
+              "Description": "Replace method body with http request to extracted service."
             }
           ]
         }
