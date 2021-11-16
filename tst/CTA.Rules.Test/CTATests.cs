@@ -50,7 +50,6 @@ namespace CTA.Rules.Test
             //We don't care about version for CTA-only rules:
             string version = "net5.0";
 
-
             var solutionPath = CopySolutionFolderToTemp(solutionName, downloadLocation);
             var solutionDir = Directory.GetParent(solutionPath).FullName;
 
@@ -105,7 +104,7 @@ namespace CTA.Rules.Test
         [Test]
         public void TestSampleWebApiSolution()
         {
-            var results = runCTAFile("MvcMusicStore.sln", "*.csproj").ProjectResults.FirstOrDefault();
+            var results = runCTAFile("WebApiWithReferences.sln", "WebApiWithReferences.csproj").ProjectResults.FirstOrDefault();
 
             StringAssert.Contains("IActionResult", results.ProjectAnalysisResult);
 
