@@ -18,7 +18,8 @@ namespace CTA.Rules.Actions
             MethodDeclarationSyntax AddComment(SyntaxGenerator syntaxGenerator, MethodDeclarationSyntax node)
             {
                 SyntaxTriviaList currentTrivia = node.GetLeadingTrivia();
-                currentTrivia = currentTrivia.Insert(0, SyntaxFactory.SyntaxTrivia(SyntaxKind.MultiLineCommentTrivia, (dontUseCTAPrefix != null ? comment : string.Format(Constants.CommentFormat, comment))));
+                var commentFormat = dontUseCTAPrefix != null ? Constants.CommentFormatBlank : Constants.CommentFormat;
+                currentTrivia = currentTrivia.Insert(0, SyntaxFactory.SyntaxTrivia(SyntaxKind.MultiLineCommentTrivia, string.Format(commentFormat, comment)));
                 node = node.WithLeadingTrivia(currentTrivia).NormalizeWhitespace();
                 return node;
             }
