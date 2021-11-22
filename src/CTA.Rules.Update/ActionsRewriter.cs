@@ -185,9 +185,10 @@ namespace CTA.Rules.Update.Rewriters
             var identifierNameSyntax = (IdentifierNameSyntax)base.VisitIdentifierName(node);
             if (symbol != null)
             {
+                var nodeKey = symbol.OriginalDefinition != null ? symbol.OriginalDefinition.ToString() : symbol.ToString();
                 foreach (var action in _allActions.OfType<IdentifierNameAction>())
                 {
-                    if (symbol.ToString() == action.Key && identifierNameTypes.Contains(identifierNameSyntax.Parent?.GetType()))
+                    if (nodeKey == action.Key && identifierNameTypes.Contains(identifierNameSyntax.Parent?.GetType()))
                     {
                         var actionExecution = new GenericActionExecution(action, _filePath)
                         {
