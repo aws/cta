@@ -13,12 +13,13 @@ namespace CTA.Rules.Actions
     /// </summary>
     public class MethodDeclarationActions
     {
-        public Func<SyntaxGenerator, MethodDeclarationSyntax, MethodDeclarationSyntax> GetAddCommentAction(string comment)
+        public Func<SyntaxGenerator, MethodDeclarationSyntax, MethodDeclarationSyntax> GetAddCommentAction(string comment, string dontUseCTAPrefix = null)
         {
             MethodDeclarationSyntax AddComment(SyntaxGenerator syntaxGenerator, MethodDeclarationSyntax node)
             {
                 SyntaxTriviaList currentTrivia = node.GetLeadingTrivia();
-                currentTrivia = currentTrivia.Insert(0, SyntaxFactory.SyntaxTrivia(SyntaxKind.MultiLineCommentTrivia, string.Format(Constants.CommentFormat, comment)));
+                var commentFormat = dontUseCTAPrefix != null ? Constants.CommentFormatBlank : Constants.CommentFormat;
+                currentTrivia = currentTrivia.Insert(0, SyntaxFactory.SyntaxTrivia(SyntaxKind.MultiLineCommentTrivia, string.Format(commentFormat, comment)));
                 node = node.WithLeadingTrivia(currentTrivia).NormalizeWhitespace();
                 return node;
             }
@@ -111,7 +112,7 @@ namespace CTA.Rules.Actions
             return AddParametersToMethodAction;
         }
 
-        public Func<SyntaxGenerator, MethodDeclarationSyntax, MethodDeclarationSyntax> GetCommentMethodAction(string comment = null)
+        public Func<SyntaxGenerator, MethodDeclarationSyntax, MethodDeclarationSyntax> GetCommentMethodAction(string comment = null, string dontUseCTAPrefix = null)
         {
             MethodDeclarationSyntax CommentMethodAction(SyntaxGenerator syntaxGenerator, MethodDeclarationSyntax node)
             {
@@ -123,7 +124,7 @@ namespace CTA.Rules.Actions
 
                 if (!string.IsNullOrWhiteSpace(comment))
                 {
-                    var addCommentsToMethodFunc = GetAddCommentAction(comment);
+                    var addCommentsToMethodFunc = GetAddCommentAction(comment, dontUseCTAPrefix);
                     return addCommentsToMethodFunc(syntaxGenerator, node);
                 }
                 return node;

@@ -48,6 +48,7 @@ namespace CTA.Rules.Config
         public const string Templates = "Templates";
 
         public const string CommentFormat = @"/* Added by CTA: {0} */";
+        public const string CommentFormatBlank = @"/* {0} */";
         public const string WebSdkName = "Microsoft.NET.Sdk.Web";
         public const string ClassLibrarySdkName = "Microsoft.NET.Sdk";
 
@@ -115,6 +116,21 @@ namespace CTA.Rules.Config
 
         public static readonly List<string> SupportedMethodModifiers = new List<string>() { "public", "internal", "protected", "private", "abstract", "extern", "override", "static", "unsafe", "virtual", "async" };
 
+        //Monolith code constants
+        public const string Await = "await";
+        public const string TaskActionResult = "Task<ActionResult>";
+        public const string ActionResult = "ActionResult";
+        public const string TaskIHttpActionResult = "Task<IHttpActionResult>";
+        public const string IHttpActionResult = "IHttpActionResult";
+        public const string CreateRequest = "CreateRequest";
+        public const string AsyncModifier = "async";
+        public const string VoidModifier = "void";
+        public const string AsyncWord = "Async";
+        public const string Public = "public";
+        public const string DotResult = ".Result";
+        public const string MonolithService = "MonolithService";
+        public const string MonolithServiceComment = "Modified to call the extracted logic.";
+
 
         public static readonly List<List<string>> TemplateFiles = new List<List<string>>() {
             new List<string> {"default.json"},
@@ -125,6 +141,7 @@ namespace CTA.Rules.Config
             new List<string> {"mvc","appsettings.json"},
             new List<string> {"mvc","Program.cs"},
             new List<string> {"mvc","Startup.cs" },
+            new List<string> {"monolithservice","MonolithService.cs" },
             new List<string> {"webclasslibrary","appsettings.json" },
             new List<string> { "wcfcodebasedservice", "Program.cs"},
             new List<string> { "wcfcodebasedservice", "Startup.cs"},

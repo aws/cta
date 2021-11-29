@@ -6,6 +6,8 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Editing;
 using NUnit.Framework;
 using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
 
 namespace CTA.Rules.Test.Actions
 {
@@ -18,6 +20,7 @@ namespace CTA.Rules.Test.Actions
         [SetUp]
         public void SetUp()
         {
+
             var workspace = new AdhocWorkspace();
             var language = LanguageNames.CSharp;
             _syntaxGenerator = SyntaxGenerator.GetGenerator(workspace, language);
@@ -315,6 +318,54 @@ class MyClass
 
             var expectedString = @"classMyClass{void Invoke(HttpContext context, string value){}}";
             StringAssert.Contains(expectedString, nodeWithExpression.ToFullString());
+        }
+
+        [Test]
+        public void ReplacePublicMethodsBodyMVC()
+        {
+            string newBody = "return Content(MonolithService.CreateRequest());";
+            var methodString1 = @"public async Task<string> SuperStringAsyncMethod(){ var hello = ""hello world!""}";
+            var methodString2 = @"public string SuperStringMethod(){ var hello = ""hello world again?!""}";
+            var methodString3 = @"private string SuperDontTouchMethod(){ var hello = ""Not hello world!""}";
+            var nodeWithMethods = _node.AddMembers(SyntaxFactory.ParseMemberDeclaration(methodString1));
+            nodeWithMethods = nodeWithMethods.AddMembers(SyntaxFactory.ParseMemberDeclaration(methodString2));
+            nodeWithMethods = nodeWithMethods.AddMembers(SyntaxFactory.ParseMemberDeclaration(methodString3));
+
+            var ReplacePublicMethodsBodyFunc = _classActions.GetReplaceMvcControllerMethodsBodyAction(newBody);
+            var newNode = ReplacePublicMethodsBodyFunc(_syntaxGenerator, nodeWithMethods);
+
+            var expectedString = @"classMyClass{public async Task<ActionResult> SuperStringAsyncMethod()
+{
+    return Content(await MonolithService.CreateRequestAsync());
+}public ActionResult SuperStringMethod()
+{
+    return Content(MonolithService.CreateRequest());
+}private string SuperDontTouchMethod(){ var hello = ""Not hello world!""}}";
+            StringAssert.Contains(expectedString, newNode.ToFullString());
+        }
+
+        [Test]
+        public void ReplacePublicMethodsBodyWebAPI()
+        {
+            string newBody = "return Content(MonolithService.CreateRequest());";
+            var methodString1 = @"public async Task<string> SuperStringAsyncMethod(){ var hello = ""hello world!""}";
+            var methodString2 = @"public string SuperStringMethod(){ var hello = ""hello world again?!""}";
+            var methodString3 = @"private string SuperDontTouchMethod(){ var hello = ""Not hello world!""}";
+            var nodeWithMethods = _node.AddMembers(SyntaxFactory.ParseMemberDeclaration(methodString1));
+            nodeWithMethods = nodeWithMethods.AddMembers(SyntaxFactory.ParseMemberDeclaration(methodString2));
+            nodeWithMethods = nodeWithMethods.AddMembers(SyntaxFactory.ParseMemberDeclaration(methodString3));
+
+            var ReplacePublicMethodsBodyFunc = _classActions.GetReplaceWebApiControllerMethodsBodyAction(newBody);
+            var newNode = ReplacePublicMethodsBodyFunc(_syntaxGenerator, nodeWithMethods);
+
+            var expectedString = @"classMyClass{public async Task<IHttpActionResult> SuperStringAsyncMethod()
+{
+    return Content(await MonolithService.CreateRequestAsync());
+}public IHttpActionResult SuperStringMethod()
+{
+    return Content(MonolithService.CreateRequest());
+}private string SuperDontTouchMethod(){ var hello = ""Not hello world!""}}";
+            StringAssert.Contains(expectedString, newNode.ToFullString());
         }
 
         [Test]

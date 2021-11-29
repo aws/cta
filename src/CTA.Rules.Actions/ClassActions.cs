@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using CTA.Rules.Config;
+using CTA.Rules.Models;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -113,13 +116,14 @@ namespace CTA.Rules.Actions
             }
             return AddAttribute;
         }
-        public Func<SyntaxGenerator, ClassDeclarationSyntax, ClassDeclarationSyntax> GetAddCommentAction(string comment)
+        public Func<SyntaxGenerator, ClassDeclarationSyntax, ClassDeclarationSyntax> GetAddCommentAction(string comment, string dontUseCTAPrefix = null)
         {
             ClassDeclarationSyntax AddComment(SyntaxGenerator syntaxGenerator, ClassDeclarationSyntax node)
             {
                 SyntaxTriviaList currentTrivia = node.GetLeadingTrivia();
                 //TODO see if this will lead NPE    
-                currentTrivia = currentTrivia.Add(SyntaxFactory.SyntaxTrivia(SyntaxKind.MultiLineCommentTrivia, string.Format(Constants.CommentFormat, comment)));
+                var commentFormat = dontUseCTAPrefix != null ? Constants.CommentFormatBlank : Constants.CommentFormat;
+                currentTrivia = currentTrivia.Add(SyntaxFactory.SyntaxTrivia(SyntaxKind.MultiLineCommentTrivia, string.Format(commentFormat, comment)));
                 node = node.WithLeadingTrivia(currentTrivia).NormalizeWhitespace();
                 return node;
             }
@@ -349,7 +353,7 @@ namespace CTA.Rules.Actions
             return RemoveMethodParameters;
         }
 
-        public Func<SyntaxGenerator, ClassDeclarationSyntax, ClassDeclarationSyntax> GetCommentMethodAction(string methodName, string comment = null)
+        public Func<SyntaxGenerator, ClassDeclarationSyntax, ClassDeclarationSyntax> GetCommentMethodAction(string methodName, string comment = null, string dontUseCTAPrefix = null)
         {
             ClassDeclarationSyntax CommentMethod(SyntaxGenerator syntaxGenerator, ClassDeclarationSyntax node)
             {
@@ -359,7 +363,7 @@ namespace CTA.Rules.Actions
                 if (methodNode != null)
                 {
                     MethodDeclarationActions methodActions = new MethodDeclarationActions();
-                    var commentMethodAction = methodActions.GetCommentMethodAction(comment);
+                    var commentMethodAction = methodActions.GetCommentMethodAction(comment, dontUseCTAPrefix);
                     var newMethodNode = commentMethodAction(syntaxGenerator, methodNode);
                     node = node.ReplaceNode(methodNode, newMethodNode);
                 }
@@ -368,7 +372,7 @@ namespace CTA.Rules.Actions
             return CommentMethod;
         }
 
-        public Func<SyntaxGenerator, ClassDeclarationSyntax, ClassDeclarationSyntax> GetAddCommentsToMethodAction(string methodName, string comment)
+        public Func<SyntaxGenerator, ClassDeclarationSyntax, ClassDeclarationSyntax> GetAddCommentsToMethodAction(string methodName, string comment, string dontUseCTAPrefix = null)
         {
             ClassDeclarationSyntax AddCommentsToMethod(SyntaxGenerator syntaxGenerator, ClassDeclarationSyntax node)
             {
@@ -379,7 +383,7 @@ namespace CTA.Rules.Actions
                     if (!string.IsNullOrWhiteSpace(comment))
                     {
                         MethodDeclarationActions methodActions = new MethodDeclarationActions();
-                        var addCommentActionFunc = methodActions.GetAddCommentAction(comment);
+                        var addCommentActionFunc = methodActions.GetAddCommentAction(comment, dontUseCTAPrefix);
                         var newMethodNode = addCommentActionFunc(syntaxGenerator, methodNode);
                         node = node.ReplaceNode(methodNode, newMethodNode);
                     }
@@ -425,6 +429,89 @@ namespace CTA.Rules.Actions
             return AddParametersToMethod;
         }
 
+        public Func<SyntaxGenerator, ClassDeclarationSyntax, ClassDeclarationSyntax> GetReplaceMvcControllerMethodsBodyAction(string expression)
+        {
+            ClassDeclarationSyntax ReplaceMethodModifiers(SyntaxGenerator syntaxGenerator, ClassDeclarationSyntax node)
+            {
+                var allMembers = node.Members.ToList();
+                var allMethods = allMembers.OfType<MethodDeclarationSyntax>().Where(m => m.Modifiers.Any(mod => mod.Text == Constants.Public))
+                    .Select(m => GetMethodId(m)).ToList();
+
+                foreach (var method in allMethods)
+                {
+                    var currentMethod = node.Members.OfType<MethodDeclarationSyntax>().FirstOrDefault(m => GetMethodId(m) == method);
+                    var originalMethod = currentMethod;
+
+                    bool asyncCheck = currentMethod.Modifiers.Any(mod => mod.Text == Constants.AsyncModifier);
+                    bool voidReturn = currentMethod.Modifiers.Any(mod => mod.Text == Constants.VoidModifier);
+                    string returnType = "";
+                    if (!voidReturn)
+                    {
+                        returnType = asyncCheck ? Constants.TaskActionResult : Constants.ActionResult;
+                    }
+
+                    var newExpression = expression;
+                    if (expression.Contains(Constants.MonolithService + "." + Constants.CreateRequest) && asyncCheck)
+                    {
+                        newExpression = expression.Insert(expression.IndexOf(Constants.MonolithService), Constants.Await + " ");
+                        newExpression = newExpression.Insert(newExpression.IndexOf(Constants.CreateRequest) + Constants.CreateRequest.Length, Constants.AsyncWord);
+                    }
+
+                    currentMethod = currentMethod.WithBody(null).WithLeadingTrivia(currentMethod.GetLeadingTrivia());
+                    currentMethod = currentMethod.WithBody(SyntaxFactory.Block(SyntaxFactory.ParseStatement(newExpression))).WithLeadingTrivia(currentMethod.GetLeadingTrivia());
+                    if (!string.IsNullOrEmpty(returnType))
+                    {
+                        currentMethod = currentMethod.WithReturnType(SyntaxFactory.ParseTypeName(returnType)).WithLeadingTrivia(currentMethod.GetLeadingTrivia());
+                    }
+                    currentMethod = currentMethod.NormalizeWhitespace();
+
+                    node = node.ReplaceNode(originalMethod, currentMethod.WithLeadingTrivia(currentMethod.GetLeadingTrivia()));
+                }
+
+                return node;
+            }
+            return ReplaceMethodModifiers;
+        }
+        public Func<SyntaxGenerator, ClassDeclarationSyntax, ClassDeclarationSyntax> GetReplaceWebApiControllerMethodsBodyAction(string expression)
+        {
+            ClassDeclarationSyntax ReplaceMethodModifiers(SyntaxGenerator syntaxGenerator, ClassDeclarationSyntax node)
+            {
+                var allMembers = node.Members.ToList();
+                var allMethods = allMembers.OfType<MethodDeclarationSyntax>().Where(m => m.Modifiers.Any(mod => mod.Text == Constants.Public))
+                    .Select(m => GetMethodId(m)).ToList();
+
+                foreach (var method in allMethods)
+                {
+                    var currentMethod = node.Members.OfType<MethodDeclarationSyntax>().FirstOrDefault(m => GetMethodId(m) == method);
+                    var originalMethod = currentMethod;
+
+                    bool asyncCheck = currentMethod.Modifiers.Any(mod => mod.Text == Constants.AsyncModifier);
+                    //IHttpActionResult is a catch all return type
+                    string returnType = asyncCheck ? Constants.TaskIHttpActionResult : Constants.IHttpActionResult;
+                    var newExpression = expression;
+                    if (expression.Contains(Constants.MonolithService + "." + Constants.CreateRequest) && asyncCheck)
+                    {
+                        newExpression = expression.Insert(expression.IndexOf(Constants.MonolithService), Constants.Await + " ");
+                        newExpression = newExpression.Insert(newExpression.IndexOf(Constants.CreateRequest) + Constants.CreateRequest.Length, Constants.AsyncWord);
+                    }
+
+                    currentMethod = currentMethod.WithBody(null).WithLeadingTrivia(currentMethod.GetLeadingTrivia());
+                    currentMethod = currentMethod.WithBody(SyntaxFactory.Block(SyntaxFactory.ParseStatement(newExpression))).WithLeadingTrivia(currentMethod.GetLeadingTrivia());
+                    currentMethod = currentMethod.WithReturnType(SyntaxFactory.ParseTypeName(returnType)).WithLeadingTrivia(currentMethod.GetLeadingTrivia());
+                    currentMethod = currentMethod.NormalizeWhitespace();
+
+                    node = node.ReplaceNode(originalMethod, currentMethod.WithLeadingTrivia(currentMethod.GetLeadingTrivia()));
+                }
+
+                return node;
+            }
+            return ReplaceMethodModifiers;
+        }
+
+        private string GetMethodId(MethodDeclarationSyntax method)
+        {
+            return $"{method.Identifier}{method.ParameterList}";
+        }
 
         private MethodDeclarationSyntax GetMethodNode(ClassDeclarationSyntax node, string methodName)
         {

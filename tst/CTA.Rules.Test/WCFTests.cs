@@ -18,6 +18,7 @@ namespace CTA.Rules.Test
             downloadLocation = SetupTests.DownloadLocation;
         }
 
+        [TestCase(TargetFramework.Dotnet6)]
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.DotnetCoreApp31)]
         public void TestBasicHttpBindingAndTransportSecurity(string version)
@@ -55,6 +56,7 @@ namespace CTA.Rules.Test
             StringAssert.Contains(@"using CoreWCF", service);
         }
 
+        [TestCase(TargetFramework.Dotnet6)]
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.DotnetCoreApp31)]
         public void TestBasicHttpTransportMessageCredUserName(string version)
@@ -92,6 +94,7 @@ namespace CTA.Rules.Test
             StringAssert.Contains(@"using CoreWCF", service);
         }
 
+        [TestCase(TargetFramework.Dotnet6)]
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.DotnetCoreApp31)]
         public void TestBasicHttpTransportMessageCredCertificate(string version)
@@ -129,6 +132,7 @@ namespace CTA.Rules.Test
             StringAssert.Contains(@"using CoreWCF", service);
         }
 
+        [TestCase(TargetFramework.Dotnet6)]
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.DotnetCoreApp31)]
         public void TestWSHttpBindingWithWindowsAuth(string version)
@@ -166,6 +170,7 @@ namespace CTA.Rules.Test
             StringAssert.Contains(@"using CoreWCF", service);
         }
 
+        [TestCase(TargetFramework.Dotnet6)]
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.DotnetCoreApp31)]
         public void TestBasicHttpMessageSecurity(string version)
@@ -188,6 +193,7 @@ namespace CTA.Rules.Test
             FileAssert.DoesNotExist(Path.Combine(projectDir, "Program.cs"));
         }
 
+        [TestCase(TargetFramework.Dotnet6)]
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.DotnetCoreApp31)]
         public void TestNetTCPBindingDefaultSecurity(string version)
@@ -225,6 +231,7 @@ namespace CTA.Rules.Test
             StringAssert.Contains(@"using CoreWCF", service);
         }
 
+        [TestCase(TargetFramework.Dotnet6)]
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.DotnetCoreApp31)]
         public void TestNetPipeBindingDefault(string version)
@@ -247,6 +254,7 @@ namespace CTA.Rules.Test
             FileAssert.DoesNotExist(Path.Combine(projectDir, "Program.cs"));
         }
 
+        [TestCase(TargetFramework.Dotnet6)]
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.DotnetCoreApp31)]
         public void TestBasicHttpAndNetTCPSupported(string version)
@@ -284,6 +292,7 @@ namespace CTA.Rules.Test
             StringAssert.Contains(@"using CoreWCF", service);
         }
 
+        [TestCase(TargetFramework.Dotnet6)]
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.DotnetCoreApp31)]
         public void TestWsHttpAndNetPipe(string version)
@@ -321,6 +330,7 @@ namespace CTA.Rules.Test
             StringAssert.Contains(@"using CoreWCF", service);
         }
 
+        [TestCase(TargetFramework.Dotnet6)]
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.DotnetCoreApp31)]
         public void TestCodeBasedBasicHttpDefaultSecurity(string version)
@@ -353,6 +363,7 @@ namespace CTA.Rules.Test
             StringAssert.Contains(@"using CoreWCF", service);
         }
 
+        [TestCase(TargetFramework.Dotnet6)]
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.DotnetCoreApp31)]
         public void TestCodeBasicHttpTransportSecurity(string version)
@@ -385,6 +396,7 @@ namespace CTA.Rules.Test
             StringAssert.Contains(@"using CoreWCF", service);
         }
 
+        [TestCase(TargetFramework.Dotnet6)]
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.DotnetCoreApp31)]
         public void TestCodeBasicHttpTransportMessageCredUserName(string version)
@@ -417,6 +429,7 @@ namespace CTA.Rules.Test
             StringAssert.Contains(@"using CoreWCF", service);
         }
 
+        [TestCase(TargetFramework.Dotnet6)]
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.DotnetCoreApp31)]
         public void TestCodeBasicHttpNetTCPSupported(string version)
@@ -449,6 +462,7 @@ namespace CTA.Rules.Test
             StringAssert.Contains(@"using CoreWCF", service);
         }
 
+        [TestCase(TargetFramework.Dotnet6)]
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.DotnetCoreApp31)]
         public void TestWCFClient(string version)
@@ -466,6 +480,7 @@ namespace CTA.Rules.Test
             StringAssert.Contains(@"System.ServiceModel.NetTcp", csProjContent);
         }
 
+        [TestCase(TargetFramework.Dotnet6)]
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.DotnetCoreApp31)]
         public void TestWCFServiceLibrary(string version)

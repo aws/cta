@@ -75,7 +75,7 @@ namespace CTA.Rules.RuleFiles
                     rules = LoadRulesFiles(_rulesFilesDir);
                     if (rules.NameSpaces != null)
                     {
-                        rules.NameSpaces = rules.NameSpaces.Where(n => _projectReferences.Contains(new Reference() { Assembly = n.Assembly, Namespace = n.@namespace }) || (n.Assembly == Constants.Project && n.@namespace == Constants.Project)).ToList();
+                        rules.NameSpaces = rules.NameSpaces.Where(n => _projectReferences.Contains(new Reference() { Assembly = n.Assembly, Namespace = n.@namespace }) || (n.Assembly == Constants.Project)).ToList();
                     }
                 }
                 return rules;

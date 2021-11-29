@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
 using System.Linq;
+using System.Xml.Linq;
 using CTA.Rules.Config;
 using CTA.Rules.Models;
 using Newtonsoft.Json;
@@ -16,6 +17,11 @@ namespace CTA.Rules.Actions
         private readonly string _projectDir;
         private readonly ProjectType _projectType;
         private bool _hasData;
+
+        /// <summary>
+        /// If connection string is encrypted,  "configProtectionProvider" is present.
+        /// </summary>
+        private const string providerForEncryptedConnString = "configProtectionProvider";
 
         public ConfigMigrate(string projectDir, ProjectType projectType)
         {
@@ -36,6 +42,7 @@ namespace CTA.Rules.Actions
         {
             return MigrateWebConfig();
         }
+
         /// <summary>
         /// Migrates the web.config file, if it exists
         /// </summary>
@@ -76,19 +83,47 @@ namespace CTA.Rules.Actions
 
         private Configuration LoadWebConfig(string projectDir)
         {
-            string webConfigFile = Path.Combine(projectDir, Constants.WebConfig);
+            string webConfigFilePath = Path.Combine(projectDir, Constants.WebConfig);
 
-            if (File.Exists(webConfigFile))
+            if (File.Exists(webConfigFilePath))
             {
                 try
                 {
-                    var fileMap = new ExeConfigurationFileMap() { ExeConfigFilename = webConfigFile };
+
+                    XElement webConfigXml = XElement.Load(webConfigFilePath);
+                    System.Xml.XmlDocument xmlDocument = new System.Xml.XmlDocument();
+                    xmlDocument.Load(webConfigFilePath);
+
+                    // Comment out connection strings if type has a configProtectionProvider
+                    // This can comment out connection strings that do not have "EncryptedData"
+                    IEnumerable<XElement> encryptedConnectionStringElement =
+                        from element in webConfigXml.Elements("connectionStrings")
+                        where (string)element.Attribute("configProtectionProvider") != null
+                        select element;
+
+                    if (encryptedConnectionStringElement.HasAny())
+                    {
+                        System.Xml.XmlNode elementToComment = xmlDocument.SelectSingleNode("/configuration/connectionStrings");
+                        string commentContents = elementToComment.OuterXml;
+
+                        // Its contents are the XML content of target node
+                        System.Xml.XmlComment commentNode = xmlDocument.CreateComment(commentContents);
+
+                        // Get a reference to the parent of the target node
+                        System.Xml.XmlNode parentNode = elementToComment.ParentNode;
+
+                        // Replace the target node with the comment
+                        parentNode.ReplaceChild(commentNode, elementToComment);
+                        xmlDocument.Save(webConfigFilePath);
+                    }
+
+                    var fileMap = new ExeConfigurationFileMap() { ExeConfigFilename = webConfigFilePath };
                     var configuration = ConfigurationManager.OpenMappedExeConfiguration(fileMap, ConfigurationUserLevel.None);
                     return configuration;
                 }
                 catch (Exception ex)
                 {
-                    LogHelper.LogError(ex, string.Format("Error processing web.config file {0}", webConfigFile));
+                    LogHelper.LogError(ex, string.Format("Error processing web.config file {0}", webConfigFilePath));
                 }
             }
             return null;
@@ -190,7 +225,7 @@ namespace CTA.Rules.Actions
 
         /// <summary>
         /// Writes the appSettings.json file to the project dir
-        /// </summary>        
+        /// </summary>
         /// <param name="content">The content of the file</param>
         /// <param name="projectDir">The project directory where this file will be created</param>
         private void AddAppSettingsJsonFile(JObject content, string projectDir)
