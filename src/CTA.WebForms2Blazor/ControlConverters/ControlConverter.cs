@@ -15,12 +15,12 @@ namespace CTA.WebForms2Blazor.ControlConverters
             get { return new Dictionary<string, string>(); }
         }
 
-        protected virtual IEnumerable<ViewLayerControlAttribute> NewAttributes
-        {
-            get { return new List<ViewLayerControlAttribute>(); }
-        }
+        protected virtual IEnumerable<ViewLayerControlAttribute> NewAttributes { get; set; }
+            = new List<ViewLayerControlAttribute>();
+
         protected abstract string BlazorName { get; }
         protected virtual string NodeTemplate { get { return @"<{0} {1}>{2}</{0}>"; } }
+        protected virtual string SingleTagNodeTemplate { get { return @"<{0} {1}>"; } }
         
         //Passing this method through every .CreateNode ensures that all nodes have original capitalization
         public static void PreserveCapitalization(HtmlDocument htmlDocument)
