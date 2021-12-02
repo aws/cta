@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <ApplicationIcon />
-    <OutputType>Exe</OutputType>
+    <OutputType>Library</OutputType>
     <StartupObject />
   </PropertyGroup>
 
@@ -13,7 +13,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CTA.Rules.Actions\CTA.Rules.Actions.csproj" />
-    <ProjectReference Include="..\CTA.Rules.PortCore\CTA.Rules.PortCore.csproj" />
   </ItemGroup>
 
   <ItemGroup>

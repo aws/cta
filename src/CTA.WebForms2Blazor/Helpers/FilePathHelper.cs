@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using CTA.FeatureDetection.Common.Extensions;
 using CTA.WebForms2Blazor.Extensions;
 
 namespace CTA.WebForms2Blazor.Helpers

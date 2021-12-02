@@ -134,7 +134,7 @@ namespace CTA.Rules.Update
         public ProjectResult Run(ProjectActions projectActions)
         {
             _projectResult.ProjectActions = projectActions;
-            CodeReplacer baseReplacer = new CodeReplacer(_sourceFileBuildResults, RulesEngineConfiguration, _metaReferences, _analyzerResult);
+            CodeReplacer baseReplacer = new CodeReplacer(_sourceFileBuildResults, RulesEngineConfiguration, _metaReferences, _analyzerResult, projectResult: _projectResult);
             _projectResult.ExecutedActions = baseReplacer.Run(projectActions, RulesEngineConfiguration.ProjectType);
             return _projectResult;
         }
@@ -150,7 +150,7 @@ namespace CTA.Rules.Update
             RulesAnalysis walker = new RulesAnalysis(_sourceFileResults, projectRules, RulesEngineConfiguration.ProjectType);
             var projectActions = walker.Analyze();
 
-            CodeReplacer baseReplacer = new CodeReplacer(_sourceFileBuildResults, RulesEngineConfiguration, _metaReferences, _analyzerResult, updatedFiles);
+            CodeReplacer baseReplacer = new CodeReplacer(_sourceFileBuildResults, RulesEngineConfiguration, _metaReferences, _analyzerResult, updatedFiles, projectResult: _projectResult);
             _projectResult.ExecutedActions = baseReplacer.Run(projectActions, RulesEngineConfiguration.ProjectType);
 
             ideFileActions = projectActions

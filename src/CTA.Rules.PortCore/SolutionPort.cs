@@ -443,6 +443,10 @@ namespace CTA.Rules.PortCore
             {
                 return ProjectType.WebApi;
             }
+            else if (projectTypeFeatureResult.IsAspNetWebFormsProject())
+            {
+                return ProjectType.WebForms;
+            }
             else if (projectTypeFeatureResult.IsWebClassLibrary())
             {
                 return ProjectType.WebClassLibrary;

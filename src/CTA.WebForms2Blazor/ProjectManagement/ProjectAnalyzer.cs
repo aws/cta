@@ -18,23 +18,21 @@ namespace CTA.WebForms2Blazor.ProjectManagement
 
         private readonly string _inputProjectPath;
         public AnalyzerResult AnalyzerResult { get; }
-        public PortCoreConfiguration ProjectConfiguration { get; }
+        public ProjectConfiguration ProjectConfiguration { get; }
         public ProjectResult ProjectResult { get; }
         public List<String> ProjectReferences { get; }
         public List<String> MetaReferences { get; }
         
         
-
         public string InputProjectPath { get { return _inputProjectPath; } }
 
-        public ProjectAnalyzer(string inputProjectPath, AnalyzerResult analyzerResult, PortCoreConfiguration projectConfiguration)
+        public ProjectAnalyzer(string inputProjectPath, AnalyzerResult analyzerResult, ProjectConfiguration projectConfiguration, ProjectResult projectResult)
         {
             _inputProjectPath = inputProjectPath;
             AnalyzerResult = analyzerResult;
             ProjectConfiguration = projectConfiguration;
-            
-            var projectRewriter = new ProjectRewriter(analyzerResult, projectConfiguration);
-            ProjectResult = projectRewriter.Initialize();
+
+            ProjectResult = projectResult;
 
             ProjectReferences = analyzerResult?.ProjectBuildResult?.ExternalReferences?.ProjectReferences.Select(p => p.AssemblyLocation).ToList();
             MetaReferences = analyzerResult?.ProjectBuildResult?.Project?.MetadataReferences?.Select(m => m.Display).ToList();

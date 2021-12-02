@@ -11,6 +11,7 @@ using CTA.FeatureDetection.Common.Extensions;
 using CTA.Rules.Config;
 using CTA.Rules.Models;
 using CTA.Rules.PortCore;
+using CTA.WebForms2Blazor;
 using CTA.Rules.Update.Rewriters;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -18,6 +19,7 @@ using Microsoft.CodeAnalysis.Text;
 using TextChange = CTA.Rules.Models.TextChange;
 using TextSpan = Codelyzer.Analysis.Model.TextSpan;
 using WCFConstants = CTA.Rules.Update.WCF.Constants;
+using System.Threading;
 
 namespace CTA.Rules.Update
 {
@@ -27,6 +29,7 @@ namespace CTA.Rules.Update
         private readonly IEnumerable<SourceFileBuildResult> _sourceFileBuildResults;
         private readonly List<string> _metadataReferences;
         private readonly AnalyzerResult _analyzerResult;
+        private readonly ProjectResult _projectResult;
 
         public CodeReplacer(List<SourceFileBuildResult> sourceFileBuildResults, ProjectConfiguration projectConfiguration, List<string> metadataReferences, AnalyzerResult analyzerResult,
             List<string> updatedFiles = null)
@@ -39,6 +42,20 @@ namespace CTA.Rules.Update
             _analyzerResult = analyzerResult;
             _projectConfiguration = projectConfiguration;
             _metadataReferences = metadataReferences;
+        }
+
+        public CodeReplacer(List<SourceFileBuildResult> sourceFileBuildResults, ProjectConfiguration projectConfiguration, List<string> metadataReferences, AnalyzerResult analyzerResult,
+            List<string> updatedFiles = null, ProjectResult projectResult = null)
+        {
+            _sourceFileBuildResults = sourceFileBuildResults;
+            if (updatedFiles != null)
+            {
+                _sourceFileBuildResults = _sourceFileBuildResults.Where(s => updatedFiles.Contains(s.SourceFileFullPath));
+            }
+            _analyzerResult = analyzerResult;
+            _projectConfiguration = projectConfiguration;
+            _metadataReferences = metadataReferences;
+            _projectResult = projectResult;
         }
 
         public Dictionary<string, List<GenericActionExecution>> Run(ProjectActions projectActions, ProjectType projectType)
@@ -65,7 +82,14 @@ namespace CTA.Rules.Update
 
                         if (_projectConfiguration.PortCode)
                         {
-                            RunCodeChanges(root, sourceFileBuildResult, currentFileActions, actionsPerProject);
+                            if (_projectConfiguration.ProjectType == ProjectType.WebForms)
+                            {
+                                RunWebFormsChanges();
+                            }
+                            else
+                            {
+                                RunCodeChanges(root, sourceFileBuildResult, currentFileActions, actionsPerProject);
+                            }
                         }                       
                         else
                         {
@@ -84,16 +108,23 @@ namespace CTA.Rules.Update
 
             if (_projectConfiguration.PortProject)
             {
-                projectRunActions = ApplyProjectActions(projectActions, projectType);
-
-                if (!actionsPerProject.TryAdd(Constants.Project, projectRunActions))
+                if (_projectConfiguration.ProjectType == ProjectType.WebForms)
                 {
-                    LogHelper.LogError(new FilePortingException(Constants.Project, new Exception("Error adding project to actions collection")));
+                    RunWebFormsChanges();
                 }
-
-                if (_projectConfiguration.ProjectType == ProjectType.WCFConfigBasedService || _projectConfiguration.ProjectType == ProjectType.WCFCodeBasedService)
+                else
                 {
-                    RunWCFChanges();
+                    projectRunActions = ApplyProjectActions(projectActions, projectType).Result;
+
+                    if (!actionsPerProject.TryAdd(Constants.Project, projectRunActions))
+                    {
+                        LogHelper.LogError(new FilePortingException(Constants.Project, new Exception("Error adding project to actions collection")));
+                    }
+
+                    if (_projectConfiguration.ProjectType == ProjectType.WCFConfigBasedService || _projectConfiguration.ProjectType == ProjectType.WCFCodeBasedService)
+                    {
+                        RunWCFChanges();
+                    }
                 }
             }
             return actionsPerProject.ToDictionary(a => a.Key, a => a.Value);
@@ -164,6 +195,36 @@ namespace CTA.Rules.Update
             catch (Exception e)
             {
                 LogHelper.LogError("WCF Porting Error: Error while creating config file: ", e.Message);
+            }
+        }
+
+        private void RunWebFormsChanges()
+        {
+            var projectDir = Path.GetDirectoryName(_projectConfiguration.ProjectPath);
+            var projectParentDir = Path.GetDirectoryName(projectDir);
+            var tempProjectDir = Path.Join(projectParentDir, string.Join("-", new DirectoryInfo(projectDir).Name, Path.GetRandomFileName()));
+            try 
+            {
+                MigrationManager migrationManager = new MigrationManager(projectDir, tempProjectDir, _analyzerResult, _projectConfiguration, _projectResult);
+                Task.Run(() => migrationManager.PerformMigration()).GetAwaiter().GetResult();
+
+                Directory.Delete(projectDir, true);
+                while (Directory.Exists(projectDir))
+                {
+                    Thread.Sleep(0);
+                }
+                Directory.Move(tempProjectDir, projectDir);
+            }
+            catch (Exception e)
+            {
+                LogHelper.LogError("WebForms Porting Error: Error while migrating WebForms to Blazor: ", e.Message);
+            }  
+            finally
+            {
+                if(Directory.Exists(tempProjectDir))
+                {
+                    Directory.Delete(tempProjectDir, true);
+                }
             }
         }
 
@@ -273,7 +334,18 @@ namespace CTA.Rules.Update
                     LogHelper.LogInformation(projectLevelAction.Description);
                 }
             }
+
+            RunProjectSpecificChanges(projectType);
+
             return projectRunActions;
+        }
+
+        private void RunProjectSpecificChanges(ProjectType projectType)
+        {
+            if (projectType == ProjectType.WCFConfigBasedService || projectType == ProjectType.WCFCodeBasedService)
+            {
+                RunWCFChanges();
+            }
         }
 
 

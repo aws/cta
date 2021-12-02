@@ -19,8 +19,9 @@ namespace CTA.WebForms2Blazor
         private readonly string _inputProjectPath;
         private readonly string _outputProjectPath;
 
-        private readonly PortCoreConfiguration _projectConfiguration;
+        private readonly ProjectConfiguration _projectConfiguration;
         private readonly AnalyzerResult _analyzerResult;
+        private readonly ProjectResult _projectResult;
 
         private ProjectAnalyzer _webFormsProjectAnalyzer;
         private ProjectBuilder _blazorProjectBuilder;
@@ -37,12 +38,13 @@ namespace CTA.WebForms2Blazor
         private FileConverterFactory _fileConverterFactory;
 
         public MigrationManager(string inputProjectPath, string outputProjectPath, AnalyzerResult analyzerResult,
-            PortCoreConfiguration projectConfiguration)
+            ProjectConfiguration projectConfiguration, ProjectResult projectResult)
         {
             _inputProjectPath = inputProjectPath;
             _outputProjectPath = outputProjectPath;
             _analyzerResult = analyzerResult;
             _projectConfiguration = projectConfiguration;
+            _projectResult = projectResult;
         }
 
         public async Task PerformMigration()
@@ -112,7 +114,7 @@ namespace CTA.WebForms2Blazor
 
         private void InitializeProjectManagementStructures()
         {
-            _webFormsProjectAnalyzer = new ProjectAnalyzer(_inputProjectPath, _analyzerResult, _projectConfiguration);
+            _webFormsProjectAnalyzer = new ProjectAnalyzer(_inputProjectPath, _analyzerResult, _projectConfiguration, _projectResult);
             _blazorProjectBuilder = new ProjectBuilder(_outputProjectPath);
         }
 

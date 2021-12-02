@@ -42,7 +42,7 @@ namespace CTA.WebForms2Blazor.Tests.Factories
         [SetUp]
         public void Setup()
         {
-            var webFormsProjectAnalyzer = new ProjectAnalyzer(_testProjectPath, new AnalyzerResult(), new PortCoreConfiguration());
+            var webFormsProjectAnalyzer = new ProjectAnalyzer(_testProjectPath, new AnalyzerResult(), new PortCoreConfiguration(), new ProjectResult());
             var blazorWorkspaceManager = new WorkspaceManagerService();
             var taskManagerService = new TaskManagerService();
 
