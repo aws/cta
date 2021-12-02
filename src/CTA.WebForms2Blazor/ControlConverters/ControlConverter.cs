@@ -21,6 +21,8 @@ namespace CTA.WebForms2Blazor.ControlConverters
         protected abstract string BlazorName { get; }
         protected virtual string NodeTemplate { get { return @"<{0} {1}>{2}</{0}>"; } }
         protected virtual string SingleTagNodeTemplate { get { return @"<{0} {1}>"; } }
+
+        private const string BooleanAttributeTrueValue = "\"\"";
         
         //Passing this method through every .CreateNode ensures that all nodes have original capitalization
         public static void PreserveCapitalization(HtmlDocument htmlDocument)
@@ -70,6 +72,17 @@ namespace CTA.WebForms2Blazor.ControlConverters
             }
 
             return $"{attr.OriginalName}='{attr.Value}'";
+        }
+
+        private protected void AddBooleanAttributeOnCondition(HtmlNode node, string aspAttrName, string htmlAttrName, bool condition)
+        {
+            var aspAttrValue = node.Attributes.AttributesWithName(aspAttrName).FirstOrDefault()?.Value
+                ?? string.Empty;
+
+            if (aspAttrValue.Equals(condition.ToString(), StringComparison.InvariantCultureIgnoreCase))
+            {
+                NewAttributes = NewAttributes.Append(new ViewLayerControlAttribute(htmlAttrName, BooleanAttributeTrueValue));
+            }
         }
 
         protected HtmlNode Convert2BlazorFromParts(string template, string name, string attributes, string body)
