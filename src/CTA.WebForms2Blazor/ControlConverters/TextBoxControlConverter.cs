@@ -22,7 +22,6 @@ namespace CTA.WebForms2Blazor.ControlConverters
         private const string ValueAttributeName = "value";
 
         private const string TypeAttributePasswordValue = "password";
-        private const string BooleanAttributeTrueValue = "\"\"";
 
         protected override Dictionary<string, string> AttributeMap
         {
@@ -63,33 +62,11 @@ namespace CTA.WebForms2Blazor.ControlConverters
                 NewAttributes = NewAttributes.Append(new ViewLayerControlAttribute(ValueAttributeName, $"\"{textValue}\""));
             }
 
-            AddReadOnlyAttributeIfNecessary(node);
-            AddDisabledAttributeIfNecessary(node);
+            AddBooleanAttributeOnCondition(node, ReadOnlyAttributeName, ReadOnlyAttributeName, true);
+            AddBooleanAttributeOnCondition(node, EnabledAttributeName, DisabledAttributeName, false);
 
             var joinedAttributesString = JoinAllAttributes(node.Attributes, NewAttributes);
             return Convert2BlazorFromParts(tagTemplate, tagName, joinedAttributesString, tagBody);
-        }
-
-        private void AddReadOnlyAttributeIfNecessary(HtmlNode node)
-        {
-            var readOnlyValue = node.Attributes.AttributesWithName(ReadOnlyAttributeName).FirstOrDefault()?.Value
-                ?? string.Empty;
-
-            if (readOnlyValue.Equals(true.ToString(), StringComparison.InvariantCultureIgnoreCase))
-            {
-                NewAttributes = NewAttributes.Append(new ViewLayerControlAttribute(ReadOnlyAttributeName, BooleanAttributeTrueValue));
-            }
-        }
-
-        private void AddDisabledAttributeIfNecessary(HtmlNode node)
-        {
-            var enabledValue = node.Attributes.AttributesWithName(EnabledAttributeName).FirstOrDefault()?.Value
-                ?? string.Empty;
-
-            if (enabledValue.Equals(false.ToString(), StringComparison.InvariantCultureIgnoreCase))
-            {
-                NewAttributes = NewAttributes.Append(new ViewLayerControlAttribute(DisabledAttributeName, BooleanAttributeTrueValue));
-            }
         }
     }
 }
