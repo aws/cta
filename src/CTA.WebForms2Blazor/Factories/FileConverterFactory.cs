@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using CTA.WebForms2Blazor.ControlConverters;
+using CTA.Rules.Config;
 using CTA.WebForms2Blazor.FileConverters;
-using CTA.WebForms2Blazor.Helpers;
 using CTA.WebForms2Blazor.ProjectManagement;
 using CTA.WebForms2Blazor.Services;
 
@@ -58,43 +58,55 @@ namespace CTA.WebForms2Blazor.Factories
             // in the FileInfo object
 
             string extension = document.Extension;
-
             FileConverter fc;
-            if (extension.Equals(Constants.CSharpCodeFileExtension))
+            try
             {
-                fc = new CodeFileConverter(_sourceProjectPath, document.FullName, _blazorWorkspaceManager, _webFormsProjectAnalyzer, _classConverterFactory, _taskManagerService);
-            }
-            else if (extension.Equals(Constants.WebFormsConfigFileExtension))
-            {
-                fc = new ConfigFileConverter(_sourceProjectPath, document.FullName, _taskManagerService);
-            }
-            else if (extension.Equals(Constants.WebFormsPageMarkupFileExtension)
-                || extension.Equals(Constants.WebFormsControlMarkupFileExtenion)
-                || extension.Equals(Constants.WebFormsMasterPageMarkupFileExtension)
-                || extension.Equals(Constants.WebFormsGlobalMarkupFileExtension))
-            {
-                fc = new ViewFileConverter(_sourceProjectPath, document.FullName, _viewImportService, _taskManagerService);
-            }
-            else if (extension.Equals(Constants.CSharpProjectFileExtension))
-            {
-                fc = new ProjectFileConverter(_sourceProjectPath, document.FullName, _blazorWorkspaceManager, _webFormsProjectAnalyzer, _taskManagerService);
-            }
-            else if (StaticResourceExtensions.Contains(extension))
-            {
-                fc = new StaticResourceFileConverter(_sourceProjectPath, document.FullName, _hostPageService, _taskManagerService);
-            }
-            else
-            {
-                fc = new StaticFileConverter(_sourceProjectPath, document.FullName, _taskManagerService);
-            }
+                if (extension.Equals(Constants.CSharpCodeFileExtension))
+                {
+                    fc = new CodeFileConverter(_sourceProjectPath, document.FullName, _blazorWorkspaceManager,
+                        _webFormsProjectAnalyzer, _classConverterFactory, _taskManagerService);
+                }
+                else if (extension.Equals(Constants.WebFormsConfigFileExtension))
+                {
+                    fc = new ConfigFileConverter(_sourceProjectPath, document.FullName, _taskManagerService);
+                }
+                else if (extension.Equals(Constants.WebFormsPageMarkupFileExtension)
+                         || extension.Equals(Constants.WebFormsControlMarkupFileExtenion)
+                         || extension.Equals(Constants.WebFormsMasterPageMarkupFileExtension)
+                         || extension.Equals(Constants.WebFormsGlobalMarkupFileExtension))
+                {
+                    fc = new ViewFileConverter(_sourceProjectPath, document.FullName, _viewImportService,
+                        _taskManagerService);
+                }
+                else if (extension.Equals(Constants.CSharpProjectFileExtension))
+                {
+                    fc = new ProjectFileConverter(_sourceProjectPath, document.FullName, _blazorWorkspaceManager,
+                        _webFormsProjectAnalyzer, _taskManagerService);
+                }
+                else if (StaticResourceExtensions.Contains(extension))
+                {
+                    fc = new StaticResourceFileConverter(_sourceProjectPath, document.FullName, _hostPageService,
+                        _taskManagerService);
+                }
+                else
+                {
+                    fc = new StaticFileConverter(_sourceProjectPath, document.FullName, _taskManagerService);
+                }
 
-
-            return fc;
+                return fc;
+            }
+            catch (Exception e)
+            {
+                LogHelper.LogError(e,$"Could not build appropriate file converter for {document.FullName}.");
+                return null;
+            }
         }
 
         public IEnumerable<FileConverter> BuildMany(IEnumerable<FileInfo> documents)
         {
-            return documents.Select(document => Build(document)).ToList();
+            return documents.Select(document => Build(document))
+                .Where(fileConverter => fileConverter != null)
+                .ToList();
         }
     }
 }
