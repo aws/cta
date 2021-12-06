@@ -73,11 +73,12 @@ namespace CTA.WebForms2Blazor.FileConverters
             {
                 await allMigrationTasks;
             }
-            // NOTE: We don't provide an reference to the caught exception because it would just be a
-            // standard aggregate exception of the exceptions that arose in the migration tasks, instead
-            // we choose to log an exception for each of the failed tasks to provide more info
-            catch
+            // NOTE: We use Exception here instead of AggregateException as sometimes await
+            // will auto un-wrap aggregate exception
+            catch (Exception e)
             {
+                LogHelper.LogError(e, "Collection of migration tasks experienced 1 or more failures");
+
                 var failedMigrationTasks = classMigrationTasks.Where(t => t.Item2.Status != TaskStatus.RanToCompletion);
 
                 foreach (var failedTask in failedMigrationTasks)
