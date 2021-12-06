@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CTA.Rules.Config;
 using CTA.WebForms2Blazor.Extensions;
 using CTA.WebForms2Blazor.FileInformationModel;
 using CTA.WebForms2Blazor.Helpers;
@@ -74,17 +76,26 @@ namespace CTA.WebForms2Blazor.ClassConverters
             // We have completed any possible registration by this point
             _lifecycleManager.NotifyMiddlewareSourceProcessed();
 
-            var middlewareClassDeclaration = MiddlewareSyntaxHelper.ConstructMiddlewareClass(
-                middlewareClassName: className,
-                shouldContinueAfterInvoke: false,
-                constructorAdditionalStatements: originalDescendantNodes.OfType<ConstructorDeclarationSyntax>().FirstOrDefault()?.Body?.Statements,
-                preHandleStatements: preHandleStatements,
-                additionalFieldDeclarations: originalDescendantNodes.OfType<FieldDeclarationSyntax>(),
-                additionalPropertyDeclarations: originalDescendantNodes.OfType<PropertyDeclarationSyntax>(),
-                additionalMethodDeclarations: keepableMethods);
+            var fileText = string.Empty;
 
-            var namespaceNode = CodeSyntaxHelper.BuildNamespace(namespaceName, middlewareClassDeclaration);
-            var fileText = CodeSyntaxHelper.GetFileSyntaxAsString(namespaceNode, CodeSyntaxHelper.BuildUsingStatements(requiredNamespaceNames));
+            try
+            {
+                var middlewareClassDeclaration = MiddlewareSyntaxHelper.ConstructMiddlewareClass(
+                    middlewareClassName: className,
+                    shouldContinueAfterInvoke: false,
+                    constructorAdditionalStatements: originalDescendantNodes.OfType<ConstructorDeclarationSyntax>().FirstOrDefault()?.Body?.Statements,
+                    preHandleStatements: preHandleStatements,
+                    additionalFieldDeclarations: originalDescendantNodes.OfType<FieldDeclarationSyntax>(),
+                    additionalPropertyDeclarations: originalDescendantNodes.OfType<PropertyDeclarationSyntax>(),
+                    additionalMethodDeclarations: keepableMethods);
+
+                var namespaceNode = CodeSyntaxHelper.BuildNamespace(namespaceName, middlewareClassDeclaration);
+                fileText = CodeSyntaxHelper.GetFileSyntaxAsString(namespaceNode, CodeSyntaxHelper.BuildUsingStatements(requiredNamespaceNames));
+            }
+            catch (Exception e)
+            {
+                LogHelper.LogError(e, $"Failed to construct new HttpHandler file content from {OriginalClassName} class at {_fullPath}");
+            }
 
             DoCleanUp();
             LogEnd();

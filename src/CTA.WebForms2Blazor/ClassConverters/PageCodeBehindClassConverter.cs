@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CTA.Rules.Config;
 using CTA.WebForms2Blazor.Extensions;
 using CTA.WebForms2Blazor.FileInformationModel;
 using CTA.WebForms2Blazor.Helpers;
@@ -34,11 +36,11 @@ namespace CTA.WebForms2Blazor.ClassConverters
 
             // NOTE: Removed temporarily until usings can be better determined, at the moment, too
             // many are being removed
-            //var requiredNamespaceNames = _sourceFileSemanticModel
-            //    .GetNamespacesReferencedByType(_originalDeclarationSyntax)
-            //    .Select(namespaceSymbol => namespaceSymbol.ToDisplayString())
-            //    // This is so we can use ComponentBase base class
-            //    .Append(Constants.BlazorComponentsNamespace);
+            // var requiredNamespaceNames = _sourceFileSemanticModel
+            //     .GetNamespacesReferencedByType(_originalDeclarationSyntax)
+            //     .Select(namespaceSymbol => namespaceSymbol.ToDisplayString())
+            //     // This is so we can use ComponentBase base class
+            //     .Append(Constants.BlazorComponentsNamespace);
 
             var requiredNamespaceNames = _sourceFileSemanticModel.GetOriginalUsingNamespaces().Append(Constants.BlazorComponentsNamespace);
             requiredNamespaceNames = CodeSyntaxHelper.RemoveFrameworkUsings(requiredNamespaceNames);
@@ -65,8 +67,17 @@ namespace CTA.WebForms2Blazor.ClassConverters
             // Remove old lifecycle methods, sort, and record their content
             foreach (var methodTuple in orderedMethods)
             {
-                // This records the statements in the proper collection
-                ProcessLifecycleEventMethod(methodTuple.Item1, (WebFormsPageLifecycleEvent)methodTuple.Item2);
+                try
+                {
+                    // This records the statements in the proper collection
+                    ProcessLifecycleEventMethod(methodTuple.Item1, (WebFormsPageLifecycleEvent)methodTuple.Item2);
+                }
+                catch (Exception e)
+                {
+                    LogHelper.LogError(e, $"Failed to process WebForms lifecycle event method {methodTuple.Item1.Identifier} " +
+                        $"from {OriginalClassName} class at {_fullPath}");
+                }
+
                 // Refresh node before removing
                 var currentMethodNode = currentClassDeclaration.GetCurrentNode(methodTuple.Item1);
                 currentClassDeclaration = currentClassDeclaration.RemoveNode(currentMethodNode, SyntaxRemoveOptions.AddElasticMarker);
@@ -78,8 +89,16 @@ namespace CTA.WebForms2Blazor.ClassConverters
                 var newLifecycleEvent = newLifecycleEventKvp.Key;
                 var newLifecycleEventStatements = newLifecycleEventKvp.Value;
 
-                var newMethodDeclaration = ComponentSyntaxHelper.ConstructComponentLifecycleMethod(newLifecycleEvent, newLifecycleEventStatements);
-                currentClassDeclaration = currentClassDeclaration.AddMembers(newMethodDeclaration);
+                try
+                {
+                    var newMethodDeclaration = ComponentSyntaxHelper.ConstructComponentLifecycleMethod(newLifecycleEvent, newLifecycleEventStatements);
+                    currentClassDeclaration = currentClassDeclaration.AddMembers(newMethodDeclaration);
+                }
+                catch (Exception e)
+                {
+                    LogHelper.LogError(e, $"Failed to construct new lifecycle event method for {newLifecycleEvent} Blazor event " +
+                        $"using {OriginalClassName} class at {_fullPath}");
+                }
             }
 
             // If we need to make use of the dispose method, add the IDisposable
