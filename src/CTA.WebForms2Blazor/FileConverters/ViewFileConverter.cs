@@ -113,7 +113,7 @@ namespace CTA.WebForms2Blazor.FileConverters
         {
             LogStart();
 
-            IEnumerable<FileInformation> result = new List<FileInformation>();
+            var result = new List<FileInformation>();
             try
             {
                 var htmlString = File.ReadAllText(FullPath);
@@ -163,7 +163,7 @@ namespace CTA.WebForms2Blazor.FileConverters
                 {
                     var fileInformation = new FileInformation(FilePathHelper.RemoveDuplicateDirectories(newRelativePath),
                         Encoding.UTF8.GetBytes(contents));
-                    result.Append(fileInformation);
+                    result.Add(fileInformation);
                 }
             }
             catch (Exception e)
@@ -171,7 +171,7 @@ namespace CTA.WebForms2Blazor.FileConverters
                 LogHelper.LogError(e, $"Error migrating view file {FullPath}. A new file could not be generated.");
             }
 
-            return Task.FromResult(result);
+            return Task.FromResult((IEnumerable<FileInformation>)result);
         }
     }
 }
