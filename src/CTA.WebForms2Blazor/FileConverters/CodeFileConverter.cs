@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Codelyzer.Analysis.CSharp;
 using CTA.Rules.Config;
 using CTA.WebForms2Blazor.ClassConverters;
 using CTA.WebForms2Blazor.Factories;
@@ -20,7 +18,7 @@ namespace CTA.WebForms2Blazor.FileConverters
         private readonly WorkspaceManagerService _blazorWorkspaceBuilder;
         private readonly ProjectAnalyzer _webFormsProjectAnaylzer;
         private readonly ClassConverterFactory _classConverterFactory;
-        private readonly IEnumerable<ClassConverter> _classConverters;
+        private readonly IEnumerable<ClassConverter> _classConverters = new List<ClassConverter>();
 
         public CodeFileConverter(
             string sourceProjectPath,
@@ -35,10 +33,21 @@ namespace CTA.WebForms2Blazor.FileConverters
             _webFormsProjectAnaylzer = webFormsProjectAnalyzer;
             _classConverterFactory = classConverterFactory;
 
-            // This code is set up to not break unit tests but still work for the demo
-            // use code above after demo and just fix unit tests
-            _fileModel = _webFormsProjectAnaylzer.AnalyzerResult.ProjectBuildResult?.SourceFileBuildResults?
-                .Single(r => r.SourceFilePath.EndsWith(RelativePath))?.SemanticModel;
+            try
+            {
+                _fileModel = _webFormsProjectAnaylzer.AnalyzerResult.ProjectBuildResult?.SourceFileBuildResults?
+                    .Single(r => r.SourceFileFullPath.EndsWith(RelativePath))?.SemanticModel;
+            }
+            catch (Exception e)
+            {
+                LogHelper.LogError(e, $"Exception occurred when trying to retrieve semantic model for the file {RelativePath}. " +
+                                      "Semantic Model will default to null.");
+            }
+
+            if (_fileModel != null)
+            {
+                _classConverters = classConverterFactory.BuildMany(RelativePath, _fileModel);
+            }
         }
 
         public override async Task<IEnumerable<FileInformation>> MigrateFileAsync()
