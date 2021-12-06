@@ -30,7 +30,7 @@ namespace CTA.WebForms2Blazor.ProjectManagement
             }
             catch (Exception e)
             {
-                LogHelper.LogError(e, "Could not create relative directory.");
+                LogHelper.LogError(e, $"Could not create relative directory {relativePath}.");
             }
         }
 
@@ -41,10 +41,10 @@ namespace CTA.WebForms2Blazor.ProjectManagement
 
         public void WriteFileBytesToProject(string relativePath, byte[] fileContent)
         {
+            var fullPath = Path.Combine(_outputProjectPath, relativePath);
             try
             {
                 CreateRelativeDirectoryIfNotExists(Path.GetDirectoryName(relativePath));
-                var fullPath = Path.Combine(_outputProjectPath, relativePath);
 
                 if (File.Exists(fullPath))
                 {
@@ -61,7 +61,7 @@ namespace CTA.WebForms2Blazor.ProjectManagement
             }
             catch (Exception e)
             {
-                LogHelper.LogError(e, "Could not write file bytes to project.");
+                LogHelper.LogError(e, $"Could not write file bytes to project (attempted to write to {fullPath}).");
             }
         }
     }
