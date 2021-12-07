@@ -12,7 +12,7 @@ using CTA.Rules.Config;
 
 namespace CTA.WebForms2Blazor.Factories
 {
-    public class ClassConverterFactory : WebFormsPortingResult
+    public class ClassConverterFactory
     {
         private readonly string _sourceProjectPath;
         private LifecycleManagerService _lifecycleManager;

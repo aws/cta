@@ -11,7 +11,7 @@ using CTA.WebForms2Blazor.Services;
 
 namespace CTA.WebForms2Blazor.Factories
 {
-    public class FileConverterFactory : WebFormsPortingResult
+    public class FileConverterFactory
     {
         private readonly string _sourceProjectPath;
         private readonly WorkspaceManagerService _blazorWorkspaceManager;
