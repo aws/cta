@@ -122,7 +122,7 @@ namespace CTA.WebForms2Blazor.Helpers.ControlHelpers
             var directiveName = DirectiveNameRegex.Match(content).Groups[DirectiveNameRegexGroupName].Value;
             var directiveConverter = SupportedControls.DirectiveRulesMap.ContainsKey(directiveName) ?
                 SupportedControls.DirectiveRulesMap[directiveName] : SupportedControls.DefaultDirectiveConverter;
-            metricContext.CollectDirectiveConversionMetrics(directiveName+"DirectiveConvertor");
+            metricContext.CollectDirectiveConversionMetrics(directiveName+ "DirectiveConverter");
         
             return directiveConverter.ConvertDirective(directiveName, content.Trim(), originalFilePath, projectName, viewImportService);
         }
