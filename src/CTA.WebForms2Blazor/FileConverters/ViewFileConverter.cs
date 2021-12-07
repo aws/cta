@@ -20,7 +20,7 @@ namespace CTA.WebForms2Blazor.FileConverters
     {
         private const string ChildActionType = "ViewFileConverter";
         private const string UnSupportedControlConverter = "UnSupportedControlConverter";
-        private Regex AspControlsRegex = new Regex(@"<asp:(\w+)\s+.*?id=(\w +)");
+        private Regex AspControlsRegex = new Regex(@"\w+:\w+");
         private ViewImportService _viewImportService;
         private List<ControlConversionAction> _controlActions;
         private readonly WebFormMetricContext _metricsContext;
@@ -90,9 +90,7 @@ namespace CTA.WebForms2Blazor.FileConverters
             else
             {
                 Match aspControlTagRegex = AspControlsRegex.Match(node.Name);
-                Match matchStartTagRegex = UnknownControlRemover.ControlStartTagRegex.Match(node.Name);
-                Match matchEndTagRegex = UnknownControlRemover.ControlEndTagRegex.Match(node.Name);
-                if (aspControlTagRegex.Success || matchEndTagRegex.Success || matchStartTagRegex.Success)
+                if (aspControlTagRegex.Success)
                 {
                     controlConverterType = UnSupportedControlConverter;
                 }
