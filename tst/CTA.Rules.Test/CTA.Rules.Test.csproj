@@ -18,6 +18,7 @@
     <ProjectReference Include="..\..\src\CTA.Rules.PortCore\CTA.Rules.PortCore.csproj" />
     <ProjectReference Include="..\..\src\CTA.Rules.Actions\CTA.Rules.Actions.csproj" />
     <ProjectReference Include="..\..\src\CTA.Rules.Config\CTA.Rules.Config.csproj" />
+    <ProjectReference Include="..\..\src\CTA.WebForms2Blazor\CTA.WebForms2Blazor.csproj" />
   </ItemGroup>
 
   <ItemGroup>
