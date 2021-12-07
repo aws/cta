@@ -93,7 +93,7 @@ namespace CTA.WebForms2Blazor
             ));
 
             // Combines migration tasks into a single task we can await
-            await Task.WhenAll(migrationTasks);
+            await Task.WhenAll(migrationTasks).ConfigureAwait(false);
 
             LogHelper.LogInformation(string.Format(Constants.GenericInformationLogTemplate, GetType().Name, MigrationTasksCompletedLogAction));
 

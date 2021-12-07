@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Codelyzer.Analysis.CSharp;
+using CTA.Rules.Config;
 using CTA.WebForms2Blazor.ClassConverters;
 using CTA.WebForms2Blazor.Factories;
 using CTA.WebForms2Blazor.FileInformationModel;
@@ -39,16 +38,16 @@ namespace CTA.WebForms2Blazor.FileConverters
             _classConverterFactory = classConverterFactory;
             _metricsContext = metricsContext;
 
-            // TODO: Place filename based retrieval in ProjectAnalyzer as method?
-            // _fileModel = _webFormsProjectAnaylzer.AnalyzerResult.ProjectBuildResult.SourceFileBuildResults
-            //     .Single(r => r.SourceFilePath.EndsWith(Path.GetFileName(RelativePath))).SemanticModel;
-
-            // _classConverters = classConverterFactory.BuildMany(RelativePath, _fileModel);
-
-            // This code is set up to not break unit tests but still work for the demo
-            // use code above after demo and just fix unit tests
-            _fileModel = _webFormsProjectAnaylzer.AnalyzerResult.ProjectBuildResult?.SourceFileBuildResults?
-                .Single(r => r.SourceFilePath.EndsWith(RelativePath))?.SemanticModel;
+            try
+            {
+                _fileModel = _webFormsProjectAnaylzer.AnalyzerResult.ProjectBuildResult?.SourceFileBuildResults?
+                    .Single(r => r.SourceFileFullPath.EndsWith(RelativePath))?.SemanticModel;
+            }
+            catch (Exception e)
+            {
+                LogHelper.LogError(e, $"Exception occurred when trying to retrieve semantic model for the file {RelativePath}. " +
+                                      "Semantic Model will default to null.");
+            }
 
             if (_fileModel != null)
             {
@@ -56,20 +55,46 @@ namespace CTA.WebForms2Blazor.FileConverters
             }
         }
 
-
         public override async Task<IEnumerable<FileInformation>> MigrateFileAsync()
         {
             LogStart();
             _metricsContext.CollectFileConversionMetrics(ChildActionType);
 
-            var classMigrationTasks = _classConverters.Select(classConverter => classConverter.MigrateClassAsync());
+            // Store migration tasks alongside converter so we can log context where necessary
+            var classMigrationTasks = new List<(ClassConverter, Task<IEnumerable<FileInformation>>)>();
+
+            foreach (var converter in _classConverters)
+            {
+                classMigrationTasks.Add((converter, converter.MigrateClassAsync()));
+            }
 
             // We want to do our cleanup now because from this point on all migration tasks
             // are done by class converters and we want to make sure that we retire the task
             // related to this file converter before we await
             DoCleanUp();
 
-            var result = (await Task.WhenAll(classMigrationTasks)).SelectMany(newFileInformation => newFileInformation);
+            var allMigrationTasks = Task.WhenAll(classMigrationTasks.Select(t => t.Item2));
+
+            try
+            {
+                await allMigrationTasks;
+            }
+            // NOTE: We use Exception here instead of AggregateException as sometimes await
+            // will auto un-wrap aggregate exception
+            catch (Exception e)
+            {
+                LogHelper.LogError(e, "Collection of migration tasks experienced 1 or more failures");
+
+                var failedMigrationTasks = classMigrationTasks.Where(t => t.Item2.Status != TaskStatus.RanToCompletion);
+
+                foreach (var failedTask in failedMigrationTasks)
+                {
+                    LogHelper.LogError(failedTask.Item2.Exception, $"Failed to migrate {failedTask.Item1.OriginalClassName} class " +
+                        $"located at {failedTask.Item1.FullPath}");
+                }
+            }
+
+            var result = classMigrationTasks.Where(t => t.Item2.Status == TaskStatus.RanToCompletion).SelectMany(t => t.Item2.Result);
 
             LogEnd();
 

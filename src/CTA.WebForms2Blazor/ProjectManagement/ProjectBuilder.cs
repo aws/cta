@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using CTA.Rules.Config;
 using CTA.WebForms2Blazor.FileInformationModel;
 
@@ -20,10 +21,17 @@ namespace CTA.WebForms2Blazor.ProjectManagement
 
         public void CreateRelativeDirectoryIfNotExists(string relativePath)
         {
-            var fullPath = Path.Combine(_outputProjectPath, relativePath);
+            try
+            {
+                var fullPath = Path.Combine(_outputProjectPath, relativePath);
 
-            // No exception is thrown if the directory already exists
-            Directory.CreateDirectory(fullPath);
+                // No exception is thrown if the directory already exists
+                Directory.CreateDirectory(fullPath);
+            }
+            catch (Exception e)
+            {
+                LogHelper.LogError(e, $"Could not create relative directory {relativePath}.");
+            }
         }
 
         public void WriteFileInformationToProject(FileInformation newDocument)
@@ -33,21 +41,28 @@ namespace CTA.WebForms2Blazor.ProjectManagement
 
         public void WriteFileBytesToProject(string relativePath, byte[] fileContent)
         {
-            CreateRelativeDirectoryIfNotExists(Path.GetDirectoryName(relativePath));
             var fullPath = Path.Combine(_outputProjectPath, relativePath);
-
-            if (File.Exists(fullPath))
+            try
             {
-                LogHelper.LogInformation(string.Format(FileAlreadyExistsLogTemplate, GetType().Name, fullPath));
-                // TODO: Maybe copy and store the old version of this file somehow?
-            }
+                CreateRelativeDirectoryIfNotExists(Path.GetDirectoryName(relativePath));
 
-            using (FileStream stream = File.Create(fullPath))
+                if (File.Exists(fullPath))
+                {
+                    LogHelper.LogInformation(string.Format(FileAlreadyExistsLogTemplate, GetType().Name, fullPath));
+                    // TODO: Maybe copy and store the old version of this file somehow?
+                }
+
+                using (FileStream stream = File.Create(fullPath))
+                {
+                    stream.Write(fileContent, 0, fileContent.Length);
+                }
+
+                LogHelper.LogInformation(string.Format(FileInfoWrittenLogTemplate, GetType().Name, fullPath));
+            }
+            catch (Exception e)
             {
-                stream.Write(fileContent, 0, fileContent.Length);
+                LogHelper.LogError(e, $"Could not write file bytes to project (attempted to write to {fullPath}).");
             }
-
-            LogHelper.LogInformation(string.Format(FileInfoWrittenLogTemplate, GetType().Name, fullPath));
         }
     }
 }
