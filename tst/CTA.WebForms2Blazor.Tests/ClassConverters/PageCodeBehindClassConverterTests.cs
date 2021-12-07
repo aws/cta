@@ -7,6 +7,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CTA.Rules.Metrics;
+using CTA.WebForms2Blazor.Metrics;
 
 namespace CTA.WebForms2Blazor.Tests.ClassConverters
 {
@@ -100,12 +102,14 @@ namespace TestNamespace
         [SetUp]
         public void SetUp()
         {
+            MetricsContext context = new MetricsContext(ClassConverterSetupFixture.TestProjectDirectoryPath);
             _converter = new PageCodeBehindClassConverter(InputRelativePath,
                 ClassConverterSetupFixture.TestProjectDirectoryPath,
                 ClassConverterSetupFixture.TestSemanticModel,
                 ClassConverterSetupFixture.TestClassDec,
                 ClassConverterSetupFixture.TestTypeSymbol,
-                new TaskManagerService());
+                new TaskManagerService(),
+                new WebFormMetricContext(context, ClassConverterSetupFixture.TestProjectDirectoryPath));
         }
 
         [Test]
@@ -124,12 +128,14 @@ namespace TestNamespace
             var complexClassDec = complexSyntaxTree.GetRoot().DescendantNodes().OfType<ClassDeclarationSyntax>().Single();
             var complexTypeSymbol = complexSemanticModel.GetDeclaredSymbol(complexClassDec);
 
+            MetricsContext context = new MetricsContext(ClassConverterSetupFixture.TestProjectDirectoryPath);
             var complexConverter = new PageCodeBehindClassConverter(InputRelativePath,
                 ClassConverterSetupFixture.TestProjectDirectoryPath,
                 complexSemanticModel,
                 complexClassDec,
                 complexTypeSymbol,
-                new TaskManagerService());
+                new TaskManagerService(),
+                new WebFormMetricContext(context, ClassConverterSetupFixture.TestProjectDirectoryPath));
 
             var fileInfo = (await complexConverter.MigrateClassAsync()).Single();
             var fileText = Encoding.UTF8.GetString(fileInfo.FileBytes);

@@ -1,4 +1,5 @@
 ﻿using System.Text.RegularExpressions;
+using CTA.WebForms2Blazor.Metrics;
 using CTA.WebForms2Blazor.Services;
 
 namespace CTA.WebForms2Blazor.Helpers.ControlHelpers
@@ -74,13 +75,13 @@ namespace CTA.WebForms2Blazor.Helpers.ControlHelpers
                 match.Groups[EmbeddedExpressionRegexGroupName].Value.Trim()));
         }
         
-        public static string ReplaceDirectives(string htmlString, string originalFilePath, string projectName, ViewImportService viewImportService)
+        public static string ReplaceDirectives(string htmlString, string originalFilePath, string projectName, ViewImportService viewImportService, WebFormMetricContext metricContext)
         {
             return DirectiveRegex.Replace(htmlString, match => ConstructBlazorDirectives(
                 match.Groups[EmbeddedExpressionRegexGroupName].Value,
                 originalFilePath,
                 projectName,
-                viewImportService));
+                viewImportService, metricContext));
         }
         
         public static string ReplaceAspExprs(string htmlString)
@@ -116,11 +117,12 @@ namespace CTA.WebForms2Blazor.Helpers.ControlHelpers
                 match.Groups[EmbeddedExpressionRegexGroupName].Value.Trim()));
         }
 
-        public static string ConstructBlazorDirectives(string content, string originalFilePath, string projectName, ViewImportService viewImportService)
+        public static string ConstructBlazorDirectives(string content, string originalFilePath, string projectName, ViewImportService viewImportService, WebFormMetricContext metricContext)
         {
             var directiveName = DirectiveNameRegex.Match(content).Groups[DirectiveNameRegexGroupName].Value;
             var directiveConverter = SupportedControls.DirectiveRulesMap.ContainsKey(directiveName) ?
                 SupportedControls.DirectiveRulesMap[directiveName] : SupportedControls.DefaultDirectiveConverter;
+            metricContext.CollectDirectiveConversionMetrics(directiveName+"DirectiveConvertor");
         
             return directiveConverter.ConvertDirective(directiveName, content.Trim(), originalFilePath, projectName, viewImportService);
         }

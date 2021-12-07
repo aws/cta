@@ -6,23 +6,27 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using CTA.WebForms2Blazor.Extensions;
 using System;
+using CTA.WebForms2Blazor.Metrics;
 using CTA.WebForms2Blazor.Services;
 
 namespace CTA.WebForms2Blazor.Factories
 {
-    public class ClassConverterFactory
+    public class ClassConverterFactory : WebFormsPortingResult
     {
         private readonly string _sourceProjectPath;
         private LifecycleManagerService _lifecycleManager;
         private TaskManagerService _taskManager;
+        private WebFormMetricContext _metricsContext;
 
         public ClassConverterFactory(string sourceProjectPath,
             LifecycleManagerService lcManager,
-            TaskManagerService taskManager)
+            TaskManagerService taskManager,
+            WebFormMetricContext metricsContext)
         {
             _sourceProjectPath = sourceProjectPath;
             _lifecycleManager = lcManager;
             _taskManager = taskManager;
+            _metricsContext = metricsContext;
 
             // TODO: Receive services required for ClassConverters
             // via constructor parameters
@@ -38,36 +42,36 @@ namespace CTA.WebForms2Blazor.Factories
             if (symbol.GetAllInheritedBaseTypes().Any(typeSymbol => typeSymbol.Name.Equals(Constants.ExpectedGlobalBaseClass))
                 && sourceFileRelativePath.EndsWith(Constants.ExpectedGlobalFileName, StringComparison.InvariantCultureIgnoreCase))
             {
-                return new GlobalClassConverter(sourceFileRelativePath, _sourceProjectPath, model, typeDeclarationNode, symbol, _lifecycleManager, _taskManager);
+                return new GlobalClassConverter(sourceFileRelativePath, _sourceProjectPath, model, typeDeclarationNode, symbol, _lifecycleManager, _taskManager, _metricsContext);
             }
             // NOTE: The order is important from this point on, mainly because
             // Page-derived classes are also IHttpHandler derived
             else if (symbol.GetAllInheritedBaseTypes().Any(typeSymbol => typeSymbol.Name.Equals(Constants.ExpectedPageBaseClass))
                 && sourceFileRelativePath.EndsWith(Constants.PageCodeBehindExtension, StringComparison.InvariantCultureIgnoreCase))
             {
-                return new PageCodeBehindClassConverter(sourceFileRelativePath, _sourceProjectPath, model, typeDeclarationNode, symbol, _taskManager);
+                return new PageCodeBehindClassConverter(sourceFileRelativePath, _sourceProjectPath, model, typeDeclarationNode, symbol, _taskManager, _metricsContext);
             }
             else if (symbol.GetAllInheritedBaseTypes().Any(typeSymbol => typeSymbol.Name.Equals(Constants.ExpectedControlBaseClass))
                 && sourceFileRelativePath.EndsWith(Constants.ControlCodeBehindExtension, StringComparison.InvariantCultureIgnoreCase))
             {
-                return new ControlCodeBehindClassConverter(sourceFileRelativePath, _sourceProjectPath, model, typeDeclarationNode, symbol, _taskManager);
+                return new ControlCodeBehindClassConverter(sourceFileRelativePath, _sourceProjectPath, model, typeDeclarationNode, symbol, _taskManager, _metricsContext);
             }
             else if (symbol.GetAllInheritedBaseTypes().Any(typeSymbol => typeSymbol.Name.Equals(Constants.ExpectedMasterPageBaseClass))
                 && sourceFileRelativePath.EndsWith(Constants.MasterPageCodeBehindExtension, StringComparison.InvariantCultureIgnoreCase))
             {
-                return new MasterPageCodeBehindClassConverter(sourceFileRelativePath, _sourceProjectPath, model, typeDeclarationNode, symbol, _taskManager);
+                return new MasterPageCodeBehindClassConverter(sourceFileRelativePath, _sourceProjectPath, model, typeDeclarationNode, symbol, _taskManager, _metricsContext);
             }
             else if (symbol.AllInterfaces.Any(interfaceSymbol => interfaceSymbol.Name.Equals(Constants.HttpHandlerInterface)))
             {
-                return new HttpHandlerClassConverter(sourceFileRelativePath, _sourceProjectPath, model, typeDeclarationNode, symbol, _lifecycleManager, _taskManager);
+                return new HttpHandlerClassConverter(sourceFileRelativePath, _sourceProjectPath, model, typeDeclarationNode, symbol, _lifecycleManager, _taskManager, _metricsContext);
             }
             else if (symbol.AllInterfaces.Any(interfaceSymbol => interfaceSymbol.Name.Equals(Constants.HttpModuleInterface)))
             {
-                return new HttpModuleClassConverter(sourceFileRelativePath, _sourceProjectPath, model, typeDeclarationNode, symbol, _lifecycleManager, _taskManager);
+                return new HttpModuleClassConverter(sourceFileRelativePath, _sourceProjectPath, model, typeDeclarationNode, symbol, _lifecycleManager, _taskManager, _metricsContext);
             }
             else
             {
-                return new UnknownClassConverter(sourceFileRelativePath, _sourceProjectPath, model, typeDeclarationNode, symbol, _taskManager);
+                return new UnknownClassConverter(sourceFileRelativePath, _sourceProjectPath, model, typeDeclarationNode, symbol, _taskManager, _metricsContext);
             }
         }
 

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using CTA.WebForms2Blazor.Extensions;
 using CTA.WebForms2Blazor.FileInformationModel;
 using CTA.WebForms2Blazor.Helpers;
+using CTA.WebForms2Blazor.Metrics;
 using CTA.WebForms2Blazor.Services;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -14,20 +15,28 @@ namespace CTA.WebForms2Blazor.ClassConverters
 {
     public class MasterPageCodeBehindClassConverter : ClassConverter
     {
+        private const string ActionName = "MasterPageCodeBehindClassConverter";
+        private WebFormMetricContext _metricsContext;
+
         public MasterPageCodeBehindClassConverter(
             string relativePath,
             string sourceProjectPath,
             SemanticModel sourceFileSemanticModel,
             TypeDeclarationSyntax originalDeclarationSyntax,
             INamedTypeSymbol originalClassSymbol,
-            TaskManagerService taskManager)
-            : base(relativePath, sourceProjectPath, sourceFileSemanticModel, originalDeclarationSyntax, originalClassSymbol, taskManager)
-        { }
+            TaskManagerService taskManager,
+            WebFormMetricContext metricsContext)
+            : base(relativePath, sourceProjectPath, sourceFileSemanticModel, originalDeclarationSyntax,
+                originalClassSymbol, taskManager)
+        {
+            _metricsContext = metricsContext;
+        }
 
         public override Task<IEnumerable<FileInformation>> MigrateClassAsync()
         {
             LogStart();
 
+            _metricsContext.CollectClassConversionMetrics(ActionName);
             var containingNamespace = _originalClassSymbol.ContainingNamespace.ToDisplayString();
 
             // NOTE: Removed temporarily until usings can be better determined, at the moment, too

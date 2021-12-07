@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using CTA.WebForms2Blazor.ControlConverters;
 using CTA.WebForms2Blazor.FileInformationModel;
 using CTA.WebForms2Blazor.Helpers;
 using CTA.WebForms2Blazor.Helpers.ControlHelpers;
+using CTA.WebForms2Blazor.Metrics;
 using CTA.WebForms2Blazor.Services;
 using HtmlAgilityPack;
 
@@ -15,18 +17,23 @@ namespace CTA.WebForms2Blazor.FileConverters
 {
     public class ViewFileConverter : FileConverter
     {
+        private const string ChildActionType = "ViewFileConverter";
+        private const string UnSupportedControlConverter = "UnSupportedControlConverter";
         private ViewImportService _viewImportService;
         private List<ControlConversionAction> ControlActions;
-
+        private readonly WebFormMetricContext _metricsContext;
+        
         public ViewFileConverter(
             string sourceProjectPath,
             string fullPath,
             ViewImportService viewImportService,
-            TaskManagerService taskManagerService) 
+            TaskManagerService taskManagerService,
+            WebFormMetricContext metricsContext) 
             : base(sourceProjectPath, fullPath, taskManagerService)
         {
             _viewImportService = viewImportService;
             ControlActions = new List<ControlConversionAction>();
+            _metricsContext = metricsContext;
         }
 
         private HtmlDocument GetRazorContents(string htmlString)
@@ -64,17 +71,25 @@ namespace CTA.WebForms2Blazor.FileConverters
 
         private void GetActions(HtmlNode node, HtmlNode parent)
         {
+            string controlConverterType = "";
             if (SupportedControls.ControlRulesMap.ContainsKey(node.Name))
             {
                 var conversionAction = new ControlConversionAction(node, parent, SupportedControls.ControlRulesMap[node.Name]);
+                controlConverterType = conversionAction.Rules.GetType().Name;
                 ControlActions.Add(conversionAction);
             } 
             else if (SupportedControls.UserControls.UserControlRulesMap.ContainsKey(node.Name))
             {
-                var conversionAction = new ControlConversionAction(node, parent, 
-                    SupportedControls.UserControls.UserControlRulesMap[node.Name]);
+                var conversionAction = new ControlConversionAction(node, parent, SupportedControls.UserControls.UserControlRulesMap[node.Name]);
+                controlConverterType = conversionAction.Rules.GetType().Name;
                 ControlActions.Add(conversionAction);
             }
+            else if(UnknownControlRemover.ControlStartTagRegex.IsMatch(node.Name) || UnknownControlRemover.ControlStartTagRegex.IsMatch(node.Name))
+            {
+                
+                controlConverterType = UnSupportedControlConverter;
+            }
+            _metricsContext.CollectControlConversionMetrics(controlConverterType, node.Name);
         }
 
         private void ConvertNodes()
@@ -94,13 +109,14 @@ namespace CTA.WebForms2Blazor.FileConverters
         public override Task<IEnumerable<FileInformation>> MigrateFileAsync()
         {
             LogStart();
-            
+            _metricsContext.CollectFileConversionMetrics(ChildActionType);
+
             string htmlString = File.ReadAllText(FullPath);
             
             //Replace directives first to build up list of user controls to be converted later by the ControlConverters
             string projectName = Path.GetFileName(ProjectPath);
-            htmlString = EmbeddedCodeReplacers.ReplaceDirectives(htmlString, RelativePath, projectName, _viewImportService);
-            
+            htmlString = EmbeddedCodeReplacers.ReplaceDirectives(htmlString, RelativePath, projectName, _viewImportService, _metricsContext);
+
             //Convert the Web Forms controls to Blazor equivalent
             HtmlDocument migratedDocument = GetRazorContents(htmlString);
             string contents = migratedDocument.DocumentNode.WriteTo();

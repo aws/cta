@@ -4,12 +4,13 @@ using System.Linq;
 using CTA.WebForms2Blazor.ControlConverters;
 using CTA.WebForms2Blazor.FileConverters;
 using CTA.WebForms2Blazor.Helpers;
+using CTA.WebForms2Blazor.Metrics;
 using CTA.WebForms2Blazor.ProjectManagement;
 using CTA.WebForms2Blazor.Services;
 
 namespace CTA.WebForms2Blazor.Factories
 {
-    public class FileConverterFactory
+    public class FileConverterFactory : WebFormsPortingResult
     {
         private readonly string _sourceProjectPath;
         private readonly WorkspaceManagerService _blazorWorkspaceManager;
@@ -18,6 +19,7 @@ namespace CTA.WebForms2Blazor.Factories
         private readonly ClassConverterFactory _classConverterFactory;
         private readonly HostPageService _hostPageService;
         private readonly TaskManagerService _taskManagerService;
+        private readonly WebFormMetricContext _metricsContext;
 
         // TODO: Organize these into "types" and force
         // content separation in file system if it doesn't
@@ -36,7 +38,8 @@ namespace CTA.WebForms2Blazor.Factories
             ViewImportService viewImportService,
             ClassConverterFactory classConverterFactory,
             HostPageService hostPageService,
-            TaskManagerService taskManagerService)
+            TaskManagerService taskManagerService,
+            WebFormMetricContext metricsContext)
         {
             _sourceProjectPath = sourceProjectPath;
             _blazorWorkspaceManager = blazorWorkspaceManager;
@@ -45,6 +48,7 @@ namespace CTA.WebForms2Blazor.Factories
             _classConverterFactory = classConverterFactory;
             _hostPageService = hostPageService;
             _taskManagerService = taskManagerService;
+            _metricsContext = metricsContext;
         }
 
         public FileConverter Build(FileInfo document)
@@ -62,30 +66,30 @@ namespace CTA.WebForms2Blazor.Factories
             FileConverter fc;
             if (extension.Equals(Constants.CSharpCodeFileExtension))
             {
-                fc = new CodeFileConverter(_sourceProjectPath, document.FullName, _blazorWorkspaceManager, _webFormsProjectAnalyzer, _classConverterFactory, _taskManagerService);
+                fc = new CodeFileConverter(_sourceProjectPath, document.FullName, _blazorWorkspaceManager, _webFormsProjectAnalyzer, _classConverterFactory, _taskManagerService, _metricsContext);
             }
             else if (extension.Equals(Constants.WebFormsConfigFileExtension))
             {
-                fc = new ConfigFileConverter(_sourceProjectPath, document.FullName, _taskManagerService);
+                fc = new ConfigFileConverter(_sourceProjectPath, document.FullName, _taskManagerService,_metricsContext);
             }
             else if (extension.Equals(Constants.WebFormsPageMarkupFileExtension)
                 || extension.Equals(Constants.WebFormsControlMarkupFileExtenion)
                 || extension.Equals(Constants.WebFormsMasterPageMarkupFileExtension)
                 || extension.Equals(Constants.WebFormsGlobalMarkupFileExtension))
             {
-                fc = new ViewFileConverter(_sourceProjectPath, document.FullName, _viewImportService, _taskManagerService);
+                fc = new ViewFileConverter(_sourceProjectPath, document.FullName, _viewImportService, _taskManagerService, _metricsContext);
             }
             else if (extension.Equals(Constants.CSharpProjectFileExtension))
             {
-                fc = new ProjectFileConverter(_sourceProjectPath, document.FullName, _blazorWorkspaceManager, _webFormsProjectAnalyzer, _taskManagerService);
+                fc = new ProjectFileConverter(_sourceProjectPath, document.FullName, _blazorWorkspaceManager, _webFormsProjectAnalyzer, _taskManagerService,_metricsContext);
             }
             else if (StaticResourceExtensions.Contains(extension))
             {
-                fc = new StaticResourceFileConverter(_sourceProjectPath, document.FullName, _hostPageService, _taskManagerService);
+                fc = new StaticResourceFileConverter(_sourceProjectPath, document.FullName, _hostPageService, _taskManagerService,_metricsContext);
             }
             else
             {
-                fc = new StaticFileConverter(_sourceProjectPath, document.FullName, _taskManagerService);
+                fc = new StaticFileConverter(_sourceProjectPath, document.FullName, _taskManagerService,_metricsContext);
             }
 
 

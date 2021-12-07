@@ -8,6 +8,8 @@ using Microsoft.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using CTA.Rules.Metrics;
+using CTA.WebForms2Blazor.Metrics;
 
 namespace CTA.WebForms2Blazor.Tests.Factories
 {
@@ -45,7 +47,8 @@ namespace CTA.WebForms2Blazor.Tests.Factories
         [SetUp]
         public void SetUp()
         {
-            _classConverterFactory = new ClassConverterFactory(string.Empty, new LifecycleManagerService(), new TaskManagerService());
+            WebFormMetricContext metricContext = new WebFormMetricContext(new MetricsContext(string.Empty), string.Empty);
+            _classConverterFactory = new ClassConverterFactory(string.Empty, new LifecycleManagerService(), new TaskManagerService(), metricContext);
             _workspaceManager = new WorkspaceManagerService();
             _workspaceManager.CreateSolutionFile();
             _workspaceManager.NotifyNewExpectedProject();

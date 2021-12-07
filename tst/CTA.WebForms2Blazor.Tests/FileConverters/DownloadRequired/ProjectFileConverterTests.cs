@@ -6,10 +6,12 @@ using System.Text;
 using System.Threading.Tasks;
 using Codelyzer.Analysis;
 using CTA.Rules.Config;
+using CTA.Rules.Metrics;
 using CTA.Rules.Models;
 using CTA.Rules.PortCore;
 using CTA.WebForms2Blazor.FileConverters;
 using CTA.WebForms2Blazor.FileInformationModel;
+using CTA.WebForms2Blazor.Metrics;
 using CTA.WebForms2Blazor.ProjectManagement;
 using CTA.WebForms2Blazor.Services;
 using Microsoft.Extensions.Logging;
@@ -81,10 +83,11 @@ namespace CTA.WebForms2Blazor.Tests.FileConverters.DownloadRequired
         [Test]
         public async Task TestProjectFileConverter()
         {
+            WebFormMetricContext metricContext = new WebFormMetricContext(new MetricsContext(DownloadTestProjectsFixture.EShopLegacyWebFormsProjectPath), DownloadTestProjectsFixture.EShopLegacyWebFormsProjectPath);
             FileConverter fc = new ProjectFileConverter(DownloadTestProjectsFixture.EShopOnBlazorSolutionPath,
                 DownloadTestProjectsFixture.EShopLegacyWebFormsProjectPath,
                 _blazorWorkspaceManager, _webFormsProjectAnalyzer,
-                new TaskManagerService());
+                new TaskManagerService(), metricContext);
 
             IEnumerable<FileInformation> fileList = await fc.MigrateFileAsync();
             FileInformation fi = fileList.Single();

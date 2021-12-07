@@ -7,6 +7,7 @@ using CTA.Rules.Actions;
 using CTA.Rules.Models;
 using CTA.WebForms2Blazor.FileInformationModel;
 using CTA.WebForms2Blazor.Helpers;
+using CTA.WebForms2Blazor.Metrics;
 using CTA.WebForms2Blazor.Services;
 
 namespace CTA.WebForms2Blazor.FileConverters
@@ -15,16 +16,20 @@ namespace CTA.WebForms2Blazor.FileConverters
     {
         private const string WebConfigFile = "web.config";
         private string _relativeDirectory;
+        private const string ChildActionType = "ConfigFileConverter";
+        private readonly WebFormMetricContext _metricsContext;
 
-        public ConfigFileConverter(string sourceProjectPath, string fullPath, TaskManagerService taskManagerService)
+        public ConfigFileConverter(string sourceProjectPath, string fullPath, TaskManagerService taskManagerService, WebFormMetricContext metricsContext)
             : base(sourceProjectPath, fullPath, taskManagerService)
         {
             _relativeDirectory = Path.GetDirectoryName(RelativePath);
+            _metricsContext = metricsContext;
         }
 
         public override Task<IEnumerable<FileInformation>> MigrateFileAsync()
         {
             LogStart();
+            _metricsContext.CollectFileConversionMetrics(ChildActionType);
 
             string filename = Path.GetFileName(RelativePath);
             var fileList = new List<FileInformation>();

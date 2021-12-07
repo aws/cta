@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using CTA.WebForms2Blazor.Extensions;
 using CTA.WebForms2Blazor.FileInformationModel;
 using CTA.WebForms2Blazor.Helpers;
+using CTA.WebForms2Blazor.Metrics;
 using CTA.WebForms2Blazor.Services;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -18,6 +19,8 @@ namespace CTA.WebForms2Blazor.ClassConverters
     {
         private const string LifecycleEventDiscovery = "lifecycle hook method";
         private const string InvokePopulationOperation = "middleware Invoke method population";
+        private const string ActionName = "HttpHandlerClassConverter";
+        private WebFormMetricContext _metricsContext;
 
         private IEnumerable<UsingDirectiveSyntax> _requiredUsings;
         private IEnumerable<MethodDeclarationSyntax> _sharedMethods;
@@ -37,17 +40,20 @@ namespace CTA.WebForms2Blazor.ClassConverters
             TypeDeclarationSyntax originalDeclarationSyntax,
             INamedTypeSymbol originalClassSymbol,
             LifecycleManagerService lifecycleManager,
-            TaskManagerService taskManager)
+            TaskManagerService taskManager,
+            WebFormMetricContext metricsContext)
             : base(relativePath, sourceProjectPath, sourceFileSemanticModel, originalDeclarationSyntax, originalClassSymbol, taskManager)
         {
             _lifecycleManager = lifecycleManager;
             _lifecycleManager.NotifyExpectedMiddlewareSource();
+            _metricsContext = metricsContext;
         }
 
         public override Task<IEnumerable<FileInformation>> MigrateClassAsync()
         {
             LogStart();
 
+            _metricsContext.CollectClassConversionMetrics(ActionName);
             _originalClassName = _originalDeclarationSyntax.Identifier.ToString();
             _namespaceName = _originalClassSymbol.ContainingNamespace.ToDisplayString();
 
