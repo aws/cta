@@ -3,8 +3,10 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CTA.Rules.Metrics;
 using CTA.WebForms2Blazor.FileConverters;
 using CTA.WebForms2Blazor.FileInformationModel;
+using CTA.WebForms2Blazor.Metrics;
 using CTA.WebForms2Blazor.Services;
 using NUnit.Framework;
 
@@ -16,7 +18,8 @@ namespace CTA.WebForms2Blazor.Tests.FileConverters
         [Test]
         public async Task TestWebConfigFileConverter()
         {
-            FileConverter fc = new ConfigFileConverter(FileConverterSetupFixture.TestProjectPath, FileConverterSetupFixture.TestWebConfigFilePath, new TaskManagerService());
+            WebFormMetricContext metricContext = new WebFormMetricContext(new MetricsContext(FileConverterSetupFixture.TestProjectPath), FileConverterSetupFixture.TestProjectPath);
+            FileConverter fc = new ConfigFileConverter(FileConverterSetupFixture.TestProjectPath, FileConverterSetupFixture.TestWebConfigFilePath, new TaskManagerService(), metricContext);
             IEnumerable<FileInformation> fileList = await fc.MigrateFileAsync();
             FileInformation fi = fileList.Single();
             

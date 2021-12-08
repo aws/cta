@@ -4,6 +4,8 @@ using System.IO;
 using System.Linq;
 using CTA.Rules.Config;
 using CTA.WebForms2Blazor.FileConverters;
+using CTA.WebForms2Blazor.Helpers;
+using CTA.WebForms2Blazor.Metrics;
 using CTA.WebForms2Blazor.ProjectManagement;
 using CTA.WebForms2Blazor.Services;
 
@@ -18,6 +20,7 @@ namespace CTA.WebForms2Blazor.Factories
         private readonly ClassConverterFactory _classConverterFactory;
         private readonly HostPageService _hostPageService;
         private readonly TaskManagerService _taskManagerService;
+        private readonly WebFormMetricContext _metricsContext;
 
         // TODO: Organize these into "types" and force
         // content separation in file system if it doesn't
@@ -36,7 +39,8 @@ namespace CTA.WebForms2Blazor.Factories
             ViewImportService viewImportService,
             ClassConverterFactory classConverterFactory,
             HostPageService hostPageService,
-            TaskManagerService taskManagerService)
+            TaskManagerService taskManagerService,
+            WebFormMetricContext metricsContext)
         {
             _sourceProjectPath = sourceProjectPath;
             _blazorWorkspaceManager = blazorWorkspaceManager;
@@ -45,6 +49,7 @@ namespace CTA.WebForms2Blazor.Factories
             _classConverterFactory = classConverterFactory;
             _hostPageService = hostPageService;
             _taskManagerService = taskManagerService;
+            _metricsContext = metricsContext;
         }
 
         public FileConverter Build(FileInfo document)
@@ -64,11 +69,11 @@ namespace CTA.WebForms2Blazor.Factories
                 if (extension.Equals(Constants.CSharpCodeFileExtension))
                 {
                     fc = new CodeFileConverter(_sourceProjectPath, document.FullName, _blazorWorkspaceManager,
-                        _webFormsProjectAnalyzer, _classConverterFactory, _taskManagerService);
+                        _webFormsProjectAnalyzer, _classConverterFactory, _taskManagerService, _metricsContext);
                 }
                 else if (extension.Equals(Constants.WebFormsConfigFileExtension))
                 {
-                    fc = new ConfigFileConverter(_sourceProjectPath, document.FullName, _taskManagerService);
+                    fc = new ConfigFileConverter(_sourceProjectPath, document.FullName, _taskManagerService, _metricsContext);
                 }
                 else if (extension.Equals(Constants.WebFormsPageMarkupFileExtension)
                          || extension.Equals(Constants.WebFormsControlMarkupFileExtenion)
@@ -76,21 +81,21 @@ namespace CTA.WebForms2Blazor.Factories
                          || extension.Equals(Constants.WebFormsGlobalMarkupFileExtension))
                 {
                     fc = new ViewFileConverter(_sourceProjectPath, document.FullName, _viewImportService,
-                        _taskManagerService);
+                        _taskManagerService, _metricsContext);
                 }
                 else if (extension.Equals(Constants.CSharpProjectFileExtension))
                 {
                     fc = new ProjectFileConverter(_sourceProjectPath, document.FullName, _blazorWorkspaceManager,
-                        _webFormsProjectAnalyzer, _taskManagerService);
+                        _webFormsProjectAnalyzer, _taskManagerService, _metricsContext);
                 }
                 else if (StaticResourceExtensions.Contains(extension))
                 {
                     fc = new StaticResourceFileConverter(_sourceProjectPath, document.FullName, _hostPageService,
-                        _taskManagerService);
+                        _taskManagerService, _metricsContext);
                 }
                 else
                 {
-                    fc = new StaticFileConverter(_sourceProjectPath, document.FullName, _taskManagerService);
+                    fc = new StaticFileConverter(_sourceProjectPath, document.FullName, _taskManagerService, _metricsContext);
                 }
 
                 return fc;

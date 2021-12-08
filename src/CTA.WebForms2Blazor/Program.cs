@@ -58,7 +58,7 @@ namespace CTA.WebForms2Blazor
 
             var solutionPort = new SolutionPort(slnPath, new List<AnalyzerResult>() { analyzerResult }, new List<PortCoreConfiguration>() { projectConfiguration });
 
-            MigrationManager migrationManager = new MigrationManager(inputProjectDir, outputProjectDir, analyzerResult, projectConfiguration);
+            MigrationManager migrationManager = new MigrationManager(inputProjectDir, outputProjectDir,slnPath, analyzerResult, projectConfiguration);
 
             await migrationManager.PerformMigration();
         }

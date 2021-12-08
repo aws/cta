@@ -8,6 +8,7 @@ using CTA.Rules.Config;
 using CTA.WebForms2Blazor.Extensions;
 using CTA.WebForms2Blazor.FileInformationModel;
 using CTA.WebForms2Blazor.Helpers;
+using CTA.WebForms2Blazor.Metrics;
 using CTA.WebForms2Blazor.Services;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -16,6 +17,7 @@ namespace CTA.WebForms2Blazor.ClassConverters
 {
     public class GlobalClassConverter : ClassConverter
     {
+        private const string ActionName = "GlobalClassConverter";
         private const string GetMiddlewareNamespacesLogCall = "GetMiddlewareNamespaces()";
         private const string GetMiddlewarePipelineAdditionsLogCall = "GetMiddlewarePiplineAdditions()";
 
@@ -31,6 +33,7 @@ namespace CTA.WebForms2Blazor.ClassConverters
         private const string MigrateServiceLayerOperation = "migrate service layer and configure depenency injection in ConfigureServices()";
         
         private LifecycleManagerService _lifecycleManager;
+        private WebFormMetricContext _metricsContext;
 
         private IEnumerable<StatementSyntax> _configureMethodStatements;
         private IEnumerable<MethodDeclarationSyntax> _keepableMethods;
@@ -43,7 +46,8 @@ namespace CTA.WebForms2Blazor.ClassConverters
             TypeDeclarationSyntax originalDeclarationSyntax,
             INamedTypeSymbol originalClassSymbol,
             LifecycleManagerService lifecycleManager,
-            TaskManagerService taskManager)
+            TaskManagerService taskManager,
+            WebFormMetricContext metricsContext)
             : base(relativePath, sourceProjectPath, sourceFileSemanticModel, originalDeclarationSyntax, originalClassSymbol, taskManager)
         {
             _lifecycleManager = lifecycleManager;
@@ -52,11 +56,13 @@ namespace CTA.WebForms2Blazor.ClassConverters
             _configureMethodStatements = new List<StatementSyntax>();
             _keepableMethods = new List<MethodDeclarationSyntax>();
             _endOfClassComments = new List<string>();
+            _metricsContext = metricsContext;
         }
 
         public override async Task<IEnumerable<FileInformation>> MigrateClassAsync()
         {
             LogStart();
+            _metricsContext.CollectClassConversionMetrics(ActionName);
 
             // Make this call once now so we don't have to keep doing it later
             var originalDescendantNodes = _originalDeclarationSyntax.DescendantNodes();

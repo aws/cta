@@ -15,6 +15,7 @@ using CTA.Rules.Config;
 using CTA.Rules.ProjectFile;
 using CTA.Rules.Update;
 using CTA.WebForms2Blazor.Helpers;
+using CTA.WebForms2Blazor.Metrics;
 
 namespace CTA.WebForms2Blazor.FileConverters
 {
@@ -22,17 +23,21 @@ namespace CTA.WebForms2Blazor.FileConverters
     {
         private readonly WorkspaceManagerService _blazorWorkspaceManager;
         private readonly ProjectAnalyzer _projectAnalyzer;
+        private readonly WebFormMetricContext _metricsContext;
+        private const string ChildActionType = "ProjectFileConverter";
 
         public ProjectFileConverter(
             string sourceProjectPath,
             string fullPath,
             WorkspaceManagerService blazorWorkspaceManager,
             ProjectAnalyzer projectAnalyzer,
-            TaskManagerService taskManagerService
-            ) : base(sourceProjectPath, fullPath, taskManagerService)
+            TaskManagerService taskManagerService,
+            WebFormMetricContext metricsContext
+        ) : base(sourceProjectPath, fullPath, taskManagerService)
         {
             _blazorWorkspaceManager = blazorWorkspaceManager;
             _projectAnalyzer = projectAnalyzer;
+            _metricsContext = metricsContext;
 
             _blazorWorkspaceManager.NotifyNewExpectedProject();
         }
@@ -55,6 +60,7 @@ namespace CTA.WebForms2Blazor.FileConverters
         public override Task<IEnumerable<FileInformation>> MigrateFileAsync()
         {
             LogStart();
+            _metricsContext.CollectFileConversionMetrics(ChildActionType);
 
             // TODO: Extract info from project files and
             // call _blazorWorkspaceManager.CreateProjectFile
@@ -66,7 +72,7 @@ namespace CTA.WebForms2Blazor.FileConverters
             // TODO: Extract accumulated project info from 
             // workspace and use it to build the actual
             // project file
-            
+
             string newCsProjContent = GenerateProjectFileContents(_projectAnalyzer.ProjectResult,
                 _projectAnalyzer.ProjectConfiguration, _projectAnalyzer.ProjectReferences, _projectAnalyzer.MetaReferences);
             
