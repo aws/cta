@@ -14,7 +14,7 @@ namespace CTA.Rules.Update
     /// </summary>
     public class SolutionRewriter
     {
-        private readonly List<ProjectRewriter> _rulesRewriters;
+        private readonly List<ProjectRewriter> _projectRewriters;
         private readonly SolutionResult _solutionResult;
 
         /// <summary>
@@ -44,10 +44,10 @@ namespace CTA.Rules.Update
                 }
             };
 
-            _rulesRewriters = new List<ProjectRewriter>();
+            _projectRewriters = new List<ProjectRewriter>();
             CodeAnalyzer analyzer = CodeAnalyzerFactory.GetAnalyzer(analyzerConfiguration, LogHelper.Logger);
             var analyzerResults = analyzer.AnalyzeSolution(solutionFilePath).Result;
-            InitializeProjects(analyzerResults, solutionConfiguration);
+            InitializeProjectRewriters(analyzerResults, solutionConfiguration);
         }
 
         /// <summary>
@@ -59,17 +59,20 @@ namespace CTA.Rules.Update
         {
             DownloadResourceFiles();
             _solutionResult = new SolutionResult();
-            _rulesRewriters = new List<ProjectRewriter>();
-            InitializeProjects(analyzerResults, solutionConfiguration);
+            _projectRewriters = new List<ProjectRewriter>();
+            InitializeProjectRewriters(analyzerResults, solutionConfiguration);
         }
 
         public SolutionRewriter(IDEProjectResult projectResult, List<ProjectConfiguration> solutionConfiguration)
         {
             DownloadResourceFiles();
-            _rulesRewriters = new List<ProjectRewriter>()
+
+            var projectConfiguration = solutionConfiguration.FirstOrDefault(s => s.ProjectPath == projectResult.ProjectPath);
+            if (projectConfiguration != null)
             {
-                new ProjectRewriter(projectResult, solutionConfiguration.FirstOrDefault(s => s.ProjectPath == projectResult.ProjectPath))
-            };
+                var projectRewriter = ProjectRewriterFactory.GetInstance(projectResult, projectConfiguration);
+                _projectRewriters = new List<ProjectRewriter> {projectRewriter};
+            }
         }
 
         /// <summary>
@@ -78,9 +81,9 @@ namespace CTA.Rules.Update
         public SolutionResult AnalysisRun()
         {
             var options = new ParallelOptions() { MaxDegreeOfParallelism = Constants.ThreadCount };
-            Parallel.ForEach(_rulesRewriters, options, rulesRewriter =>
+            Parallel.ForEach(_projectRewriters, options, projectRewriter =>
             {
-                _solutionResult.ProjectResults.Add(rulesRewriter.Initialize());
+                _solutionResult.ProjectResults.Add(projectRewriter.Initialize());
             });
             return _solutionResult;
         }
@@ -90,10 +93,12 @@ namespace CTA.Rules.Update
         /// </summary>
         public SolutionResult Run(Dictionary<string, ProjectActions> projectActions)
         {
-            var options = new ParallelOptions() { MaxDegreeOfParallelism = Constants.ThreadCount };
-            Parallel.ForEach(_rulesRewriters, options, rulesRewriter =>
+            var options = new ParallelOptions { MaxDegreeOfParallelism = Constants.ThreadCount };
+            Parallel.ForEach(_projectRewriters, options, projectRewriter =>
             {
-                _solutionResult.ProjectResults.Add(rulesRewriter.Run(projectActions[rulesRewriter.RulesEngineConfiguration.ProjectPath]));
+                var actionsToRun = projectActions[projectRewriter.ProjectConfiguration.ProjectPath];
+                var projectResult = projectRewriter.Run(actionsToRun);
+                _solutionResult.ProjectResults.Add(projectResult);
             });
             return _solutionResult;
         }
@@ -101,10 +106,10 @@ namespace CTA.Rules.Update
         public List<IDEFileActions> RunIncremental(RootNodes projectRules, List<string> updatedFiles)
         {
             var ideFileActions = new BlockingCollection<IDEFileActions>();
-            var options = new ParallelOptions() { MaxDegreeOfParallelism = Constants.ThreadCount };
-            Parallel.ForEach(_rulesRewriters, options, rulesRewriter =>
+            var options = new ParallelOptions { MaxDegreeOfParallelism = Constants.ThreadCount };
+            Parallel.ForEach(_projectRewriters, options, projectRewriter =>
             {
-                var result = rulesRewriter.RunIncremental(updatedFiles, projectRules);
+                var result = projectRewriter.RunIncremental(updatedFiles, projectRules);
                 result.ForEach(fileAction => ideFileActions.Add(fileAction));
             });
             return ideFileActions.ToList();
@@ -116,9 +121,9 @@ namespace CTA.Rules.Update
         public SolutionResult Run()
         {
             var options = new ParallelOptions() { MaxDegreeOfParallelism = Constants.ThreadCount };
-            Parallel.ForEach(_rulesRewriters, options, rulesRewriter =>
+            Parallel.ForEach(_projectRewriters, options, projectRewriter =>
             {
-                var projectResult = rulesRewriter.Run();
+                var projectResult = projectRewriter.Run();
                 var existingResult = _solutionResult.ProjectResults.FirstOrDefault(p => p.ProjectFile == projectResult.ProjectFile);
                 if (existingResult == null)
                 {
@@ -137,15 +142,15 @@ namespace CTA.Rules.Update
         /// </summary>
         /// <param name="analyzerResults">The list of analysis results for each project</param>
         /// <param name="solutionConfiguration">ProjectConfiguration for each project</param>
-        private void InitializeProjects(List<AnalyzerResult> analyzerResults, List<ProjectConfiguration> solutionConfiguration)
+        private void InitializeProjectRewriters(List<AnalyzerResult> analyzerResults, List<ProjectConfiguration> solutionConfiguration)
         {
             foreach (var analyzerResult in analyzerResults)
             {
                 var projectConfiguration = solutionConfiguration.Where(s => s.ProjectPath == analyzerResult.ProjectResult.ProjectFilePath).FirstOrDefault();
                 if (projectConfiguration != null)
                 {
-                    ProjectRewriter rulesRewriter = new ProjectRewriter(analyzerResult, projectConfiguration);
-                    _rulesRewriters.Add(rulesRewriter);
+                    var projectRewriter = ProjectRewriterFactory.GetInstance(analyzerResult, projectConfiguration);
+                    _projectRewriters.Add(projectRewriter);
                 }
             }
         }
