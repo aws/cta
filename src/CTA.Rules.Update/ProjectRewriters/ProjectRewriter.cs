@@ -9,7 +9,6 @@ using CTA.Rules.Analyzer;
 using CTA.Rules.Config;
 using CTA.Rules.Models;
 using CTA.Rules.RuleFiles;
-using Microsoft.CodeAnalysis;
 
 namespace CTA.Rules.Update
 {
@@ -18,54 +17,54 @@ namespace CTA.Rules.Update
     /// </summary>
     public class ProjectRewriter
     {
-        public ProjectConfiguration RulesEngineConfiguration;
-        private readonly List<RootUstNode> _sourceFileResults;
-        private readonly List<SourceFileBuildResult> _sourceFileBuildResults;
-        private readonly List<string> _projectReferences;
-        private readonly ProjectResult _projectResult;
-        private readonly List<string> _metaReferences;
-        private readonly AnalyzerResult _analyzerResult;
+        public ProjectConfiguration ProjectConfiguration;
+        protected readonly List<RootUstNode> _sourceFileResults;
+        protected readonly List<SourceFileBuildResult> _sourceFileBuildResults;
+        protected readonly List<string> _projectReferences;
+        protected readonly ProjectResult _projectResult;
+        protected readonly List<string> _metaReferences;
+        protected readonly AnalyzerResult _analyzerResult;
 
         /// <summary>
         /// Initializes a new instance of ProjectRewriter using an existing analysis
         /// </summary>
         /// <param name="analyzerResult">The analysis results of the project</param>
-        /// <param name="rulesEngineConfiguration">ProjectConfiguration for this project</param>
-        public ProjectRewriter(AnalyzerResult analyzerResult, ProjectConfiguration rulesEngineConfiguration)
+        /// <param name="projectConfiguration">ProjectConfiguration for this project</param>
+        public ProjectRewriter(AnalyzerResult analyzerResult, ProjectConfiguration projectConfiguration)
         {
             _projectResult = new ProjectResult()
             {
-                ProjectFile = rulesEngineConfiguration.ProjectPath,
-                TargetVersions = rulesEngineConfiguration.TargetVersions,
-                UpgradePackages = rulesEngineConfiguration.PackageReferences.Select(p => new PackageAction()
+                ProjectFile = projectConfiguration.ProjectPath,
+                TargetVersions = projectConfiguration.TargetVersions,
+                UpgradePackages = projectConfiguration.PackageReferences.Select(p => new PackageAction()
                 {
                     Name = p.Key,
                     OriginalVersion = p.Value.Item1,
                     Version = p.Value.Item2
                 }).ToList(),
                 MissingMetaReferences = analyzerResult?.ProjectBuildResult?.MissingReferences
-        };
+            };
 
             _analyzerResult = analyzerResult;
             _sourceFileBuildResults = analyzerResult?.ProjectBuildResult?.SourceFileBuildResults;
             _sourceFileResults = analyzerResult?.ProjectResult?.SourceFileResults;
             _projectReferences = analyzerResult?.ProjectBuildResult?.ExternalReferences?.ProjectReferences.Select(p => p.AssemblyLocation).ToList();
             _metaReferences = analyzerResult?.ProjectBuildResult?.Project?.MetadataReferences?.Select(m => m.Display).ToList()
-                ?? rulesEngineConfiguration.MetaReferences;
-            RulesEngineConfiguration = rulesEngineConfiguration;
+                ?? projectConfiguration.MetaReferences;
+            ProjectConfiguration = projectConfiguration;
         }
 
-        public ProjectRewriter(IDEProjectResult projectResult, ProjectConfiguration rulesEngineConfiguration)
+        public ProjectRewriter(IDEProjectResult projectResult, ProjectConfiguration projectConfiguration)
         {
             _sourceFileResults = projectResult.RootNodes;
             _sourceFileBuildResults = projectResult.SourceFileBuildResults;
-            RulesEngineConfiguration = rulesEngineConfiguration;
+            ProjectConfiguration = projectConfiguration;
 
             _projectResult = new ProjectResult()
             {
-                ProjectFile = rulesEngineConfiguration.ProjectPath,
-                TargetVersions = rulesEngineConfiguration.TargetVersions,
-                UpgradePackages = rulesEngineConfiguration.PackageReferences.Select(p => new PackageAction()
+                ProjectFile = projectConfiguration.ProjectPath,
+                TargetVersions = projectConfiguration.TargetVersions,
+                UpgradePackages = projectConfiguration.PackageReferences.Select(p => new PackageAction()
                 {
                     Name = p.Key,
                     OriginalVersion = p.Value.Item1,
@@ -85,22 +84,22 @@ namespace CTA.Rules.Update
             {
                 var allReferences = _sourceFileResults?.SelectMany(s => s.References)
                         .Union(_sourceFileResults.SelectMany(s => s.Children.OfType<UsingDirective>())?.Select(u => new Reference() { Namespace = u.Identifier, Assembly = u.Identifier }).Distinct())
-                        .Union(RulesEngineConfiguration.AdditionalReferences.Select(r => new Reference { Assembly = r, Namespace = r }));
-                RulesFileLoader rulesFileLoader = new RulesFileLoader(allReferences, RulesEngineConfiguration.RulesDir, RulesEngineConfiguration.TargetVersions, string.Empty, RulesEngineConfiguration.AssemblyDir);
+                        .Union(ProjectConfiguration.AdditionalReferences.Select(r => new Reference { Assembly = r, Namespace = r }));
+                RulesFileLoader rulesFileLoader = new RulesFileLoader(allReferences, ProjectConfiguration.RulesDir, ProjectConfiguration.TargetVersions, string.Empty, ProjectConfiguration.AssemblyDir);
 
                 var projectRules = rulesFileLoader.Load();
 
-                RulesAnalysis walker = new RulesAnalysis(_sourceFileResults, projectRules, RulesEngineConfiguration.ProjectType);
+                RulesAnalysis walker = new RulesAnalysis(_sourceFileResults, projectRules, ProjectConfiguration.ProjectType);
                 projectActions = walker.Analyze();
                 _projectReferences.ForEach(p =>
                 {
-                    projectActions.ProjectReferenceActions.Add(Config.Utils.GetRelativePath(RulesEngineConfiguration.ProjectPath, p));
+                    projectActions.ProjectReferenceActions.Add(Config.Utils.GetRelativePath(ProjectConfiguration.ProjectPath, p));
                 });
 
                 _projectResult.ActionPackages = projectActions.PackageActions.Distinct().ToList();
                 _projectResult.MetaReferences = _metaReferences;
 
-                foreach (var p in RulesEngineConfiguration.PackageReferences)
+                foreach (var p in ProjectConfiguration.PackageReferences)
                 {
                     projectActions.PackageActions.Add(new PackageAction() { Name = p.Key, OriginalVersion = p.Value.Item1, Version = p.Value.Item2 });
                 }
@@ -112,7 +111,7 @@ namespace CTA.Rules.Update
             }
             catch (Exception ex)
             {
-                LogHelper.LogError(ex, "Error while initializing project {0}", RulesEngineConfiguration.ProjectPath);
+                LogHelper.LogError(ex, "Error while initializing project {0}", ProjectConfiguration.ProjectPath);
             }
 
             return _projectResult;
@@ -131,27 +130,27 @@ namespace CTA.Rules.Update
         /// Runs the project rewriter using a previously initialized analysis
         /// </summary>
         /// <param name="projectActions"></param>
-        public ProjectResult Run(ProjectActions projectActions)
+        public virtual ProjectResult Run(ProjectActions projectActions)
         {
             _projectResult.ProjectActions = projectActions;
-            CodeReplacer baseReplacer = new CodeReplacer(_sourceFileBuildResults, RulesEngineConfiguration, _metaReferences, _analyzerResult, projectResult: _projectResult);
-            _projectResult.ExecutedActions = baseReplacer.Run(projectActions, RulesEngineConfiguration.ProjectType);
+            CodeReplacer baseReplacer = CodeReplacerFactory.GetInstance(_sourceFileBuildResults, ProjectConfiguration, _metaReferences, _analyzerResult, projectResult: _projectResult);
+            _projectResult.ExecutedActions = baseReplacer.Run(projectActions, ProjectConfiguration.ProjectType);
             return _projectResult;
         }
 
-        public List<IDEFileActions> RunIncremental(List<string> updatedFiles, RootNodes projectRules)
+        public virtual List<IDEFileActions> RunIncremental(List<string> updatedFiles, RootNodes projectRules)
         {
             var ideFileActions = new List<IDEFileActions>();
 
             var allReferences = _sourceFileResults?.SelectMany(s => s.References).Distinct();
-            RulesFileLoader rulesFileLoader = new RulesFileLoader(allReferences, Constants.RulesDefaultPath, RulesEngineConfiguration.TargetVersions, string.Empty, RulesEngineConfiguration.AssemblyDir);
+            RulesFileLoader rulesFileLoader = new RulesFileLoader(allReferences, Constants.RulesDefaultPath, ProjectConfiguration.TargetVersions, string.Empty, ProjectConfiguration.AssemblyDir);
             projectRules = rulesFileLoader.Load();
 
-            RulesAnalysis walker = new RulesAnalysis(_sourceFileResults, projectRules, RulesEngineConfiguration.ProjectType);
+            RulesAnalysis walker = new RulesAnalysis(_sourceFileResults, projectRules, ProjectConfiguration.ProjectType);
             var projectActions = walker.Analyze();
 
-            CodeReplacer baseReplacer = new CodeReplacer(_sourceFileBuildResults, RulesEngineConfiguration, _metaReferences, _analyzerResult, updatedFiles, projectResult: _projectResult);
-            _projectResult.ExecutedActions = baseReplacer.Run(projectActions, RulesEngineConfiguration.ProjectType);
+            CodeReplacer baseReplacer = CodeReplacerFactory.GetInstance(_sourceFileBuildResults, ProjectConfiguration, _metaReferences, _analyzerResult, updatedFiles, projectResult: _projectResult);
+            _projectResult.ExecutedActions = baseReplacer.Run(projectActions, ProjectConfiguration.ProjectType);
 
             ideFileActions = projectActions
                 .FileActions
@@ -167,11 +166,11 @@ namespace CTA.Rules.Update
         /// <param name="packageActions">A list of packages and their versions to add to the project</param>
         private void MergePackages(BlockingCollection<PackageAction> packageActions)
         {
-            if (RulesEngineConfiguration.PackageReferences != null)
+            if (ProjectConfiguration.PackageReferences != null)
             {
-                foreach (var package in RulesEngineConfiguration.PackageReferences.Keys)
+                foreach (var package in ProjectConfiguration.PackageReferences.Keys)
                 {
-                    var versionTuple = RulesEngineConfiguration.PackageReferences[package];
+                    var versionTuple = ProjectConfiguration.PackageReferences[package];
                     var version = versionTuple != null ? versionTuple.Item2 ?? "*" : "*";
                     packageActions.Add(new FilePackageAction() { Name = package, Version = version });
                 }
