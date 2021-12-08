@@ -16,6 +16,7 @@ namespace CTA.Rules.Update
     {
         private readonly List<ProjectRewriter> _projectRewriters;
         private readonly SolutionResult _solutionResult;
+        private readonly IProjectRewriterFactory _projectRewriterFactory;
 
         /// <summary>
         /// Initializes a new instance of SolutionRewriter, analyzing the solution path using the provided config.
@@ -25,10 +26,11 @@ namespace CTA.Rules.Update
         /// <param name="analyzerConfiguration">Configuration for code analyzer to be used (AnalyzerConfiguration)</param>
         /// <param name="solutionFilePath">Path to solution file</param>
         /// <param name="solutionConfiguration">Configuration for each project in solution to be built</param>
-        public SolutionRewriter(string solutionFilePath, List<ProjectConfiguration> solutionConfiguration)
+        public SolutionRewriter(string solutionFilePath, List<ProjectConfiguration> solutionConfiguration, IProjectRewriterFactory projectRewriterFactory = null)
         {
             DownloadResourceFiles();
             _solutionResult = new SolutionResult();
+            _projectRewriterFactory = projectRewriterFactory ?? new DefaultProjectRewriterFactory();
             AnalyzerConfiguration analyzerConfiguration = new AnalyzerConfiguration(LanguageOptions.CSharp)
             {
                 MetaDataSettings = new MetaDataSettings()
@@ -55,22 +57,24 @@ namespace CTA.Rules.Update
         /// </summary>
         /// <param name="analyzerResults">The solution analysis</param>
         /// <param name="solutionConfiguration">Configuration for each project in the solution</param>
-        public SolutionRewriter(List<AnalyzerResult> analyzerResults, List<ProjectConfiguration> solutionConfiguration)
+        public SolutionRewriter(List<AnalyzerResult> analyzerResults, List<ProjectConfiguration> solutionConfiguration, IProjectRewriterFactory projectRewriterFactory = null)
         {
             DownloadResourceFiles();
             _solutionResult = new SolutionResult();
+            _projectRewriterFactory = projectRewriterFactory ?? new DefaultProjectRewriterFactory();
             _projectRewriters = new List<ProjectRewriter>();
             InitializeProjectRewriters(analyzerResults, solutionConfiguration);
         }
 
-        public SolutionRewriter(IDEProjectResult projectResult, List<ProjectConfiguration> solutionConfiguration)
+        public SolutionRewriter(IDEProjectResult projectResult, List<ProjectConfiguration> solutionConfiguration, IProjectRewriterFactory projectRewriterFactory = null)
         {
             DownloadResourceFiles();
+            _projectRewriterFactory = projectRewriterFactory ?? new DefaultProjectRewriterFactory();
 
             var projectConfiguration = solutionConfiguration.FirstOrDefault(s => s.ProjectPath == projectResult.ProjectPath);
             if (projectConfiguration != null)
             {
-                var projectRewriter = ProjectRewriterFactory.GetInstance(projectResult, projectConfiguration);
+                var projectRewriter = _projectRewriterFactory.GetInstance(projectResult, projectConfiguration);
                 _projectRewriters = new List<ProjectRewriter> {projectRewriter};
             }
         }
@@ -149,7 +153,7 @@ namespace CTA.Rules.Update
                 var projectConfiguration = solutionConfiguration.Where(s => s.ProjectPath == analyzerResult.ProjectResult.ProjectFilePath).FirstOrDefault();
                 if (projectConfiguration != null)
                 {
-                    var projectRewriter = ProjectRewriterFactory.GetInstance(analyzerResult, projectConfiguration);
+                    var projectRewriter = _projectRewriterFactory.GetInstance(analyzerResult, projectConfiguration);
                     _projectRewriters.Add(projectRewriter);
                 }
             }
