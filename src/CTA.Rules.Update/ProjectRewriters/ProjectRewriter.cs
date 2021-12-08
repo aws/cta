@@ -120,7 +120,7 @@ namespace CTA.Rules.Update
         /// <summary>
         /// Initializes the ProjectRewriter then runs it
         /// </summary>
-        public ProjectResult Run()
+        public virtual ProjectResult Run()
         {
             var projectResult = Initialize();
             return Run(projectResult.ProjectActions);

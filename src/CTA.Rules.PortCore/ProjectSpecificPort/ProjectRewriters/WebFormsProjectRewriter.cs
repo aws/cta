@@ -35,7 +35,7 @@ namespace CTA.Rules.PortCore
         /// <summary>
         /// Initializes the ProjectRewriter then runs it
         /// </summary>
-        public ProjectResult Run()
+        public override ProjectResult Run()
         {
             var projectResult = Initialize();
             return Run(projectResult.ProjectActions);
@@ -45,7 +45,7 @@ namespace CTA.Rules.PortCore
         /// Runs the project rewriter using a previously initialized analysis
         /// </summary>
         /// <param name="projectActions"></param>
-        public ProjectResult Run(ProjectActions projectActions)
+        public override ProjectResult Run(ProjectActions projectActions)
         {
             // NOTE: project actions are not used, but are still used for telemetry
             _projectResult.ProjectActions = projectActions;
@@ -58,7 +58,7 @@ namespace CTA.Rules.PortCore
             return _projectResult;
         }
 
-        public List<IDEFileActions> RunIncremental(List<string> updatedFiles, RootNodes projectRules)
+        public override List<IDEFileActions> RunIncremental(List<string> updatedFiles, RootNodes projectRules)
         {
             var ideFileActions = new List<IDEFileActions>();
 

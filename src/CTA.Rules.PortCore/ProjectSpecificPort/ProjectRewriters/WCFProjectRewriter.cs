@@ -33,7 +33,7 @@ namespace CTA.Rules.Update
         /// <summary>
         /// Initializes the ProjectRewriter then runs it
         /// </summary>
-        public ProjectResult Run()
+        public override ProjectResult Run()
         {
             var projectResult = Initialize();
             return Run(projectResult.ProjectActions);
@@ -43,7 +43,7 @@ namespace CTA.Rules.Update
         /// Runs the project rewriter using a previously initialized analysis
         /// </summary>
         /// <param name="projectActions"></param>
-        public ProjectResult Run(ProjectActions projectActions)
+        public override ProjectResult Run(ProjectActions projectActions)
         {
             base.Run(projectActions);
 
@@ -56,7 +56,7 @@ namespace CTA.Rules.Update
             return _projectResult;
         }
 
-        public List<IDEFileActions> RunIncremental(List<string> updatedFiles, RootNodes projectRules)
+        public override List<IDEFileActions> RunIncremental(List<string> updatedFiles, RootNodes projectRules)
         {
             base.RunIncremental(updatedFiles, projectRules);
             var ideFileActions = new List<IDEFileActions>();
