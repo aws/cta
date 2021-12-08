@@ -3,12 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 using Codelyzer.Analysis;
+using CTA.Rules.Metrics;
 using CTA.Rules.Models;
 using NUnit.Framework;
 using CTA.WebForms2Blazor.Factories;
 using CTA.WebForms2Blazor.Services;
 using CTA.WebForms2Blazor.FileConverters;
+using CTA.WebForms2Blazor.Metrics;
 using CTA.WebForms2Blazor.ProjectManagement;
+using CTA.WebForms2Blazor.Tests.ClassConverters;
 
 namespace CTA.WebForms2Blazor.Tests.Factories
 {
@@ -47,15 +50,16 @@ namespace CTA.WebForms2Blazor.Tests.Factories
             var taskManagerService = new TaskManagerService();
 
             blazorWorkspaceManager.CreateSolutionFile();
-
+            WebFormMetricContext metricContext = new WebFormMetricContext(new MetricsContext(_testProjectPath), _testProjectPath);
             _fileConverterFactory = new FileConverterFactory(
                 _testProjectPath,
                 blazorWorkspaceManager,
                 webFormsProjectAnalyzer,
                 new ViewImportService(),
-                new ClassConverterFactory(string.Empty, new LifecycleManagerService(), taskManagerService),
+                new ClassConverterFactory(string.Empty, new LifecycleManagerService(), taskManagerService, metricContext),
                 new HostPageService(),
-                taskManagerService);
+                taskManagerService,
+                metricContext);
         }
 
         [Test]

@@ -114,7 +114,7 @@ namespace CTA.Rules.Update
                 }
                 else
                 {
-                    projectRunActions = ApplyProjectActions(projectActions, projectType).Result;
+                    projectRunActions = ApplyProjectActions(projectActions, projectType);
 
                     if (!actionsPerProject.TryAdd(Constants.Project, projectRunActions))
                     {
@@ -205,7 +205,7 @@ namespace CTA.Rules.Update
             var tempProjectDir = Path.Join(projectParentDir, string.Join("-", new DirectoryInfo(projectDir).Name, Path.GetRandomFileName()));
             try 
             {
-                MigrationManager migrationManager = new MigrationManager(projectDir, tempProjectDir, _analyzerResult, _projectConfiguration, _projectResult);
+                MigrationManager migrationManager = new MigrationManager(projectDir, tempProjectDir,"", _analyzerResult, _projectConfiguration, _projectResult);
                 Task.Run(() => migrationManager.PerformMigration()).GetAwaiter().GetResult();
 
                 Directory.Delete(projectDir, true);

@@ -8,6 +8,7 @@ using CTA.Rules.Config;
 using CTA.WebForms2Blazor.Extensions;
 using CTA.WebForms2Blazor.FileInformationModel;
 using CTA.WebForms2Blazor.Helpers;
+using CTA.WebForms2Blazor.Metrics;
 using CTA.WebForms2Blazor.Services;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -16,6 +17,7 @@ namespace CTA.WebForms2Blazor.ClassConverters
 {
     public class GlobalClassConverter : ClassConverter
     {
+        private const string ActionName = "GlobalClassConverter";
         private const string GetMiddlewareNamespacesLogCall = "GetMiddlewareNamespaces()";
         private const string GetMiddlewarePipelineAdditionsLogCall = "GetMiddlewarePiplineAdditions()";
 
@@ -31,6 +33,7 @@ namespace CTA.WebForms2Blazor.ClassConverters
         private const string MigrateServiceLayerOperation = "migrate service layer and configure depenency injection in ConfigureServices()";
         
         private LifecycleManagerService _lifecycleManager;
+        private WebFormMetricContext _metricsContext;
 
         private IEnumerable<StatementSyntax> _configureMethodStatements;
         private IEnumerable<MethodDeclarationSyntax> _keepableMethods;
@@ -43,7 +46,8 @@ namespace CTA.WebForms2Blazor.ClassConverters
             TypeDeclarationSyntax originalDeclarationSyntax,
             INamedTypeSymbol originalClassSymbol,
             LifecycleManagerService lifecycleManager,
-            TaskManagerService taskManager)
+            TaskManagerService taskManager,
+            WebFormMetricContext metricsContext)
             : base(relativePath, sourceProjectPath, sourceFileSemanticModel, originalDeclarationSyntax, originalClassSymbol, taskManager)
         {
             _lifecycleManager = lifecycleManager;
@@ -52,11 +56,13 @@ namespace CTA.WebForms2Blazor.ClassConverters
             _configureMethodStatements = new List<StatementSyntax>();
             _keepableMethods = new List<MethodDeclarationSyntax>();
             _endOfClassComments = new List<string>();
+            _metricsContext = metricsContext;
         }
 
         public override async Task<IEnumerable<FileInformation>> MigrateClassAsync()
         {
             LogStart();
+            _metricsContext.CollectClassConversionMetrics(ActionName);
 
             // Make this call once now so we don't have to keep doing it later
             var originalDescendantNodes = _originalDeclarationSyntax.DescendantNodes();
@@ -74,17 +80,26 @@ namespace CTA.WebForms2Blazor.ClassConverters
             // before we have all statements required to build startup class
             await InsertRequestPipelineMiddlewareRegistrations();
 
-            var startupClassDeclaration = StartupSyntaxHelper.ConstructStartupClass(
-                constructorAdditionalStatements: originalDescendantNodes.OfType<ConstructorDeclarationSyntax>().FirstOrDefault()?.Body?.Statements,
-                configureAdditionalStatements: _configureMethodStatements,
-                configureServicesAdditionalStatements: configureServicesLines,
-                additionalFieldDeclarations: originalDescendantNodes.OfType<FieldDeclarationSyntax>(),
-                additionalPropertyDeclarations: originalDescendantNodes.OfType<PropertyDeclarationSyntax>(),
-                additionalMethodDeclarations: _keepableMethods)
-                .AddClassBlockComment(_endOfClassComments, false);
+            var fileText = string.Empty;
 
-            var containingNamespace = CodeSyntaxHelper.BuildNamespace(_originalClassSymbol.ContainingNamespace.ToDisplayString(), startupClassDeclaration);
-            var fileText = CodeSyntaxHelper.GetFileSyntaxAsString(containingNamespace, await GetAllUsingStatements());
+            try
+            {
+                var startupClassDeclaration = StartupSyntaxHelper.ConstructStartupClass(
+                    constructorAdditionalStatements: originalDescendantNodes.OfType<ConstructorDeclarationSyntax>().FirstOrDefault()?.Body?.Statements,
+                    configureAdditionalStatements: _configureMethodStatements,
+                    configureServicesAdditionalStatements: configureServicesLines,
+                    additionalFieldDeclarations: originalDescendantNodes.OfType<FieldDeclarationSyntax>(),
+                    additionalPropertyDeclarations: originalDescendantNodes.OfType<PropertyDeclarationSyntax>(),
+                    additionalMethodDeclarations: _keepableMethods)
+                    .AddClassBlockComment(_endOfClassComments, false);
+
+                var containingNamespace = CodeSyntaxHelper.BuildNamespace(_originalClassSymbol.ContainingNamespace.ToDisplayString(), startupClassDeclaration);
+                fileText = CodeSyntaxHelper.GetFileSyntaxAsString(containingNamespace, await GetAllUsingStatements());
+            }
+            catch (Exception e)
+            {
+                LogHelper.LogError(e, $"Failed to construct new Startup file content from {OriginalClassName} class at {_fullPath}");
+            }
 
             DoCleanUp();
             LogEnd();
@@ -98,29 +113,36 @@ namespace CTA.WebForms2Blazor.ClassConverters
         {
             foreach (var method in orignalMethods)
             {
-                var lifecycleEvent = LifecycleManagerService.CheckMethodApplicationLifecycleHook(method);
+                try
+                {
+                    var lifecycleEvent = LifecycleManagerService.CheckMethodApplicationLifecycleHook(method);
 
-                if (lifecycleEvent != null)
-                {
-                    HandleLifecycleMethod(method, (WebFormsAppLifecycleEvent)lifecycleEvent);
-                }
-                else if (method.IsEventHandler(ApplicationStartMethodName))
-                {
-                    var newStatements = method.Body.Statements
-                        // Make a note of where these lines came from
-                        .AddComment(string.Format(Constants.CodeOriginCommentTemplate, ApplicationStartMethodName))
-                        // Add blank line before new statements to give some separation from previous statements
-                        .Prepend(CodeSyntaxHelper.GetBlankLine());
+                    if (lifecycleEvent != null)
+                    {
+                        HandleLifecycleMethod(method, (WebFormsAppLifecycleEvent)lifecycleEvent);
+                    }
+                    else if (method.IsEventHandler(ApplicationStartMethodName))
+                    {
+                        var newStatements = method.Body.Statements
+                            // Make a note of where these lines came from
+                            .AddComment(string.Format(Constants.CodeOriginCommentTemplate, ApplicationStartMethodName))
+                            // Add blank line before new statements to give some separation from previous statements
+                            .Prepend(CodeSyntaxHelper.GetBlankLine());
 
-                    _configureMethodStatements = _configureMethodStatements.Concat(newStatements);
+                        _configureMethodStatements = _configureMethodStatements.Concat(newStatements);
+                    }
+                    else if (method.IsEventHandler(ApplicationEndMethodName) || method.IsEventHandler(SessionStartMethodName) || method.IsEventHandler(SessionEndMethodName))
+                    {
+                        CommentOutMethod(method);
+                    }
+                    else
+                    {
+                        _keepableMethods = _keepableMethods.Append(method);
+                    }
                 }
-                else if (method.IsEventHandler(ApplicationEndMethodName) || method.IsEventHandler(SessionStartMethodName) || method.IsEventHandler(SessionEndMethodName))
+                catch (Exception e)
                 {
-                    CommentOutMethod(method);
-                }
-                else
-                {
-                    _keepableMethods = _keepableMethods.Append(method);
+                    LogHelper.LogError(e, $"Failed to process {method.Identifier} method in {OriginalClassName} class at {_fullPath}");
                 }
             }
 

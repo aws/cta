@@ -21,6 +21,8 @@ namespace CTA.WebForms2Blazor.Helpers.ControlHelpers
             ["asp:listview"] = new ListViewControlConverter(),
             ["asp:gridview"] = new GridViewControlConverter(),
             ["asp:content"] = new RemoveNodeKeepContentsConverter(),
+            ["asp:textbox"] = new TextBoxControlConverter(),
+            ["asp:radiobutton"] = new RadioButtonControlConverter(),
             ["html"] = new RemoveNodeKeepContentsConverter(),
             ["body"] = new RemoveNodeKeepContentsConverter(),
             ["head"] = new RemoveNodeAndContentsConverter(),

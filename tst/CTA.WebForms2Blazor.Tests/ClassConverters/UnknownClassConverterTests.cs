@@ -4,6 +4,8 @@ using NUnit.Framework;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using CTA.Rules.Metrics;
+using CTA.WebForms2Blazor.Metrics;
 
 namespace CTA.WebForms2Blazor.Tests.ClassConverters
 {
@@ -16,12 +18,14 @@ namespace CTA.WebForms2Blazor.Tests.ClassConverters
         [SetUp]
         public void SetUp()
         {
+            MetricsContext context = new MetricsContext(ClassConverterSetupFixture.TestProjectDirectoryPath);
             _converter = new UnknownClassConverter(InputRelativePath,
                 ClassConverterSetupFixture.TestProjectDirectoryPath,
                 ClassConverterSetupFixture.TestSemanticModel,
                 ClassConverterSetupFixture.TestClassDec,
                 ClassConverterSetupFixture.TestTypeSymbol,
-                new TaskManagerService());
+                new TaskManagerService(),
+                new WebFormMetricContext(context, ClassConverterSetupFixture.TestProjectDirectoryPath));
         }
 
         [Test]

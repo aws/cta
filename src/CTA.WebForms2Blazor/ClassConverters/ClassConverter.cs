@@ -23,6 +23,9 @@ namespace CTA.WebForms2Blazor.ClassConverters
         private protected readonly TaskManagerService _taskManager;
         private protected int _taskId;
 
+        public string FullPath { get { return _fullPath; } }
+        public string OriginalClassName { get { return _originalDeclarationSyntax.Identifier.ToString(); } }
+
         protected ClassConverter(
             string relativePath,
             string sourceProjectPath,
@@ -46,7 +49,7 @@ namespace CTA.WebForms2Blazor.ClassConverters
             LogHelper.LogInformation(string.Format(
                 Constants.RegisteredAsTaskLogTemplate,
                 GetType().Name,
-                _originalDeclarationSyntax.Identifier.ToString(),
+                OriginalClassName,
                 _fullPath,
                 _taskId));
         }
@@ -76,7 +79,7 @@ namespace CTA.WebForms2Blazor.ClassConverters
                 Constants.StartedForAtLogTemplate,
                 GetType().Name,
                 Constants.ClassMigrationLogAction,
-                _originalDeclarationSyntax.Identifier.ToString(),
+                OriginalClassName,
                 _fullPath));
         }
 
@@ -86,7 +89,7 @@ namespace CTA.WebForms2Blazor.ClassConverters
                 Constants.EndedForAtLogTemplate,
                 GetType().Name,
                 Constants.ClassMigrationLogAction,
-                _originalDeclarationSyntax.Identifier.ToString(),
+                OriginalClassName,
                 _fullPath));
         }
 

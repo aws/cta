@@ -4,9 +4,11 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CTA.Rules.Config;
 using CTA.WebForms2Blazor.Extensions;
 using CTA.WebForms2Blazor.FileInformationModel;
 using CTA.WebForms2Blazor.Helpers;
+using CTA.WebForms2Blazor.Metrics;
 using CTA.WebForms2Blazor.Services;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -18,6 +20,8 @@ namespace CTA.WebForms2Blazor.ClassConverters
     {
         private const string LifecycleEventDiscovery = "lifecycle hook method";
         private const string InvokePopulationOperation = "middleware Invoke method population";
+        private const string ActionName = "HttpHandlerClassConverter";
+        private WebFormMetricContext _metricsContext;
 
         private IEnumerable<UsingDirectiveSyntax> _requiredUsings;
         private IEnumerable<MethodDeclarationSyntax> _sharedMethods;
@@ -37,17 +41,20 @@ namespace CTA.WebForms2Blazor.ClassConverters
             TypeDeclarationSyntax originalDeclarationSyntax,
             INamedTypeSymbol originalClassSymbol,
             LifecycleManagerService lifecycleManager,
-            TaskManagerService taskManager)
+            TaskManagerService taskManager,
+            WebFormMetricContext metricsContext)
             : base(relativePath, sourceProjectPath, sourceFileSemanticModel, originalDeclarationSyntax, originalClassSymbol, taskManager)
         {
             _lifecycleManager = lifecycleManager;
             _lifecycleManager.NotifyExpectedMiddlewareSource();
+            _metricsContext = metricsContext;
         }
 
         public override Task<IEnumerable<FileInformation>> MigrateClassAsync()
         {
             LogStart();
 
+            _metricsContext.CollectClassConversionMetrics(ActionName);
             _originalClassName = _originalDeclarationSyntax.Identifier.ToString();
             _namespaceName = _originalClassSymbol.ContainingNamespace.ToDisplayString();
 
@@ -68,13 +75,24 @@ namespace CTA.WebForms2Blazor.ClassConverters
             // Process init method first before classifying so that we know what method names to look for
             var initMethod = originalDescendantNodes.OfType<MethodDeclarationSyntax>().Where(method => IsInitMethod(method)).SingleOrDefault();
             // Classify methods and store results as tuple so we don't have to keep recalculating it
-            IEnumerable<(MethodDeclarationSyntax, WebFormsAppLifecycleEvent?)> classifiedMethods;
+            IEnumerable<(MethodDeclarationSyntax, WebFormsAppLifecycleEvent?)> classifiedMethods = null;
+
             if (initMethod != null)
             {
-                ProcessInitMethod(initMethod);
-                classifiedMethods = originalDescendantNodes.OfType<MethodDeclarationSyntax>().Select(method => (method, CheckModuleEventHandlerMethod(method)));
+                try
+                {
+                    ProcessInitMethod(initMethod);
+                    classifiedMethods = originalDescendantNodes.OfType<MethodDeclarationSyntax>().Select(method => (method, CheckModuleEventHandlerMethod(method)));
+                }
+                catch (Exception e)
+                {
+                    LogHelper.LogError(e, $"Failed to process {OriginalClassName} HttpModule class Init method at {_fullPath}, " +
+                        $"as a result lifecycle methods will not be detectable and will not be converted to middleware");
+                }
             }
-            else
+
+            // NOTE: We want this default value if initMethod is null or if processing the init method fails
+            if (classifiedMethods == null)
             {
                 classifiedMethods = originalDescendantNodes.OfType<MethodDeclarationSyntax>().Select(method => (method, (WebFormsAppLifecycleEvent?)null));
             }
@@ -95,29 +113,55 @@ namespace CTA.WebForms2Blazor.ClassConverters
             // middleware classes for each event
             if (lifecycleTuples.Count() > 1)
             {
+
                 foreach (var lifecycleTuple in lifecycleTuples)
                 {
                     var newClassName = _originalClassName + lifecycleTuple.Item2.ToString();
-                    _lifecycleManager.RegisterMiddlewareClass((WebFormsAppLifecycleEvent)lifecycleTuple.Item2, newClassName, _namespaceName, _originalClassName, true);
-                    fileInfoCollection.Add(GetNewMiddlewareFileInformation(
-                        lifecycleTuple.Item1,
-                        newClassName,
-                        LifecycleManagerService.ContentIsPreHandle((WebFormsAppLifecycleEvent)lifecycleTuple.Item2),
-                        _originalClassName));
+
+                    try
+                    {
+                        _lifecycleManager.RegisterMiddlewareClass((WebFormsAppLifecycleEvent)lifecycleTuple.Item2, newClassName, _namespaceName, _originalClassName, true);
+                        fileInfoCollection.Add(GetNewMiddlewareFileInformation(
+                            lifecycleTuple.Item1,
+                            newClassName,
+                            LifecycleManagerService.ContentIsPreHandle((WebFormsAppLifecycleEvent)lifecycleTuple.Item2),
+                            _originalClassName));
+                    }
+                    catch (Exception e)
+                    {
+                        LogHelper.LogError(e, $"Failed to construct {newClassName} middleware class from {lifecycleTuple.Item2} event " +
+                            $" handler in {_originalClassName} class at {_fullPath}");
+                    }
                 }
             }
             else if (lifecycleTuples.Any())
             {
                 var lifecycleTuple = lifecycleTuples.Single();
-                _lifecycleManager.RegisterMiddlewareClass((WebFormsAppLifecycleEvent)lifecycleTuple.Item2, _originalClassName, _namespaceName, _originalClassName, false);
-                fileInfoCollection.Add(GetNewMiddlewareFileInformation(
-                    lifecycleTuple.Item1,
-                    _originalClassName,
-                    LifecycleManagerService.ContentIsPreHandle((WebFormsAppLifecycleEvent)lifecycleTuple.Item2)));
+
+                try
+                {
+                    _lifecycleManager.RegisterMiddlewareClass((WebFormsAppLifecycleEvent)lifecycleTuple.Item2, _originalClassName, _namespaceName, _originalClassName, false);
+                    fileInfoCollection.Add(GetNewMiddlewareFileInformation(
+                        lifecycleTuple.Item1,
+                        _originalClassName,
+                        LifecycleManagerService.ContentIsPreHandle((WebFormsAppLifecycleEvent)lifecycleTuple.Item2)));
+                }
+                catch (Exception e)
+                {
+                    LogHelper.LogError(e, $"Failed to construct middleware class from {lifecycleTuple.Item2} event " +
+                        $" handler in {_originalClassName} class at {_fullPath}");
+                }
             }
             else
             {
-                fileInfoCollection.Add(GetNewMiddlewareFileInformation(null, _originalClassName));
+                try
+                {
+                    fileInfoCollection.Add(GetNewMiddlewareFileInformation(null, _originalClassName));
+                }
+                catch (Exception e)
+                {
+                    LogHelper.LogError(e, $"Failed to construct no-event middleware class from {_originalClassName} class at {_fullPath}");
+                }
             }
 
             // By this point all new middleware has been registered

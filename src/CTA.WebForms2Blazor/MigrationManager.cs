@@ -1,14 +1,16 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Codelyzer.Analysis;
-using CTA.Rules.Models;
-using CTA.WebForms2Blazor.Services;
-using CTA.WebForms2Blazor.Factories;
-using CTA.WebForms2Blazor.ProjectManagement;
-using CTA.WebForms2Blazor.FileInformationModel;
 using CTA.Rules.Config;
-using System;
-using System.IO;
+using CTA.Rules.Metrics;
+using CTA.Rules.Models;
+using CTA.WebForms2Blazor.Factories;
+using CTA.WebForms2Blazor.FileInformationModel;
+using CTA.WebForms2Blazor.Metrics;
+using CTA.WebForms2Blazor.ProjectManagement;
+using CTA.WebForms2Blazor.Services;
 
 namespace CTA.WebForms2Blazor
 {
@@ -18,10 +20,11 @@ namespace CTA.WebForms2Blazor
 
         private readonly string _inputProjectPath;
         private readonly string _outputProjectPath;
+        private readonly string _solutionPath;
+        private readonly ProjectResult _projectResult;
 
         private readonly ProjectConfiguration _projectConfiguration;
         private readonly AnalyzerResult _analyzerResult;
-        private readonly ProjectResult _projectResult;
 
         private ProjectAnalyzer _webFormsProjectAnalyzer;
         private ProjectBuilder _blazorProjectBuilder;
@@ -36,18 +39,22 @@ namespace CTA.WebForms2Blazor
 
         private ClassConverterFactory _classConverterFactory;
         private FileConverterFactory _fileConverterFactory;
+        private WebFormMetricContext _metricsContext;
 
-        public MigrationManager(string inputProjectPath, string outputProjectPath, AnalyzerResult analyzerResult,
-            ProjectConfiguration projectConfiguration, ProjectResult projectResult)
+        public MigrationManager(string inputProjectPath, string outputProjectPath, string solutionPath, AnalyzerResult analyzerResult,
+            CTA.Rules.Models.ProjectConfiguration projectConfiguration, ProjectResult projectResult)
         {
             _inputProjectPath = inputProjectPath;
             _outputProjectPath = outputProjectPath;
+            _solutionPath = solutionPath;
             _analyzerResult = analyzerResult;
             _projectConfiguration = projectConfiguration;
             _projectResult = projectResult;
+            var context = new MetricsContext(_solutionPath, new List<AnalyzerResult> { _analyzerResult });
+            _metricsContext = new WebFormMetricContext(context, _projectConfiguration.ProjectPath);
         }
 
-        public async Task PerformMigration()
+        public async Task<WebFormsPortingResult> PerformMigration()
         {
             LogHelper.LogInformation(string.Format(
                 Constants.StartedFromToLogTemplate,
@@ -88,11 +95,12 @@ namespace CTA.WebForms2Blazor
             ));
 
             // Combines migration tasks into a single task we can await
-            await Task.WhenAll(migrationTasks);
+            await Task.WhenAll(migrationTasks).ConfigureAwait(false);
 
             LogHelper.LogInformation(string.Format(Constants.GenericInformationLogTemplate, GetType().Name, MigrationTasksCompletedLogAction));
 
             WriteServiceDerivedFiles();
+            var result = new WebFormsPortingResult() { WebFormMetrics = _metricsContext.GetMetricList() };
 
             // TODO: Any necessary cleanup or last checks on new project
 
@@ -102,6 +110,9 @@ namespace CTA.WebForms2Blazor
                 Constants.ProjectMigrationLogAction,
                 _inputProjectPath,
                 _outputProjectPath));
+
+            return result;
+
         }
 
         private void WriteServiceDerivedFiles()
@@ -141,7 +152,7 @@ namespace CTA.WebForms2Blazor
             _classConverterFactory = new ClassConverterFactory(
                 _inputProjectPath,
                 _lifecycleManager,
-                _taskManager);
+                _taskManager, _metricsContext);
             _fileConverterFactory = new FileConverterFactory(
                 _inputProjectPath,
                 _blazorWorkspaceManager,
@@ -149,7 +160,7 @@ namespace CTA.WebForms2Blazor
                 _viewImportService,
                 _classConverterFactory,
                 _hostPageService,
-                _taskManager);
+                _taskManager, _metricsContext);
         }
     }
 }

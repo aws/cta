@@ -9,6 +9,7 @@ namespace CTA.WebForms2Blazor.FileConverters
 {
     public abstract class FileConverter
     {
+        protected const string ConverterType = "FileConverter";
         private readonly string _relativePath;
         private readonly string _fullPath;
         private readonly string _sourceProjectPath;
@@ -28,6 +29,7 @@ namespace CTA.WebForms2Blazor.FileConverters
             _sourceProjectPath = sourceProjectPath;
             _taskManager = taskManager;
 
+            
             // We want to force the use of the task manager even if each file doesn't
             // necessarily have to do any managed runs, this is because they may end up
             // unblocking other processes by simply running normally
