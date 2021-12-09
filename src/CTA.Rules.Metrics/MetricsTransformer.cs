@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using CTA.FeatureDetection.Common.Models;
+using CTA.Rules.Config;
 using CTA.Rules.Metrics.Models.WebForms;
 using CTA.Rules.Models;
 
@@ -136,6 +137,9 @@ namespace CTA.Rules.Metrics
                     webFormActionMetrics.Add(new ClassConversionMetric(context, metric.ChildAction, projectFile));
                 else if(metric.ActionName == WebFormsActionType.DirectiveConversion)
                     webFormActionMetrics.Add(new DirectiveConversionMetric(context, metric.ChildAction, projectFile));
+                else
+                    LogHelper.LogInformation($"WebForms porting action not found with the name"+ metric.ActionName.ToString());
+
             }
 
             return webFormActionMetrics;

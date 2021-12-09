@@ -106,11 +106,7 @@ namespace CTA.Rules.Metrics
                 actionPackageMetrics.AddRange(MetricsTransformer.TransformActionPackages(Context, projectResult));
                 actionExecutionMetrics.AddRange(MetricsTransformer.TransformGenericActionExecutions(Context, projectResult));
                 missingMetaReferenceMetrics.AddRange(MetricsTransformer.TransformMissingMetaReferences(Context, projectResult));
-
-                if (projectResult.WebFormsMetricResults != null)
-                {
-                    webFormsActionMetrics.AddRange(MetricsTransformer.TransformWebFormActionMetrics(Context, projectResult));
-                }
+                webFormsActionMetrics.AddRange(MetricsTransformer.TransformWebFormActionMetrics(Context, projectResult));
             }
 
             TargetVersionMetrics = targetVersionMetrics;
@@ -147,12 +143,8 @@ namespace CTA.Rules.Metrics
                 .Concat(GenericActionExecutionMetrics)
                 .Concat(BuildErrorMetrics)
                 .Concat(MissingMetaReferenceMetrics)
+                .Concat(WebFormsActionMetrics)
                 .ToList();
-
-            if (WebFormsActionMetrics != null)
-            {
-                allMetrics = allMetrics.Concat(WebFormsActionMetrics).ToList();
-            }
 
             PortSolutionResultJsonReport = JsonConvert.SerializeObject(allMetrics);
             return PortSolutionResultJsonReport;
