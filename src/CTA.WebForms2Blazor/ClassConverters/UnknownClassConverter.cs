@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CTA.Rules.Models;
 using CTA.WebForms2Blazor.Extensions;
 using CTA.WebForms2Blazor.FileInformationModel;
 using CTA.WebForms2Blazor.Helpers;
@@ -34,7 +35,7 @@ namespace CTA.WebForms2Blazor.ClassConverters
         {
             LogStart();
 
-            _metricsContext.CollectClassConversionMetrics(ActionName);
+            _metricsContext.CollectActionMetrics(WebFormsActionType.ClassConversion, ActionName);
             // NOTE: We could just read the file from the disk and retrieve the bytes like
             // that but instead I opted to "rebuild" the type in case we wanted to add comments
             // or something else to these undefined code files, most likely though we may still

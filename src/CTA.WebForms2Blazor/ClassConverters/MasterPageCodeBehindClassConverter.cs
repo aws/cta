@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CTA.Rules.Models;
 using CTA.WebForms2Blazor.Extensions;
 using CTA.WebForms2Blazor.FileInformationModel;
 using CTA.WebForms2Blazor.Helpers;
@@ -36,7 +37,7 @@ namespace CTA.WebForms2Blazor.ClassConverters
         {
             LogStart();
 
-            _metricsContext.CollectClassConversionMetrics(ActionName);
+            _metricsContext.CollectActionMetrics(WebFormsActionType.ClassConversion, ActionName);
             var containingNamespace = _originalClassSymbol.ContainingNamespace.ToDisplayString();
 
             // NOTE: Removed temporarily until usings can be better determined, at the moment, too

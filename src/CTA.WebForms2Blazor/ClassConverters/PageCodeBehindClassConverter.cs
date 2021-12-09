@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CTA.Rules.Config;
+using CTA.Rules.Models;
 using CTA.WebForms2Blazor.Extensions;
 using CTA.WebForms2Blazor.FileInformationModel;
 using CTA.WebForms2Blazor.Helpers;
@@ -40,7 +41,7 @@ namespace CTA.WebForms2Blazor.ClassConverters
         {
             LogStart();
 
-            _metricsContext.CollectClassConversionMetrics(ActionName);
+            _metricsContext.CollectActionMetrics(WebFormsActionType.ClassConversion, ActionName);
             // NOTE: Removed temporarily until usings can be better determined, at the moment, too
             // many are being removed
             // var requiredNamespaceNames = _sourceFileSemanticModel

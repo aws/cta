@@ -117,5 +117,15 @@ namespace CTA.FeatureDetection.ProjectType.Extensions
         {
             return featureDetectionResult.FeatureStatus.GetValueOrDefault(Constants.WCFServiceHostFeatureName, false);
         }
+
+        /// <summary>
+        /// Queries a FeatureDetectionResult object to determine if the project is a .NET Framework WebForms project
+        /// </summary>
+        /// <param name="featureDetectionResult">Result from feature detection</param>
+        /// <returns>Whether or not the project is a .NET Framework WebForms project</returns>
+        public static bool IsAspNetWebFormsProject(this FeatureDetectionResult featureDetectionResult)
+        {
+            return featureDetectionResult.FeatureStatus.GetValueOrDefault(Constants.AspNetWebFormsFeatureName, false);
+        }
     }
 }

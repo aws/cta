@@ -6,6 +6,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using CTA.Rules.Config;
+using CTA.Rules.Models;
 using CTA.WebForms2Blazor.ControlConverters;
 using CTA.WebForms2Blazor.FileInformationModel;
 using CTA.WebForms2Blazor.Helpers;
@@ -74,7 +75,7 @@ namespace CTA.WebForms2Blazor.FileConverters
 
         private void GetActions(HtmlNode node, HtmlNode parent)
         {
-            string controlConverterType = "";
+            string controlConverterType = "NonWebFormsControl";
             if (SupportedControls.ControlRulesMap.ContainsKey(node.Name))
             {
                 var conversionAction = new ControlConversionAction(node, parent, SupportedControls.ControlRulesMap[node.Name]);
@@ -95,7 +96,7 @@ namespace CTA.WebForms2Blazor.FileConverters
                     controlConverterType = UnSupportedControlConverter;
                 }
             }
-            _metricsContext.CollectControlConversionMetrics(controlConverterType, node.Name);
+            _metricsContext.CollectActionMetrics(WebFormsActionType.ControlConversion, controlConverterType, node.Name);
         }
 
         private void ConvertNodes()
@@ -125,7 +126,7 @@ namespace CTA.WebForms2Blazor.FileConverters
         public override Task<IEnumerable<FileInformation>> MigrateFileAsync()
         {
             LogStart();
-            _metricsContext.CollectFileConversionMetrics(ChildActionType);
+            _metricsContext.CollectActionMetrics(WebFormsActionType.FileConversion, ChildActionType);
 
             var result = new List<FileInformation>();
             try

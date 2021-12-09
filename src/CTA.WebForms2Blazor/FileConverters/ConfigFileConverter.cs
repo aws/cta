@@ -29,7 +29,7 @@ namespace CTA.WebForms2Blazor.FileConverters
         public override Task<IEnumerable<FileInformation>> MigrateFileAsync()
         {
             LogStart();
-            _metricsContext.CollectFileConversionMetrics(ChildActionType);
+            _metricsContext.CollectActionMetrics(WebFormsActionType.FileConversion, ChildActionType);
 
             string filename = Path.GetFileName(RelativePath);
             var fileList = new List<FileInformation>();

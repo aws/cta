@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Codelyzer.Analysis;
 using CTA.Rules.Config;
-using CTA.Rules.Metrics;
 using CTA.Rules.Models;
 using CTA.WebForms2Blazor.Factories;
 using CTA.WebForms2Blazor.FileInformationModel;
@@ -19,10 +18,10 @@ namespace CTA.WebForms2Blazor
         private const string MigrationTasksCompletedLogAction = "Migration Tasks Completed";
 
         private readonly string _inputProjectPath;
-        private readonly string _outputProjectPath;
         private readonly string _solutionPath;
+        private readonly ProjectResult _projectResult;
 
-        private readonly PortCoreConfiguration _projectConfiguration;
+        private readonly ProjectConfiguration _projectConfiguration;
         private readonly AnalyzerResult _analyzerResult;
 
         private ProjectAnalyzer _webFormsProjectAnalyzer;
@@ -40,26 +39,24 @@ namespace CTA.WebForms2Blazor
         private FileConverterFactory _fileConverterFactory;
         private WebFormMetricContext _metricsContext;
 
-        public MigrationManager(string inputProjectPath, string outputProjectPath, string solutionPath, AnalyzerResult analyzerResult,
-            PortCoreConfiguration projectConfiguration)
+        public MigrationManager(string inputProjectPath, AnalyzerResult analyzerResult,
+            ProjectConfiguration projectConfiguration, ProjectResult projectResult)
         {
             _inputProjectPath = inputProjectPath;
-            _outputProjectPath = outputProjectPath;
-            _solutionPath = solutionPath;
+            _solutionPath = projectConfiguration.SolutionPath;
             _analyzerResult = analyzerResult;
             _projectConfiguration = projectConfiguration;
-            var context = new MetricsContext(_solutionPath, new List<AnalyzerResult> { _analyzerResult });
-            _metricsContext = new WebFormMetricContext(context, _projectConfiguration.ProjectPath);
+            _projectResult = projectResult;
+            _metricsContext = new WebFormMetricContext();
         }
 
         public async Task<WebFormsPortingResult> PerformMigration()
         {
             LogHelper.LogInformation(string.Format(
-                Constants.StartedFromToLogTemplate,
+                Constants.StartedOfLogTemplate,
                 GetType().Name,
                 Constants.ProjectMigrationLogAction,
-                _inputProjectPath,
-                _outputProjectPath));
+                _inputProjectPath));
 
             // Order is important here
             InitializeProjectManagementStructures();
@@ -69,6 +66,12 @@ namespace CTA.WebForms2Blazor
             // Pass workspace build manager to factory constructor
             var fileConverterCollection = _fileConverterFactory.BuildMany(_webFormsProjectAnalyzer.GetProjectFileInfo());
 
+            var ignorableFileInfo = _webFormsProjectAnalyzer.GetProjectIgnoredFiles();
+            foreach(var fileInfo in ignorableFileInfo)
+            {
+                _blazorProjectBuilder.DeleteFileAndEmptyDirectories(fileInfo.FullName, _inputProjectPath);
+            }
+
             var migrationTasks = fileConverterCollection.Select(fileConverter =>
                 // ContinueWith specifies the action to be run after each task completes,
                 // in this case it sends each generated file to the project builder
@@ -76,6 +79,8 @@ namespace CTA.WebForms2Blazor
                 {
                     try
                     {
+                        _blazorProjectBuilder.DeleteFileAndEmptyDirectories(fileConverter.FullPath, _inputProjectPath);
+
                         // It's ok to use Task.Result here because the lambda within
                         // the ContinueWith block only executes once the original task
                         // is complete. Task.Result is also preferred because await
@@ -98,19 +103,17 @@ namespace CTA.WebForms2Blazor
             LogHelper.LogInformation(string.Format(Constants.GenericInformationLogTemplate, GetType().Name, MigrationTasksCompletedLogAction));
 
             WriteServiceDerivedFiles();
-            var result = new WebFormsPortingResult() { WebFormMetrics = _metricsContext.GetMetricList() };
+            var result = new WebFormsPortingResult() { Metrics = _metricsContext.Transform() };
 
             // TODO: Any necessary cleanup or last checks on new project
 
             LogHelper.LogInformation(string.Format(
-                Constants.EndedFromToLogTemplate,
+                Constants.EndedOfLogTemplate,
                 GetType().Name,
                 Constants.ProjectMigrationLogAction,
-                _inputProjectPath,
-                _outputProjectPath));
+                _inputProjectPath));
 
             return result;
-
         }
 
         private void WriteServiceDerivedFiles()
@@ -123,8 +126,8 @@ namespace CTA.WebForms2Blazor
 
         private void InitializeProjectManagementStructures()
         {
-            _webFormsProjectAnalyzer = new ProjectAnalyzer(_inputProjectPath, _analyzerResult, _projectConfiguration);
-            _blazorProjectBuilder = new ProjectBuilder(_outputProjectPath);
+            _webFormsProjectAnalyzer = new ProjectAnalyzer(_inputProjectPath, _analyzerResult, _projectConfiguration, _projectResult);
+            _blazorProjectBuilder = new ProjectBuilder(_inputProjectPath);
         }
 
         private void InitializeServices()

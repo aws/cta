@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CTA.Rules.Config;
+using CTA.Rules.Models;
 using CTA.WebForms2Blazor.Extensions;
 using CTA.WebForms2Blazor.FileInformationModel;
 using CTA.WebForms2Blazor.Helpers;
@@ -44,7 +45,7 @@ namespace CTA.WebForms2Blazor.ClassConverters
         {
             LogStart();
 
-            _metricsContext.CollectClassConversionMetrics(ActionName);
+            _metricsContext.CollectActionMetrics(WebFormsActionType.ClassConversion, ActionName);
             var className = _originalDeclarationSyntax.Identifier.ToString();
             var namespaceName = _originalClassSymbol.ContainingNamespace.ToDisplayString();
 

@@ -1,12 +1,14 @@
 ﻿using System;
 using System.IO;
-using CTA.FeatureDetection.Common.Extensions;
+using System.Linq;
 using CTA.WebForms2Blazor.Extensions;
 
 namespace CTA.WebForms2Blazor.Helpers
 {
     public static class FilePathHelper
     {
+        private const string PreviousDirPathSymbol = "..";
+        private const string CurrentDirPathSymbol = ".";
         private const string FileNameDoesNotContainExtensionError = 
             "Cannot alter file name, file name {0} does not end with extension {1}";
         
@@ -59,6 +61,22 @@ namespace CTA.WebForms2Blazor.Helpers
             }
 
             return result;
+        }
+
+        public static bool IsSubDirectory(string basePath, string otherPath)
+        {
+            var relativePath = Path.GetRelativePath(basePath, otherPath);
+            var pathSeparator = Path.PathSeparator;
+            var firstDir = relativePath.Split(Path.DirectorySeparatorChar).FirstOrDefault();
+
+            if (relativePath.Equals(otherPath)
+                || relativePath.Equals(CurrentDirPathSymbol)
+                || (firstDir?.Equals(PreviousDirPathSymbol) ?? true))
+            {
+                return false;
+            }
+
+            return true;
         }
     }
 }

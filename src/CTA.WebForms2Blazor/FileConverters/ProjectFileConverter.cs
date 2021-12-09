@@ -10,7 +10,6 @@ using CTA.Rules.Models;
 using CTA.WebForms2Blazor.FileInformationModel;
 using CTA.WebForms2Blazor.ProjectManagement;
 using CTA.WebForms2Blazor.Services;
-using CTA.Rules.PortCore;
 using CTA.Rules.Config;
 using CTA.Rules.ProjectFile;
 using CTA.Rules.Update;
@@ -43,7 +42,7 @@ namespace CTA.WebForms2Blazor.FileConverters
         }
 
         private string GenerateProjectFileContents(ProjectResult projectResult, 
-            PortCoreConfiguration projectConfiguration, List<String> projectReferences, List<String> metaReferences)
+            ProjectConfiguration projectConfiguration, List<String> projectReferences, List<String> metaReferences)
         {
             var projectActions = projectResult.ProjectActions;
             var packages = projectActions.PackageActions.Distinct()
@@ -60,7 +59,7 @@ namespace CTA.WebForms2Blazor.FileConverters
         public override Task<IEnumerable<FileInformation>> MigrateFileAsync()
         {
             LogStart();
-            _metricsContext.CollectFileConversionMetrics(ChildActionType);
+            _metricsContext.CollectActionMetrics(WebFormsActionType.FileConversion, ChildActionType);
 
             // TODO: Extract info from project files and
             // call _blazorWorkspaceManager.CreateProjectFile

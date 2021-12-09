@@ -61,6 +61,7 @@ namespace CTA.Rules.Test
 
             ProjectConfiguration projectConfiguration = new ProjectConfiguration()
             {
+                SolutionPath = solutionPath,
                 ProjectPath = projectFile,
                 TargetVersions = new List<string> { version },
                 RulesDir = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "CTAFiles")),

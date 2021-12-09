@@ -1647,5 +1647,139 @@ options.ListenLocalhost(8080);
 	}
 }
 ";
+        public const string WebFormsProgramText =
+@"using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Hosting;
+
+namespace ASP.NET-WebForms
+{
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            CreateHostBuilder(args).Build().Run();
+        }
+
+        public static IHostBuilder CreateHostBuilder(string[] args) =>
+            Host.CreateDefaultBuilder(args)
+                .ConfigureWebHostDefaults(webBuilder =>
+                {
+                    webBuilder.UseStartup<Startup>();
+                });
+    }
+}";
+        public const string WebFormsStartupText =
+@"using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+
+namespace ASP.NET_WebForms
+{
+    public class Startup
+    {
+        public IConfiguration Configuration { get; }
+
+        public IWebHostEnvironment Env { get; }
+
+        public Startup(IConfiguration configuration, IWebHostEnvironment env)
+        {
+            Configuration = configuration;
+            Env = env;
+        }
+
+        public void Configure(IApplicationBuilder app)
+        {
+            app.UseStaticFiles();
+            app.UseRouting();
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapBlazorHub();
+                endpoints.MapFallbackToPage(""/_Host"");
+            });
+            if (Env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
+
+            
+            // Code that runs on application startup
+            // The following lines were extracted from Application_Start
+            RouteConfig.RegisterRoutes(RouteTable.Routes);
+            BundleConfig.RegisterBundles(BundleTable.Bundles);
+        }
+
+        public void ConfigureServices(IServiceCollection services)
+        {
+            services.AddRazorPages();
+            services.AddServerSideBlazor();
+             // Did not attempt to migrate service layer
+            // and configure depenency injection in ConfigureServices(),
+            // this must be done manually
+        }
+    }
+}";
+
+        public const string BlazorConfigureFunctionText =
+            @"public void Configure(IApplicationBuilder app)
+        {
+            app.UseStaticFiles();
+            app.UseRouting();
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapBlazorHub();
+                endpoints.MapFallbackToPage(""/_Host"");
+            });
+            if (Env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
+
+            
+            // Code that runs on application startup
+            // The following lines were extracted from Application_Start
+            RouteConfig.RegisterRoutes(RouteTable.Routes);
+            BundleConfig.RegisterBundles(BundleTable.Bundles);
+            ConfigureContainer();
+            ConfigDataBase();
+            // This code replaces the original handling
+            // of the BeginRequest event
+            app.Use(async (context, next) =>
+            {
+                //set the property to our new object
+                LogicalThreadContext.Properties[""activityid""] = new ActivityIdHelper();
+                LogicalThreadContext.Properties[""requestinfo""] = new WebRequestInfo();
+                _log.Debug(""Application_BeginRequest"");
+                await next();
+            });
+        }";
+
+        public const string BlazorProgramText = @"
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            CreateHostBuilder(args).Build().Run();
+        }
+
+        public static IHostBuilder CreateHostBuilder(string[] args) =>
+            Host.CreateDefaultBuilder(args)
+                .ConfigureWebHostDefaults(webBuilder =>
+                {
+                    webBuilder.UseStartup<Startup>();
+                });
+    }";
+        public const string BlazorWebRequestInfoText = @"
+    public class WebRequestInfo
+    {
+        public override string ToString()
+        {
+            return HttpContext.Current?.Request?.RawUrl + "", "" + HttpContext.Current?.Request?.UserAgent;
+        }
+    }";
     }
 }

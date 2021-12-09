@@ -23,14 +23,13 @@ namespace CTA.WebForms2Blazor.Tests.ClassConverters
         [SetUp]
         public void SetUp()
         {
-            MetricsContext context = new MetricsContext(ClassConverterSetupFixture.TestProjectDirectoryPath);
             _converter = new ControlCodeBehindClassConverter(InputRelativePath,
                 ClassConverterSetupFixture.TestProjectDirectoryPath,
                 ClassConverterSetupFixture.TestSemanticModel,
                 ClassConverterSetupFixture.TestClassDec,
                 ClassConverterSetupFixture.TestTypeSymbol,
                 new TaskManagerService(),
-                new WebFormMetricContext(context, ClassConverterSetupFixture.TestProjectDirectoryPath));
+                new WebFormMetricContext());
         }
 
         [Test]

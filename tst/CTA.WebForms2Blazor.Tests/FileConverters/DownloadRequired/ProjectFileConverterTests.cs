@@ -9,6 +9,7 @@ using CTA.Rules.Config;
 using CTA.Rules.Metrics;
 using CTA.Rules.Models;
 using CTA.Rules.PortCore;
+using CTA.Rules.Update;
 using CTA.WebForms2Blazor.FileConverters;
 using CTA.WebForms2Blazor.FileInformationModel;
 using CTA.WebForms2Blazor.Metrics;
@@ -74,16 +75,19 @@ namespace CTA.WebForms2Blazor.Tests.FileConverters.DownloadRequired
                 PortCode = false,
                 PortProject = true,
                 TargetVersions = new List<string> { cli.Version }
-            };   
-            
-            _webFormsProjectAnalyzer = new ProjectAnalyzer(_testProjectPath, analyzerResult, projectConfiguration);
+            };
+
+            var projectRewriter = new ProjectRewriter(analyzerResult, projectConfiguration);
+            ProjectResult projectResult = projectRewriter.Initialize();
+
+            _webFormsProjectAnalyzer = new ProjectAnalyzer(_testProjectPath, analyzerResult, projectConfiguration, projectResult);
             _blazorWorkspaceManager = new WorkspaceManagerService();
         }
 
         [Test]
         public async Task TestProjectFileConverter()
         {
-            WebFormMetricContext metricContext = new WebFormMetricContext(new MetricsContext(DownloadTestProjectsFixture.EShopLegacyWebFormsProjectPath), DownloadTestProjectsFixture.EShopLegacyWebFormsProjectPath);
+            WebFormMetricContext metricContext = new WebFormMetricContext();
             FileConverter fc = new ProjectFileConverter(DownloadTestProjectsFixture.EShopOnBlazorSolutionPath,
                 DownloadTestProjectsFixture.EShopLegacyWebFormsProjectPath,
                 _blazorWorkspaceManager, _webFormsProjectAnalyzer,
