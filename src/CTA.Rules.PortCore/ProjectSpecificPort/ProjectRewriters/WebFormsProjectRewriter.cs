@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
-using System.Threading.Tasks;
 using Codelyzer.Analysis;
 using Codelyzer.Analysis.Build;
 using CTA.Rules.Config;
 using CTA.Rules.Models;
 using CTA.Rules.Update;
 using CTA.WebForms2Blazor;
+using Microsoft.Build.Logging.StructuredLogger;
+using Task = System.Threading.Tasks.Task;
 
 namespace CTA.Rules.PortCore
 {
@@ -67,6 +68,7 @@ namespace CTA.Rules.PortCore
             var ideFileActions = new List<IDEFileActions>();
 
             // Incremental porting for WebForms project is yet to be implemented
+            LogHelper.LogError(new NotImplementedException("WebForms Porting Error: Failed to run incremental porting on a WebForms project. This feature is not yet supported for this project type."));
             
             return ideFileActions;
         }
@@ -75,7 +77,6 @@ namespace CTA.Rules.PortCore
         {
             WebFormsPortingResult result = null;
             var projectDir = Path.GetDirectoryName(ProjectConfiguration.ProjectPath);
-            var projectParentDir = Path.GetDirectoryName(projectDir);
 
             try
             {
@@ -84,7 +85,7 @@ namespace CTA.Rules.PortCore
             }
             catch (Exception e)
             {
-                LogHelper.LogError("WebForms Porting Error: Error while migrating WebForms to Blazor: ", e.Message);
+                LogHelper.LogError(e, "WebForms Porting Error: Error while migrating WebForms to Blazor.");
             }
             return result;
         }
