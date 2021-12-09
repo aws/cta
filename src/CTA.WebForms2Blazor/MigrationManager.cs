@@ -40,11 +40,11 @@ namespace CTA.WebForms2Blazor
         private FileConverterFactory _fileConverterFactory;
         private WebFormMetricContext _metricsContext;
 
-        public MigrationManager(string inputProjectPath, string solutionPath, AnalyzerResult analyzerResult,
-            CTA.Rules.Models.ProjectConfiguration projectConfiguration, ProjectResult projectResult)
+        public MigrationManager(string inputProjectPath, AnalyzerResult analyzerResult,
+            ProjectConfiguration projectConfiguration, ProjectResult projectResult)
         {
             _inputProjectPath = inputProjectPath;
-            _solutionPath = solutionPath;
+            _solutionPath = projectConfiguration.SolutionPath;
             _analyzerResult = analyzerResult;
             _projectConfiguration = projectConfiguration;
             _projectResult = projectResult;

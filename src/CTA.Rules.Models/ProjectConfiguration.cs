@@ -12,6 +12,7 @@ namespace CTA.Rules.Models
             PackageReferences = new Dictionary<string, Tuple<string, string>>();
             AdditionalReferences = new List<string>();
         }
+        public string SolutionPath;
         public string ProjectPath;
         public List<string> TargetVersions;
         public string AssemblyDir;
