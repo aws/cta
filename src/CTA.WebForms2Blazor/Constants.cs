@@ -109,12 +109,12 @@
         public const string StartedAtLogTemplate = "{0}: Started {1} at {2}";
         public const string StartedForLogTemplate = "{0}: Started {1} for {2}";
         public const string StartedForAtLogTemplate = "{0}: Started {1} for {2} at {3}";
-        public const string StartedFromToLogTemplate = "{0}: Started {1} from {2} to {3}";
+        public const string StartedOfLogTemplate = "{0}: Started {1} of {2}";
         public const string EndedLogTemplate = "{0}: Ended {1}";
         public const string EndedAtLogTemplate = "{0}: Ended {1} at {2}";
         public const string EndedForLogTemplate = "{0}: Ended {1} for {2}";
         public const string EndedForAtLogTemplate = "{0}: Ended {1} for {2} at {3}";
-        public const string EndedFromToLogTemplate = "{0}: Ended {1} from {2} to {3}";
+        public const string EndedOfLogTemplate = "{0}: Ended {1} of {2}";
 
         // Logging Actions
         public const string ProjectMigrationLogAction = "Project Migration";

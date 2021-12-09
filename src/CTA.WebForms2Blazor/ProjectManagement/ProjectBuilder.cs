@@ -1,7 +1,9 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using CTA.Rules.Config;
 using CTA.WebForms2Blazor.FileInformationModel;
+using CTA.WebForms2Blazor.Helpers;
 
 namespace CTA.WebForms2Blazor.ProjectManagement
 {
@@ -62,6 +64,45 @@ namespace CTA.WebForms2Blazor.ProjectManagement
             catch (Exception e)
             {
                 LogHelper.LogError(e, $"Could not write file bytes to project (attempted to write to {fullPath}).");
+            }
+        }
+
+        public void DeleteDirectoriesIfEmpty(string fullPath, string pathLimit)
+        {
+            if (fullPath == null)
+            {
+                return;
+            }
+
+            try
+            {
+                var beforePathLimit = FilePathHelper.IsSubDirectory(pathLimit, fullPath);
+                var directoryEmpty = !Directory.EnumerateFileSystemEntries(fullPath).Any();
+
+                if (beforePathLimit && directoryEmpty)
+                {
+                    var parentDir = Path.GetDirectoryName(fullPath);
+                    Directory.Delete(fullPath);
+                    DeleteDirectoriesIfEmpty(parentDir, pathLimit);
+                }
+            }
+            catch (Exception e)
+            {
+                LogHelper.LogError(e, $"Could not delete directory at {fullPath}");
+            }
+        }
+
+        public void DeleteFileAndEmptyDirectories(string fullPath, string pathLimit)
+        {
+            try
+            {
+                var parentDir = Path.GetDirectoryName(fullPath);
+                File.Delete(fullPath);
+                DeleteDirectoriesIfEmpty(parentDir, pathLimit);
+            }
+            catch (Exception e)
+            {
+                LogHelper.LogError(e, $"Unable to delete file at {fullPath}");
             }
         }
     }
