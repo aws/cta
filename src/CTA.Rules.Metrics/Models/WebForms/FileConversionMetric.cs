@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 
 namespace CTA.Rules.Metrics.Models.WebForms
 {
-    class FileConversionMetric : WebFormsActionMetric
+    public class FileConversionMetric : WebFormsActionMetric
     {
         [JsonProperty("actionName", Order = 11)]
         public string ActionName => "FileConversion";
