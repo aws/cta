@@ -18,7 +18,7 @@ namespace CTA.WebForms2Blazor.Tests.FileConverters
         [Test]
         public async Task TestWebConfigFileConverter()
         {
-            WebFormMetricContext metricContext = new WebFormMetricContext(new MetricsContext(FileConverterSetupFixture.TestProjectPath), FileConverterSetupFixture.TestProjectPath);
+            WebFormMetricContext metricContext = new WebFormMetricContext();
             FileConverter fc = new ConfigFileConverter(FileConverterSetupFixture.TestProjectPath, FileConverterSetupFixture.TestWebConfigFilePath, new TaskManagerService(), metricContext);
             IEnumerable<FileInformation> fileList = await fc.MigrateFileAsync();
             FileInformation fi = fileList.Single();

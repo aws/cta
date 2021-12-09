@@ -76,31 +76,16 @@ namespace CTA.Rules.PortCore
             WebFormsPortingResult result = null;
             var projectDir = Path.GetDirectoryName(ProjectConfiguration.ProjectPath);
             var projectParentDir = Path.GetDirectoryName(projectDir);
-            var tempProjectDir = Path.Join(projectParentDir, string.Join("-", new DirectoryInfo(projectDir).Name, Path.GetRandomFileName()));
+
             try
             {
-                var migrationManager = new MigrationManager(projectDir, tempProjectDir, "", _analyzerResult, ProjectConfiguration, _projectResult);
+                MigrationManager migrationManager = new MigrationManager(projectDir, _analyzerResult, ProjectConfiguration, _projectResult);
                 result = Task.Run(() => migrationManager.PerformMigration()).GetAwaiter().GetResult();
-
-                Directory.Delete(projectDir, true);
-                while (Directory.Exists(projectDir))
-                {
-                    Thread.Sleep(0);
-                }
-                Directory.Move(tempProjectDir, projectDir);
             }
             catch (Exception e)
             {
                 LogHelper.LogError("WebForms Porting Error: Error while migrating WebForms to Blazor: ", e.Message);
             }
-            finally
-            {
-                if (Directory.Exists(tempProjectDir))
-                {
-                    Directory.Delete(tempProjectDir, true);
-                }
-            }
-
             return result;
         }
     }

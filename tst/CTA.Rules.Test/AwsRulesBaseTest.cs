@@ -109,6 +109,7 @@ namespace CTA.Rules.Test
                         };
                         PortCoreConfiguration projectConfiguration = new PortCoreConfiguration()
                         {
+                            SolutionPath = solutionPath,
                             ProjectPath = projectFile,
                             UseDefaultRules = true,
                             TargetVersions = new List<string> { version },
@@ -129,6 +130,7 @@ namespace CTA.Rules.Test
                     // Otherwise will hit KeyNotFoundException 
                     solutionPortConfiguration.Add(new PortCoreConfiguration
                     {
+                        SolutionPath = solutionPath,
                         ProjectPath = "fakeproject.csproj",
                         UseDefaultRules = true,
                     });

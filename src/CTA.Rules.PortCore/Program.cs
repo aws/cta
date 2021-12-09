@@ -50,6 +50,7 @@ namespace CTA.Rules.PortCore
                 {
                     PortCoreConfiguration projectConfiguration = new PortCoreConfiguration()
                     {
+                        SolutionPath = cli.FilePath,
                         ProjectPath = proj,
                         RulesDir = cli.RulesDir,
                         IsMockRun = cli.IsMockRun,

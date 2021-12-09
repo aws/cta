@@ -18,7 +18,7 @@ namespace CTA.WebForms2Blazor
         private const string MigrationTasksCompletedLogAction = "Migration Tasks Completed";
 
         private readonly string _inputProjectPath;
-        private readonly string _outputProjectPath;
+        private readonly string _solutionPath;
         private readonly ProjectResult _projectResult;
 
         private readonly ProjectConfiguration _projectConfiguration;
@@ -39,11 +39,11 @@ namespace CTA.WebForms2Blazor
         private FileConverterFactory _fileConverterFactory;
         private WebFormMetricContext _metricsContext;
 
-        public MigrationManager(string inputProjectPath, string outputProjectPath, string solutionPath, AnalyzerResult analyzerResult,
-            CTA.Rules.Models.ProjectConfiguration projectConfiguration, ProjectResult projectResult)
+        public MigrationManager(string inputProjectPath, AnalyzerResult analyzerResult,
+            ProjectConfiguration projectConfiguration, ProjectResult projectResult)
         {
             _inputProjectPath = inputProjectPath;
-            _outputProjectPath = outputProjectPath;
+            _solutionPath = projectConfiguration.SolutionPath;
             _analyzerResult = analyzerResult;
             _projectConfiguration = projectConfiguration;
             _projectResult = projectResult;
@@ -53,11 +53,10 @@ namespace CTA.WebForms2Blazor
         public async Task<WebFormsPortingResult> PerformMigration()
         {
             LogHelper.LogInformation(string.Format(
-                Constants.StartedFromToLogTemplate,
+                Constants.StartedOfLogTemplate,
                 GetType().Name,
                 Constants.ProjectMigrationLogAction,
-                _inputProjectPath,
-                _outputProjectPath));
+                _inputProjectPath));
 
             // Order is important here
             InitializeProjectManagementStructures();
@@ -67,6 +66,12 @@ namespace CTA.WebForms2Blazor
             // Pass workspace build manager to factory constructor
             var fileConverterCollection = _fileConverterFactory.BuildMany(_webFormsProjectAnalyzer.GetProjectFileInfo());
 
+            var ignorableFileInfo = _webFormsProjectAnalyzer.GetProjectIgnoredFiles();
+            foreach(var fileInfo in ignorableFileInfo)
+            {
+                _blazorProjectBuilder.DeleteFileAndEmptyDirectories(fileInfo.FullName, _inputProjectPath);
+            }
+
             var migrationTasks = fileConverterCollection.Select(fileConverter =>
                 // ContinueWith specifies the action to be run after each task completes,
                 // in this case it sends each generated file to the project builder
@@ -74,6 +79,8 @@ namespace CTA.WebForms2Blazor
                 {
                     try
                     {
+                        _blazorProjectBuilder.DeleteFileAndEmptyDirectories(fileConverter.FullPath, _inputProjectPath);
+
                         // It's ok to use Task.Result here because the lambda within
                         // the ContinueWith block only executes once the original task
                         // is complete. Task.Result is also preferred because await
@@ -101,14 +108,12 @@ namespace CTA.WebForms2Blazor
             // TODO: Any necessary cleanup or last checks on new project
 
             LogHelper.LogInformation(string.Format(
-                Constants.EndedFromToLogTemplate,
+                Constants.EndedOfLogTemplate,
                 GetType().Name,
                 Constants.ProjectMigrationLogAction,
-                _inputProjectPath,
-                _outputProjectPath));
+                _inputProjectPath));
 
             return result;
-
         }
 
         private void WriteServiceDerivedFiles()
@@ -122,7 +127,7 @@ namespace CTA.WebForms2Blazor
         private void InitializeProjectManagementStructures()
         {
             _webFormsProjectAnalyzer = new ProjectAnalyzer(_inputProjectPath, _analyzerResult, _projectConfiguration, _projectResult);
-            _blazorProjectBuilder = new ProjectBuilder(_outputProjectPath);
+            _blazorProjectBuilder = new ProjectBuilder(_inputProjectPath);
         }
 
         private void InitializeServices()

@@ -69,5 +69,58 @@ namespace CTA.WebForms2Blazor.Tests.Helpers
 
             Assert.AreEqual(expectedPath, FilePathHelper.RemoveDuplicateDirectories(inputPath));
         }
+
+        [Test]
+        public void IsSubDirectory_Returns_True_If_OtherPath_Is_One_Level_Above_BasePath()
+        {
+            var basePath = Path.Combine("Dir1", "Dir2");
+            var otherPath = Path.Combine(basePath, "Dir3");
+
+            Assert.True(FilePathHelper.IsSubDirectory(basePath, otherPath));
+        }
+
+        [Test]
+        public void IsSubDirectory_Returns_True_If_OtherPath_Is_Multiple_Levels_Above_BasePath()
+        {
+            var basePath = Path.Combine("Dir1", "Dir2");
+            var otherPath = Path.Combine(basePath, "Dir3", "Dir4", "Dir5");
+
+            Assert.True(FilePathHelper.IsSubDirectory(basePath, otherPath));
+        }
+
+        [Test]
+        public void IsSubDirectory_Returns_False_If_OtherPath_Is_Same_As_BasePath()
+        {
+            var path = Path.Combine("Dir1", "Dir2");
+
+            Assert.False(FilePathHelper.IsSubDirectory(path, path));
+        }
+
+        [Test]
+        public void IsSubDirectory_Returns_False_If_OtherPath_Is_One_Level_Below_BasePath()
+        {
+            var otherPath = Path.Combine("Dir1", "Dir2");
+            var basePath = Path.Combine(otherPath, "Dir3");
+
+            Assert.False(FilePathHelper.IsSubDirectory(basePath, otherPath));
+        }
+
+        [Test]
+        public void IsSubDirectory_Returns_False_If_OtherPath_Is_Multiple_Levels_Below_BasePath()
+        {
+            var otherPath = Path.Combine("Dir1", "Dir2");
+            var basePath = Path.Combine(otherPath, "Dir3", "Dir4", "Dir5");
+
+            Assert.False(FilePathHelper.IsSubDirectory(basePath, otherPath));
+        }
+
+        [Test]
+        public void IsSubDirectory_Returns_False_If_Paths_Do_Not_Share_A_Root()
+        {
+            var basePath = Path.Combine("Dir1Alt", "Dir2", "Dir3");
+            var otherPath = Path.Combine("Dir1", "Dir2");
+
+            Assert.False(FilePathHelper.IsSubDirectory(basePath, otherPath));
+        }
     }
 }

@@ -124,7 +124,6 @@ namespace ProjectNamespace
         [SetUp]
         public void SetUp()
         {
-            MetricsContext context = new MetricsContext(ClassConverterSetupFixture.TestProjectDirectoryPath);
             _converter = new GlobalClassConverter(InputRelativePath,
                 ClassConverterSetupFixture.TestProjectDirectoryPath,
                 ClassConverterSetupFixture.TestSemanticModel,
@@ -132,7 +131,7 @@ namespace ProjectNamespace
                 ClassConverterSetupFixture.TestTypeSymbol,
                 new LifecycleManagerService(),
                 new TaskManagerService(),
-                new WebFormMetricContext(context, ClassConverterSetupFixture.TestProjectDirectoryPath));
+                new WebFormMetricContext());
         }
 
         [Test]
@@ -151,7 +150,6 @@ namespace ProjectNamespace
             var complexClassDec = complexSyntaxTree.GetRoot().DescendantNodes().OfType<ClassDeclarationSyntax>().Single();
             var complexTypeSymbol = complexSemanticModel.GetDeclaredSymbol(complexClassDec);
 
-            MetricsContext context = new MetricsContext(ClassConverterSetupFixture.TestProjectDirectoryPath);
             var complexConverter = new GlobalClassConverter(InputRelativePath,
                 ClassConverterSetupFixture.TestProjectDirectoryPath,
                 complexSemanticModel,
@@ -159,7 +157,7 @@ namespace ProjectNamespace
                 complexTypeSymbol,
                 new LifecycleManagerService(),
                 new TaskManagerService(),
-                new WebFormMetricContext(context, ClassConverterSetupFixture.TestProjectDirectoryPath));
+                new WebFormMetricContext());
 
             var fileInfo = (await complexConverter.MigrateClassAsync()).Single();
             var fileText = Encoding.UTF8.GetString(fileInfo.FileBytes);

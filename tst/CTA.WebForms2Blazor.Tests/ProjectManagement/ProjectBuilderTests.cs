@@ -83,6 +83,124 @@ namespace CTA.WebForms2Blazor.Tests.ProjectManagement
             Assert.True(File.Exists(deepTestClassTargetPath));
         }
 
+        [Test]
+        [NonParallelizable]
+        public void DeleteDirectoriesIfEmpty_Will_Not_Delete_Directory_With_Content()
+        {
+            var pathLimit = PartialProjectSetupFixture.TestingAreaPath;
+
+            var basePath = Path.Combine(pathLimit, "Dir1");
+            var filePath = Path.Combine(basePath, "testfile.txt");
+            var contentBytes = Encoding.UTF8.GetBytes("namespace SomeNS { public class NewClass {} }");
+
+            _projectBuilder.WriteFileBytesToProject(filePath, contentBytes);
+            _projectBuilder.DeleteDirectoriesIfEmpty(basePath, pathLimit);
+
+            Assert.True(Directory.Exists(basePath));
+            Assert.True(File.Exists(filePath));
+
+            Directory.Delete(basePath, true);
+        }
+
+        [Test]
+        [NonParallelizable]
+        public void DeleteDirectoriesIfEmpty_Will_Not_Delete_Directory_With_Content_One_Level_Up()
+        {
+            var pathLimit = PartialProjectSetupFixture.TestingAreaPath;
+
+            var contentPath = Path.Combine(pathLimit, "Dir1");
+            var emptyPath = Path.Combine(contentPath, "Dir2");
+            var filePath = Path.Combine(contentPath, "testfile.txt");
+            var contentBytes = Encoding.UTF8.GetBytes("namespace SomeNS { public class NewClass {} }");
+
+            _projectBuilder.WriteFileBytesToProject(filePath, contentBytes);
+            _projectBuilder.DeleteDirectoriesIfEmpty(emptyPath, pathLimit);
+
+            Assert.False(Directory.Exists(emptyPath));
+            Assert.True(Directory.Exists(contentPath));
+            Assert.True(File.Exists(filePath));
+
+            Directory.Delete(contentPath, true);
+        }
+
+        [Test]
+        [NonParallelizable]
+        public void DeleteDirectoriesIfEmpty_Will_Not_Delete_Directory_With_Content_Multiple_Levels_Up()
+        {
+            var pathLimit = PartialProjectSetupFixture.TestingAreaPath;
+
+            var contentPath = Path.Combine(pathLimit, "Dir1");
+            var emptyPath = Path.Combine(contentPath, "Dir2");
+            var filePath = Path.Combine(contentPath, "Dir3", "Dir4", "testfile.txt");
+            var contentBytes = Encoding.UTF8.GetBytes("namespace SomeNS { public class NewClass {} }");
+
+            _projectBuilder.WriteFileBytesToProject(filePath, contentBytes);
+            _projectBuilder.DeleteDirectoriesIfEmpty(emptyPath, pathLimit);
+
+            Assert.False(Directory.Exists(emptyPath));
+            Assert.True(Directory.Exists(contentPath));
+            Assert.True(File.Exists(filePath));
+
+            Directory.Delete(contentPath, true);
+        }
+
+        [Test]
+        [NonParallelizable]
+        public void DeleteDirectoriesIfEmpty_Will_Not_Delete_Past_PathLimit_Directory()
+        {
+            var pathLimit = Path.Combine(PartialProjectSetupFixture.TestingAreaPath, "Dir1");
+
+            var basePath = Path.Combine(pathLimit, "Dir2");
+            Directory.CreateDirectory(basePath);
+
+            _projectBuilder.DeleteDirectoriesIfEmpty(basePath, pathLimit);
+
+            Assert.True(Directory.Exists(pathLimit));
+            Assert.False(Directory.Exists(basePath));
+
+            Directory.Delete(pathLimit, true);
+        }
+
+        [Test]
+        [NonParallelizable]
+        public void DeleteFileAndEmptyDirectories_Will_Only_Delete_File_If_Sibling_Content_Exists()
+        {
+            var pathLimit = PartialProjectSetupFixture.TestingAreaPath;
+
+            var basePath = Path.Combine(pathLimit, "Dir1");
+            var filePath = Path.Combine(basePath, "testfile.txt");
+            var siblingFilePath = Path.Combine(basePath, "testfile2.txt");
+            var contentBytes = Encoding.UTF8.GetBytes("namespace SomeNS { public class NewClass {} }");
+
+            _projectBuilder.WriteFileBytesToProject(filePath, contentBytes);
+            _projectBuilder.WriteFileBytesToProject(siblingFilePath, contentBytes);
+            _projectBuilder.DeleteFileAndEmptyDirectories(filePath, pathLimit);
+
+            Assert.False(File.Exists(filePath));
+            Assert.True(Directory.Exists(basePath));
+            Assert.True(File.Exists(siblingFilePath));
+
+            Directory.Delete(basePath, true);
+        }
+
+        [Test]
+        [NonParallelizable]
+        public void DeleteFileAndEmptyDirectories_Will_Delete_Parent_Directory_If_No_Sibling_Content_Exists()
+        {
+            var pathLimit = PartialProjectSetupFixture.TestingAreaPath;
+
+            var basePath = Path.Combine(pathLimit, "Dir1");
+            var filePath = Path.Combine(basePath, "testfile.txt");
+            var contentBytes = Encoding.UTF8.GetBytes("namespace SomeNS { public class NewClass {} }");
+
+            _projectBuilder.WriteFileBytesToProject(filePath, contentBytes);
+            _projectBuilder.DeleteFileAndEmptyDirectories(filePath, pathLimit);
+
+            Assert.False(File.Exists(filePath));
+            Assert.False(Directory.Exists(basePath));
+            Assert.True(Directory.Exists(pathLimit));
+        }
+
         public void ClearTestBlazorProjectDirectory()
         {
             if (Directory.Exists(PartialProjectSetupFixture.TestBlazorProjectPath))

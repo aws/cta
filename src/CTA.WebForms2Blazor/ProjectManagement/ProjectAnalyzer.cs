@@ -16,6 +16,9 @@ namespace CTA.WebForms2Blazor.ProjectManagement
         private const string DiscoveredFilesLogTemplate = "{0}: Discovered {1} Files in Project at {2}";
         private const string RetrievedFilesForProcessingLogTemplate = "{0}: Retrieved {1}/{2} Discovered Files for Processing";
 
+        private IEnumerable<FileInfo> _migrationFileInfo;
+        private IEnumerable<FileInfo> _ignorableFileInfo;
+
         private readonly string _inputProjectPath;
         public AnalyzerResult AnalyzerResult { get; }
         public ProjectConfiguration ProjectConfiguration { get; }
@@ -40,15 +43,35 @@ namespace CTA.WebForms2Blazor.ProjectManagement
 
         public IEnumerable<FileInfo> GetProjectFileInfo()
         {
+            if (_migrationFileInfo == null)
+            {
+                DoAnalysis();
+            }
+
+            return _migrationFileInfo;
+        }
+
+        public IEnumerable<FileInfo> GetProjectIgnoredFiles()
+        {
+            if (_ignorableFileInfo == null)
+            {
+                DoAnalysis();
+            }
+
+            return _ignorableFileInfo;
+        }
+
+        private void DoAnalysis()
+        {
             var directoryInfo = new DirectoryInfo(_inputProjectPath);
             var allFiles = directoryInfo.GetFiles("*", SearchOption.AllDirectories);
             LogHelper.LogInformation(string.Format(DiscoveredFilesLogTemplate, GetType().Name, allFiles.Length, InputProjectPath));
 
-            var result = allFiles.Where(fileInfo => !FileFilter.ShouldIgnoreFileAtPath(Path.GetRelativePath(_inputProjectPath, fileInfo.FullName)));
-            LogHelper.LogInformation(string.Format(RetrievedFilesForProcessingLogTemplate, GetType().Name, result.Count(), allFiles.Length));
+            var migrationFiles = allFiles.Where(fileInfo => !FileFilter.ShouldIgnoreFileAtPath(Path.GetRelativePath(_inputProjectPath, fileInfo.FullName)));
+            LogHelper.LogInformation(string.Format(RetrievedFilesForProcessingLogTemplate, GetType().Name, migrationFiles.Count(), allFiles.Length));
 
-            return result;
+            _migrationFileInfo = migrationFiles;
+            _ignorableFileInfo = allFiles.Where(fileInfo => !migrationFiles.Contains(fileInfo));
         }
-        
     }
 }
