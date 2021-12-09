@@ -16,17 +16,8 @@ namespace CTA.Rules.PortCore
             try
             {
                 PortCoreRulesCli cli = new PortCoreRulesCli();
-                args = new[]
-                {
-                    "-p", @"C:\Users\saakla\source\repos\TestWebForms\TestWebForms.sln",
-                    "-d", "true",
-                    "-m", "false",
-                    "-c", "true"
-                };
                 cli.HandleCommand(args);
 
-
-                
                 Console.WriteLine(cli.FilePath);
 
                 /* 1. Logger object */
