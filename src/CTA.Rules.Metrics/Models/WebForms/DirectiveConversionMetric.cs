@@ -1,10 +1,11 @@
-﻿using System.Collections.Generic;
-using CTA.Rules.Metrics;
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
 using Newtonsoft.Json;
 
-namespace CTA.WebForms2Blazor.Metrics
+namespace CTA.Rules.Metrics.Models.WebForms
 {
-    public class DirectiveConversionMetric : WebFormMetric
+    public class DirectiveConversionMetric : WebFormsActionMetric
     {
         [JsonProperty("actionName", Order = 11)]
         public string ActionName => "DirectiveConversion";

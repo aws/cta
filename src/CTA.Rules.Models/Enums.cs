@@ -57,4 +57,12 @@
         RequestFiltering,
         RequestLimits
     }
+
+    public enum WebFormsActionType
+    {
+        DirectiveConversion,
+        ControlConversion,
+        ClassConversion,
+        FileConversion
+    }
 }

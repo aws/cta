@@ -52,7 +52,11 @@ namespace CTA.Rules.PortCore
 
             if (ProjectConfiguration.PortCode)
             {
-                RunWebFormsChanges();
+               var result =  RunWebFormsChanges();
+               if (result != null)
+               {
+                   _projectResult.WebFormsMetricResults = result.Metrics;
+               }
             }
 
             return _projectResult;
@@ -67,15 +71,16 @@ namespace CTA.Rules.PortCore
             return ideFileActions;
         }
 
-        private void RunWebFormsChanges()
+        private WebFormsPortingResult RunWebFormsChanges()
         {
+            WebFormsPortingResult result = null;
             var projectDir = Path.GetDirectoryName(ProjectConfiguration.ProjectPath);
             var projectParentDir = Path.GetDirectoryName(projectDir);
             var tempProjectDir = Path.Join(projectParentDir, string.Join("-", new DirectoryInfo(projectDir).Name, Path.GetRandomFileName()));
             try
             {
                 var migrationManager = new MigrationManager(projectDir, tempProjectDir, "", _analyzerResult, ProjectConfiguration, _projectResult);
-                Task.Run(() => migrationManager.PerformMigration()).GetAwaiter().GetResult();
+                result = Task.Run(() => migrationManager.PerformMigration()).GetAwaiter().GetResult();
 
                 Directory.Delete(projectDir, true);
                 while (Directory.Exists(projectDir))
@@ -95,6 +100,8 @@ namespace CTA.Rules.PortCore
                     Directory.Delete(tempProjectDir, true);
                 }
             }
+
+            return result;
         }
     }
 }

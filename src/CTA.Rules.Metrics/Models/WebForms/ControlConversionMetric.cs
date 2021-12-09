@@ -1,17 +1,14 @@
 ﻿using System.Collections.Generic;
-using CTA.Rules.Metrics;
 using Newtonsoft.Json;
 
-namespace CTA.WebForms2Blazor.Metrics
+namespace CTA.Rules.Metrics.Models.WebForms
 {
-    public class ControlConversionMetric : WebFormMetric
+    public class ControlConversionMetric : WebFormsActionMetric
     {
         [JsonProperty("actionName", Order = 11)]
         public string ActionName => "ControlConversion";
-        [JsonProperty("nodeName", Order = 12)]
-        public string NodeName { get; set; }
 
-        public ControlConversionMetric(MetricsContext context, string childActionName, string projectPath, string nodeName)
+        public ControlConversionMetric(MetricsContext context, string childActionName, string nodeName, string projectPath)
         {
             ChildActionName = childActionName;
             SolutionPathHash = context.SolutionPathHash;

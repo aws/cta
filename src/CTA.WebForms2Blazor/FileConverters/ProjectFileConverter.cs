@@ -59,7 +59,7 @@ namespace CTA.WebForms2Blazor.FileConverters
         public override Task<IEnumerable<FileInformation>> MigrateFileAsync()
         {
             LogStart();
-            _metricsContext.CollectFileConversionMetrics(ChildActionType);
+            _metricsContext.CollectActionMetrics(WebFormsActionType.FileConversion, ChildActionType);
 
             // TODO: Extract info from project files and
             // call _blazorWorkspaceManager.CreateProjectFile

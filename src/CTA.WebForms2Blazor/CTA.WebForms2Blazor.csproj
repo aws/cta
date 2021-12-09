@@ -13,7 +13,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CTA.Rules.Actions\CTA.Rules.Actions.csproj" />
-    <ProjectReference Include="..\CTA.Rules.Metrics\CTA.Rules.Metrics.csproj" />
   </ItemGroup>
 
   <ItemGroup>

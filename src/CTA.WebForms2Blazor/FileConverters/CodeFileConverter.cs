@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using CTA.Rules.Config;
+using CTA.Rules.Models;
 using CTA.WebForms2Blazor.ClassConverters;
 using CTA.WebForms2Blazor.Factories;
 using CTA.WebForms2Blazor.FileInformationModel;
@@ -58,7 +59,7 @@ namespace CTA.WebForms2Blazor.FileConverters
         public override async Task<IEnumerable<FileInformation>> MigrateFileAsync()
         {
             LogStart();
-            _metricsContext.CollectFileConversionMetrics(ChildActionType);
+            _metricsContext.CollectActionMetrics(WebFormsActionType.FileConversion, ChildActionType);
 
             // Store migration tasks alongside converter so we can log context where necessary
             var classMigrationTasks = new List<(ClassConverter, Task<IEnumerable<FileInformation>>)>();

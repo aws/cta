@@ -11,6 +11,7 @@ namespace CTA.Rules.Models
         public List<string> TargetVersions { get; set; }
         public List<string> MetaReferences { get; set; }
         public List<string> MissingMetaReferences { get; set; }
+        public List<WebFormsMetricResult> WebFormsMetricResults { get; set; }
 
         public ProjectResult()
         {
