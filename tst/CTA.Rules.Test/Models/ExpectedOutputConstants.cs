@@ -1723,5 +1723,63 @@ namespace ASP.NET_WebForms
         }
     }
 }";
+
+        public const string BlazorConfigureFunctionText =
+            @"public void Configure(IApplicationBuilder app)
+        {
+            app.UseStaticFiles();
+            app.UseRouting();
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapBlazorHub();
+                endpoints.MapFallbackToPage(""/_Host"");
+            });
+            if (Env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
+
+            
+            // Code that runs on application startup
+            // The following lines were extracted from Application_Start
+            RouteConfig.RegisterRoutes(RouteTable.Routes);
+            BundleConfig.RegisterBundles(BundleTable.Bundles);
+            ConfigureContainer();
+            ConfigDataBase();
+            // This code replaces the original handling
+            // of the BeginRequest event
+            app.Use(async (context, next) =>
+            {
+                //set the property to our new object
+                LogicalThreadContext.Properties[""activityid""] = new ActivityIdHelper();
+                LogicalThreadContext.Properties[""requestinfo""] = new WebRequestInfo();
+                _log.Debug(""Application_BeginRequest"");
+                await next();
+            });
+        }";
+
+        public const string BlazorProgramText = @"
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            CreateHostBuilder(args).Build().Run();
+        }
+
+        public static IHostBuilder CreateHostBuilder(string[] args) =>
+            Host.CreateDefaultBuilder(args)
+                .ConfigureWebHostDefaults(webBuilder =>
+                {
+                    webBuilder.UseStartup<Startup>();
+                });
+    }";
+        public const string BlazorWebRequestInfoText = @"
+    public class WebRequestInfo
+    {
+        public override string ToString()
+        {
+            return HttpContext.Current?.Request?.RawUrl + "", "" + HttpContext.Current?.Request?.UserAgent;
+        }
+    }";
     }
 }
