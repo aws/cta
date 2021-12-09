@@ -18,6 +18,7 @@ namespace CTA.Rules.Models
             ExecutedActions = new Dictionary<string, List<GenericActionExecution>>();
             UpgradePackages = new List<PackageAction>();
             ActionPackages = new List<PackageAction>();
+            WebFormsMetricResults = new List<WebFormsMetricResult>();
         }
         public string ProjectFile { get; set; }
         public ProjectActions ProjectActions { get; set; }

@@ -75,7 +75,7 @@ namespace CTA.WebForms2Blazor.FileConverters
 
         private void GetActions(HtmlNode node, HtmlNode parent)
         {
-            string controlConverterType = "";
+            string controlConverterType = "NonWebFormsControl";
             if (SupportedControls.ControlRulesMap.ContainsKey(node.Name))
             {
                 var conversionAction = new ControlConversionAction(node, parent, SupportedControls.ControlRulesMap[node.Name]);
