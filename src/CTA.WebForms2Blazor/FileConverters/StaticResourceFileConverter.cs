@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using CTA.Rules.Models;
 using CTA.WebForms2Blazor.FileInformationModel;
 using CTA.WebForms2Blazor.Helpers;
 using CTA.WebForms2Blazor.Metrics;
@@ -25,7 +26,7 @@ namespace CTA.WebForms2Blazor.FileConverters
         public override Task<IEnumerable<FileInformation>> MigrateFileAsync()
         {
             LogStart();
-            _metricsContext.CollectFileConversionMetrics(ChildActionType);
+            _metricsContext.CollectActionMetrics(WebFormsActionType.FileConversion, ChildActionType);
             // We want to add the relative path to _Host.cshtml before
             // prepending wwwroot/ because the web root folder is ignored
             // when fetching static files

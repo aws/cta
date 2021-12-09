@@ -1,4 +1,5 @@
 ﻿using System.Text.RegularExpressions;
+using CTA.Rules.Models;
 using CTA.WebForms2Blazor.Metrics;
 using CTA.WebForms2Blazor.Services;
 
@@ -122,7 +123,7 @@ namespace CTA.WebForms2Blazor.Helpers.ControlHelpers
             var directiveName = DirectiveNameRegex.Match(content).Groups[DirectiveNameRegexGroupName].Value;
             var directiveConverter = SupportedControls.DirectiveRulesMap.ContainsKey(directiveName) ?
                 SupportedControls.DirectiveRulesMap[directiveName] : SupportedControls.DefaultDirectiveConverter;
-            metricContext.CollectDirectiveConversionMetrics(directiveName+ "DirectiveConverter");
+            metricContext.CollectActionMetrics(WebFormsActionType.DirectiveConversion, directiveName+ "DirectiveConverter");
         
             return directiveConverter.ConvertDirective(directiveName, content.Trim(), originalFilePath, projectName, viewImportService);
         }

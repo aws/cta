@@ -17,6 +17,7 @@ namespace CTA.Rules.PortCore
             {
                 PortCoreRulesCli cli = new PortCoreRulesCli();
                 cli.HandleCommand(args);
+
                 Console.WriteLine(cli.FilePath);
 
                 /* 1. Logger object */

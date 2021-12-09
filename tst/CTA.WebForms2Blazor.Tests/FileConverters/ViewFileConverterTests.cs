@@ -21,9 +21,8 @@ namespace CTA.WebForms2Blazor.Tests.FileConverters
         [Test]
         public async Task HyperLinkControlConverter_Returns_Href_Node()
         {
-            MetricsContext context = new MetricsContext(FileConverterSetupFixture.TestProjectPath);
             FileConverter fc = new ViewFileConverter(FileConverterSetupFixture.TestProjectPath, 
-                FileConverterSetupFixture.TestHyperLinkControlFilePath, new ViewImportService(), new TaskManagerService(), new WebFormMetricContext(context, FileConverterSetupFixture.TestProjectPath));
+                FileConverterSetupFixture.TestHyperLinkControlFilePath, new ViewImportService(), new TaskManagerService(), new WebFormMetricContext());
             
             IEnumerable<FileInformation> fileList = await fc.MigrateFileAsync();
             FileInformation fi = fileList.Single();
@@ -75,9 +74,8 @@ namespace CTA.WebForms2Blazor.Tests.FileConverters
         [Test]
         public async Task ButtonControlConverter_Returns_Button_Node()
         {
-            MetricsContext context = new MetricsContext(FileConverterSetupFixture.TestProjectPath);
             FileConverter fc = new ViewFileConverter(FileConverterSetupFixture.TestProjectPath, 
-                FileConverterSetupFixture.TestButtonControlFilePath, new ViewImportService(), new TaskManagerService(), new WebFormMetricContext(context, FileConverterSetupFixture.TestProjectPath));
+                FileConverterSetupFixture.TestButtonControlFilePath, new ViewImportService(), new TaskManagerService(), new WebFormMetricContext());
             
             IEnumerable<FileInformation> fileList = await fc.MigrateFileAsync();
             FileInformation fi = fileList.Single();
@@ -112,9 +110,8 @@ namespace CTA.WebForms2Blazor.Tests.FileConverters
         [Test]
         public async Task LabelControlConverter_Returns_DynamicText()
         {
-            MetricsContext context = new MetricsContext(FileConverterSetupFixture.TestProjectPath);
             FileConverter fc = new ViewFileConverter(FileConverterSetupFixture.TestProjectPath, 
-                FileConverterSetupFixture.TestLabelControlFilePath, new ViewImportService(), new TaskManagerService(), new WebFormMetricContext(context, FileConverterSetupFixture.TestProjectPath));
+                FileConverterSetupFixture.TestLabelControlFilePath, new ViewImportService(), new TaskManagerService(), new WebFormMetricContext());
             
             IEnumerable<FileInformation> fileList = await fc.MigrateFileAsync();
             FileInformation fi = fileList.Single();
@@ -203,9 +200,8 @@ namespace CTA.WebForms2Blazor.Tests.FileConverters
         [Test]
         public async Task ListViewControlConverter_Returns_ListView_Node()
         {
-            MetricsContext context = new MetricsContext(FileConverterSetupFixture.TestProjectPath);
             FileConverter fc = new ViewFileConverter(FileConverterSetupFixture.TestProjectPath, 
-                FileConverterSetupFixture.TestListViewControlFilePath, new ViewImportService(), new TaskManagerService(), new WebFormMetricContext(context, FileConverterSetupFixture.TestProjectPath));
+                FileConverterSetupFixture.TestListViewControlFilePath, new ViewImportService(), new TaskManagerService(), new WebFormMetricContext());
             
             IEnumerable<FileInformation> fileList = await fc.MigrateFileAsync();
             FileInformation fi = fileList.Single();
@@ -263,9 +259,8 @@ namespace CTA.WebForms2Blazor.Tests.FileConverters
         [Test]
         public async Task TestViewFileConverter_Returns_GridView_Node()
         {
-            MetricsContext context = new MetricsContext(FileConverterSetupFixture.TestProjectPath);
             FileConverter fc = new ViewFileConverter(FileConverterSetupFixture.TestProjectPath, 
-                FileConverterSetupFixture.TestGridViewControlFilePath, new ViewImportService(), new TaskManagerService(), new WebFormMetricContext(context, FileConverterSetupFixture.TestProjectPath));
+                FileConverterSetupFixture.TestGridViewControlFilePath, new ViewImportService(), new TaskManagerService(), new WebFormMetricContext());
             
             IEnumerable<FileInformation> fileList = await fc.MigrateFileAsync();
             FileInformation fi = fileList.Single();
@@ -314,10 +309,9 @@ namespace CTA.WebForms2Blazor.Tests.FileConverters
         [Test]
         public async Task TestViewFileConverter_Returns_ContentPlaceHolderNode_As_Body_Directive()
         {
-            MetricsContext context = new MetricsContext(FileConverterSetupFixture.TestProjectPath);
             FileConverter fc = new ViewFileConverter(FileConverterSetupFixture.TestProjectPath, 
                 FileConverterSetupFixture.TestContentPlaceHolderControlFilePath,
-                new ViewImportService(), new TaskManagerService(), new WebFormMetricContext(context, FileConverterSetupFixture.TestProjectPath));
+                new ViewImportService(), new TaskManagerService(), new WebFormMetricContext());
             
             IEnumerable<FileInformation> fileList = await fc.MigrateFileAsync();
             FileInformation fi = fileList.Single();
@@ -340,10 +334,9 @@ namespace CTA.WebForms2Blazor.Tests.FileConverters
         [Test]
         public async Task TestViewFileConverter_Returns_ContentNode_As_Div()
         {
-            MetricsContext context = new MetricsContext(FileConverterSetupFixture.TestProjectPath);
             FileConverter fc = new ViewFileConverter(FileConverterSetupFixture.TestProjectPath, 
                 FileConverterSetupFixture.TestContentControlFilePath,
-                new ViewImportService(), new TaskManagerService(), new WebFormMetricContext(context, FileConverterSetupFixture.TestProjectPath));
+                new ViewImportService(), new TaskManagerService(), new WebFormMetricContext());
             
             IEnumerable<FileInformation> fileList = await fc.MigrateFileAsync();
             FileInformation fi = fileList.Single();
@@ -377,10 +370,9 @@ namespace CTA.WebForms2Blazor.Tests.FileConverters
         [Test]
         public async Task TestViewFileConverter_Converts_Directives()
         {
-            MetricsContext context = new MetricsContext(FileConverterSetupFixture.TestProjectPath);
             FileConverter fc = new ViewFileConverter(FileConverterSetupFixture.TestProjectPath, 
                 FileConverterSetupFixture.TestDirectiveFilePath,
-                new ViewImportService(), new TaskManagerService(), new WebFormMetricContext(context, FileConverterSetupFixture.TestProjectPath));
+                new ViewImportService(), new TaskManagerService(), new WebFormMetricContext());
             
             IEnumerable<FileInformation> fileList = await fc.MigrateFileAsync();
             FileInformation fi = fileList.Single();
@@ -421,9 +413,8 @@ namespace CTA.WebForms2Blazor.Tests.FileConverters
         [Test]
         public async Task TestViewFileConverter_DefaultAspx()
         {
-            MetricsContext context = new MetricsContext(FileConverterSetupFixture.TestProjectPath);
             FileConverter fc = new ViewFileConverter(FileConverterSetupFixture.TestProjectPath, 
-                FileConverterSetupFixture.TestViewFilePath, new ViewImportService(), new TaskManagerService(), new WebFormMetricContext(context, FileConverterSetupFixture.TestProjectPath));
+                FileConverterSetupFixture.TestViewFilePath, new ViewImportService(), new TaskManagerService(), new WebFormMetricContext());
             
             IEnumerable<FileInformation> fileList = await fc.MigrateFileAsync();
             FileInformation fi = fileList.Single();
@@ -509,9 +500,8 @@ namespace CTA.WebForms2Blazor.Tests.FileConverters
         [Test]
         public async Task TestViewFileConverter_SiteMaster()
         {
-            MetricsContext context = new MetricsContext(FileConverterSetupFixture.TestProjectPath);
             FileConverter fc = new ViewFileConverter(FileConverterSetupFixture.TestProjectPath, 
-                FileConverterSetupFixture.TestSiteMasterFilePath, new ViewImportService(), new TaskManagerService(), new WebFormMetricContext(context, FileConverterSetupFixture.TestProjectPath));
+                FileConverterSetupFixture.TestSiteMasterFilePath, new ViewImportService(), new TaskManagerService(), new WebFormMetricContext());
             
             IEnumerable<FileInformation> fileList = await fc.MigrateFileAsync();
             FileInformation fi = fileList.Single();

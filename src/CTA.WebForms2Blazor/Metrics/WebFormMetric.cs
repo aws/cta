@@ -1,19 +1,18 @@
-﻿using CTA.Rules.Metrics;
-using Newtonsoft.Json;
+﻿using CTA.Rules.Models;
 
 namespace CTA.WebForms2Blazor.Metrics
 {
-    public class WebFormMetric :CTAMetric
+    public class WebFormMetric
     {
-        [JsonProperty("metricName", Order = 10)]
-        public string MetricName => "WebFormsAction";
-
-        [JsonProperty("childActionName", Order = 11)]
+        public WebFormsActionType ActionName { get; set; }
         public string ChildActionName { get; set; }
-        [JsonProperty("solutionPath", Order = 30)]
-        public string SolutionPathHash { get; set; }
+        public string NodeName { get; set; }
 
-        [JsonProperty("projectGuid", Order = 40)]
-        public string ProjectGuid { get; set; }
+        public WebFormMetric(WebFormsActionType actionName, string childActionName, string nodeName = "")
+        {
+            ActionName = actionName;
+            ChildActionName = childActionName;
+            NodeName = nodeName;
+        }
     }
 }

@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Codelyzer.Analysis;
 using CTA.Rules.Config;
-using CTA.Rules.Metrics;
 using CTA.Rules.Models;
 using CTA.WebForms2Blazor.Factories;
 using CTA.WebForms2Blazor.FileInformationModel;
@@ -48,8 +47,7 @@ namespace CTA.WebForms2Blazor
             _analyzerResult = analyzerResult;
             _projectConfiguration = projectConfiguration;
             _projectResult = projectResult;
-            var context = new MetricsContext(_solutionPath, new List<AnalyzerResult> { _analyzerResult });
-            _metricsContext = new WebFormMetricContext(context, _projectConfiguration.ProjectPath);
+            _metricsContext = new WebFormMetricContext();
         }
 
         public async Task<WebFormsPortingResult> PerformMigration()
@@ -105,7 +103,7 @@ namespace CTA.WebForms2Blazor
             LogHelper.LogInformation(string.Format(Constants.GenericInformationLogTemplate, GetType().Name, MigrationTasksCompletedLogAction));
 
             WriteServiceDerivedFiles();
-            var result = new WebFormsPortingResult() { WebFormMetrics = _metricsContext.GetMetricList() };
+            var result = new WebFormsPortingResult() { Metrics = _metricsContext.Transform() };
 
             // TODO: Any necessary cleanup or last checks on new project
 

@@ -17,7 +17,7 @@ namespace CTA.WebForms2Blazor.Tests.FileConverters
         [Test]
         public async Task TestStaticResourceFileConverter()
         {
-            WebFormMetricContext metricContext = new WebFormMetricContext(new MetricsContext(FileConverterSetupFixture.TestProjectPath), FileConverterSetupFixture.TestProjectPath);
+            WebFormMetricContext metricContext = new WebFormMetricContext();
             string sourceFilePath = FileConverterSetupFixture.TestStaticResourceFilePath;
             FileConverter fc = new StaticResourceFileConverter(FileConverterSetupFixture.TestProjectPath, sourceFilePath, new HostPageService(), new TaskManagerService(), metricContext);
 

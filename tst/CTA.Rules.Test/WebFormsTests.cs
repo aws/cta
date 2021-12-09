@@ -47,7 +47,7 @@ namespace CTA.Rules.Test
         [TestCase(TargetFramework.DotnetCoreApp31)]
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.Dotnet6)]
-        public async Task TestSolutionWithMvcAndDualWebForms(string version)
+        public void TestSolutionWithMvcAndDualWebForms(string version)
         {
             var solutionName = "MvcAndDualWebForms.sln";
             var solutionPath = CopySolutionFolderToTemp(solutionName, tempDir);

@@ -50,7 +50,7 @@ namespace CTA.WebForms2Blazor.Tests.Factories
             var taskManagerService = new TaskManagerService();
 
             blazorWorkspaceManager.CreateSolutionFile();
-            WebFormMetricContext metricContext = new WebFormMetricContext(new MetricsContext(_testProjectPath), _testProjectPath);
+            WebFormMetricContext metricContext = new WebFormMetricContext();
             _fileConverterFactory = new FileConverterFactory(
                 _testProjectPath,
                 blazorWorkspaceManager,

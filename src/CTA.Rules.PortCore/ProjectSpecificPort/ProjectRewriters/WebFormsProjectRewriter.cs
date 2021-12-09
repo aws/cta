@@ -52,7 +52,11 @@ namespace CTA.Rules.PortCore
 
             if (ProjectConfiguration.PortCode)
             {
-                RunWebFormsChanges();
+               var result =  RunWebFormsChanges();
+               if (result != null)
+               {
+                   _projectResult.WebFormsMetricResults = result.Metrics;
+               }
             }
 
             return _projectResult;
@@ -67,20 +71,22 @@ namespace CTA.Rules.PortCore
             return ideFileActions;
         }
 
-        private void RunWebFormsChanges()
+        private WebFormsPortingResult RunWebFormsChanges()
         {
+            WebFormsPortingResult result = null;
             var projectDir = Path.GetDirectoryName(ProjectConfiguration.ProjectPath);
             var projectParentDir = Path.GetDirectoryName(projectDir);
 
             try
             {
                 MigrationManager migrationManager = new MigrationManager(projectDir, _analyzerResult, ProjectConfiguration, _projectResult);
-                Task.Run(() => migrationManager.PerformMigration()).GetAwaiter().GetResult();
+                result = Task.Run(() => migrationManager.PerformMigration()).GetAwaiter().GetResult();
             }
             catch (Exception e)
             {
                 LogHelper.LogError("WebForms Porting Error: Error while migrating WebForms to Blazor: ", e.Message);
             }
+            return result;
         }
     }
 }

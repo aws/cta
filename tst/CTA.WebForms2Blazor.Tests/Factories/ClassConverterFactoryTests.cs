@@ -47,7 +47,7 @@ namespace CTA.WebForms2Blazor.Tests.Factories
         [SetUp]
         public void SetUp()
         {
-            WebFormMetricContext metricContext = new WebFormMetricContext(new MetricsContext(string.Empty), string.Empty);
+            WebFormMetricContext metricContext = new WebFormMetricContext();
             _classConverterFactory = new ClassConverterFactory(string.Empty, new LifecycleManagerService(), new TaskManagerService(), metricContext);
             _workspaceManager = new WorkspaceManagerService();
             _workspaceManager.CreateSolutionFile();

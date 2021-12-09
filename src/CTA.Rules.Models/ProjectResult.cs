@@ -11,12 +11,14 @@ namespace CTA.Rules.Models
         public List<string> TargetVersions { get; set; }
         public List<string> MetaReferences { get; set; }
         public List<string> MissingMetaReferences { get; set; }
+        public List<WebFormsMetricResult> WebFormsMetricResults { get; set; }
 
         public ProjectResult()
         {
             ExecutedActions = new Dictionary<string, List<GenericActionExecution>>();
             UpgradePackages = new List<PackageAction>();
             ActionPackages = new List<PackageAction>();
+            WebFormsMetricResults = new List<WebFormsMetricResult>();
         }
         public string ProjectFile { get; set; }
         public ProjectActions ProjectActions { get; set; }
