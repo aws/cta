@@ -108,6 +108,8 @@ namespace CTA.Rules.Update
                 projectActions.ProjectLevelActions.AddRange(projectRules.ProjectTokens.SelectMany(p => p.ProjectFileActions));
                 projectActions.ProjectRules = projectRules;
                 _projectResult.ProjectActions = projectActions;
+
+                _projectResult.FeatureType = ProjectConfiguration.ProjectType;
             }
             catch (Exception ex)
             {
