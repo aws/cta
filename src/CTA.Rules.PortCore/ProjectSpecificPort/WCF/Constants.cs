@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace CTA.Rules.Update.WCF
+namespace CTA.Rules.PortCore.WCF
 {
     public class Constants
     {

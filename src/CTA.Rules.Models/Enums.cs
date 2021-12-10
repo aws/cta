@@ -31,7 +31,8 @@
         WCFCodeBasedService,
         WCFClient,
         WCFServiceLibrary,
-        MonolithService
+        MonolithService,
+        WebForms
     }
     public enum FileTypeCreation
     {
@@ -55,5 +56,13 @@
         DigestAuthentication,
         RequestFiltering,
         RequestLimits
+    }
+
+    public enum WebFormsActionType
+    {
+        DirectiveConversion,
+        ControlConversion,
+        ClassConversion,
+        FileConversion
     }
 }

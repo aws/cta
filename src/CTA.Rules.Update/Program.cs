@@ -34,6 +34,7 @@ namespace CTA.Rules.Update
                 {
                     ProjectConfiguration projectConfiguration = new ProjectConfiguration()
                     {
+                        SolutionPath = cli.FilePath,
                         ProjectPath = proj,
                         RulesDir = cli.RulesDir,
                         IsMockRun = cli.IsMockRun,
