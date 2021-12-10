@@ -266,8 +266,25 @@ namespace CTA.WebForms2Blazor.ClassConverters
                     if (objCreationExpr != null && objCreationExpr.Type.ToString().Equals(typeof(EventHandler).Name))
                     {
                         var arguments = objCreationExpr.ArgumentList.Arguments;
-                        var memberAccessExpr = arguments.FirstOrDefault().Expression as MemberAccessExpressionSyntax;
-                        var methodName = memberAccessExpr.Name.ToString();
+                        var methodNameExpr = arguments.FirstOrDefault()?.Expression;
+
+                        string methodName = null;
+                        if (methodNameExpr is MemberAccessExpressionSyntax)
+                        {
+                            methodName = (methodNameExpr as MemberAccessExpressionSyntax).Name.ToString();
+                        }
+                        else if (methodNameExpr is IdentifierNameSyntax)
+                        {
+                            methodName = (methodNameExpr as IdentifierNameSyntax).Identifier.ToString();
+                        }
+                        else
+                        {
+                            LogHelper.LogError(new InvalidOperationException("Failed to retrieve method name from expression"),
+                                $"Failed to retrieve method name from expression '{methodNameExpr}' of type {methodNameExpr?.GetType()} " +
+                                $"while processing Init method of {OriginalClassName} class");
+                            continue;
+                        }
+
                         results.Add((methodName, (WebFormsAppLifecycleEvent)lcEvent));
                     }
                 }
