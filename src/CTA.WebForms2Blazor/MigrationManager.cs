@@ -7,6 +7,7 @@ using CTA.Rules.Config;
 using CTA.Rules.Models;
 using CTA.WebForms2Blazor.Factories;
 using CTA.WebForms2Blazor.FileInformationModel;
+using CTA.WebForms2Blazor.Helpers;
 using CTA.WebForms2Blazor.Metrics;
 using CTA.WebForms2Blazor.ProjectManagement;
 using CTA.WebForms2Blazor.Services;
@@ -141,8 +142,9 @@ namespace CTA.WebForms2Blazor
             _blazorWorkspaceManager = new WorkspaceManagerService();
 
             // By convention, we expect the root namespace to share a name with the project
-            // root folder
-            var rootNamespace = _analyzerResult.ProjectResult.ProjectName;
+            // root folder, we normalize the folder name before using it in case the folder name
+            // is not a valid identifier
+            var rootNamespace = Utilities.NormalizeNamespaceIdentifier(_analyzerResult.ProjectResult.ProjectName);
             _programCsService.ProgramCsNamespace = rootNamespace;
             _hostPageService.HostNamespace = rootNamespace;
             _blazorWorkspaceManager.CreateSolutionFile();
