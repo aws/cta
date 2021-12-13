@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using HtmlAgilityPack;
 
@@ -7,11 +6,15 @@ namespace CTA.WebForms2Blazor.ControlConverters
 {
     public class ButtonControlConverter : ControlConverter
     {
+        private const string EnabledAttributeName = "enabled";
+        private const string DisabledAttributeName = "disabled";
+
         protected override Dictionary<string, string> AttributeMap { 
             get
             {
                 return new Dictionary<string, string>()
                 {
+                    ["id"] = "id",
                     ["onclick"] = "@onclick", 
                     ["cssclass"] = "class"
                 };
@@ -23,7 +26,10 @@ namespace CTA.WebForms2Blazor.ControlConverters
         {
             var textAttr = node.Attributes.AttributesWithName("text").FirstOrDefault();
             var buttonText = textAttr?.Value ?? string.Empty;
+
+            AddBooleanAttributeOnCondition(node, EnabledAttributeName, DisabledAttributeName, false);
             var joinedAttributesString = JoinAllAttributes(node.Attributes, NewAttributes);
+
             return Convert2BlazorFromParts(NodeTemplate, BlazorName, joinedAttributesString, buttonText);
         }
     }

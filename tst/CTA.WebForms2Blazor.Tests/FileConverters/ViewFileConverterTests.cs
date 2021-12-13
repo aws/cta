@@ -37,11 +37,11 @@ namespace CTA.WebForms2Blazor.Tests.FileConverters
     <div class=""container"">
         <article class=""esh-pager-wrapper row"">
             <nav>
-                <a class=""esh-pager-item esh-pager-item--navigable"">
+                <a id=""PaginationPrevious"" class=""esh-pager-item esh-pager-item--navigable"">
                     Previous
                 </a>
 
-                <a class=""esh-pager-item esh-pager-item--navigable"">
+                <a id=""PaginationNext"" class=""esh-pager-item esh-pager-item--navigable"">
                     Next
                 </a>
             </nav>
@@ -155,7 +155,7 @@ namespace CTA.WebForms2Blazor.Tests.FileConverters
         </dt>
 
         <dd>
-            <label>@(product.Price)</label>
+            <label class=""esh-price"">@(product.Price)</label>
         </dd>
 
         <dt>Picture name
