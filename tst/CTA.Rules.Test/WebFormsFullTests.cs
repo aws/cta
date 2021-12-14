@@ -106,18 +106,61 @@ namespace CTA.Rules.Test
         [TestCase(TargetFramework.DotnetCoreApp31)]
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.Dotnet6)]
-        public void TestHttpModulesMovedToMiddleware(string version)
+        public void TestProperHttpModulePortsCorrectly(string version)
         {
             var results = _resultsDict[version];
             var webFormsFullResult = results.ProjectResults.First(proj => proj.CsProjectPath.EndsWith("WebFormsFull.csproj"));
             var projectDir = Path.GetDirectoryName(webFormsFullResult.CsProjectPath);
             
             // HttpModule contents
-            var content = File.ReadAllText(Path.Combine(projectDir, "Middleware", "HttpModules", "TestHttpModule.cs"));
-            StringAssert.Contains("using Microsoft.AspNetCore.Http;", content);
-            StringAssert.Contains("using System.Threading.Tasks;", content);
-            StringAssert.Contains("public async Task Invoke(HttpContext context)", content);
-            StringAssert.Contains("await _next.Invoke(context);", content);
+            var content = File.ReadAllText(Path.Combine(projectDir, "Middleware", "HttpModules", "TestProperHttpModule.cs"));
+            StringAssert.AreEqualIgnoringCase(WebFormsFullExpectedOutputConstants.TestProperHttpModuleFile, content);
+        }
+
+        [TestCase(TargetFramework.DotnetCoreApp31)]
+        [TestCase(TargetFramework.Dotnet5)]
+        [TestCase(TargetFramework.Dotnet6)]
+        public void TestProperHttpModuleAlternatePortsCorrectly(string version)
+        {
+            var results = _resultsDict[version];
+            var webFormsFullResult = results.ProjectResults.First(proj => proj.CsProjectPath.EndsWith("WebFormsFull.csproj"));
+            var projectDir = Path.GetDirectoryName(webFormsFullResult.CsProjectPath);
+
+            // Application_ResolveRequestCache generates its own module
+            var content = File.ReadAllText(Path.Combine(projectDir, "Middleware", "HttpModules", "TestProperHttpModuleAlternateResolveRequestCache.cs"));
+            StringAssert.AreEqualIgnoringCase(WebFormsFullExpectedOutputConstants.TestProperHttpModuleAlternateResolveRequestCacheFile, content);
+
+            //  Application_PostResolveRequestCache generates its own module
+            var spinoffContent = File.ReadAllText(Path.Combine(projectDir, "Middleware", "HttpModules", "TestProperHttpModuleAlternatePostResolveRequestCache.cs"));
+            StringAssert.AreEqualIgnoringCase(WebFormsFullExpectedOutputConstants.TestProperHttpModuleAlternatePostResolveRequestCacheFile, spinoffContent);
+        }
+
+        [TestCase(TargetFramework.DotnetCoreApp31)]
+        [TestCase(TargetFramework.Dotnet5)]
+        [TestCase(TargetFramework.Dotnet6)]
+        public void TestImproperHttpModulePortsCorrectly(string version)
+        {
+            var results = _resultsDict[version];
+            var webFormsFullResult = results.ProjectResults.First(proj => proj.CsProjectPath.EndsWith("WebFormsFull.csproj"));
+            var projectDir = Path.GetDirectoryName(webFormsFullResult.CsProjectPath);
+
+            // HttpModule contents
+            var content = File.ReadAllText(Path.Combine(projectDir, "Middleware", "HttpModules", "TestImproperHttpModule.cs"));
+            StringAssert.AreEqualIgnoringCase(WebFormsFullExpectedOutputConstants.TestImproperHttpModuleFile, content);
+        }
+
+        [TestCase(TargetFramework.DotnetCoreApp31)]
+        [TestCase(TargetFramework.Dotnet5)]
+        [TestCase(TargetFramework.Dotnet6)]
+        public void TestHttpHandlersMovedToMiddleware(string version)
+        {
+            var results = _resultsDict[version];
+            var webFormsFullResult = results.ProjectResults.First(proj => proj.CsProjectPath.EndsWith("WebFormsFull.csproj"));
+            var projectDir = Path.GetDirectoryName(webFormsFullResult.CsProjectPath);
+            
+            // HttpModule contents
+            var content = File.ReadAllText(Path.Combine(projectDir, "Middleware", "HttpHandlers", "TestHttpHandler.cs"));
+            StringAssert.AreEqualIgnoringCase(WebFormsFullExpectedOutputConstants.TestHttpHandlerFile, content);
         }
 
         [TestCase(TargetFramework.DotnetCoreApp31)]
