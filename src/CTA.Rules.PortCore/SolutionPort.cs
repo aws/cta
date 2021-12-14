@@ -17,7 +17,7 @@ using CTA.Rules.Metrics;
 using CTA.Rules.Models;
 using CTA.Rules.Update;
 using Microsoft.Extensions.Logging;
-using WCFConstants = CTA.Rules.Update.WCF.Constants;
+using WCFConstants = CTA.Rules.PortCore.WCF.Constants;
 
 namespace CTA.Rules.PortCore
 {
@@ -122,13 +122,17 @@ namespace CTA.Rules.PortCore
             _solutionPath = solutionFilePath;
             SkipDownloadFiles = new ConcurrentDictionary<string, bool>();
             _projectResult = projectResult;
-            _solutionRewriter = new SolutionRewriter(projectResult, solutionConfiguration.ToList<ProjectConfiguration>());
+
+            var projectRewriterFactory = new PortCoreProjectRewriterFactory();
+            _solutionRewriter = new SolutionRewriter(projectResult, solutionConfiguration.ToList<ProjectConfiguration>(), projectRewriterFactory);
         }
         private void InitSolutionRewriter(List<AnalyzerResult> analyzerResults, List<PortCoreConfiguration> solutionConfiguration)
         {
             CheckCache();
             InitRules(solutionConfiguration, analyzerResults);
-            _solutionRewriter = new SolutionRewriter(analyzerResults, solutionConfiguration.ToList<ProjectConfiguration>());
+
+            var projectRewriterFactory = new PortCoreProjectRewriterFactory();
+            _solutionRewriter = new SolutionRewriter(analyzerResults, solutionConfiguration.ToList<ProjectConfiguration>(), projectRewriterFactory);
         }
 
         public ProjectResult RunProject(AnalyzerResult analyzerResult, PortCoreConfiguration portCoreConfiguration)
@@ -442,6 +446,10 @@ namespace CTA.Rules.PortCore
             else if (projectTypeFeatureResult.IsWebApiProject())
             {
                 return ProjectType.WebApi;
+            }
+            else if (projectTypeFeatureResult.IsAspNetWebFormsProject())
+            {
+                return ProjectType.WebForms;
             }
             else if (projectTypeFeatureResult.IsWebClassLibrary())
             {

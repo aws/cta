@@ -1,18 +1,10 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
 using Codelyzer.Analysis;
-using Codelyzer.Analysis.Build;
 using Codelyzer.Analysis.Model;
 using CTA.FeatureDetection;
 using CTA.FeatureDetection.Common.Models;
-using CTA.FeatureDetection.ProjectType.Extensions;
 using CTA.Rules.Config;
-using CTA.Rules.Metrics;
 using CTA.Rules.Models;
 using CTA.Rules.Update;
 using Microsoft.Extensions.Logging;
@@ -29,6 +21,7 @@ namespace CTA.Rules.PortCore
         private ProjectResult _projectResult;
         internal HashSet<string> ProjectReferences;
         private SolutionPort _solutionPort;
+        private IProjectRewriterFactory _projectRewriterFactory;
 
         public ProjectPort(AnalyzerResult analyzerResult, PortCoreConfiguration projectConfiguration, SolutionPort solutionPort, ILogger logger = null)
         {
@@ -38,13 +31,14 @@ namespace CTA.Rules.PortCore
             }
 
             _solutionPort = solutionPort;
+            _projectRewriterFactory = new PortCoreProjectRewriterFactory();
             ProjectReferences = new HashSet<string>() { Constants.ProjectRecommendationFile };
             InitProjectRewriter(analyzerResult, projectConfiguration);
         }
         private void InitProjectRewriter(AnalyzerResult analyzerResult, PortCoreConfiguration projectConfiguration)
         {
             InitRules(projectConfiguration, analyzerResult);
-            _projectRewriter = new ProjectRewriter(analyzerResult, projectConfiguration);
+            _projectRewriter = _projectRewriterFactory.GetInstance(analyzerResult, projectConfiguration);
         }
 
         private void InitRules(PortCoreConfiguration projectConfiguration, AnalyzerResult analyzerResult)

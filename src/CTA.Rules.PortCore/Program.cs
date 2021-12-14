@@ -17,6 +17,7 @@ namespace CTA.Rules.PortCore
             {
                 PortCoreRulesCli cli = new PortCoreRulesCli();
                 cli.HandleCommand(args);
+
                 Console.WriteLine(cli.FilePath);
 
                 /* 1. Logger object */
@@ -49,6 +50,7 @@ namespace CTA.Rules.PortCore
                 {
                     PortCoreConfiguration projectConfiguration = new PortCoreConfiguration()
                     {
+                        SolutionPath = cli.FilePath,
                         ProjectPath = proj,
                         RulesDir = cli.RulesDir,
                         IsMockRun = cli.IsMockRun,

@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using CTA.FeatureDetection.Common.Models;
+using CTA.Rules.Config;
+using CTA.Rules.Metrics.Models.WebForms;
 using CTA.Rules.Models;
 
 namespace CTA.Rules.Metrics
@@ -119,6 +121,28 @@ namespace CTA.Rules.Metrics
             }
 
             return missingMetaReferenceMetrics;
+        }
+
+        internal static IEnumerable<WebFormsActionMetric> TransformWebFormActionMetrics(MetricsContext context, ProjectResult projectResult)
+        {
+            var projectFile = projectResult.ProjectFile;
+            var webFormActionMetrics = new List<WebFormsActionMetric>();
+            foreach (var metric in projectResult.WebFormsMetricResults)
+            {
+                if(metric.ActionName == WebFormsActionType.FileConversion)
+                    webFormActionMetrics.Add(new FileConversionMetric(context, metric.ChildAction, projectFile));
+                else if(metric.ActionName == WebFormsActionType.ControlConversion)
+                    webFormActionMetrics.Add(new ControlConversionMetric(context,metric.ChildAction,metric.NodeName, projectFile));
+                else if(metric.ActionName == WebFormsActionType.ClassConversion)
+                    webFormActionMetrics.Add(new ClassConversionMetric(context, metric.ChildAction, projectFile));
+                else if(metric.ActionName == WebFormsActionType.DirectiveConversion)
+                    webFormActionMetrics.Add(new DirectiveConversionMetric(context, metric.ChildAction, projectFile));
+                else
+                    LogHelper.LogInformation($"WebForms porting action not found with the name"+ metric.ActionName.ToString());
+
+            }
+
+            return webFormActionMetrics;
         }
 
         internal static IEnumerable<BuildErrorMetric> TransformBuildErrors(MetricsContext context,

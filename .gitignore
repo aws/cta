@@ -118,3 +118,8 @@ publish/
 .vshistory/
 tst/Projects/
 /tst/CopyFolder
+
+# Rider
+*.idea
+*.DS_Store
+**/.DS_Store

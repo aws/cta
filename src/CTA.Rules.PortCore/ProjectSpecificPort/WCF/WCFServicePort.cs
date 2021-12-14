@@ -14,7 +14,7 @@ using CTA.Rules.Models;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Constants = CTA.Rules.Update.WCF.Constants;
+using Constants = CTA.Rules.PortCore.WCF.Constants;
 
 namespace CTA.Rules.PortCore
 {
