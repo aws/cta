@@ -13,7 +13,6 @@
     <ProjectReference Include="..\CTA.Rules.Models\CTA.Rules.Models.csproj" />
     <ProjectReference Include="..\CTA.Rules.ProjectFile\CTA.Rules.ProjectFile.csproj" />
     <ProjectReference Include="..\CTA.Rules.RuleFiles\CTA.Rules.RuleFiles.csproj" />
-    <ProjectReference Include="..\CTA.WebForms2Blazor\CTA.WebForms2Blazor.csproj" />
   </ItemGroup>
 
   <ItemGroup>
