@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using HtmlAgilityPack;
 
 namespace CTA.WebForms2Blazor.ControlConverters
@@ -13,7 +11,8 @@ namespace CTA.WebForms2Blazor.ControlConverters
             {
                 return new Dictionary<string, string>()
                 {
-                    ["id"] = "id"
+                    ["id"] = "id",
+                    ["cssclass"] = "class"
                 };
             } 
         }
@@ -21,8 +20,13 @@ namespace CTA.WebForms2Blazor.ControlConverters
         
         public override HtmlNode Convert2Blazor(HtmlNode node)
         {
-            var textAttr = node.Attributes.AttributesWithName("text").FirstOrDefault();
-            var labelText = textAttr?.Value ?? string.Empty;
+            var labelText = node.InnerHtml;
+
+            if (string.IsNullOrEmpty(node.InnerHtml))
+            {
+                var textAttr = node.Attributes.AttributesWithName("text").FirstOrDefault();
+                labelText = textAttr?.Value ?? string.Empty;
+            }
 
             var joinedAttributesString = JoinAllAttributes(node.Attributes, NewAttributes);
             return Convert2BlazorFromParts(NodeTemplate, BlazorName, joinedAttributesString, labelText);
