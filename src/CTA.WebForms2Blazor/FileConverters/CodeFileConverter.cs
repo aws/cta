@@ -46,7 +46,7 @@ namespace CTA.WebForms2Blazor.FileConverters
             }
             catch (Exception e)
             {
-                LogHelper.LogError(e, $"Exception occurred when trying to retrieve semantic model for the file {RelativePath}. " +
+                LogHelper.LogError(e, $"{Constants.WebFormsErrorTag}Exception occurred when trying to retrieve semantic model for the file {RelativePath}. " +
                                       "Semantic Model will default to null.");
             }
 
@@ -84,13 +84,13 @@ namespace CTA.WebForms2Blazor.FileConverters
             // will auto un-wrap aggregate exception
             catch (Exception e)
             {
-                LogHelper.LogError(e, "Collection of migration tasks experienced 1 or more failures");
+                LogHelper.LogError(e, $"{Constants.WebFormsErrorTag}Collection of migration tasks experienced 1 or more failures");
 
                 var failedMigrationTasks = classMigrationTasks.Where(t => t.Item2.Status != TaskStatus.RanToCompletion);
 
                 foreach (var failedTask in failedMigrationTasks)
                 {
-                    LogHelper.LogError(failedTask.Item2.Exception, $"Failed to migrate {failedTask.Item1.OriginalClassName} class " +
+                    LogHelper.LogError(failedTask.Item2.Exception, $"{Constants.WebFormsErrorTag}Failed to migrate {failedTask.Item1.OriginalClassName} class " +
                         $"located at {failedTask.Item1.FullPath}");
                 }
             }

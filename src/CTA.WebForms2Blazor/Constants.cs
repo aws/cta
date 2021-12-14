@@ -127,5 +127,8 @@
         // Routing constants
         public const string DefaultHomePagePath = "Default.aspx";
         public const char RouteSeparator = '/';
+
+        // Error Tag
+        public const string WebFormsErrorTag = "WebForms Porting Error: ";
     }
 }

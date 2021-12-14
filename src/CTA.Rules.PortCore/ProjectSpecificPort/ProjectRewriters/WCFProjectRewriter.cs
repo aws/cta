@@ -90,7 +90,7 @@ namespace CTA.Rules.Update
             }
             catch (Exception e)
             {
-                LogHelper.LogError("WCF Porting Error: Error while writing to Program.cs file: ", e.Message);
+                LogHelper.LogError($"{Constants.WCFErrorTag}Error while writing to Program.cs file: ", e.Message);
             }
 
             var startupFile = Path.Combine(projectDir, FileTypeCreation.Startup.ToString() + ".cs");
@@ -106,7 +106,7 @@ namespace CTA.Rules.Update
             }
             catch (Exception e)
             {
-                LogHelper.LogError("WCF Porting Error: Error while writing to Startup file: ", e.Message);
+                LogHelper.LogError($"{Constants.WCFErrorTag}Error while writing to Startup file: ", e.Message);
             }
 
             try
@@ -134,7 +134,7 @@ namespace CTA.Rules.Update
             }
             catch (Exception e)
             {
-                LogHelper.LogError("WCF Porting Error: Error while creating config file: ", e.Message);
+                LogHelper.LogError($"{Constants.WCFErrorTag}Error while creating config file: ", e.Message);
             }
         }
     }
