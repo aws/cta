@@ -7,7 +7,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using CTA.Rules.Metrics;
 using CTA.WebForms2Blazor.Metrics;
 
 namespace CTA.WebForms2Blazor.Tests.ClassConverters
@@ -34,6 +33,44 @@ namespace ProjectNamespace
         }
 
         private void Application_EndRequest(Object source, EventArgs e)
+        {
+            HttpContext context = ((HttpApplication)source).Context;
+        }
+    }
+}";
+        private const string InputClassNoEventHandlerObjectCreationText =
+@"using Microsoft.AspNetCore.Http;
+using System.Threading.Tasks;
+
+namespace ProjectNamespace
+{
+    public class MyModule : IHttpModule
+    {
+        public void Init(HttpApplication application)
+        {
+            application.BeginRequest += this.Application_BeginRequest;
+        }
+
+        private void Application_BeginRequest(Object source, EventArgs e)
+        {
+            HttpContext context = ((HttpApplication)source).Context;
+        }
+    }
+}";
+        private const string InputClassNoEventHandlerObjectCreationTextOrMemberAccess =
+@"using Microsoft.AspNetCore.Http;
+using System.Threading.Tasks;
+
+namespace ProjectNamespace
+{
+    public class MyModule : IHttpModule
+    {
+        public void Init(HttpApplication application)
+        {
+            application.BeginRequest += Application_BeginRequest;
+        }
+
+        private void Application_BeginRequest(Object source, EventArgs e)
         {
             HttpContext context = ((HttpApplication)source).Context;
         }
@@ -86,6 +123,27 @@ namespace ProjectNamespace
         {
             await _next.Invoke(context);
             HttpContext context = ((HttpApplication)source).Context;
+        }
+    }
+}";
+        private const string ExpectedOutputNoEventHandlerObjectCreation =
+@"using Microsoft.AspNetCore.Http;
+using System.Threading.Tasks;
+
+namespace ProjectNamespace
+{
+    public class MyModule
+    {
+        private readonly RequestDelegate _next;
+        public MyModule(RequestDelegate next)
+        {
+            _next = next;
+        }
+
+        public async Task Invoke(HttpContext context)
+        {
+            HttpContext context = ((HttpApplication)source).Context;
+            await _next.Invoke(context);
         }
     }
 }";
@@ -145,6 +203,58 @@ namespace ProjectNamespace
 
             Assert.AreEqual(ExpectedOutputComplexClassText1, fileText1);
             Assert.AreEqual(ExpectedOutputComplexClassText2, fileText2);
+        }
+
+        [Test]
+        public async Task MigrateClassAsync_Correctly_Identifies_Events_Without_EventHandler_Object_Creation()
+        {
+            var testSyntaxTree = SyntaxFactory.ParseSyntaxTree(InputClassNoEventHandlerObjectCreationText);
+            var testSemanticModel = CSharpCompilation.Create("TestCompilation", new[] { testSyntaxTree }).GetSemanticModel(testSyntaxTree);
+            var testClassDec = testSyntaxTree.GetRoot().DescendantNodes().OfType<ClassDeclarationSyntax>().Single();
+            var testTypeSymbol = testSemanticModel.GetDeclaredSymbol(testClassDec);
+
+            var testConverter = new HttpModuleClassConverter(InputRelativePath,
+                ClassConverterSetupFixture.TestProjectDirectoryPath,
+                testSemanticModel,
+                testClassDec,
+                testTypeSymbol,
+                new LifecycleManagerService(),
+                new TaskManagerService(),
+                new WebFormMetricContext());
+
+            var fileInfo = await testConverter.MigrateClassAsync();
+
+            Assert.AreEqual(1, fileInfo.Count());
+
+            var fileText1 = Encoding.UTF8.GetString(fileInfo.Single().FileBytes);
+
+            Assert.AreEqual(ExpectedOutputNoEventHandlerObjectCreation, fileText1);
+        }
+
+        [Test]
+        public async Task MigrateClassAsync_Correctly_Identifies_Events_Without_EventHandler_Object_Creation_Or_Member_Access()
+        {
+            var testSyntaxTree = SyntaxFactory.ParseSyntaxTree(InputClassNoEventHandlerObjectCreationTextOrMemberAccess);
+            var testSemanticModel = CSharpCompilation.Create("TestCompilation", new[] { testSyntaxTree }).GetSemanticModel(testSyntaxTree);
+            var testClassDec = testSyntaxTree.GetRoot().DescendantNodes().OfType<ClassDeclarationSyntax>().Single();
+            var testTypeSymbol = testSemanticModel.GetDeclaredSymbol(testClassDec);
+
+            var testConverter = new HttpModuleClassConverter(InputRelativePath,
+                ClassConverterSetupFixture.TestProjectDirectoryPath,
+                testSemanticModel,
+                testClassDec,
+                testTypeSymbol,
+                new LifecycleManagerService(),
+                new TaskManagerService(),
+                new WebFormMetricContext());
+
+            var fileInfo = await testConverter.MigrateClassAsync();
+
+            Assert.AreEqual(1, fileInfo.Count());
+
+            var fileText1 = Encoding.UTF8.GetString(fileInfo.Single().FileBytes);
+
+            Assert.AreEqual(ExpectedOutputNoEventHandlerObjectCreation, fileText1);
         }
     }
 }
