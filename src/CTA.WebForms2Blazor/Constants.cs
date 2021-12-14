@@ -103,7 +103,7 @@
         // Logging Templates
         public const string GenericInformationLogTemplate = "{0}: {1}";
         public const string RegisteredAsTaskLogTemplate = "{0}: Registered {1} at {2} as Task {3}";
-        public const string CaneledServiceCallLogTemplate = "{0}: {1} {2} Call Canceled";
+        public const string CaneledServiceCallLogTemplate = "{0}{1}: {2} {3} Call Canceled";
         public const string OperationFailedLogTemplate = "{0}: {1} Operation Failed";
         public const string StartedLogTemplate = "{0}: Started {1}";
         public const string StartedAtLogTemplate = "{0}: Started {1} at {2}";
