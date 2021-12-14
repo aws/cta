@@ -114,7 +114,7 @@ namespace CTA.WebForms2Blazor.FileConverters
                 catch (Exception e)
                 {
                     // TODO: add conversion failure metrics
-                    LogHelper.LogError(e, $"{Constants.WebFormsErrorTag}Error converting node. " +
+                    LogHelper.LogError(e, $"{Rules.Config.Constants.WebFormsErrorTag}Error converting node. " +
                                           $"Converter type: {controlConversionAction.ControlConverter.GetType()}, " +
                                           $"Node name: {controlConversionAction.Node.Name}");
                 }
@@ -183,7 +183,7 @@ namespace CTA.WebForms2Blazor.FileConverters
             }
             catch (Exception e)
             {
-                LogHelper.LogError(e, $"{Constants.WebFormsErrorTag}Error migrating view file {FullPath}. A new file could not be generated.");
+                LogHelper.LogError(e, $"{Rules.Config.Constants.WebFormsErrorTag}Error migrating view file {FullPath}. A new file could not be generated.");
             }
 
             return Task.FromResult((IEnumerable<FileInformation>)result);

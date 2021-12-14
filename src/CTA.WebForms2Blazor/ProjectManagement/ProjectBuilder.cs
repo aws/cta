@@ -32,7 +32,7 @@ namespace CTA.WebForms2Blazor.ProjectManagement
             }
             catch (Exception e)
             {
-                LogHelper.LogError(e, $"{Constants.WebFormsErrorTag}Could not create relative directory {relativePath}.");
+                LogHelper.LogError(e, $"{Rules.Config.Constants.WebFormsErrorTag}Could not create relative directory {relativePath}.");
             }
         }
 
@@ -63,7 +63,7 @@ namespace CTA.WebForms2Blazor.ProjectManagement
             }
             catch (Exception e)
             {
-                LogHelper.LogError(e, $"{Constants.WebFormsErrorTag}Could not write file bytes to project (attempted to write to {fullPath}).");
+                LogHelper.LogError(e, $"{Rules.Config.Constants.WebFormsErrorTag}Could not write file bytes to project (attempted to write to {fullPath}).");
             }
         }
 
@@ -88,7 +88,7 @@ namespace CTA.WebForms2Blazor.ProjectManagement
             }
             catch (Exception e)
             {
-                LogHelper.LogError(e, $"{Constants.WebFormsErrorTag}Could not delete directory at {fullPath}");
+                LogHelper.LogError(e, $"{Rules.Config.Constants.WebFormsErrorTag}Could not delete directory at {fullPath}");
             }
         }
 
@@ -102,7 +102,7 @@ namespace CTA.WebForms2Blazor.ProjectManagement
             }
             catch (Exception e)
             {
-                LogHelper.LogError(e, $"{Constants.WebFormsErrorTag}Unable to delete file at {fullPath}");
+                LogHelper.LogError(e, $"{Rules.Config.Constants.WebFormsErrorTag}Unable to delete file at {fullPath}");
             }
         }
     }

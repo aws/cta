@@ -82,7 +82,7 @@ namespace CTA.WebForms2Blazor.ClassConverters
                 }
                 catch (Exception e)
                 {
-                    LogHelper.LogError(e, $"{Constants.WebFormsErrorTag}Failed to process WebForms lifecycle event method {methodTuple.Item1.Identifier} " +
+                    LogHelper.LogError(e, $"{Rules.Config.Constants.WebFormsErrorTag}Failed to process WebForms lifecycle event method {methodTuple.Item1.Identifier} " +
                         $"from {OriginalClassName} class at {_fullPath}");
                 }
 
@@ -104,7 +104,7 @@ namespace CTA.WebForms2Blazor.ClassConverters
                 }
                 catch (Exception e)
                 {
-                    LogHelper.LogError(e, $"{Constants.WebFormsErrorTag}Failed to construct new lifecycle event method for {newLifecycleEvent} Blazor event " +
+                    LogHelper.LogError(e, $"{Rules.Config.Constants.WebFormsErrorTag}Failed to construct new lifecycle event method for {newLifecycleEvent} Blazor event " +
                         $"using {OriginalClassName} class at {_fullPath}");
                 }
             }

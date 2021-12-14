@@ -39,7 +39,7 @@ namespace CTA.WebForms2Blazor.ControlConverters
             }
             catch (Exception e)
             {
-                LogHelper.LogError(e, $"{Constants.WebFormsErrorTag}Error converting control {node.Name}.");
+                LogHelper.LogError(e, $"{Rules.Config.Constants.WebFormsErrorTag}Error converting control {node.Name}.");
                 return HtmlNode.CreateNode(string.Empty);
             }
         }
@@ -182,7 +182,7 @@ namespace CTA.WebForms2Blazor.ControlConverters
             }
             catch (Exception e)
             {
-                LogHelper.LogError(e, $"{Constants.WebFormsErrorTag}Could not delete node {node.Name}");
+                LogHelper.LogError(e, $"{Rules.Config.Constants.WebFormsErrorTag}Could not delete node {node.Name}");
             }
         }
     }

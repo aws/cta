@@ -81,7 +81,7 @@ namespace CTA.WebForms2Blazor.Factories
             }
             catch (Exception e)
             {
-                LogHelper.LogError(e, $"{Constants.WebFormsErrorTag}Failed to build class converter for {sourceFileRelativePath}");
+                LogHelper.LogError(e, $"{Rules.Config.Constants.WebFormsErrorTag}Failed to build class converter for {sourceFileRelativePath}");
                 return null;
             }
         }
