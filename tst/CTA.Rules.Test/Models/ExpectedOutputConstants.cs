@@ -1651,7 +1651,7 @@ options.ListenLocalhost(8080);
 @"using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 
-namespace ASP.NET-WebForms
+namespace ASP.NETWebForms
 {
     public class Program
     {
