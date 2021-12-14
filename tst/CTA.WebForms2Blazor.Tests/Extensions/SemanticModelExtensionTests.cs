@@ -117,7 +117,7 @@ namespace CTA.WebForms2Blazor.Tests.Extensions
             var classSymbol = model.GetDeclaredSymbol(testClass1Declaration);
             var requiredNamespaces = model.GetNamespacesReferencedByType(testClass1Declaration);
 
-            Assert.False(requiredNamespaces.Contains(classSymbol?.ContainingNamespace));
+            Assert.False(requiredNamespaces.Contains(classSymbol?.ContainingNamespace.ToDisplayString()));
         }
 
         [Test]
@@ -142,7 +142,7 @@ namespace CTA.WebForms2Blazor.Tests.Extensions
             var class2Symbol = model2.GetDeclaredSymbol(class2Declaration);
             var requiredNamespaces = model1.GetNamespacesReferencedByType(class1Declaration);
 
-            Assert.True(requiredNamespaces.Contains(class2Symbol.ContainingNamespace));
+            Assert.True(requiredNamespaces.Contains(class2Symbol.ContainingNamespace.ToDisplayString()));
         }
 
         [Test]
@@ -163,7 +163,7 @@ namespace CTA.WebForms2Blazor.Tests.Extensions
             var class2Symbol = model.GetDeclaredSymbol(class2Declaration);
             var requiredNamespaces = model.GetNamespacesReferencedByType(class1Declaration);
 
-            Assert.True(requiredNamespaces.Contains(class2Symbol.ContainingNamespace));
+            Assert.True(requiredNamespaces.Contains(class2Symbol.ContainingNamespace.ToDisplayString()));
         }
 
         [Test]
@@ -186,8 +186,8 @@ namespace CTA.WebForms2Blazor.Tests.Extensions
             var interface2Symbol = model.GetDeclaredSymbol(interface2Declaration);
             var requiredNamespaces = model.GetNamespacesReferencedByType(class1Declaration);
 
-            Assert.True(requiredNamespaces.Contains(interface1Symbol.ContainingNamespace));
-            Assert.True(requiredNamespaces.Contains(interface2Symbol.ContainingNamespace));
+            Assert.True(requiredNamespaces.Contains(interface1Symbol.ContainingNamespace.ToDisplayString()));
+            Assert.True(requiredNamespaces.Contains(interface2Symbol.ContainingNamespace.ToDisplayString()));
         }
 
         [Test]
@@ -208,7 +208,7 @@ namespace CTA.WebForms2Blazor.Tests.Extensions
             var class2Symbol = model.GetDeclaredSymbol(class2Declaration);
             var requiredNamespaces = model.GetNamespacesReferencedByType(class1Declaration);
 
-            Assert.True(requiredNamespaces.Contains(class2Symbol.ContainingNamespace));
+            Assert.True(requiredNamespaces.Contains(class2Symbol.ContainingNamespace.ToDisplayString()));
         }
 
         [Test]

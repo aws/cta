@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using CTA.Rules.Config;
 using CTA.WebForms2Blazor.Extensions;
@@ -59,7 +58,7 @@ namespace CTA.WebForms2Blazor.ClassConverters
         private protected SourceClassComponents GetSourceClassComponents()
         {
             var requiredNamespaces = _sourceFileSemanticModel.GetNamespacesReferencedByType(_originalDeclarationSyntax);
-            var usingStatements = CodeSyntaxHelper.BuildUsingStatements(requiredNamespaces.Select(namespaceSymbol => namespaceSymbol.ToDisplayString()));
+            var usingStatements = CodeSyntaxHelper.BuildUsingStatements(requiredNamespaces);
             var namespaceNode = CodeSyntaxHelper.BuildNamespace(_originalClassSymbol.ContainingNamespace.ToDisplayString(), _originalDeclarationSyntax);
             var fileText = CodeSyntaxHelper.GetFileSyntaxAsString(namespaceNode, usingStatements);
 
@@ -95,13 +94,13 @@ namespace CTA.WebForms2Blazor.ClassConverters
 
         private protected class SourceClassComponents
         {
-            public IEnumerable<INamespaceSymbol> RequiredNamespaces { get; }
+            public IEnumerable<string> RequiredNamespaces { get; }
             public IEnumerable<UsingDirectiveSyntax> UsingStatements { get; }
             public NamespaceDeclarationSyntax NamespaceNode { get; }
             public string FileText { get; }
 
             public SourceClassComponents(
-                IEnumerable<INamespaceSymbol> requiredNamespaces,
+                IEnumerable<string> requiredNamespaces,
                 IEnumerable<UsingDirectiveSyntax> usingStatements,
                 NamespaceDeclarationSyntax namespaceNode,
                 string fileText)
