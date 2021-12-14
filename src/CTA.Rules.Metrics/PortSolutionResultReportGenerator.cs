@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using CTA.FeatureDetection.Common.Models;
 using CTA.Rules.Config;
+using CTA.Rules.Metrics.Models.WebForms;
 using CTA.Rules.Models;
 using Newtonsoft.Json;
 
@@ -24,6 +25,7 @@ namespace CTA.Rules.Metrics
         public IEnumerable<FeatureDetectionMetric> FeatureDetectionMetrics { get; set; }
         public IEnumerable<GenericActionExecutionMetric> GenericActionExecutionMetrics { get; set; }
         public IEnumerable<BuildErrorMetric> BuildErrorMetrics { get; set; }
+        public IEnumerable<WebFormsActionMetric> WebFormsActionMetrics { get; set; }
         public string AnalyzeSolutionResultJsonReport { get; set; }
         public string PortSolutionResultJsonReport { get; set; }
         public string PortSolutionResultTextReport { get; set; }
@@ -95,6 +97,7 @@ namespace CTA.Rules.Metrics
             var actionPackageMetrics = new List<ActionPackageMetric>();
             var actionExecutionMetrics = new List<GenericActionExecutionMetric>();
             var missingMetaReferenceMetrics = new List<MissingMetaReferenceMetric>();
+            var webFormsActionMetrics = new List<WebFormsActionMetric>();
 
             foreach (var projectResult in PortSolutionResult.ProjectResults)
             {
@@ -103,6 +106,7 @@ namespace CTA.Rules.Metrics
                 actionPackageMetrics.AddRange(MetricsTransformer.TransformActionPackages(Context, projectResult));
                 actionExecutionMetrics.AddRange(MetricsTransformer.TransformGenericActionExecutions(Context, projectResult));
                 missingMetaReferenceMetrics.AddRange(MetricsTransformer.TransformMissingMetaReferences(Context, projectResult));
+                webFormsActionMetrics.AddRange(MetricsTransformer.TransformWebFormActionMetrics(Context, projectResult));
             }
 
             TargetVersionMetrics = targetVersionMetrics;
@@ -110,6 +114,7 @@ namespace CTA.Rules.Metrics
             ActionPackageMetrics = actionPackageMetrics;
             GenericActionExecutionMetrics = actionExecutionMetrics;
             MissingMetaReferenceMetrics = missingMetaReferenceMetrics;
+            WebFormsActionMetrics = webFormsActionMetrics;
         }
 
         private string GenerateAnalyzeSolutionResultJsonReport()
@@ -138,6 +143,7 @@ namespace CTA.Rules.Metrics
                 .Concat(GenericActionExecutionMetrics)
                 .Concat(BuildErrorMetrics)
                 .Concat(MissingMetaReferenceMetrics)
+                .Concat(WebFormsActionMetrics)
                 .ToList();
 
             PortSolutionResultJsonReport = JsonConvert.SerializeObject(allMetrics);

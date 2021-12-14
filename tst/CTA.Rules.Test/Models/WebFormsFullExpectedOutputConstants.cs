@@ -141,6 +141,8 @@ using System;
 using System.Configuration;
 using System.Diagnostics;
 using System.Web;
+using eShopLegacyWebForms.HttpHandlers;
+using eShopLegacyWebForms.HttpModules;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
@@ -200,12 +202,28 @@ namespace WebFormsFull
                 await next();
             });
             // This code replaces the original handling
+            // of the ResolveRequestCache event
+            // This class was generated using a portion
+            // of TestProperHttpModuleAlternate
+            app.UseMiddleware<TestProperHttpModuleAlternateResolveRequestCache>();
+            // This code replaces the original handling
+            // of the PostResolveRequestCache event
+            // This class was generated using a portion
+            // of TestProperHttpModuleAlternate
+            app.UseMiddleware<TestProperHttpModuleAlternatePostResolveRequestCache>();
+            // This code replaces the original handling
             // of the PreRequestHandlerExecute event
             app.Use(async (context, next) =>
             {
                 _log.Debug(""Application_PreRequestHandlerExecute"");
                 await next();
             });
+            // This middleware was originally an http handler,
+            // use conditions must be added manually
+            app.UseMiddleware<TestHttpHandler>();
+            // This code replaces the original handling
+            // of the EndRequest event
+            app.UseMiddleware<TestProperHttpModule>();
         }
 
         public void ConfigureServices(IServiceCollection services)
@@ -389,6 +407,174 @@ namespace WebFormsFull
 {
     public partial class OtherPage : ComponentBase
     {
+    }
+}";
+
+        public const string TestHttpHandlerFile = @"using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using Microsoft.AspNetCore.Http;
+using System.Threading.Tasks;
+
+namespace eShopLegacyWebForms.HttpHandlers
+{
+    public class TestHttpHandler
+    {
+        private readonly RequestDelegate _next;
+        public bool IsReusable => false;
+        public TestHttpHandler(RequestDelegate next)
+        {
+            _next = next;
+        }
+
+        public async Task Invoke(HttpContext context)
+        {
+            // Do some request handling
+            // The following lines were extracted from ProcessRequest
+            context.Response.StatusCode = 200;
+        }
+    }
+}";
+
+        public const string TestProperHttpModuleFile = @"using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using Microsoft.AspNetCore.Http;
+using System.Threading.Tasks;
+
+namespace eShopLegacyWebForms.HttpModules
+{
+    public class TestProperHttpModule
+    {
+        private readonly RequestDelegate _next;
+        public TestProperHttpModule(RequestDelegate next)
+        {
+            _next = next;
+        }
+
+        public async Task Invoke(HttpContext context)
+        {
+            await _next.Invoke(context);
+            var application = (HttpApplication)source;
+            var endContext = application.Context;
+        }
+
+        public void Dispose()
+        {
+        // Do cleanup
+        }
+    }
+}";
+
+        public const string TestProperHttpModuleAlternateResolveRequestCacheFile = @"using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using Microsoft.AspNetCore.Http;
+using System.Threading.Tasks;
+
+namespace eShopLegacyWebForms.HttpModules
+{
+    // Heavy modifications likely necessary, please
+    // review
+    // This class was generated using a portion
+    // of TestProperHttpModuleAlternate
+    public class TestProperHttpModuleAlternateResolveRequestCache
+    {
+        private readonly RequestDelegate _next;
+        public string X { get; set; }
+
+        public TestProperHttpModuleAlternateResolveRequestCache(RequestDelegate next)
+        {
+            _next = next;
+        }
+
+        public async Task Invoke(HttpContext context)
+        {
+            // Do some stuff here
+            X = source.GetType().ToString();
+            await _next.Invoke(context);
+        }
+
+        public void Dispose()
+        {
+        // Do cleanup
+        }
+    }
+}";
+
+        public const string TestProperHttpModuleAlternatePostResolveRequestCacheFile = @"using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using Microsoft.AspNetCore.Http;
+using System.Threading.Tasks;
+
+namespace eShopLegacyWebForms.HttpModules
+{
+    // Heavy modifications likely necessary, please
+    // review
+    // This class was generated using a portion
+    // of TestProperHttpModuleAlternate
+    public class TestProperHttpModuleAlternatePostResolveRequestCache
+    {
+        private readonly RequestDelegate _next;
+        public string X { get; set; }
+
+        public TestProperHttpModuleAlternatePostResolveRequestCache(RequestDelegate next)
+        {
+            _next = next;
+        }
+
+        public async Task Invoke(HttpContext context)
+        {
+            // Do some other stuff over here
+            int x = 12;
+            int y = x + 1;
+            x = y - 1;
+            X = x.ToString() + X;
+            await _next.Invoke(context);
+        }
+
+        public void Dispose()
+        {
+        // Do cleanup
+        }
+    }
+}";
+
+        public const string TestImproperHttpModuleFile = @"using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using Microsoft.AspNetCore.Http;
+using System.Threading.Tasks;
+
+namespace eShopLegacyWebForms.HttpModules
+{
+    public class TestImproperHttpModule
+    {
+        private readonly RequestDelegate _next;
+        public TestImproperHttpModule(RequestDelegate next)
+        {
+            _next = next;
+        }
+
+        public async Task Invoke(HttpContext context)
+        {
+            await _next.Invoke(context);
+            // Could not identify lifecycle hook method,
+            // dependant middleware Invoke method population
+            // operation must be done manually
+            
+        }
+
+        public void Dispose()
+        {
+        // Do cleanup
+        }
     }
 }";
     }

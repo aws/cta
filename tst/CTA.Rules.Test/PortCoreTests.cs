@@ -173,6 +173,7 @@ namespace CTA.Rules.Test
                 using var result = resultEnumerator.Current;
                 PortCoreConfiguration projectConfiguration = new PortCoreConfiguration()
                 {
+                    SolutionPath = solutionPath,
                     ProjectPath = result.ProjectResult.ProjectFilePath,
                     IsMockRun = false,
                     UseDefaultRules = true,
