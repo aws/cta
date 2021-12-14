@@ -102,7 +102,7 @@ namespace CTA.WebForms2Blazor.Factories
             }
             catch (Exception e)
             {
-                LogHelper.LogError(e,$"Could not build appropriate file converter for {document.FullName}.");
+                LogHelper.LogError(e,$"{Rules.Config.Constants.WebFormsErrorTag}Could not build appropriate file converter for {document.FullName}.");
                 return null;
             }
         }

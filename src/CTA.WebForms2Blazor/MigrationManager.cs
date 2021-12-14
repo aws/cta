@@ -93,7 +93,9 @@ namespace CTA.WebForms2Blazor
                     }
                     catch (Exception e)
                     {
-                        LogHelper.LogError(e, string.Format(Constants.OperationFailedLogTemplate, GetType().Name, Constants.FileMigrationLogAction));
+                        LogHelper.LogError(
+                            e, Rules.Config.Constants.WebFormsErrorTag +
+                        string.Format(Constants.OperationFailedLogTemplate, GetType().Name, Constants.FileMigrationLogAction));
                     }
                 }
             ));

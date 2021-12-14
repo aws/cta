@@ -101,7 +101,7 @@ namespace CTA.WebForms2Blazor.ClassConverters
             }
             catch (Exception e)
             {
-                LogHelper.LogError(e, $"Failed to construct new HttpHandler file content from {OriginalClassName} class at {_fullPath}");
+                LogHelper.LogError(e, $"{Rules.Config.Constants.WebFormsErrorTag}Failed to construct new HttpHandler file content from {OriginalClassName} class at {_fullPath}");
             }
 
             DoCleanUp();

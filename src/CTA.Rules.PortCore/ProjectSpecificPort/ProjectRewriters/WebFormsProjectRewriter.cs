@@ -68,7 +68,7 @@ namespace CTA.Rules.PortCore
             var ideFileActions = new List<IDEFileActions>();
 
             // Incremental porting for WebForms project is yet to be implemented
-            LogHelper.LogError(new NotImplementedException("WebForms Porting Error: Failed to run incremental porting on a WebForms project. This feature is not yet supported for this project type."));
+            LogHelper.LogError(new NotImplementedException($"{Constants.WebFormsErrorTag}Failed to run incremental porting on a WebForms project. This feature is not yet supported for this project type."));
             
             return ideFileActions;
         }
@@ -85,7 +85,7 @@ namespace CTA.Rules.PortCore
             }
             catch (Exception e)
             {
-                LogHelper.LogError(e, "WebForms Porting Error: Error while migrating WebForms to Blazor.");
+                LogHelper.LogError(e, $"{Constants.WebFormsErrorTag}Error while migrating WebForms to Blazor.");
             }
             return result;
         }

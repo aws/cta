@@ -13,6 +13,8 @@ namespace CTA.Rules.Models
         public List<string> MissingMetaReferences { get; set; }
         public List<WebFormsMetricResult> WebFormsMetricResults { get; set; }
 
+        public ProjectType FeatureType { get; set; } = ProjectType.WebForms;
+
         public ProjectResult()
         {
             ExecutedActions = new Dictionary<string, List<GenericActionExecution>>();

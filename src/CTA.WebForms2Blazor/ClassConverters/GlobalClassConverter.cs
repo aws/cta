@@ -99,7 +99,7 @@ namespace CTA.WebForms2Blazor.ClassConverters
             }
             catch (Exception e)
             {
-                LogHelper.LogError(e, $"Failed to construct new Startup file content from {OriginalClassName} class at {_fullPath}");
+                LogHelper.LogError(e, $"{Rules.Config.Constants.WebFormsErrorTag}Failed to construct new Startup file content from {OriginalClassName} class at {_fullPath}");
             }
 
             DoCleanUp();
@@ -143,7 +143,7 @@ namespace CTA.WebForms2Blazor.ClassConverters
                 }
                 catch (Exception e)
                 {
-                    LogHelper.LogError(e, $"Failed to process {method.Identifier} method in {OriginalClassName} class at {_fullPath}");
+                    LogHelper.LogError(e, $"{Rules.Config.Constants.WebFormsErrorTag}Failed to process {method.Identifier} method in {OriginalClassName} class at {_fullPath}");
                 }
             }
 
@@ -173,6 +173,7 @@ namespace CTA.WebForms2Blazor.ClassConverters
             {
                 LogHelper.LogError(e, string.Format(
                     Constants.CaneledServiceCallLogTemplate,
+                    Rules.Config.Constants.WebFormsErrorTag,
                     GetType().Name,
                     typeof(LifecycleManagerService).Name,
                     GetMiddlewareNamespacesLogCall));
@@ -218,6 +219,7 @@ namespace CTA.WebForms2Blazor.ClassConverters
             {
                 LogHelper.LogError(e, string.Format(
                     Constants.CaneledServiceCallLogTemplate,
+                    Rules.Config.Constants.WebFormsErrorTag,
                     GetType().Name,
                     typeof(LifecycleManagerService).Name,
                     GetMiddlewarePipelineAdditionsLogCall));

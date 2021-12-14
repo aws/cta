@@ -87,7 +87,7 @@ namespace CTA.WebForms2Blazor.ClassConverters
                 }
                 catch (Exception e)
                 {
-                    LogHelper.LogError(e, $"Failed to process {OriginalClassName} HttpModule class Init method at {_fullPath}, " +
+                    LogHelper.LogError(e, $"{Rules.Config.Constants.WebFormsErrorTag}Failed to process {OriginalClassName} HttpModule class Init method at {_fullPath}, " +
                         $"as a result lifecycle methods will not be detectable and will not be converted to middleware");
                 }
             }
@@ -130,7 +130,7 @@ namespace CTA.WebForms2Blazor.ClassConverters
                     }
                     catch (Exception e)
                     {
-                        LogHelper.LogError(e, $"Failed to construct {newClassName} middleware class from {lifecycleTuple.Item2} event " +
+                        LogHelper.LogError(e, $"{Rules.Config.Constants.WebFormsErrorTag}Failed to construct {newClassName} middleware class from {lifecycleTuple.Item2} event " +
                             $" handler in {_originalClassName} class at {_fullPath}");
                     }
                 }
@@ -149,7 +149,7 @@ namespace CTA.WebForms2Blazor.ClassConverters
                 }
                 catch (Exception e)
                 {
-                    LogHelper.LogError(e, $"Failed to construct middleware class from {lifecycleTuple.Item2} event " +
+                    LogHelper.LogError(e, $"{Rules.Config.Constants.WebFormsErrorTag}Failed to construct middleware class from {lifecycleTuple.Item2} event " +
                         $" handler in {_originalClassName} class at {_fullPath}");
                 }
             }
@@ -161,7 +161,7 @@ namespace CTA.WebForms2Blazor.ClassConverters
                 }
                 catch (Exception e)
                 {
-                    LogHelper.LogError(e, $"Failed to construct no-event middleware class from {_originalClassName} class at {_fullPath}");
+                    LogHelper.LogError(e, $"{Rules.Config.Constants.WebFormsErrorTag}Failed to construct no-event middleware class from {_originalClassName} class at {_fullPath}");
                 }
             }
 
