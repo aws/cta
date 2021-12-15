@@ -24,6 +24,7 @@ namespace CTA.FeatureDetection.Tests
         private static readonly string _webFormsDir = "WebForms";
         private static readonly string _webClassLibraryDir = "WebClassLibrary";
         private static readonly string _windowsAuthenticationDir = "WindowsAuthentication";
+        private static readonly string _iisConfigDir = "IIS";
         private static readonly string _formsAuthenticationDir = "FormsAuthentication";
         private static readonly string _federatedAuthenticationDir = "FederatedAuthentication";
         private static readonly string _wcfDir = "WCF";
@@ -40,6 +41,7 @@ namespace CTA.FeatureDetection.Tests
         public static string WebFormsSolutionName => "ASP.NET-WebForms.sln";
         public static string WebClassLibrarySolutionName => "WebClassLibrary.sln";
         public static string WindowsAuthenticationSolutionName => "WindowsAuthentication.sln";
+        public static string IISConfigSolutionName => "MVCAppWithIISConfig.sln";
         public static string FormsAuthenticationSolutionName => "FormsAuthentication.sln";
         public static string FederatedAuthenticationSolutionName => "FederatedAuthentication.sln";
         public static string CoreWCFServiceSolutionName => "WCFServer.sln";
@@ -53,6 +55,7 @@ namespace CTA.FeatureDetection.Tests
         public static string WebClassLibrarySolutionPath => Path.Combine(_targetDir, _webClassLibraryDir, WebClassLibrarySolutionName);
         public static string WindowsAuthenticationSolutionPath => Path.Combine(_targetDir, _windowsAuthenticationDir, WindowsAuthenticationSolutionName);
         public static string FormsAuthenticationSolutionPath => Path.Combine(_targetDir, _formsAuthenticationDir, FormsAuthenticationSolutionName);
+        public static string IISConfigSolutionPath => Path.Combine(_targetDir, _iisConfigDir, IISConfigSolutionName);
         public static string FederatedAuthenticationSolutionPath => Path.Combine(_targetDir, _federatedAuthenticationDir, FederatedAuthenticationSolutionName);
         public static string CoreWCFServiceSolutionPath => Path.Combine(_targetDir, _wcfDir, CoreWCFServiceSolutionName);
         public static string WCFClientSolutionPath => Path.Combine(_targetDir, _wcfDir, WCFClientSolutionName);
@@ -64,6 +67,7 @@ namespace CTA.FeatureDetection.Tests
         public static string WebClassLibraryProjectPath => Path.Combine(_targetDir, _webClassLibraryDir, "WebClassLibrary", "WebClassLibrary.csproj");
         public static string WindowsAuthenticationProjectPath => Path.Combine(_targetDir, _windowsAuthenticationDir, "WindowsAuthentication", "WindowsAuthentication.csproj");
         public static string FormsAuthenticationProjectPath => Path.Combine(_targetDir, _formsAuthenticationDir, _formsAuthenticationDir, "FormsAuthentication.csproj");
+        public static string IISConfigProjectPath => Path.Combine(_targetDir, _iisConfigDir, "MVCAppWithIISConfig", "MVCAppWithIISConfig.csproj");
         public static string FederatedAuthenticationProjectPath => Path.Combine(_targetDir, _federatedAuthenticationDir, _federatedAuthenticationDir, "FederatedAuthentication.csproj");
         public static string CoreWCFServiceConfigProjectPath => Path.Combine(_targetDir, _wcfDir, _wcfConfigBasedProjectDir, "WCFConfigBasedProject.csproj");
         public static string CoreWCFServiceCodeProjectPath => Path.Combine(_targetDir, _wcfDir, _wcfCodeBasedProjectDir, "WCFCodeBasedProject.csproj");
@@ -77,6 +81,7 @@ namespace CTA.FeatureDetection.Tests
         public static IEnumerable<AnalyzerResult> WebClassLibraryAnalyzerResults { get; private set; }
         public static IEnumerable<AnalyzerResult> WebFormsAnalyzerResults { get; private set; }
         public static IEnumerable<AnalyzerResult> WindowsAuthenticationAnalyzerResults { get; private set; }
+        public static IEnumerable<AnalyzerResult> IISConfigAnalyzerResults { get; private set; }
         public static IEnumerable<AnalyzerResult> FormsAuthenticationAnalyzerResults { get; private set; }
         public static IEnumerable<AnalyzerResult> FederatedAuthenticationAnalyzerResults { get; private set; }
         public static IEnumerable<AnalyzerResult> CoreWCFServiceAnalyzerResults { get; private set; }
@@ -91,6 +96,7 @@ namespace CTA.FeatureDetection.Tests
         public static FeatureDetectionResult WebClassLibraryFeatureDetectionResult { get; private set; }
         public static FeatureDetectionResult WindowsAuthenticationFeatureDetectionResult { get; private set; }
         public static FeatureDetectionResult FormsAuthenticationFeatureDetectionResult { get; private set; }
+        public static FeatureDetectionResult IISConfigFeatureDetectionResult { get; private set; }
         public static FeatureDetectionResult FederatedAuthenticationFeatureDetectionResult { get; private set; }
         public static FeatureDetectionResult CoreWCFServiceConfigFeatureDetectionResult { get; private set; }
         public static FeatureDetectionResult CoreWCFServiceCodeFeatureDetectionResult { get; private set; }
@@ -115,6 +121,7 @@ namespace CTA.FeatureDetection.Tests
             var tempWebFormsSolutionDir = GetSolutionDir(tempDownloadDir, WebFormsSolutionName);
             var tempWebClassLibrarySolutionDir = GetSolutionDir(tempDownloadDir, WebClassLibrarySolutionName);
             var tempWindowsAuthenticationSolutionDir = GetSolutionDir(tempDownloadDir, WindowsAuthenticationSolutionName);
+            var tempIISConfigSolutionDir = GetSolutionDir(tempDownloadDir, IISConfigSolutionName);
             var tempFormsAuthenticationSolutionDir = GetSolutionDir(tempDownloadDir, FormsAuthenticationSolutionName);
             var tempFederatedAuthenticationSolutionDir = GetSolutionDir(tempDownloadDir, FederatedAuthenticationSolutionName);
             var tempCoreWCFServiceSolutionDir = GetSolutionDir(tempDownloadDir, CoreWCFServiceSolutionName);
@@ -129,6 +136,7 @@ namespace CTA.FeatureDetection.Tests
             TestUtils.CopyDirectory(tempMvcSolutionDir, new DirectoryInfo(Path.Combine(_targetDir, _mvcDir)));
             TestUtils.CopyDirectory(tempWebApiSolutionDir, new DirectoryInfo(Path.Combine(_targetDir, _webApiDir)));
             TestUtils.CopyDirectory(tempWebFormsSolutionDir, new DirectoryInfo(Path.Combine(_targetDir, _webFormsDir)));
+            TestUtils.CopyDirectory(tempIISConfigSolutionDir, new DirectoryInfo(Path.Combine(_targetDir, _iisConfigDir)));
             TestUtils.CopyDirectory(tempWebClassLibrarySolutionDir, new DirectoryInfo(Path.Combine(_targetDir, _webClassLibraryDir)));
             TestUtils.CopyDirectory(tempWindowsAuthenticationSolutionDir, new DirectoryInfo(Path.Combine(_targetDir, _windowsAuthenticationDir)));
             TestUtils.CopyDirectory(tempFormsAuthenticationSolutionDir, new DirectoryInfo(Path.Combine(_targetDir, _formsAuthenticationDir)));
@@ -146,6 +154,7 @@ namespace CTA.FeatureDetection.Tests
             WebClassLibraryAnalyzerResults = AnalyzerResultsFactory.GetAnalyzerResults(WebClassLibrarySolutionPath);
             WindowsAuthenticationAnalyzerResults = AnalyzerResultsFactory.GetAnalyzerResults(WindowsAuthenticationSolutionPath);
             FormsAuthenticationAnalyzerResults = AnalyzerResultsFactory.GetAnalyzerResults(FormsAuthenticationSolutionPath);
+            IISConfigAnalyzerResults = AnalyzerResultsFactory.GetAnalyzerResults(IISConfigSolutionPath);
             FederatedAuthenticationAnalyzerResults = AnalyzerResultsFactory.GetAnalyzerResults(FederatedAuthenticationSolutionPath);
             CoreWCFServiceAnalyzerResults = AnalyzerResultsFactory.GetAnalyzerResults(CoreWCFServiceSolutionPath);
             WCFClientAnalyzerResults = AnalyzerResultsFactory.GetAnalyzerResults(WCFClientSolutionPath);
@@ -161,6 +170,7 @@ namespace CTA.FeatureDetection.Tests
             WebClassLibraryFeatureDetectionResult = FeatureDetector.DetectFeaturesInProjects(WebClassLibraryAnalyzerResults)[WebClassLibraryProjectPath];
             WindowsAuthenticationFeatureDetectionResult = FeatureDetector.DetectFeaturesInProjects(WindowsAuthenticationAnalyzerResults)[WindowsAuthenticationProjectPath];
             FormsAuthenticationFeatureDetectionResult = FeatureDetector.DetectFeaturesInProjects(FormsAuthenticationAnalyzerResults)[FormsAuthenticationProjectPath];
+            IISConfigFeatureDetectionResult = FeatureDetector.DetectFeaturesInProjects(IISConfigAnalyzerResults)[IISConfigProjectPath];
             FederatedAuthenticationFeatureDetectionResult = FeatureDetector.DetectFeaturesInProjects(FederatedAuthenticationAnalyzerResults)[FederatedAuthenticationProjectPath];
             CoreWCFServiceConfigFeatureDetectionResult = FeatureDetector.DetectFeaturesInProjects(CoreWCFServiceAnalyzerResults)[CoreWCFServiceConfigProjectPath];
             CoreWCFServiceCodeFeatureDetectionResult = FeatureDetector.DetectFeaturesInProjects(CoreWCFServiceAnalyzerResults)[CoreWCFServiceCodeProjectPath];

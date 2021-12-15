@@ -86,6 +86,10 @@
                 {
                   "Name": "FormsAuthenticationWithMembershipFeature",
                   "ClassName": "FormsAuthenticationWithMembershipFeature"
+                },
+                {
+                  "Name": "IISConfigFeature",
+                  "ClassName": "IISConfigFeature"
                 }
               ]
             }
