@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Threading;
 using Codelyzer.Analysis;
 using Codelyzer.Analysis.Build;
 using CTA.Rules.Config;
 using CTA.Rules.Models;
 using CTA.Rules.Update;
 using CTA.WebForms2Blazor;
-using Microsoft.Build.Logging.StructuredLogger;
 using Task = System.Threading.Tasks.Task;
 
 namespace CTA.Rules.PortCore
