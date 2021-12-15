@@ -21,9 +21,9 @@ namespace CTA.WebForms2Blazor.Extensions
             var classTypeSymbol = model.GetDeclaredSymbol(typeDeclarationNode);
             if (classTypeSymbol.BaseType != null)
             {
-                namespaces.Add(classTypeSymbol.BaseType.ContainingNamespace.ToDisplayString());
+                namespaces.Add(classTypeSymbol.BaseType.ContainingNamespace?.ToDisplayString());
             }
-            namespaces.UnionWith(classTypeSymbol.Interfaces.Select(interfaceTypeSymbol => interfaceTypeSymbol.ContainingNamespace.ToDisplayString()));
+            namespaces.UnionWith(classTypeSymbol.Interfaces.Select(interfaceTypeSymbol => interfaceTypeSymbol.ContainingNamespace?.ToDisplayString()));
 
             // Get references required for any declarations that occur
             var variableDeclarationNodes = descendantNodes.OfType<VariableDeclarationSyntax>();
@@ -32,7 +32,7 @@ namespace CTA.WebForms2Blazor.Extensions
                 // VariableDeclarationSyntax can refer to multiple declarations of
                 // the same type, but we are only interested in the type itself
                 .SelectMany(node => GetAllPotentialSymbols(model.GetSymbolInfo(node.Type))
-                .Select(symbol => symbol.ContainingNamespace.ToDisplayString())));
+                .Select(symbol => symbol.ContainingNamespace?.ToDisplayString())));
 
             // Get references required for any object creation that occurs,
             // this is distinct from the declaration references as the namespace
@@ -41,17 +41,17 @@ namespace CTA.WebForms2Blazor.Extensions
             var objectCreationNodes = descendantNodes.OfType<ObjectCreationExpressionSyntax>();
             namespaces.UnionWith(objectCreationNodes
                 .SelectMany(node => GetAllPotentialSymbols(model.GetSymbolInfo(node))
-                .Select(symbol => symbol.ContainingNamespace.ToDisplayString())));
+                .Select(symbol => symbol.ContainingNamespace?.ToDisplayString())));
 
             // Get references required for any invocations that occur
             var invocationNodes = descendantNodes.OfType<InvocationExpressionSyntax>();
             namespaces.UnionWith(invocationNodes
                 .SelectMany(node => GetAllPotentialSymbols(model.GetSymbolInfo(node)))
-                .Select(symbol => symbol.ContainingNamespace.ToDisplayString()));
+                .Select(symbol => symbol.ContainingNamespace?.ToDisplayString()));
 
             // We don't need to include the namespace that the given class belongs
             // to as references within the same namespace are already accessible
-            namespaces.Remove(classTypeSymbol.ContainingNamespace.ToDisplayString());
+            namespaces.Remove(classTypeSymbol.ContainingNamespace?.ToDisplayString());
 
             // TODO: Find out why null namespaces occur and maybe replace with Codelyzer usage
             // We need to remove occurrences of the global namespace, it sometimes gets added

@@ -94,7 +94,7 @@ namespace CTA.WebForms2Blazor.ClassConverters
                     additionalMethodDeclarations: _keepableMethods)
                     .AddClassBlockComment(_endOfClassComments, false);
 
-                var containingNamespace = CodeSyntaxHelper.BuildNamespace(_originalClassSymbol.ContainingNamespace.ToDisplayString(), startupClassDeclaration);
+                var containingNamespace = CodeSyntaxHelper.BuildNamespace(_originalClassSymbol.ContainingNamespace?.ToDisplayString(), startupClassDeclaration);
                 fileText = CodeSyntaxHelper.GetFileSyntaxAsString(containingNamespace, await GetAllUsingStatements());
             }
             catch (Exception e)

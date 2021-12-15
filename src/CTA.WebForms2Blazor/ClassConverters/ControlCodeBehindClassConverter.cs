@@ -54,7 +54,7 @@ namespace CTA.WebForms2Blazor.ClassConverters
                 // normal razor components
                 .AddBaseType(Constants.ComponentBaseClass);
 
-            var namespaceNode = CodeSyntaxHelper.BuildNamespace(_originalClassSymbol.ContainingNamespace.ToDisplayString(), modifiedClass);
+            var namespaceNode = CodeSyntaxHelper.BuildNamespace(_originalClassSymbol.ContainingNamespace?.ToDisplayString(), modifiedClass);
 
             DoCleanUp();
             LogEnd();

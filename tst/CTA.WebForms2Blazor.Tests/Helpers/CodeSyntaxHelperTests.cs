@@ -13,12 +13,20 @@ namespace CTA.WebForms2Blazor.Tests.Helpers
         private const string TestStatement1 = "var x = 10;";
         private const string TestStatement2 = "var y = x + x";
         private const string TestNamespaceName = "TestNamespace";
+        private const string TestNullNamespaceName = "Empty_Namespace";
         private const string TestClassName = "TestClass";
 
         private static string ExpectedTestReferencedNamespaceUsing1 => $"using {TestReferencedNamespace1};";
         private static string ExpectedTestReferencedNamespaceUsing2 => $"using {TestReferencedNamespace2};";
         private static string ExpectedTestNamespaceText =>
 $@"namespace {TestNamespaceName}
+{{
+    class {TestClassName}
+    {{
+    }}
+}}";
+        private static string ExpectedTestNullNamespaceText =>
+$@"namespace {TestNullNamespaceName}
 {{
     class {TestClassName}
     {{
@@ -61,9 +69,20 @@ $@"{ExpectedTestReferencedNamespaceUsing1}
         {
             var classDeclaration = SyntaxFactory.ClassDeclaration(TestClassName);
 
+            var actualNamespaceTexrt = CodeSyntaxHelper.BuildNamespace(null, classDeclaration).NormalizeWhitespace().ToFullString();
             var actualNamespaceText = CodeSyntaxHelper.BuildNamespace(TestNamespaceName, classDeclaration).NormalizeWhitespace().ToFullString();
 
             Assert.AreEqual(ExpectedTestNamespaceText, actualNamespaceText);
+        }
+
+        [Test]
+        public void BuildNamespace_Correctly_Builds_Namespace_With_Null_NamespaceName()
+        {
+            var classDeclaration = SyntaxFactory.ClassDeclaration(TestClassName);
+            string nullNamespaceName = null;
+            var actualNamespaceText = CodeSyntaxHelper.BuildNamespace(nullNamespaceName, classDeclaration).NormalizeWhitespace().ToFullString();
+            
+            Assert.AreEqual(ExpectedTestNullNamespaceText, actualNamespaceText);
         }
 
         [Test]
