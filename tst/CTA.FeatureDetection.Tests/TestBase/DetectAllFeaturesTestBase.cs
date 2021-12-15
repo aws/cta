@@ -29,6 +29,7 @@ namespace CTA.FeatureDetection.Tests.TestBase
         protected FeatureDetectionResult _windowsAuthenticationFeatureDetectionResult;
         protected FeatureDetectionResult _formsAuthenticationFeatureDetectionResult;
         protected FeatureDetectionResult _federatedAuthenticationFeatureDetectionResult;
+        protected FeatureDetectionResult _iisConfigFeatureDetectionResult;
         protected FeatureDetectionResult _coreWCFServiceConfigFeatureDetectionResult;
         protected FeatureDetectionResult _coreWCFServiceCodeFeatureDetectionResult;
         protected FeatureDetectionResult _wcfClientFeatureDetectionResult;
@@ -59,6 +60,7 @@ namespace CTA.FeatureDetection.Tests.TestBase
             _webClassLibraryFeatureDetectionResult = TestProjectsSetupFixture.WebClassLibraryFeatureDetectionResult;
             _windowsAuthenticationFeatureDetectionResult = TestProjectsSetupFixture.WindowsAuthenticationFeatureDetectionResult;
             _formsAuthenticationFeatureDetectionResult = TestProjectsSetupFixture.FormsAuthenticationFeatureDetectionResult;
+            _iisConfigFeatureDetectionResult = TestProjectsSetupFixture.IISConfigFeatureDetectionResult;
             _federatedAuthenticationFeatureDetectionResult = TestProjectsSetupFixture.FederatedAuthenticationFeatureDetectionResult;
             _coreWCFServiceConfigFeatureDetectionResult = TestProjectsSetupFixture.CoreWCFServiceConfigFeatureDetectionResult;
             _coreWCFServiceCodeFeatureDetectionResult = TestProjectsSetupFixture.CoreWCFServiceCodeFeatureDetectionResult;

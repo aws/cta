@@ -36,5 +36,6 @@
 
         // Paths System.webserver
         internal static readonly string WindowsAuthenticationElementPath = $"{ConfigurationElement}/{SystemWebServerElement}/{SecurityElement}/{AuthenticationElement}/{WindowsAuthenticationElement}";
+        internal static readonly string IISConfigElementPath = $"{ConfigurationElement}/{SystemWebServerElement}";
     }
 }

@@ -70,6 +70,7 @@ namespace CTA.Rules.Actions
                     {
                         try
                         {
+                            LogHelper.LogInformation($"Migrate {attribute} IIS server config to kestrel");
                             InvokeMethod(attribute, new object[] { childAttributes.First() });
                         }
                         catch(Exception ex)

@@ -75,5 +75,13 @@ namespace CTA.FeatureDetection.Tests.CTA.FeatureDetection.AuthType
             
             Assert.True(isAuthorizeRoleAttributeInCode, "Expected Authorize Role attribute to be present.");
         }
+
+        [Test]
+        public void IISConfigFeature_Is_Present_In_WebConfig_Project()
+        {
+            var featureName = "IISConfigFeature";
+            Assert.True(_iisConfigFeatureDetectionResult.FeatureStatus[featureName],
+                $"Expected {featureName} to be present.");
+        }
     }
 }
