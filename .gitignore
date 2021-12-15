@@ -121,5 +121,4 @@ tst/Projects/
 
 # Rider
 *.idea
-*.DS_Store
-**/.DS_Store
+.DS_Store

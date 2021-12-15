@@ -57,7 +57,7 @@ namespace CTA.WebForms2Blazor.ClassConverters
 
             _metricsContext.CollectActionMetrics(WebFormsActionType.ClassConversion, ActionName);
             _originalClassName = _originalDeclarationSyntax.Identifier.ToString();
-            _namespaceName = _originalClassSymbol.ContainingNamespace.ToDisplayString();
+            _namespaceName = _originalClassSymbol.ContainingNamespace?.ToDisplayString();
 
             // NOTE: Removed temporarily until usings can be better determined, at the moment, too
             // many are being removed

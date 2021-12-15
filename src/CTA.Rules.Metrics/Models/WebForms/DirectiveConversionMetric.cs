@@ -11,10 +11,8 @@ namespace CTA.Rules.Metrics.Models.WebForms
         public string ActionName => "DirectiveConversion";
 
         public DirectiveConversionMetric(MetricsContext context, string childActionName, string projectPath)
+            : base(context, childActionName, projectPath)
         {
-            ChildActionName = childActionName;
-            SolutionPathHash = context.SolutionPathHash;
-            ProjectGuid = context.ProjectGuidMap.GetValueOrDefault(projectPath, "N/A");
         }
     }
 }

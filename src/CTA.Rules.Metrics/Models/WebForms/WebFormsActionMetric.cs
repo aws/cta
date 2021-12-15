@@ -22,5 +22,12 @@ namespace CTA.Rules.Metrics.Models.WebForms
 
         [JsonProperty("projectGuid", Order = 40)]
         public string ProjectGuid { get; set; }
+
+        public WebFormsActionMetric(MetricsContext context, string childActionName, string projectPath)
+        {
+            ChildActionName = childActionName;
+            SolutionPathHash = context.SolutionPathHash;
+            ProjectGuid = context.ProjectGuidMap.GetValueOrDefault(projectPath, "N/A");
+        }
     }
 }

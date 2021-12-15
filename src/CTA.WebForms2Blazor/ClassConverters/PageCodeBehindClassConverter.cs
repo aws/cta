@@ -117,7 +117,7 @@ namespace CTA.WebForms2Blazor.ClassConverters
                 currentClassDeclaration = currentClassDeclaration.AddBaseType(Constants.DisposableInterface);
             }
 
-            var namespaceNode = CodeSyntaxHelper.BuildNamespace(_originalClassSymbol.ContainingNamespace.ToDisplayString(), currentClassDeclaration);
+            var namespaceNode = CodeSyntaxHelper.BuildNamespace(_originalClassSymbol.ContainingNamespace?.ToDisplayString(), currentClassDeclaration);
             var fileText = CodeSyntaxHelper.GetFileSyntaxAsString(namespaceNode, CodeSyntaxHelper.BuildUsingStatements(requiredNamespaceNames));
 
             DoCleanUp();

@@ -9,11 +9,11 @@ namespace CTA.WebForms2Blazor.Extensions
 {
     public static class SemanticModelExtensions
     {
-        public static IEnumerable<INamespaceSymbol> GetNamespacesReferencedByType(this SemanticModel model, TypeDeclarationSyntax typeDeclarationNode)
+        public static IEnumerable<string> GetNamespacesReferencedByType(this SemanticModel model, TypeDeclarationSyntax typeDeclarationNode)
         {
             // We use a set here because there's no need to maintain
             // duplicates of the referenced namespace declarations
-            var namespaceSymbols = new HashSet<INamespaceSymbol>();
+            var namespaces = new HashSet<string>();
 
             var descendantNodes = typeDeclarationNode.DescendantNodes();
 
@@ -21,42 +21,42 @@ namespace CTA.WebForms2Blazor.Extensions
             var classTypeSymbol = model.GetDeclaredSymbol(typeDeclarationNode);
             if (classTypeSymbol.BaseType != null)
             {
-                namespaceSymbols.Add(classTypeSymbol.BaseType.ContainingNamespace);
+                namespaces.Add(classTypeSymbol.BaseType.ContainingNamespace?.ToDisplayString());
             }
-            namespaceSymbols.UnionWith(classTypeSymbol.Interfaces.Select(interfaceTypeSymbol => interfaceTypeSymbol.ContainingNamespace));
+            namespaces.UnionWith(classTypeSymbol.Interfaces.Select(interfaceTypeSymbol => interfaceTypeSymbol.ContainingNamespace?.ToDisplayString()));
 
             // Get references required for any declarations that occur
             var variableDeclarationNodes = descendantNodes.OfType<VariableDeclarationSyntax>();
-            namespaceSymbols.UnionWith(variableDeclarationNodes
+            namespaces.UnionWith(variableDeclarationNodes
                 // Note that we pass node.Type to GetSymbolInfo, this is because
                 // VariableDeclarationSyntax can refer to multiple declarations of
                 // the same type, but we are only interested in the type itself
                 .SelectMany(node => GetAllPotentialSymbols(model.GetSymbolInfo(node.Type))
-                .Select(symbol => symbol.ContainingNamespace)));
+                .Select(symbol => symbol.ContainingNamespace?.ToDisplayString())));
 
             // Get references required for any object creation that occurs,
             // this is distinct from the declaration references as the namespace
             // of the initialized type may be different from the declared type
             // of the variable it is assigned to
             var objectCreationNodes = descendantNodes.OfType<ObjectCreationExpressionSyntax>();
-            namespaceSymbols.UnionWith(objectCreationNodes
+            namespaces.UnionWith(objectCreationNodes
                 .SelectMany(node => GetAllPotentialSymbols(model.GetSymbolInfo(node))
-                .Select(symbol => symbol.ContainingNamespace)));
+                .Select(symbol => symbol.ContainingNamespace?.ToDisplayString())));
 
             // Get references required for any invocations that occur
             var invocationNodes = descendantNodes.OfType<InvocationExpressionSyntax>();
-            namespaceSymbols.UnionWith(invocationNodes
+            namespaces.UnionWith(invocationNodes
                 .SelectMany(node => GetAllPotentialSymbols(model.GetSymbolInfo(node)))
-                .Select(symbol => symbol.ContainingNamespace));
+                .Select(symbol => symbol.ContainingNamespace?.ToDisplayString()));
 
             // We don't need to include the namespace that the given class belongs
             // to as references within the same namespace are already accessible
-            namespaceSymbols.Remove(classTypeSymbol.ContainingNamespace);
+            namespaces.Remove(classTypeSymbol.ContainingNamespace?.ToDisplayString());
 
             // TODO: Find out why null namespaces occur and maybe replace with Codelyzer usage
             // We need to remove occurrences of the global namespace, it sometimes gets added
             // when a required namespace was not found
-            return namespaceSymbols.Where(namespaceSymbol => namespaceSymbol != null && !namespaceSymbol.ToDisplayString().Equals(Constants.GlobalNamespace));
+            return namespaces.Where(@namespace => @namespace != null && !@namespace.Equals(Constants.GlobalNamespace));
         }
 
         public static IEnumerable<string> GetOriginalUsingNamespaces(this SemanticModel model)

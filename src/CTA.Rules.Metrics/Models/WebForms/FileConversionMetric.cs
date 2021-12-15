@@ -11,10 +11,8 @@ namespace CTA.Rules.Metrics.Models.WebForms
         public string ActionName => "FileConversion";
 
         public FileConversionMetric(MetricsContext context, string childActionName, string projectPath)
+            : base(context, childActionName, projectPath)
         {
-            ChildActionName = childActionName;
-            SolutionPathHash = context.SolutionPathHash;
-            ProjectGuid = context.ProjectGuidMap.GetValueOrDefault(projectPath, "N/A");
         }
     }
 }
