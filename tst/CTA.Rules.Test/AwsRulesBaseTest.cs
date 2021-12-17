@@ -92,12 +92,11 @@ namespace CTA.Rules.Test
             bool portProject = true)
         {
             TestSolutionAnalysis result = new TestSolutionAnalysis();
-            var solutionDir = Directory.GetParent(solutionPath).FullName;
 
             if (solutionPath != null && solutionPath.Length > 0)
             {
                 List<PortCoreConfiguration> solutionPortConfiguration = new List<PortCoreConfiguration>();
-                IEnumerable<string> projectFiles = Directory.EnumerateFiles(solutionDir, "*.csproj", SearchOption.AllDirectories);
+                IEnumerable<string> projectFiles = Utils.GetProjectPaths(solutionPath);
 
                 if (projectFiles != null && projectFiles.Count() > 0)
                 {
@@ -124,8 +123,13 @@ namespace CTA.Rules.Test
                         }
 
                         solutionPortConfiguration.Add(projectConfiguration);
+                        result.ProjectResults.Add(new ProjectResult()
+                        {
+                            CsProjectPath = projectFile,
+                            ProjectDirectory = Directory.GetParent(projectFile).FullName
+                        });
                     }
-                    
+
                     // SolutionPort should remove this extra config because it does not have a matching analyzer result.
                     // Otherwise will hit KeyNotFoundException 
                     solutionPortConfiguration.Add(new PortCoreConfiguration
@@ -139,22 +143,38 @@ namespace CTA.Rules.Test
                     CopyTestRules();
                     var analysisRunResult = solutionPort.AnalysisRun();
 
+                    StringBuilder str = new StringBuilder();
                     foreach (var projectResult in analysisRunResult.ProjectResults)
                     {
                         Assert.IsTrue(projectResult.ProjectActions.ToSummaryString()?.Length > 0);
+                        StringBuilder projectResults = new StringBuilder();
+                        projectResults.AppendLine(projectResult.ProjectFile);
+                        projectResults.AppendLine(projectResult.ProjectActions.ToString());
+                        result.ProjectResults.Where(p => p.CsProjectPath == projectResult.ProjectFile).FirstOrDefault().ProjectAnalysisResult = projectResults.ToString();
+
+                        str.Append(projectResults);
                     }
+                    result.SolutionAnalysisResult = str.ToString();
+
+
                     var runResult = solutionPort.Run();
-                    result = GenerateSolutionResult(solutionDir, analysisRunResult, runResult);
+
+                    foreach (var projectFile in result.ProjectResults)
+                    {
+                        projectFile.CsProjectContent = File.ReadAllText(projectFile.CsProjectPath);
+                    }
+
+                    result.SolutionRunResult = runResult;
                 }
             }
             return result;
         }
 
-        internal TestSolutionAnalysis GenerateSolutionResult(string solutionDir, SolutionResult analysisRunResult, PortSolutionResult solutionRunResult)
+        internal TestSolutionAnalysis GenerateSolutionResult(string solutionPath, SolutionResult analysisRunResult, PortSolutionResult solutionRunResult)
         {
             var result = new TestSolutionAnalysis();
 
-            var projectFiles = Directory.EnumerateFiles(solutionDir, "*.csproj", SearchOption.AllDirectories).ToList();
+            var projectFiles = Utils.GetProjectPaths(solutionPath).ToList();
             projectFiles.ForEach(projectFile => {
                 result.ProjectResults.Add(new ProjectResult()
                 {
