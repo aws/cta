@@ -16,7 +16,7 @@ namespace CTA.Rules.Config
     public class Utils
     {
         private const string DefaultMutexName = "DefaultMutex";
-        private static List<SolutionProjectType> AcceptedProjectTypes = new List<SolutionProjectType>()
+        private static HashSet<SolutionProjectType> AcceptedProjectTypes = new HashSet<SolutionProjectType>()
         {
             SolutionProjectType.KnownToBeMSBuildFormat,
             SolutionProjectType.WebDeploymentProject,
