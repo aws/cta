@@ -18,7 +18,6 @@ namespace CTA.Rules.Config
         private const string DefaultMutexName = "DefaultMutex";
         private static List<SolutionProjectType> AcceptedProjectTypes = new List<SolutionProjectType>()
         {
-            SolutionProjectType.EtpSubProject,
             SolutionProjectType.KnownToBeMSBuildFormat,
             SolutionProjectType.WebDeploymentProject,
             SolutionProjectType.WebProject
@@ -295,7 +294,7 @@ namespace CTA.Rules.Config
 
                 return projectPaths;
             }
-            return null;
+            return new List<string>();
         }
     }
 }
