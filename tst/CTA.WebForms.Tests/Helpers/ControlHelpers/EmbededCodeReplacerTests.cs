@@ -7,6 +7,7 @@ namespace CTA.WebForms.Tests.Helpers.ControlHelpers
     {
         private const string NormalExpressionContent = "normal expression content";
         private const string MutualTagCharExpressionContent = "mutual %_tag_% chars";
+        private const string MultiLineExpressionContent = "<div>\n<p>\nText\n<\\p>\n<\\div>";
 
         private const string AppSettingsSectionName = "appsettings";
         private const string AppSettingsAspExpressionType = "AppSettings";
@@ -50,6 +51,14 @@ namespace CTA.WebForms.Tests.Helpers.ControlHelpers
         }
 
         [Test]
+        public void DataBindRegex_Matches_Expression_With_Multi_Line_Content()
+        {
+            var inputText = $"{WebFormsOneWayDataBindStartTag} {MultiLineExpressionContent} {WebFormsNormalEndTag}";
+
+            Assert.True(EmbeddedCodeReplacers.DataBindRegex.IsMatch(inputText));
+        }
+
+        [Test]
         public void DataBindRegex_Does_Not_Match_Expressions_With_Malformed_Tag_Braces()
         {
             var inputText = $"{WebFormsOneWayDataBindStartTag} {NormalExpressionContent} {WebFormsMalformedEndTag}";
@@ -69,6 +78,14 @@ namespace CTA.WebForms.Tests.Helpers.ControlHelpers
         public void RawExprRegex_Matches_Expressions_With_Characters_Mutual_To_Tag_Braces()
         {
             var inputText = $"{WebFormsRawExpressionStartTag} {MutualTagCharExpressionContent} {WebFormsNormalEndTag}";
+
+            Assert.True(EmbeddedCodeReplacers.RawExprRegex.IsMatch(inputText));
+        }
+
+        [Test]
+        public void RawExprRegex_Matches_Expression_With_Multi_Line_Content()
+        {
+            var inputText = $"{WebFormsRawExpressionStartTag} {MultiLineExpressionContent} {WebFormsNormalEndTag}";
 
             Assert.True(EmbeddedCodeReplacers.RawExprRegex.IsMatch(inputText));
         }
@@ -98,6 +115,14 @@ namespace CTA.WebForms.Tests.Helpers.ControlHelpers
         }
 
         [Test]
+        public void HTMLEncodedExprRegex_Matches_Expression_With_Multi_Line_Content()
+        {
+            var inputText = $"{WebFormsHTMLEncodedExpressionStartTag} {MultiLineExpressionContent} {WebFormsNormalEndTag}";
+
+            Assert.True(EmbeddedCodeReplacers.HTMLEncodedExprRegex.IsMatch(inputText));
+        }
+
+        [Test]
         public void HTMLEncodedExprRegex_Does_Not_Match_Expressions_With_Malformed_Tag_Braces()
         {
             var inputText = $"{WebFormsHTMLEncodedExpressionStartTag} {NormalExpressionContent} {WebFormsMalformedEndTag}";
@@ -122,6 +147,14 @@ namespace CTA.WebForms.Tests.Helpers.ControlHelpers
         }
 
         [Test]
+        public void DirectiveRegex_Matches_Expression_With_Multi_Line_Content()
+        {
+            var inputText = $"{WebFormsDirectiveStartTag} {MultiLineExpressionContent} {WebFormsNormalEndTag}";
+
+            Assert.True(EmbeddedCodeReplacers.DirectiveRegex.IsMatch(inputText));
+        }
+
+        [Test]
         public void DirectiveRegex_Does_Not_Match_Expressions_With_Malformed_Tag_Braces()
         {
             var inputText = $"{WebFormsDirectiveStartTag} {NormalExpressionContent} {WebFormsMalformedEndTag}";
@@ -133,6 +166,14 @@ namespace CTA.WebForms.Tests.Helpers.ControlHelpers
         public void AspExpRegex_Matches_Normal_Correct_Expressions()
         {
             var inputText = $"{WebFormsAspExpressionStartTag} {AppSettingsAspExpressionType}: {AppSettingsAspExpressionContent} {WebFormsNormalEndTag}";
+
+            Assert.True(EmbeddedCodeReplacers.AspExpRegex.IsMatch(inputText));
+        }
+
+        [Test]
+        public void AspExpRegex_Matches_Expression_With_Multi_Line_Content()
+        {
+            var inputText = $"{WebFormsAspExpressionStartTag} {AppSettingsAspExpressionType}:\n {AppSettingsAspExpressionContent} {WebFormsNormalEndTag}";
 
             Assert.True(EmbeddedCodeReplacers.AspExpRegex.IsMatch(inputText));
         }
@@ -162,6 +203,14 @@ namespace CTA.WebForms.Tests.Helpers.ControlHelpers
         }
 
         [Test]
+        public void AspCommentRegex_Matches_Expression_With_Multi_Line_Content()
+        {
+            var inputText = $"{WebFormsCommentStartTag} {MultiLineExpressionContent} {WebFormsCommentEndTag}";
+
+            Assert.True(EmbeddedCodeReplacers.AspCommentRegex.IsMatch(inputText));
+        }
+
+        [Test]
         public void AspCommentRegex_Does_Not_Match_Expressions_With_Malformed_Tag_Braces()
         {
             var inputText = $"{WebFormsCommentStartTag} {NormalExpressionContent} {WebFormsMalformedCommentEndTag}";
@@ -181,6 +230,14 @@ namespace CTA.WebForms.Tests.Helpers.ControlHelpers
         public void EmbeddedCodeBlockRegex_Matches_Expressions_With_Characters_Mutual_To_Tag_Braces()
         {
             var inputText = $"{WebFormsCodeBlockStartTag} {MutualTagCharExpressionContent} {WebFormsNormalEndTag}";
+
+            Assert.True(EmbeddedCodeReplacers.EmbeddedCodeBlockRegex.IsMatch(inputText));
+        }
+
+        [Test]
+        public void EmbeddedCodeBlockRegex_Matches_Expression_With_Multi_Line_Content()
+        {
+            var inputText = $"{WebFormsCodeBlockStartTag} {MultiLineExpressionContent} {WebFormsNormalEndTag}";
 
             Assert.True(EmbeddedCodeReplacers.EmbeddedCodeBlockRegex.IsMatch(inputText));
         }

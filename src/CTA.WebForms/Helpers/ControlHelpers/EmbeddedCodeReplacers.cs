@@ -16,38 +16,38 @@ namespace CTA.WebForms.Helpers.ControlHelpers
         /// Regular expression to identify data binding syntax, matches start and end
         /// tags (<%# or <%#: and %>) with content that does not contain the end tag
         /// </summary>
-        public static Regex DataBindRegex = new Regex(@"<%#:?\s*(?<expr>[^:](?:(?!%>).)*)\s*%>");
+        public static Regex DataBindRegex = new Regex(@"<%#:?\s*(?<expr>[^:](?:(?!%>).)*)\s*%>", RegexOptions.Singleline);
         /// <summary>
         /// Regular expression to identify raw expression syntax, matches start and end
         /// tags (<%= and %>) with content that does not contain the end tag
         /// </summary>
-        public static Regex RawExprRegex = new Regex(@"<%=\s*(?<expr>(?:(?!%>).)*)\s*%>");
+        public static Regex RawExprRegex = new Regex(@"<%=\s*(?<expr>(?:(?!%>).)*)\s*%>", RegexOptions.Singleline);
         /// <summary>
         /// Regular expression to identify html encoded expression syntax, matches start
         /// and end tags (<%: and %>) with content that does not contain the end tag
         /// </summary>
-        public static Regex HTMLEncodedExprRegex = new Regex(@"<%:\s*(?<expr>(?:(?!%>).)*)\s*%>");
+        public static Regex HTMLEncodedExprRegex = new Regex(@"<%:\s*(?<expr>(?:(?!%>).)*)\s*%>", RegexOptions.Singleline);
         /// <summary>
         /// Regular expression to identify directive syntax, matches start and end
         /// tags (<%@ and %>) with content that does not contain the end tag
         /// </summary>
-        public static Regex DirectiveRegex = new Regex(@"<%@\s*(?<expr>(?:(?!%>).)*)\s*%>");
+        public static Regex DirectiveRegex = new Regex(@"<%@\s*(?<expr>(?:(?!%>).)*)\s*%>", RegexOptions.Singleline);
         /// <summary>
         /// Regular expression to identify asp expression syntax, matches start and end
         /// tags (<%$ and %>) with content that does not contain the end tag
         /// </summary>
-        public static Regex AspExpRegex = new Regex(@"<%\$\s*(?<exprType>[^*]+):\s*(?<expr>(?:(?!%>).)+)\s*%>");
+        public static Regex AspExpRegex = new Regex(@"<%\$\s*(?<exprType>[^*]+):\s*(?<expr>(?:(?!%>).)+)\s*%>", RegexOptions.Singleline);
         /// <summary>
         /// Regular expression to identify asp comment syntax, matches start and end tags
         /// (<%-- and --%>) with content that does not contain the end tag
         /// </summary>
-        public static Regex AspCommentRegex = new Regex(@"<%--\s*(?<expr>(?:(?!--%>).)*)\s*--%>");
+        public static Regex AspCommentRegex = new Regex(@"<%--\s*(?<expr>(?:(?!--%>).)*)\s*--%>", RegexOptions.Singleline);
         /// <summary>
         /// Regular expression to identify code block syntax, matches start and end
         /// tags (<%# and %>) with content that does not contain the end tag and has
         /// extra conditions to ensure other embedding syntaxes aren't matched accidentally
         /// </summary>
-        public static Regex EmbeddedCodeBlockRegex = new Regex(@"<%(?!(?:--)|[#=:@\$]).\s*(?<expr>(?:(?!%>).)*)\s*%>");
+        public static Regex EmbeddedCodeBlockRegex = new Regex(@"<%(?!(?:--)|[#=:@\$]).\s*(?<expr>(?:(?!%>).)*)\s*%>", RegexOptions.Singleline);
 
         /// <summary>
         /// Regular expression to identify directive name within directive syntax content,
