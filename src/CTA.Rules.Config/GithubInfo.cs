@@ -6,5 +6,6 @@
         public const string TestGithubRepo = "TestProjects";
         public const string TestGithubTag = "master";
         public const string TestGithubToken = "";
+
     }
 }
