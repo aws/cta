@@ -22,7 +22,7 @@ namespace CTA.Rules.Config
             //client.DefaultRequestHeaders.Add(HttpRequestHeader.Authorization.ToString(), string.Concat("token ", GithubInfo.TestGithubToken));
             client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/vnd.github.v3.raw"));
             client.DefaultRequestHeaders.UserAgent.Add(new System.Net.Http.Headers.ProductInfoHeaderValue("TestApp", "1.0.0.0"));
-
+            client.Timeout = TimeSpan.FromMinutes(5);
             var content = client.GetByteArrayAsync(string.Concat("https://api.github.com/repos/", owner, "/", repo, "/zipball/", tag)).Result;
             return content;
         }
