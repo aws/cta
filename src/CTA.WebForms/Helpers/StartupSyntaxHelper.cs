@@ -17,7 +17,8 @@ namespace CTA.WebForms.Helpers
             "Microsoft.AspNetCore.Hosting",
             "Microsoft.AspNetCore.Builder",
             "Microsoft.Extensions.Configuration",
-            "Microsoft.Extensions.DependencyInjection"
+            "Microsoft.Extensions.DependencyInjection",
+            "Microsoft.Extensions.Hosting"
         };
 
         /// <summary>
