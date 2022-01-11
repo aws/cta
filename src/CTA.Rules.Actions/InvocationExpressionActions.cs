@@ -88,9 +88,23 @@ namespace CTA.Rules.Actions
         /// <returns></returns>
         public Func<SyntaxGenerator, InvocationExpressionSyntax, InvocationExpressionSyntax> GetReplaceMethodAndParametersAction(string oldMethod, string newMethod, string newParameters)
         {
+            const string oldParam1EscapeKeyWord = "****OLDPARAM1****";
+            const string oldParam2EscapeKeyWord = "****OLDPARAM2****";
+
             //TODO what's the outcome if newMethod doesn't have a valid signature.. are there any options we could provide to parseexpression ?
             InvocationExpressionSyntax ReplaceOnlyMethod(SyntaxGenerator syntaxGenerator, InvocationExpressionSyntax node)
             {
+                if (newParameters.Contains(oldParam1EscapeKeyWord))
+                {
+                    var oldParam1 = node.ArgumentList.Arguments.First().ToFullString();
+                    newParameters = newParameters.Replace(oldParam1EscapeKeyWord, oldParam1);
+                }
+                if (newParameters.Contains(oldParam2EscapeKeyWord))
+                {
+                    var oldParam2 = node.ArgumentList.Arguments.Skip(1).First().ToFullString();
+                    newParameters = newParameters.Replace(oldParam2EscapeKeyWord, oldParam2);
+                }
+                
                 node = node.WithExpression(SyntaxFactory.ParseExpression(node.Expression.ToString().Replace(oldMethod, newMethod)))
                     .WithArgumentList(SyntaxFactory.ParseArgumentList(newParameters))
                     .WithLeadingTrivia(node.GetLeadingTrivia())

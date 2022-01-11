@@ -66,12 +66,12 @@ namespace CTA.Rules.Test.Actions
         public void GetReplaceMethodAndParametersAction()
         {
             const string newMethod = "Floor";
-            const string newParameter = "(-2)";
+            const string newParameter = "(****OLDPARAM1****)";
             var replaceMethodFunc =
                 _invocationExpressionActions.GetReplaceMethodAndParametersAction("Abs", newMethod, newParameter);
             var newNode = replaceMethodFunc(_syntaxGenerator, _node);
 
-            var expectedResult = "/* Comment */\r\nMath.Floor(-2)";
+            var expectedResult = "/* Comment */\r\nMath.Floor(-1)";
             Assert.AreEqual(expectedResult, newNode.ToFullString());
         }
 
