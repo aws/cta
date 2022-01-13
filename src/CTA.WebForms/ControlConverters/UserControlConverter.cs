@@ -42,7 +42,7 @@ namespace CTA.WebForms.ControlConverters
         {
             foreach (HtmlAttribute attr in node.Attributes)
             {
-                if (!_removeAttributeSet.Contains(attr.Name))
+                if (!_removeAttributeSet.Contains(attr.Name) && !_attributeMap.ContainsKey(attr.Name))
                 {
                     _attributeMap.Add(attr.Name, attr.OriginalName);
                 }
