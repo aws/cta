@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+	  <IsTestProject>true</IsTestProject>
+	  <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="nunit" Version="3.13.2" />
+		<PackageReference Include="NUnit3TestAdapter" Version="4.0.0" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.11.0" />
+	</ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="TestingArea\TestFiles\SampleCodeFile.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+	<ProjectReference Include="..\..\src\CTA.Rules.Actions\CTA.Rules.Actions.csproj" />
+	<ProjectReference Include="..\..\src\CTA.WebForms\CTA.WebForms.csproj" />
+	<ProjectReference Include="..\CTA.FeatureDetection.Tests\CTA.FeatureDetection.Tests.csproj" />
+	<ProjectReference Include="..\CTA.Rules.Test\CTA.Rules.Test.csproj" />
+  </ItemGroup>
+
+</Project>

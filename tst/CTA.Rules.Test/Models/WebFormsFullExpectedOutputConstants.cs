@@ -147,6 +147,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.EntityFrameworkCore;
 
 namespace WebFormsFull
@@ -231,7 +232,7 @@ namespace WebFormsFull
             services.AddRazorPages();
             services.AddServerSideBlazor();
         // Did not attempt to migrate service layer
-        // and configure depenency injection in ConfigureServices(),
+        // and configure dependency injection in ConfigureServices(),
         // this must be done manually
         }
 

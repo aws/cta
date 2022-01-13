@@ -7,7 +7,6 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Build.Construction;
 using NJsonSchema.Generation;
 using NJsonSchema.Validation;
 
@@ -16,12 +15,6 @@ namespace CTA.Rules.Config
     public class Utils
     {
         private const string DefaultMutexName = "DefaultMutex";
-        private static HashSet<SolutionProjectType> AcceptedProjectTypes = new HashSet<SolutionProjectType>()
-        {
-            SolutionProjectType.KnownToBeMSBuildFormat,
-            SolutionProjectType.WebDeploymentProject,
-            SolutionProjectType.WebProject
-        };
 
         public static byte[] DownloadFromGitHub(string owner, string repo, string tag)
         {
@@ -277,24 +270,7 @@ namespace CTA.Rules.Config
 
         public static IEnumerable<string> GetProjectPaths(string solutionPath)
         {
-            if(solutionPath.Contains(".sln") && File.Exists(solutionPath))
-            {
-                string solutionDir = Directory.GetParent(solutionPath).FullName;
-                IEnumerable<string> projectPaths = null;
-                try
-                {
-                    SolutionFile solution = SolutionFile.Parse(solutionPath);
-                    projectPaths = solution.ProjectsInOrder.Where(p => AcceptedProjectTypes.Contains(p.ProjectType)).Select(p => p.AbsolutePath);
-                }
-                catch(Exception ex)
-                {
-                    LogHelper.LogError(ex, $"Error while parsing solution file {solutionPath} falling back to directory parsing.");
-                    projectPaths = Directory.EnumerateFiles(solutionDir, "*.csproj", SearchOption.AllDirectories);
-                }
-
-                return projectPaths;
-            }
-            return new List<string>();
+            return new List<string>();//TODO: Codelyzer.Analysis.Common.FileUtils.GetProjectPathsFromSolutionFile(solutionPath);
         }
     }
 }

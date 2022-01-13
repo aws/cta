@@ -6,7 +6,7 @@ using Codelyzer.Analysis.Build;
 using CTA.Rules.Config;
 using CTA.Rules.Models;
 using CTA.Rules.Update;
-using CTA.WebForms2Blazor;
+using CTA.WebForms;
 using Task = System.Threading.Tasks.Task;
 
 namespace CTA.Rules.PortCore

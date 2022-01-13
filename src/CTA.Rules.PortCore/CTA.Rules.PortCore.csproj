@@ -8,7 +8,7 @@
   <ItemGroup>
 	<ProjectReference Include="..\CTA.FeatureDetection\CTA.FeatureDetection.csproj" />
     <ProjectReference Include="..\CTA.Rules.Update\CTA.Rules.Update.csproj" />
-    <ProjectReference Include="..\CTA.WebForms2Blazor\CTA.WebForms2Blazor.csproj" />
+    <ProjectReference Include="..\CTA.WebForms\CTA.WebForms.csproj" />
   </ItemGroup>
 
   <ItemGroup>
