@@ -121,7 +121,7 @@ namespace AspNetRoutes
             create.Serialize();
             /* Added by CTA: Please use instead the methods of the TicketSerializer class: WriteIdentity, WriteClaim, Write for AuthenticationTicket or the ReadIdentity, ReadClaim, Read for AuthenticationTicket. */
             create.SetToken("""");
-            /* Added by CTA: Please change the parameter type from string to a byte[]. This is also the data type returned by the TicketSerializer.Serialize method. This new method also returns the actual Microsoft.AspNetCore.Authentication.AuthenticationTicket object serialized with the TicketSerializer.Serialize method. */
+            /* Added by CTA: Please change the parameter type from string to a byte[]. This is also the data type returned by the TicketSerializer.Serialize method. */
             receive.Deserialize(serializedTicket);
             SecurityHelper helper = new SecurityHelper();
             /* Added by CTA: Please use UseAuthentication() in your Configure method in your Startup class and in your ConfigureServices method in your Startup class use AddAuthentication to set all your various options and middleware as needed. */
@@ -144,7 +144,7 @@ namespace AspNetRoutes
         {
             IRequestCookieCollection cookies = context.Request.Cookies;
             string owinCookieValue = cookies[""OwinCookieKey""];
-            context.Request.QueryString = /* Added by CTA: This method only takes a single parameter for the value of the new query string or none at all. */
+            context.Request.QueryString = /* Added by CTA: This method only take a single parameter for the value of the new query string or none at all. */
             new QueryString(""owin"", ""owinValue"");
             IQueryCollection stringquery = context.Request.Query;
             string owinquery = stringquery[""owin""];
@@ -570,20 +570,20 @@ namespace StaticFilesSample
 #endif
             // Remap '/' to '.\defaults\'.
             // Turns on static files and default files.
-            app.UseFileServer(/* Added by CTA: For FileServerOptions, if FileSystem was not present before FileProvider was added, please initialize this new value. Using the value from RequestPath with System.IO.Directory.GetCurrentDirectory() as a prefix may be a good starting point. */
+            app.UseFileServer(/* Added by CTA: For FileServerOptions, if FileSystem was not present before FileProvider was added, please initialize this new value. */
             new FileServerOptions()
             {RequestPath = PathString.Empty, FileProvider = defaultFS, });
             // Only serve files requested by name.
             app.UseStaticFiles(""/files"");
             // Turns on static files, directory browsing, and default files.
-            app.UseFileServer(/* Added by CTA: For FileServerOptions, if FileSystem was not present before FileProvider was added, please initialize this new value. Using the value from RequestPath with System.IO.Directory.GetCurrentDirectory() as a prefix may be a good starting point. */
+            app.UseFileServer(/* Added by CTA: For FileServerOptions, if FileSystem was not present before FileProvider was added, please initialize this new value. */
             new FileServerOptions()
             {RequestPath = new PathString(""/public""), EnableDirectoryBrowsing = true, FileProvider = new PhysicalFileProvider(@"""")});
             // Browse the root of your application (but do not serve the files).
             // NOTE: Avoid serving static files from the root of your application or bin folder,
             // it allows people to download your application binaries, config files, etc..
             /* Added by CTA: Please add a new ConfigureServices method: public void ConfigureServices(IServiceCollection services) { services.AddDirectoryBrowser(); } */
-            app.UseDirectoryBrowser(/* Added by CTA: For DirectoryBrowserOptions, if FileSystem was not present before FileProvider was added, please initialize this new value. Using the value from RequestPath with System.IO.Directory.GetCurrentDirectory() as a prefix may be a good starting point. */
+            app.UseDirectoryBrowser(/* Added by CTA: For DirectoryBrowserOptions, if FileSystem was not present before FileProvider was added, please initialize this new value. */
             new DirectoryBrowserOptions()
             {RequestPath = new PathString(""/src""), FileProvider = new PhysicalFileProvider(@""""), });
             // Anything not handled will land at the welcome page.
