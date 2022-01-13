@@ -104,7 +104,7 @@ namespace ProjectNamespace
             services.AddRazorPages();
             services.AddServerSideBlazor();
              // Did not attempt to migrate service layer
-            // and configure depenency injection in ConfigureServices(),
+            // and configure dependency injection in ConfigureServices(),
             // this must be done manually
         }
 
