@@ -45,7 +45,7 @@ namespace CTA.Rules.Test
 
         }
 
-        private TestSolutionAnalysis runCTAFile(string solutionName, string projectName) 
+        private TestSolutionAnalysis runCTAFile(string solutionName) 
         {
             //We don't care about version for CTA-only rules:
             string version = "net5.0";
@@ -56,7 +56,7 @@ namespace CTA.Rules.Test
             FileAssert.Exists(solutionPath);
 
             //Sample Web API has only one project:
-            string projectFile = Directory.EnumerateFiles(solutionDir, projectName, SearchOption.AllDirectories).FirstOrDefault();
+            string projectFile = Utils.GetProjectPaths(Path.Combine(solutionDir, solutionName)).FirstOrDefault();
             FileAssert.Exists(projectFile);
 
             ProjectConfiguration projectConfiguration = new ProjectConfiguration()
@@ -138,7 +138,7 @@ namespace CTA.Rules.Test
         [Test]
         public void TestMvcMusicStore()
         {
-            var results = runCTAFile("MvcMusicStore.sln", "*.csproj").ProjectResults.FirstOrDefault();
+            var results = runCTAFile("MvcMusicStore.sln").ProjectResults.FirstOrDefault();
 
             StringAssert.Contains("HtmlEncoder", results.ProjectAnalysisResult);
 
@@ -191,7 +191,7 @@ namespace CTA.Rules.Test
         [Test]
         public void TestMonolithReplacementsMVC()
         {
-            var results = runCTAFile("MvcMusicStore.sln", "*.csproj").ProjectResults.FirstOrDefault();
+            var results = runCTAFile("MvcMusicStore.sln").ProjectResults.FirstOrDefault();
 
             var storeManagerControllerText = File.ReadAllText(Path.Combine(results.ProjectDirectory, "Controllers", "StoreManagerController.cs"));
 
@@ -202,7 +202,7 @@ namespace CTA.Rules.Test
         [Test]
         public void TestMonolithReplacementsWebAPI()
         {
-            var results = runCTAFile("SampleWebApi.sln", "*.csproj").ProjectResults.FirstOrDefault();
+            var results = runCTAFile("SampleWebApi.sln").ProjectResults.FirstOrDefault();
 
             var houseControllerText = File.ReadAllText(Path.Combine(results.ProjectDirectory, "Controllers", "HouseController.cs"));
 
