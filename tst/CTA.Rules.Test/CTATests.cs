@@ -45,7 +45,7 @@ namespace CTA.Rules.Test
 
         }
 
-        private TestSolutionAnalysis runCTAFile(string solutionName) 
+        private TestSolutionAnalysis runCTAFile(string solutionName, string projectName = null) 
         {
             //We don't care about version for CTA-only rules:
             string version = "net5.0";
@@ -56,7 +56,7 @@ namespace CTA.Rules.Test
             FileAssert.Exists(solutionPath);
 
             //Sample Web API has only one project:
-            string projectFile = Utils.GetProjectPaths(Path.Combine(solutionDir, solutionName)).FirstOrDefault();
+            string projectFile = (projectName == null ? Utils.GetProjectPaths(Path.Combine(solutionDir, solutionName)).FirstOrDefault() : Directory.EnumerateFiles(solutionDir, projectName, SearchOption.AllDirectories).FirstOrDefault());
             FileAssert.Exists(projectFile);
 
             ProjectConfiguration projectConfiguration = new ProjectConfiguration()
