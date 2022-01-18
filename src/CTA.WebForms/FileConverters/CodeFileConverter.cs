@@ -80,17 +80,27 @@ namespace CTA.WebForms.FileConverters
             {
                 await allMigrationTasks;
             }
-            // NOTE: We use Exception here instead of AggregateException as sometimes await
-            // will auto un-wrap aggregate exception
-            catch (Exception e)
+            // NOTE: We don't provide a reference to the caught exception here because any
+            // encountered exceptions will be logged when examining the individual failed tasks
+            catch
             {
-                LogHelper.LogError(e, $"{Rules.Config.Constants.WebFormsErrorTag}Collection of migration tasks experienced 1 or more failures");
+                // NOTE: While using await does automatically unwrap AggregateExceptions when they
+                // only contain 1 exception, component tasks of Task.WhenAll() will never have their
+                // AggregateExceptions unwrapped when the WhenAll task is awaited
 
-                var failedMigrationTasks = classMigrationTasks.Where(t => t.Item2.Status != TaskStatus.RanToCompletion);
+                var failedMigrationTasks = classMigrationTasks
+                    // Select failed tasks only
+                    .Where(t => t.Item2.Status != TaskStatus.RanToCompletion)
+                    // We can be fairly certain that failed tasks will only have a single exception,
+                    // but we use InnerExceptions instead of InnerException just to be thorough
+                    .SelectMany(t =>
+                        t.Item2.Exception?.InnerExceptions?.Select(e => (t.Item1, e))
+                        ?? Enumerable.Empty<(ClassConverter, Exception)>()
+                    );
 
                 foreach (var failedTask in failedMigrationTasks)
                 {
-                    LogHelper.LogError(failedTask.Item2.Exception, $"{Rules.Config.Constants.WebFormsErrorTag}Failed to migrate {failedTask.Item1.OriginalClassName} class " +
+                    LogHelper.LogError(failedTask.Item2, $"{Rules.Config.Constants.WebFormsErrorTag}Failed to migrate {failedTask.Item1.OriginalClassName} class " +
                         $"located at {failedTask.Item1.FullPath}");
                 }
             }
