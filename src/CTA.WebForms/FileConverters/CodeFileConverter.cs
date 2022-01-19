@@ -61,7 +61,9 @@ namespace CTA.WebForms.FileConverters
             LogStart();
             _metricsContext.CollectActionMetrics(WebFormsActionType.FileConversion, ChildActionType);
 
-            var classMigrationTasks = _classConverters.Select(converter => converter.MigrateClassAsync());
+            // Need to have ToList call here to enumerate the collection and ensure class
+            // converters are running before we retire this file converter task
+            var classMigrationTasks = _classConverters.Select(converter => converter.MigrateClassAsync()).ToList();
 
             // We want to do our cleanup now because from this point on all migration tasks
             // are done by class converters and we want to make sure that we retire the task
