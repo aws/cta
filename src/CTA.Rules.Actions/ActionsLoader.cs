@@ -329,7 +329,7 @@ namespace CTA.Rules.Actions
                 {
                     result.Add(jsonParameters[p.Name]);
                 }
-                else if(!p.IsOptional)
+                else
                 {
                     LogHelper.LogDebug(string.Format("Parameter {0} is not available for action {1}", p.Name, method.Name));
                     return null;

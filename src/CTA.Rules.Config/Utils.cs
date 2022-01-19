@@ -270,7 +270,7 @@ namespace CTA.Rules.Config
 
         public static IEnumerable<string> GetProjectPaths(string solutionPath)
         {
-            return new List<string>();//TODO: Codelyzer.Analysis.Common.FileUtils.GetProjectPathsFromSolutionFile(solutionPath);
+            return Codelyzer.Analysis.Common.FileUtils.GetProjectPathsFromSolutionFile(solutionPath, LogHelper.Logger);
         }
     }
 }
