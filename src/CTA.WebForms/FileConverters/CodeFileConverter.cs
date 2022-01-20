@@ -42,7 +42,7 @@ namespace CTA.WebForms.FileConverters
             try
             {
                 _fileModel = _webFormsProjectAnaylzer.AnalyzerResult.ProjectBuildResult?.SourceFileBuildResults?
-                    .Single(r => r.SourceFileFullPath == FullPath)?.SemanticModel;
+                    .Single(r => r.SourceFileFullPath.Equals(fullPath, StringComparison.OrdinalIgnoreCase))?.SemanticModel;
             }
             catch (Exception e)
             {
