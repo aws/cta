@@ -42,11 +42,11 @@ namespace CTA.WebForms.FileConverters
             try
             {
                 _fileModel = _webFormsProjectAnaylzer.AnalyzerResult.ProjectBuildResult?.SourceFileBuildResults?
-                    .Single(r => r.SourceFileFullPath.EndsWith(RelativePath))?.SemanticModel;
+                    .Single(r => r.SourceFileFullPath.Equals(fullPath, StringComparison.OrdinalIgnoreCase))?.SemanticModel;
             }
             catch (Exception e)
             {
-                LogHelper.LogError(e, $"{Rules.Config.Constants.WebFormsErrorTag}Exception occurred when trying to retrieve semantic model for the file {RelativePath}. " +
+                LogHelper.LogError(e, $"{Rules.Config.Constants.WebFormsErrorTag}Exception occurred when trying to retrieve semantic model for the file {FullPath}. " +
                                       "Semantic Model will default to null.");
             }
 
