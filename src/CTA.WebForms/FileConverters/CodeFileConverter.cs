@@ -57,7 +57,7 @@ namespace CTA.WebForms.FileConverters
             else
             {
                 _classConverters = new List<ClassConverter>();
-                LogHelper.LogWarning("Semantic model was found so class conversion cannot take place. Returning zero class converters.");
+                LogHelper.LogWarning($"Semantic model was not found so class conversion cannot take place. Returning zero class converters for file: {FullPath}");
             }
         }
 
