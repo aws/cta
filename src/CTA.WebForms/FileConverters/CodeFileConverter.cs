@@ -61,41 +61,35 @@ namespace CTA.WebForms.FileConverters
             LogStart();
             _metricsContext.CollectActionMetrics(WebFormsActionType.FileConversion, ChildActionType);
 
-            // Store migration tasks alongside converter so we can log context where necessary
-            var classMigrationTasks = new List<(ClassConverter, Task<IEnumerable<FileInformation>>)>();
-
-            foreach (var converter in _classConverters)
-            {
-                classMigrationTasks.Add((converter, converter.MigrateClassAsync()));
-            }
+            // Need to have ToList call here to enumerate the collection and ensure class
+            // converters are running before we retire this file converter task
+            var classMigrationTasks = _classConverters.Select(converter => converter.MigrateClassAsync()).ToList();
 
             // We want to do our cleanup now because from this point on all migration tasks
             // are done by class converters and we want to make sure that we retire the task
             // related to this file converter before we await
             DoCleanUp();
 
-            var allMigrationTasks = Task.WhenAll(classMigrationTasks.Select(t => t.Item2));
+            var allMigrationTasks = Task.WhenAll(classMigrationTasks);
 
             try
             {
                 await allMigrationTasks;
             }
-            // NOTE: We use Exception here instead of AggregateException as sometimes await
-            // will auto un-wrap aggregate exception
-            catch (Exception e)
+            // We don't provide a reference for the thrown exception here because await auto-
+            // unwraps aggregate exceptions and throws only the first encountered exception
+            catch
             {
-                LogHelper.LogError(e, $"{Rules.Config.Constants.WebFormsErrorTag}Collection of migration tasks experienced 1 or more failures");
+                // We access allMigrationTasks.Exception instead to provide the original AggregateException
+                var allExceptions = allMigrationTasks.Exception.Flatten().InnerExceptions;
 
-                var failedMigrationTasks = classMigrationTasks.Where(t => t.Item2.Status != TaskStatus.RanToCompletion);
-
-                foreach (var failedTask in failedMigrationTasks)
+                foreach (Exception e in allExceptions)
                 {
-                    LogHelper.LogError(failedTask.Item2.Exception, $"{Rules.Config.Constants.WebFormsErrorTag}Failed to migrate {failedTask.Item1.OriginalClassName} class " +
-                        $"located at {failedTask.Item1.FullPath}");
+                    LogHelper.LogError(e, $"{Rules.Config.Constants.WebFormsErrorTag}Failed to migrate class");
                 }
             }
 
-            var result = classMigrationTasks.Where(t => t.Item2.Status == TaskStatus.RanToCompletion).SelectMany(t => t.Item2.Result);
+            var result = classMigrationTasks.Where(t => t.Status == TaskStatus.RanToCompletion).SelectMany(t => t.Result);
 
             LogEnd();
 
