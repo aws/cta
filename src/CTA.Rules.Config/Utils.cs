@@ -7,6 +7,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Build.Construction;
 using NJsonSchema.Generation;
 using NJsonSchema.Validation;
 
@@ -182,7 +183,7 @@ namespace CTA.Rules.Config
                 // If this happens, generate a unique identifier, append it to the file name,
                 // and try writing again.
                 var uniqueFileName = GenerateUniqueFileName(filePath, mutexName);
-                
+
                 using var fileStream = File.Open(uniqueFileName, FileMode.Create, FileAccess.ReadWrite, fileShare);
                 using var streamWriter = new StreamWriter(fileStream);
                 streamWriter.Write(content);
@@ -191,20 +192,52 @@ namespace CTA.Rules.Config
             }
         }
 
+
+        public static string CopySolutionToDestinationLocation(string solutionName, string solutionPath)
+        {
+            string slnDirPath = Directory.GetParent(solutionPath).FullName;
+            string root = Path.GetPathRoot(slnDirPath);
+            string relativeSrc = Path.GetRelativePath(root, slnDirPath);
+            
+            var newTempDirPath = Path.Combine(Directory.GetParent(slnDirPath).FullName, Guid.NewGuid().ToString());
+            string destPath = Path.Combine(newTempDirPath, relativeSrc);
+            string newSlnPath = CopyFolderToTemp(solutionName, slnDirPath, destPath);
+
+
+            if (solutionPath.Contains(".sln") && File.Exists(solutionPath))
+            {
+                IEnumerable<string> projects = GetProjectPathsFromSolutionFile(solutionPath);
+                foreach (string project in projects)
+                {
+                    string projPath = Directory.GetParent(project).FullName;
+                    relativeSrc = Path.GetRelativePath(solutionPath, projPath);
+                    string projName = Path.GetFileName(project);
+
+                    if (!IsSubPathOf(slnDirPath, projPath))
+                    {
+                        string relDestPath = Path.Combine(destPath, relativeSrc);
+                        CopyFolderToTemp(projName, projPath, relDestPath);
+                    }
+                }
+            }
+            return newSlnPath;
+        }
+
+
+
         /// <summary>
         /// Copies a solution to a new location under a folder with a randomly generated name
         /// </summary>
         /// <param name="solutionName">The name of the solution (MySolution.sln)</param>
         /// <param name="tempDir">The folder the location resides in</param>
         /// <returns></returns>
-        public static string CopySolutionFolderToTemp(string solutionName, string tempDir)
+        public static string CopyFolderToTemp(string solutionName, string tempDir, string destinationLocation)
         {
             string solutionPath = Directory.EnumerateFiles(tempDir, solutionName, SearchOption.AllDirectories).FirstOrDefault(s => !s.Contains(string.Concat(Path.DirectorySeparatorChar, Path.DirectorySeparatorChar)));
             string solutionDir = Directory.GetParent(solutionPath).FullName;
-            var newTempDir = Path.Combine(Directory.GetParent(solutionDir).FullName, Guid.NewGuid().ToString());
-            CopyDirectory(new DirectoryInfo(solutionDir), new DirectoryInfo(newTempDir));
+            CopyDirectory(new DirectoryInfo(solutionDir), new DirectoryInfo(destinationLocation));
 
-            solutionPath = Directory.EnumerateFiles(newTempDir, solutionName, SearchOption.AllDirectories).FirstOrDefault();
+            solutionPath = Directory.EnumerateFiles(destinationLocation, solutionName, SearchOption.AllDirectories).FirstOrDefault();
             return solutionPath;
         }
 
@@ -241,7 +274,8 @@ namespace CTA.Rules.Config
 
             var parallelOptions = new ParallelOptions() { MaxDegreeOfParallelism = Constants.ThreadCount };
 
-            Parallel.ForEach(Constants.TemplateFiles, file => {
+            Parallel.ForEach(Constants.TemplateFiles, file =>
+            {
                 var localFile = Path.Combine(targetFolder, string.Join(Path.DirectorySeparatorChar, file));
                 var remoteFile = string.Concat(s3Bucket, "/", string.Join("/", file));
 
@@ -266,6 +300,51 @@ namespace CTA.Rules.Config
                     LogHelper.LogError(ex, $"Error while dowloading file {file}");
                 }
             });
+        }
+
+        public static IEnumerable<string> GetProjectPathsFromSolutionFile(string solutionPath)
+        {
+
+            IEnumerable<string> projectPaths = null;
+            try
+            {
+                SolutionFile solution = SolutionFile.Parse(solutionPath);
+                projectPaths = solution.ProjectsInOrder.Where(p => AcceptedProjectTypes.Contains(p.ProjectType)).Select(p => p.AbsolutePath);
+            }
+            catch (Exception ex)
+            {
+                LogHelper.LogError(ex, $"Error while parsing the solution file {solutionPath}");
+            }
+
+            return projectPaths;
+
+        }
+
+        public static HashSet<SolutionProjectType> AcceptedProjectTypes = new HashSet<SolutionProjectType>()
+        {
+            SolutionProjectType.KnownToBeMSBuildFormat,
+            SolutionProjectType.WebDeploymentProject,
+            SolutionProjectType.WebProject
+        };
+
+        public static bool IsSubPathOf(string subPath, string basePath)
+        {
+            DirectoryInfo subDir = new DirectoryInfo(subPath);
+            DirectoryInfo baseDir = new DirectoryInfo(basePath);
+            bool isParent = false;
+            while (baseDir.Parent != null)
+            {
+                if (baseDir.Parent.FullName == subDir.FullName)
+                {
+                    isParent = true;
+                    break;
+                }
+                else
+                {
+                    baseDir = baseDir.Parent;
+                }
+            }
+            return isParent;
         }
     }
 }

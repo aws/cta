@@ -16,6 +16,7 @@ namespace CTA.Rules.PortCore
             try
             {
                 PortCoreRulesCli cli = new PortCoreRulesCli();
+
                 cli.HandleCommand(args);
 
                 Console.WriteLine(cli.FilePath);
@@ -34,7 +35,7 @@ namespace CTA.Rules.PortCore
 
                 if (cli.CreateNew)
                 {
-                    cli.FilePath = Utils.CopySolutionFolderToTemp(Path.GetFileName(cli.FilePath), Directory.GetParent(cli.FilePath).FullName);
+                    cli.FilePath = Utils.CopySolutionToDestinationLocation(Path.GetFileName(cli.FilePath), cli.FilePath);
                 }
 
                 string solutionDir = Directory.GetParent(cli.FilePath).FullName;
