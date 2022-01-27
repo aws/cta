@@ -570,20 +570,20 @@ namespace StaticFilesSample
 #endif
             // Remap '/' to '.\defaults\'.
             // Turns on static files and default files.
-            app.UseFileServer(/* Added by CTA: For FileServerOptions, if FileSystem was not present before FileProvider was added, please initialize this new value. Using the value from RequestPath with System.IO.Directory.GetCurrentDirectory() as a prefix may be a good starting point. */
+            app.UseFileServer(/* Added by CTA: For FileServerOptions, if FileSystem was not present before FileProvider was added, please initialize this new value. */
             new FileServerOptions()
             {RequestPath = PathString.Empty, FileProvider = defaultFS, });
             // Only serve files requested by name.
             app.UseStaticFiles(""/files"");
             // Turns on static files, directory browsing, and default files.
-            app.UseFileServer(/* Added by CTA: For FileServerOptions, if FileSystem was not present before FileProvider was added, please initialize this new value. Using the value from RequestPath with System.IO.Directory.GetCurrentDirectory() as a prefix may be a good starting point. */
+            app.UseFileServer(/* Added by CTA: For FileServerOptions, if FileSystem was not present before FileProvider was added, please initialize this new value. */
             new FileServerOptions()
             {RequestPath = new PathString(""/public""), EnableDirectoryBrowsing = true, FileProvider = new PhysicalFileProvider(@"""")});
             // Browse the root of your application (but do not serve the files).
             // NOTE: Avoid serving static files from the root of your application or bin folder,
             // it allows people to download your application binaries, config files, etc..
             /* Added by CTA: Please add a new ConfigureServices method: public void ConfigureServices(IServiceCollection services) { services.AddDirectoryBrowser(); } */
-            app.UseDirectoryBrowser(/* Added by CTA: For DirectoryBrowserOptions, if FileSystem was not present before FileProvider was added, please initialize this new value. Using the value from RequestPath with System.IO.Directory.GetCurrentDirectory() as a prefix may be a good starting point. */
+            app.UseDirectoryBrowser(/* Added by CTA: For DirectoryBrowserOptions, if FileSystem was not present before FileProvider was added, please initialize this new value. */
             new DirectoryBrowserOptions()
             {RequestPath = new PathString(""/src""), FileProvider = new PhysicalFileProvider(@""""), });
             // Anything not handled will land at the welcome page.
