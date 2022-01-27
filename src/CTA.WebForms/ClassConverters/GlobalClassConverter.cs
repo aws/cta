@@ -31,7 +31,7 @@ namespace CTA.WebForms.ClassConverters
 
         private const string AddMiddlewareUsingsOperation = "retrieve and add usings for middleware namespaces";
         private const string ConfigureRequestPipelineOperation = "configure request pipeline";
-        private const string MigrateServiceLayerOperation = "migrate service layer and configure depenency injection in ConfigureServices()";
+        private const string MigrateServiceLayerOperation = "migrate service layer and configure dependency injection in ConfigureServices()";
         
         private LifecycleManagerService _lifecycleManager;
         private WebFormMetricContext _metricsContext;

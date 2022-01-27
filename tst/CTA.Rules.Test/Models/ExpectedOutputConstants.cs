@@ -121,7 +121,7 @@ namespace AspNetRoutes
             create.Serialize();
             /* Added by CTA: Please use instead the methods of the TicketSerializer class: WriteIdentity, WriteClaim, Write for AuthenticationTicket or the ReadIdentity, ReadClaim, Read for AuthenticationTicket. */
             create.SetToken("""");
-            /* Added by CTA: Please change the parameter type from string to a byte[]. This is also the data type returned by the TicketSerializer.Serialize method. This new method also returns the actual Microsoft.AspNetCore.Authentication.AuthenticationTicket object serialized with the TicketSerializer.Serialize method. */
+            /* Added by CTA: Please change the parameter type from string to a byte[]. This is also the data type returned by the TicketSerializer.Serialize method. */
             receive.Deserialize(serializedTicket);
             SecurityHelper helper = new SecurityHelper();
             /* Added by CTA: Please use UseAuthentication() in your Configure method in your Startup class and in your ConfigureServices method in your Startup class use AddAuthentication to set all your various options and middleware as needed. */
@@ -144,7 +144,7 @@ namespace AspNetRoutes
         {
             IRequestCookieCollection cookies = context.Request.Cookies;
             string owinCookieValue = cookies[""OwinCookieKey""];
-            context.Request.QueryString = /* Added by CTA: This method only takes a single parameter for the value of the new query string or none at all. */
+            context.Request.QueryString = /* Added by CTA: This method only take a single parameter for the value of the new query string or none at all. */
             new QueryString(""owin"", ""owinValue"");
             IQueryCollection stringquery = context.Request.Query;
             string owinquery = stringquery[""owin""];
@@ -1719,7 +1719,7 @@ namespace ASP.NET_WebForms
             services.AddRazorPages();
             services.AddServerSideBlazor();
              // Did not attempt to migrate service layer
-            // and configure depenency injection in ConfigureServices(),
+            // and configure dependency injection in ConfigureServices(),
             // this must be done manually
         }
     }
