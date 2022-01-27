@@ -230,7 +230,7 @@ namespace CTA.WebForms.Tests.Extensions
             var class2Symbol = model.GetDeclaredSymbol(class2Declaration);
             var inheritedBaseTypes = class1Symbol.GetAllInheritedBaseTypes();
 
-            Assert.True(inheritedBaseTypes.Contains(class2Symbol));
+            Assert.True(inheritedBaseTypes.Contains(class2Symbol, SymbolEqualityComparer.Default));
         }
 
         [Test]
@@ -254,8 +254,8 @@ namespace CTA.WebForms.Tests.Extensions
             var class3Symbol = model.GetDeclaredSymbol(class3Declaration);
             var inheritedBaseTypes = class1Symbol.GetAllInheritedBaseTypes();
 
-            Assert.True(inheritedBaseTypes.Contains(class2Symbol));
-            Assert.True(inheritedBaseTypes.Contains(class3Symbol));
+            Assert.True(inheritedBaseTypes.Contains(class2Symbol, SymbolEqualityComparer.Default));
+            Assert.True(inheritedBaseTypes.Contains(class3Symbol, SymbolEqualityComparer.Default));
         }
     }
 }
