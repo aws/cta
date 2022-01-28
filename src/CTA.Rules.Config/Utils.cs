@@ -109,14 +109,14 @@ namespace CTA.Rules.Config
                         File.WriteAllBytes(destinationFile, fileContents);
                         break;
                     }
-                    catch (Exception ex)
+                    catch (Exception)
                     {
                         retryAttempts++;
                         Thread.Sleep(Constants.DefaultThreadSleepTime);
 
                         if (retryAttempts == retryCount)
                         {
-                            throw ex;
+                            throw;
                         }
                     }
                 }

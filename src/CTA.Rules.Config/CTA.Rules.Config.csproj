@@ -5,12 +5,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Codelyzer.Analysis" Version="2.2.9-alpha-g0c5b20b186" />
-    <PackageReference Include="Codelyzer.Analysis.Model" Version="2.2.9-alpha-g0c5b20b186" />
+    <PackageReference Include="Codelyzer.Analysis" Version="2.2.10" />
+    <PackageReference Include="Codelyzer.Analysis.Model" Version="2.2.10" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="6.0.0" />
-    <PackageReference Include="NJsonSchema" Version="10.6.6" />
+    <PackageReference Include="NJsonSchema" Version="10.6.7" />
   </ItemGroup>
 
   <ItemGroup>
