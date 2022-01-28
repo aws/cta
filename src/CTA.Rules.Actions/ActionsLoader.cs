@@ -303,9 +303,11 @@ namespace CTA.Rules.Actions
                     {
                         result = new List<string>() { value };
                         var optionalParameters = method.GetParameters().Where(p => p.IsOptional);
-                        if (optionalParameters.Any())
+                        // This should only run if optional parameter was not inlcuded originally.
+                        // TODO: We do not support ONLY optional parameters > 1 at this time, this logic would need to be re-written properly, that scenario would fail at val = (T)method.Invoke(invokeObject, parameters);
+                        if (optionalParameters.Any() && method.GetParameters().Count() > 1) 
                         {
-                            result.AddRange(optionalParameters.Select(p => p.Name));
+                            result.AddRange(optionalParameters.Select(p => p.HasDefaultValue && p.DefaultValue != null ? p.DefaultValue.ToString() : null));
                         }
                     }
                 }
