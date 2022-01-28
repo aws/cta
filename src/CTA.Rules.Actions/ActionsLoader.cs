@@ -302,6 +302,11 @@ namespace CTA.Rules.Actions
                     else
                     {
                         result = new List<string>() { value };
+                        var optionalParameters = method.GetParameters().Where(p => p.IsOptional);
+                        if (optionalParameters.Any())
+                        {
+                            result.AddRange(optionalParameters.Select(p => p.Name));
+                        }
                     }
                 }
                 else
@@ -328,6 +333,10 @@ namespace CTA.Rules.Actions
                 if (jsonParameters.ContainsKey(p.Name))
                 {
                     result.Add(jsonParameters[p.Name]);
+                }
+                else if(p.IsOptional)
+                {
+                    result.Add(p.HasDefaultValue && p.DefaultValue != null ? p.DefaultValue.ToString() : null);
                 }
                 else
                 {

@@ -13,8 +13,7 @@ namespace CTA.Rules.Actions
     {
         public Func<string, ProjectType, List<string>, Dictionary<string, string>, List<string>, List<string>, string> GetMigrateProjectFileAction(string _)
         {
-            static string func
-(string projectDir, ProjectType projectType, List<string> targetVersion, Dictionary<string, string> packageReferences, List<string> projectReferences, List<string> metaReferences)
+            static string func(string projectDir, ProjectType projectType, List<string> targetVersion, Dictionary<string, string> packageReferences, List<string> projectReferences, List<string> metaReferences)
             {
                 bool result = false;
                 try

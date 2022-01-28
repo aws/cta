@@ -36,7 +36,7 @@ namespace CTA.Rules.Actions
             return action;
         }
 
-        public Func<SyntaxGenerator, ObjectCreationExpressionSyntax, ExpressionSyntax> GetReplaceOrAddObjectPropertyIdentifierAction(string oldMember, string newMember, string newValueIfAdding)
+        public Func<SyntaxGenerator, ObjectCreationExpressionSyntax, ExpressionSyntax> GetReplaceOrAddObjectPropertyIdentifierAction(string oldMember, string newMember, string newValueIfAdding = null)
         {
             ExpressionSyntax action(SyntaxGenerator syntaxGenerator, ObjectCreationExpressionSyntax node)
             {
