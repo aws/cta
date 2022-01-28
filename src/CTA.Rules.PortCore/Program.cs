@@ -35,7 +35,7 @@ namespace CTA.Rules.PortCore
 
                 if (cli.CreateNew)
                 {
-                    cli.FilePath = Utils.CopySolutionToDestinationLocation(Path.GetFileName(cli.FilePath), cli.FilePath);
+                    cli.FilePath = Utils.CopySolutionToTemp(cli.FilePath);
                 }
 
                 string solutionDir = Directory.GetParent(cli.FilePath).FullName;

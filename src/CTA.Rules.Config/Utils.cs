@@ -7,7 +7,6 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Build.Construction;
 using NJsonSchema.Generation;
 using NJsonSchema.Validation;
 
@@ -193,7 +192,7 @@ namespace CTA.Rules.Config
         }
 
 
-        public static string CopySolutionToDestinationLocation(string solutionName, string solutionPath)
+        public static string CopySolutionToTemp(string solutionPath)
         {
             string slnDirPath = Directory.GetParent(solutionPath).FullName;
             string root = Path.GetPathRoot(slnDirPath);
@@ -201,20 +200,20 @@ namespace CTA.Rules.Config
             
             var newTempDirPath = Path.Combine(Directory.GetParent(slnDirPath).FullName, Guid.NewGuid().ToString());
             string destPath = Path.Combine(newTempDirPath, relativeSrc);
-            string newSlnPath = CopyFolderToTemp(solutionName, slnDirPath, destPath);
+            string newSlnPath = CopyFolderToTemp(Path.GetFileName(solutionPath), slnDirPath, destPath);
 
 
             if (solutionPath.Contains(".sln") && File.Exists(solutionPath))
             {
-                IEnumerable<string> projects = GetProjectPathsFromSolutionFile(solutionPath);
+                IEnumerable<string> projects = Codelyzer.Analysis.Common.FileUtils.GetProjectPathsFromSolutionFile(solutionPath, LogHelper.Logger);
                 foreach (string project in projects)
                 {
                     string projPath = Directory.GetParent(project).FullName;
-                    relativeSrc = Path.GetRelativePath(solutionPath, projPath);
-                    string projName = Path.GetFileName(project);
-
+                  
                     if (!IsSubPathOf(slnDirPath, projPath))
                     {
+                        relativeSrc = Path.GetRelativePath(solutionPath, projPath);
+                        string projName = Path.GetFileName(project);
                         string relDestPath = Path.Combine(destPath, relativeSrc);
                         CopyFolderToTemp(projName, projPath, relDestPath);
                     }
@@ -230,6 +229,7 @@ namespace CTA.Rules.Config
         /// </summary>
         /// <param name="solutionName">The name of the solution (MySolution.sln)</param>
         /// <param name="tempDir">The folder the location resides in</param>
+        /// <param name="destinationLocation">copied folder location</param>
         /// <returns></returns>
         public static string CopyFolderToTemp(string solutionName, string tempDir, string destinationLocation)
         {
@@ -301,31 +301,6 @@ namespace CTA.Rules.Config
                 }
             });
         }
-
-        public static IEnumerable<string> GetProjectPathsFromSolutionFile(string solutionPath)
-        {
-
-            IEnumerable<string> projectPaths = null;
-            try
-            {
-                SolutionFile solution = SolutionFile.Parse(solutionPath);
-                projectPaths = solution.ProjectsInOrder.Where(p => AcceptedProjectTypes.Contains(p.ProjectType)).Select(p => p.AbsolutePath);
-            }
-            catch (Exception ex)
-            {
-                LogHelper.LogError(ex, $"Error while parsing the solution file {solutionPath}");
-            }
-
-            return projectPaths;
-
-        }
-
-        public static HashSet<SolutionProjectType> AcceptedProjectTypes = new HashSet<SolutionProjectType>()
-        {
-            SolutionProjectType.KnownToBeMSBuildFormat,
-            SolutionProjectType.WebDeploymentProject,
-            SolutionProjectType.WebProject
-        };
 
         public static bool IsSubPathOf(string subPath, string basePath)
         {
