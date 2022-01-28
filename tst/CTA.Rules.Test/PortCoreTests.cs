@@ -185,7 +185,7 @@ namespace CTA.Rules.Test
                 solutionPort.RunProject(result, projectConfiguration);
             }
             var portSolutionResult = solutionPort.GenerateResults();
-            var testSolutionResult = GenerateSolutionResult(Path.GetDirectoryName(solutionPath), solutionPort.GetAnalysisResult(), portSolutionResult);
+            var testSolutionResult = GenerateSolutionResult(solutionPath, solutionPort.GetAnalysisResult(), portSolutionResult);
 
             ValidateWebApiWithReferences(testSolutionResult);
         }

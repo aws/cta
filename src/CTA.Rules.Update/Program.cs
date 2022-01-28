@@ -25,9 +25,7 @@ namespace CTA.Rules.Update
 
                 LogHelper.Logger = loggerFactory.CreateLogger("Translator");
 
-
-                string solutionDir = Directory.GetParent(cli.FilePath).FullName;
-                var projectFiles = Directory.EnumerateFiles(solutionDir, "*.csproj", SearchOption.AllDirectories);
+                var projectFiles = Utils.GetProjectPaths(cli.FilePath);
 
                 List<ProjectConfiguration> configs = new List<ProjectConfiguration>();
                 foreach (var proj in projectFiles)
