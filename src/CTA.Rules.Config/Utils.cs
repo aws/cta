@@ -205,7 +205,7 @@ namespace CTA.Rules.Config
 
             if (solutionPath.Contains(".sln") && File.Exists(solutionPath))
             {
-                IEnumerable<string> projects = Codelyzer.Analysis.Common.FileUtils.GetProjectPathsFromSolutionFile(solutionPath, LogHelper.Logger);
+                IEnumerable<string> projects = GetProjectPaths(solutionPath);
                 foreach (string project in projects)
                 {
                     string projPath = Directory.GetParent(project).FullName;
@@ -300,6 +300,11 @@ namespace CTA.Rules.Config
                     LogHelper.LogError(ex, $"Error while dowloading file {file}");
                 }
             });
+        }
+
+        public static IEnumerable<string> GetProjectPaths(string solutionPath)
+        {
+            return Codelyzer.Analysis.Common.FileUtils.GetProjectPathsFromSolutionFile(solutionPath, LogHelper.Logger);
         }
 
         public static bool IsSubPathOf(string subPath, string basePath)

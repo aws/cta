@@ -38,8 +38,7 @@ namespace CTA.Rules.PortCore
                     cli.FilePath = Utils.CopySolutionToTemp(cli.FilePath);
                 }
 
-                string solutionDir = Directory.GetParent(cli.FilePath).FullName;
-                var projectFiles = Directory.EnumerateFiles(solutionDir, "*.csproj", SearchOption.AllDirectories);
+                var projectFiles = Utils.GetProjectPaths(cli.FilePath);
 
                 var packageReferences = new Dictionary<string, Tuple<string, string>>
                 {
