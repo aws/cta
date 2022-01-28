@@ -10,7 +10,7 @@ using System.Collections.Generic;
 
 namespace CTA.Rules.Test.Actions
 {
-    public class AttributeAActionsLoaderTests
+    public class ActionLoaderTests
     {
         ActionsLoader _actionLoader;
 
