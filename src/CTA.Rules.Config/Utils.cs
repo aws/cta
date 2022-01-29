@@ -225,7 +225,7 @@ namespace CTA.Rules.Config
 
 
         /// <summary>
-        /// Copies a solution to a new location under a folder with a randomly generated name
+        /// Copies a solution to a new location under a specified folder
         /// </summary>
         /// <param name="solutionName">The name of the solution (MySolution.sln)</param>
         /// <param name="tempDir">The folder the location resides in</param>
