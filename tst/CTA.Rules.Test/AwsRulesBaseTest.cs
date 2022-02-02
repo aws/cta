@@ -11,6 +11,7 @@ using System.IO.Compression;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace CTA.Rules.Test
 {
@@ -253,6 +254,34 @@ namespace CTA.Rules.Test
             string solutionPath = Directory.EnumerateFiles(tempDir, solutionName, SearchOption.AllDirectories).FirstOrDefault(s => !s.Contains(string.Concat(Path.DirectorySeparatorChar, CopyFolder, Path.DirectorySeparatorChar)));
             string solutionDir = Directory.GetParent(solutionPath).FullName;
             var newTempDir = Path.Combine(GetTstPath(this.GetType()), CopyFolder, Guid.NewGuid().ToString());
+
+            int folderCount = 1;
+
+            if (solutionPath.Contains(".sln") && File.Exists(solutionPath))
+            {
+                IEnumerable<string> projects = Utils.GetProjectPaths(solutionPath);
+
+                int depths = projects.ToList().Max(p => Regex.Matches(Path.GetRelativePath(solutionDir, p), Regex.Escape("..")).Count);
+                for (int i = 0; i < depths; i++)
+                {
+                    newTempDir += "\\Folder" + folderCount++;
+                }
+
+                foreach (string project in projects)
+                {
+                    string projPath = Directory.GetParent(project).FullName;
+
+                    if (!Utils.IsSubPathOf(solutionDir, projPath))
+                    {
+                        string relativeSrc = Path.GetRelativePath(solutionDir, projPath);
+                        string projName = Path.GetFileName(project);
+                        string newRelDir = Path.Combine(newTempDir, relativeSrc);
+
+                        Utils.CopyFolderToTemp(projName, projPath, newRelDir);
+                    }
+                }
+            }
+
             CopyDirectory(new DirectoryInfo(solutionDir), new DirectoryInfo(newTempDir));
 
             solutionPath = Directory.EnumerateFiles(newTempDir, solutionName, SearchOption.AllDirectories).FirstOrDefault();
