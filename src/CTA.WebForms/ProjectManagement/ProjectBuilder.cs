@@ -67,42 +67,47 @@ namespace CTA.WebForms.ProjectManagement
             }
         }
 
-        public void DeleteDirectoriesIfEmpty(string fullPath, string pathLimit)
+        public void DeleteDirectoriesIfEmpty(string directory, string pathLimit)
         {
-            if (fullPath == null)
+            if (directory == null || !Directory.Exists(directory))
             {
                 return;
             }
 
             try
             {
-                var beforePathLimit = FilePathHelper.IsSubDirectory(pathLimit, fullPath);
-                var directoryEmpty = !Directory.EnumerateFileSystemEntries(fullPath).Any();
+                var beforePathLimit = FilePathHelper.IsSubDirectory(pathLimit, directory);
+                var directoryEmpty = !Directory.EnumerateFileSystemEntries(directory).Any();
 
                 if (beforePathLimit && directoryEmpty)
                 {
-                    var parentDir = Path.GetDirectoryName(fullPath);
-                    Directory.Delete(fullPath);
+                    var parentDir = Path.GetDirectoryName(directory);
+                    Directory.Delete(directory);
                     DeleteDirectoriesIfEmpty(parentDir, pathLimit);
                 }
             }
             catch (Exception e)
             {
-                LogHelper.LogError(e, $"{Rules.Config.Constants.WebFormsErrorTag}Could not delete directory at {fullPath}");
+                LogHelper.LogError(e, $"{Rules.Config.Constants.WebFormsErrorTag}Could not delete directory at {directory}");
             }
         }
 
-        public void DeleteFileAndEmptyDirectories(string fullPath, string pathLimit)
+        public void DeleteFileAndEmptyDirectories(string filePath, string pathLimit)
         {
+            if (!File.Exists(filePath))
+            {
+                return;
+            }
+
             try
             {
-                var parentDir = Path.GetDirectoryName(fullPath);
-                File.Delete(fullPath);
+                var parentDir = Path.GetDirectoryName(filePath);
+                File.Delete(filePath);
                 DeleteDirectoriesIfEmpty(parentDir, pathLimit);
             }
             catch (Exception e)
             {
-                LogHelper.LogError(e, $"{Rules.Config.Constants.WebFormsErrorTag}Unable to delete file at {fullPath}");
+                LogHelper.LogError(e, $"{Rules.Config.Constants.WebFormsErrorTag}Unable to delete file at {filePath}");
             }
         }
     }
