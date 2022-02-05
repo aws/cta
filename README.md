@@ -57,6 +57,7 @@ In addition to the above rules, Porting Assistant will apply other rules dependi
   * -a (assemblies-dir): Path to assembly containing custom actions specified in your rules
   * -v (version): Version of .net core to port to (currently supports netcoreapp3.1 and net5.0)
   * -m (mock-run): Run the rules without applying changes. Used to generate a run report before applying any changes
+  * -c (create-new): Create a new folder to output the ported solution into (folder will be created at the parent folder of the given solution or project file)
 
 ## Recommendations
 

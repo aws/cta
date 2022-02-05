@@ -49,10 +49,15 @@ namespace CTA.WebForms.FileConverters
                 LogHelper.LogError(e, $"{Rules.Config.Constants.WebFormsErrorTag}Exception occurred when trying to retrieve semantic model for the file {FullPath}. " +
                                       "Semantic Model will default to null.");
             }
-
+            
             if (_fileModel != null)
             {
-                _classConverters = classConverterFactory.BuildMany(RelativePath, _fileModel);
+                _classConverters = _classConverterFactory.BuildMany(RelativePath, _fileModel);
+            }
+            else
+            {
+                _classConverters = new List<ClassConverter>();
+                LogHelper.LogWarning($"Semantic model was not found so class conversion cannot take place. Returning zero class converters for file: {FullPath}");
             }
         }
 

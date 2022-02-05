@@ -35,8 +35,7 @@ namespace CTA.WebForms.Tests.FileConverters.DownloadRequired
 
             _copyFolder = Directory.GetParent(EShopOnBlazorSolutionPath).FullName;
 
-            _eShopLegacyWebFormsProjectPath = Directory
-                .EnumerateFiles(EShopOnBlazorSolutionPath, "*.csproj", SearchOption.AllDirectories)
+            _eShopLegacyWebFormsProjectPath = Utils.GetProjectPaths(EShopOnBlazorSolutionPath)
                 .First(filePath =>
                     filePath.EndsWith("eShopLegacyWebForms.csproj", StringComparison.InvariantCultureIgnoreCase));
 
