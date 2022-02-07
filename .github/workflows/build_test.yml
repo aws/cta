@@ -39,7 +39,7 @@ jobs:
     - name: Build
       run: dotnet build --configuration Release --no-restore src/CTA.Rules.sln
     - name: Test
-      run: dotnet test --configuration Release --no-build --no-restore --verbosity normal src/CTA.Rules.sln
+      run: dotnet test --configuration Release --no-restore --verbosity normal src/CTA.Rules.sln
     - name: Pack
       if: ${{ github.event_name == 'push' }}
       run: dotnet pack --configuration Release --no-restore -o dist src/CTA.Rules.sln
