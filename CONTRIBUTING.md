@@ -19,6 +19,18 @@ reported the issue. Please try to include as much information as you can. Detail
 * Any modifications you've made relevant to the bug
 * Anything unusual about your environment or deployment
 
+## How to Set Up a Development Environment
+* Clone the repository `git clone https://github.com/aws/cta`
+    * If on Windows, test will fail if files are not converted to CRLF (Windows style line endings `\r\n`). You can do this when cloning with git by setting `core.autocrlf=true`.
+* You'll need BOTH Visual Studio 2022 and 2019. 2019 is needed to bring in the required dependencies for some tests. Community, Professional and Enterprise Edition all work.
+* Install Visual Studio 2022 with:
+  * The `.NET Desktop Development` Workload
+* Install Visual Studio 2019 with:
+  * The `ASP.NET and Web Development` Workload
+  * The `Windows Communication Foundation` Individual Component
+* Load the solution `CTA.Rules.sln` using Visual Studio 2022. 
+* Build
+* Run tests
 
 ## Contributing via Pull Requests
 Contributions via pull requests are much appreciated. Before sending us a pull request, please ensure that:
