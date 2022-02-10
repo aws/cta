@@ -314,7 +314,7 @@ namespace CTA.Rules.Config
             bool isParent = false;
             while (baseDir.Parent != null)
             {
-                if (baseDir.Parent.FullName == subDir.FullName)
+                if (baseDir.Parent.FullName == subDir.FullName || baseDir.FullName == subDir.FullName)
                 {
                     isParent = true;
                     break;
