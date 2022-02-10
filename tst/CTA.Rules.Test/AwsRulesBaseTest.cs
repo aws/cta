@@ -267,6 +267,8 @@ namespace CTA.Rules.Test
                     newTempDir += "\\Folder" + folderCount++;
                 }
 
+                CopyDirectory(new DirectoryInfo(solutionDir), new DirectoryInfo(newTempDir));
+
                 foreach (string project in projects)
                 {
                     string projPath = Directory.GetParent(project).FullName;
@@ -281,8 +283,10 @@ namespace CTA.Rules.Test
                     }
                 }
             }
-
-            CopyDirectory(new DirectoryInfo(solutionDir), new DirectoryInfo(newTempDir));
+            else
+            {
+                CopyDirectory(new DirectoryInfo(solutionDir), new DirectoryInfo(newTempDir));
+            }
 
             solutionPath = Directory.EnumerateFiles(newTempDir, solutionName, SearchOption.AllDirectories).FirstOrDefault();
             return solutionPath;
