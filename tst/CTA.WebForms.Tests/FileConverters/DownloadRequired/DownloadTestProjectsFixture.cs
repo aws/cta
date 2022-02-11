@@ -50,9 +50,9 @@ namespace CTA.WebForms.Tests.FileConverters.DownloadRequired
         private void DownloadTestProjects()
         {
             var tempDirectory = Directory.CreateDirectory(_tempDir);
-            _downloadLocation = Path.Combine(tempDirectory.FullName, "d");
+            _downloadLocation = Path.Combine(tempDirectory.FullName, "w2b");
 
-            var fileName = Path.Combine(tempDirectory.Parent.FullName, @"TestProjects.zip");
+            var fileName = Path.Combine(tempDirectory.FullName, @"TestProjects.zip");
             Utils.SaveFileFromGitHub(fileName, GithubInfo.TestGithubOwner, GithubInfo.TestGithubRepo,
                 GithubInfo.TestGithubTag);
             ZipFile.ExtractToDirectory(fileName, _downloadLocation, true);
