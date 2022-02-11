@@ -13,7 +13,7 @@ namespace CTA.WebForms.Tests.FileConverters.DownloadRequired
     public class DownloadTestProjectsFixture : AwsRulesBaseTest
     {
         private string _tempDir;
-        private string _copyFolder;
+        private string _testRunFolder;
         private string _downloadLocation;
         private static string _eShopOnBlazorSolutionFilePath;
         private static string _eShopOnBlazorSolutionPath;
@@ -30,10 +30,11 @@ namespace CTA.WebForms.Tests.FileConverters.DownloadRequired
             _tempDir = GetTstPath(Path.Combine(new[] {"Projects", "Temp", "W2B"}));
             DownloadTestProjects();
 
+            var targetDir = "w2b";
             _eShopOnBlazorSolutionFilePath = CopySolutionFolderToTemp("eShopOnBlazor.sln", _tempDir);
             _eShopOnBlazorSolutionPath = Directory.GetParent(EShopOnBlazorSolutionFilePath).FullName;
 
-            _copyFolder = Directory.GetParent(EShopOnBlazorSolutionPath).FullName;
+            _testRunFolder = Directory.GetParent(EShopOnBlazorSolutionPath).FullName;
 
             _eShopLegacyWebFormsProjectPath = Utils.GetProjectPaths(EShopOnBlazorSolutionPath)
                 .First(filePath =>
@@ -65,7 +66,7 @@ namespace CTA.WebForms.Tests.FileConverters.DownloadRequired
                 try
                 {
                     Directory.Delete(_tempDir, true);
-                    Directory.Delete(_copyFolder, true);
+                    Directory.Delete(_testRunFolder, true);
                 }
                 catch (Exception)
                 {
