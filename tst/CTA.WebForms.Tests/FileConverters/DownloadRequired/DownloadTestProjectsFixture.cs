@@ -30,7 +30,6 @@ namespace CTA.WebForms.Tests.FileConverters.DownloadRequired
             _tempDir = GetTstPath(Path.Combine(new[] {"Projects", "Temp", "W2B"}));
             DownloadTestProjects();
 
-            var targetDir = "w2b";
             _eShopOnBlazorSolutionFilePath = CopySolutionFolderToTemp("eShopOnBlazor.sln", _tempDir);
             _eShopOnBlazorSolutionPath = Directory.GetParent(EShopOnBlazorSolutionFilePath).FullName;
             _testRunFolder = EShopOnBlazorSolutionPath;
