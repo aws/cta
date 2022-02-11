@@ -13,7 +13,7 @@ namespace CTA.WebForms.Tests.FileConverters.DownloadRequired
     public class DownloadTestProjectsFixture : AwsRulesBaseTest
     {
         private string _tempDir;
-        private string _copyFolder;
+        private string _testRunFolder;
         private string _downloadLocation;
         private static string _eShopOnBlazorSolutionFilePath;
         private static string _eShopOnBlazorSolutionPath;
@@ -32,8 +32,7 @@ namespace CTA.WebForms.Tests.FileConverters.DownloadRequired
 
             _eShopOnBlazorSolutionFilePath = CopySolutionFolderToTemp("eShopOnBlazor.sln", _tempDir);
             _eShopOnBlazorSolutionPath = Directory.GetParent(EShopOnBlazorSolutionFilePath).FullName;
-
-            _copyFolder = Directory.GetParent(EShopOnBlazorSolutionPath).FullName;
+            _testRunFolder = EShopOnBlazorSolutionPath;
 
             _eShopLegacyWebFormsProjectPath = Utils.GetProjectPaths(EShopOnBlazorSolutionPath)
                 .First(filePath =>
@@ -50,9 +49,9 @@ namespace CTA.WebForms.Tests.FileConverters.DownloadRequired
         private void DownloadTestProjects()
         {
             var tempDirectory = Directory.CreateDirectory(_tempDir);
-            _downloadLocation = Path.Combine(tempDirectory.FullName, "d");
+            _downloadLocation = Path.Combine(tempDirectory.FullName, "w2b");
 
-            var fileName = Path.Combine(tempDirectory.Parent.FullName, @"TestProjects.zip");
+            var fileName = Path.Combine(tempDirectory.FullName, @"TestProjects.zip");
             Utils.SaveFileFromGitHub(fileName, GithubInfo.TestGithubOwner, GithubInfo.TestGithubRepo,
                 GithubInfo.TestGithubTag);
             ZipFile.ExtractToDirectory(fileName, _downloadLocation, true);
@@ -65,7 +64,7 @@ namespace CTA.WebForms.Tests.FileConverters.DownloadRequired
                 try
                 {
                     Directory.Delete(_tempDir, true);
-                    Directory.Delete(_copyFolder, true);
+                    Directory.Delete(_testRunFolder, true);
                 }
                 catch (Exception)
                 {

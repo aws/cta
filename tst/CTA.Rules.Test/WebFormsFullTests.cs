@@ -38,13 +38,6 @@ namespace CTA.Rules.Test
             };
         }
 
-        [OneTimeTearDown]
-        public void TearDown()
-        {
-            tempDir = SetupTests.TempDir;
-            downloadLocation = SetupTests.DownloadLocation;
-        }
-
         [TestCase(TargetFramework.DotnetCoreApp31)]
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.Dotnet6)]
