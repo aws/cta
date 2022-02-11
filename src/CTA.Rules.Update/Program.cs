@@ -10,9 +10,9 @@ using Microsoft.Extensions.Logging;
 namespace CTA.Rules.Update
 {
     [ExcludeFromCodeCoverage]
-    class Program
+    public class Program
     {
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
             try
             {
