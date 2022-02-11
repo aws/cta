@@ -1,10 +1,8 @@
 ﻿using CTA.Rules.Test.Models;
 using NUnit.Framework;
-using System;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Threading;
 
 namespace CTA.Rules.Test
 {
@@ -27,7 +25,7 @@ namespace CTA.Rules.Test
         {
             TestSolutionAnalysis results = AnalyzeSolution("AspNetRoutes.sln", tempDir, downloadLocation, version);
 
-            string projectDir = results.ProjectResults.FirstOrDefault().ProjectDirectory;
+            var projectDir = results.ProjectResults.FirstOrDefault().ProjectDirectory;
             var csProjContent = results.ProjectResults.FirstOrDefault().CsProjectContent;
 
             var startupText = File.ReadAllText(Path.Combine(projectDir, "Startup.cs"));
