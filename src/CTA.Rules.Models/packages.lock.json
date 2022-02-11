@@ -575,8 +575,8 @@
       },
       "NJsonSchema": {
         "type": "Transitive",
-        "resolved": "10.6.7",
-        "contentHash": "lZLJDlkjZ9lZ9XuEaTdlmXyZx0EQbrmU8MGFuAwXxGWJb4v0Zesnduta1KAs3RPCjUtFKheMWqmE1/411DUwzQ==",
+        "resolved": "10.6.8",
+        "contentHash": "/Sr08+VZVseYGN1o2PUO9BRAOtd78s6R/ks/9dc+HerDPnhU8/v382YKIOOJThD7HnahsuPAolcr3dh9m+ovnw==",
         "dependencies": {
           "Namotion.Reflection": "2.0.10",
           "Newtonsoft.Json": "9.0.1"
@@ -1695,7 +1695,7 @@
           "Microsoft.Extensions.Logging": "6.0.0",
           "Microsoft.Extensions.Logging.Abstractions": "6.0.0",
           "Microsoft.Extensions.Logging.Console": "6.0.0",
-          "NJsonSchema": "10.6.7"
+          "NJsonSchema": "10.6.8"
         }
       }
     }

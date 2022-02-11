@@ -19,4 +19,14 @@ namespace CTA.Rules.Test
             return method;
         }
     }
+    
+    internal static class StringExtensions
+    {
+        public static string NormalizeNewLineChars(this string toNormalize)
+        {
+            return toNormalize
+                .Replace("\r\n", "\n")
+                .Replace("\n", Environment.NewLine);
+        }
+    }
 }

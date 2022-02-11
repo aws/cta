@@ -217,17 +217,6 @@ namespace CTA.Rules.Test
             }
         }
 
-        public string DownloadTestProjects(string tempDir)
-        {
-            var tempDirectory = Directory.CreateDirectory(tempDir);
-            string downloadLocation = Path.Combine(tempDirectory.FullName, "d");
-
-            var fileName = Path.Combine(tempDirectory.Parent.FullName, @"TestProjects.zip");
-            Utils.SaveFileFromGitHub(fileName, GithubInfo.TestGithubOwner, GithubInfo.TestGithubRepo, GithubInfo.TestGithubTag);
-            ZipFile.ExtractToDirectory(fileName, downloadLocation, true);
-            return downloadLocation;
-        }
-
         protected void CopyDirectory(DirectoryInfo source, DirectoryInfo target)
         {
             if (!Directory.Exists(target.FullName))
@@ -249,10 +238,10 @@ namespace CTA.Rules.Test
             }
         }
 
-        protected string CopySolutionFolderToTemp(string solutionName, string tempDir)
+        protected string CopySolutionFolderToTemp(string solutionName, string searchDir)
         {
-            string solutionPath = Directory.EnumerateFiles(tempDir, solutionName, SearchOption.AllDirectories).FirstOrDefault(s => !s.Contains(string.Concat(Path.DirectorySeparatorChar, CopyFolder, Path.DirectorySeparatorChar)));
-            string solutionDir = Directory.GetParent(solutionPath).FullName;
+            var solutionPath = Directory.EnumerateFiles(searchDir, solutionName, SearchOption.AllDirectories).FirstOrDefault(s => !s.Contains(string.Concat(Path.DirectorySeparatorChar, CopyFolder, Path.DirectorySeparatorChar)));
+            var solutionDir = Directory.GetParent(solutionPath).FullName;
             var newTempDir = Path.Combine(GetTstPath(this.GetType()), CopyFolder, Guid.NewGuid().ToString());
 
             int folderCount = 1;
@@ -288,8 +277,8 @@ namespace CTA.Rules.Test
                 CopyDirectory(new DirectoryInfo(solutionDir), new DirectoryInfo(newTempDir));
             }
 
-            solutionPath = Directory.EnumerateFiles(newTempDir, solutionName, SearchOption.AllDirectories).FirstOrDefault();
-            return solutionPath;
+            var newSolutionPath = Directory.EnumerateFiles(newTempDir, solutionName, SearchOption.AllDirectories).FirstOrDefault();
+            return newSolutionPath;
         }
 
 

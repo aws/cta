@@ -1,10 +1,8 @@
 ﻿using CTA.Rules.Test.Models;
 using NUnit.Framework;
-using System;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Threading;
 
 namespace CTA.Rules.Test
 {
@@ -27,7 +25,7 @@ namespace CTA.Rules.Test
         {
             TestSolutionAnalysis results = AnalyzeSolution("AspNetRoutes.sln", tempDir, downloadLocation, version);
 
-            string projectDir = results.ProjectResults.FirstOrDefault().ProjectDirectory;
+            var projectDir = results.ProjectResults.FirstOrDefault().ProjectDirectory;
             var csProjContent = results.ProjectResults.FirstOrDefault().CsProjectContent;
 
             var startupText = File.ReadAllText(Path.Combine(projectDir, "Startup.cs"));
@@ -38,8 +36,8 @@ namespace CTA.Rules.Test
             //StringAssert.Contains(@"Microsoft.AspNetCore.Hosting", programText);
             //StringAssert.Contains(@"Microsoft.Extensions.Hosting;", programText);
 
-            StringAssert.AreEqualIgnoringCase(ExpectedOutputConstants.AspNetRoutesOwinApp2, owinapp2Text);
-            StringAssert.AreEqualIgnoringCase(ExpectedOutputConstants.AspNetRoutesStartup, startupText);
+            StringAssert.AreEqualIgnoringCase(ExpectedOutputConstants.AspNetRoutesOwinApp2.NormalizeNewLineChars(), owinapp2Text.NormalizeNewLineChars());
+            StringAssert.AreEqualIgnoringCase(ExpectedOutputConstants.AspNetRoutesStartup.NormalizeNewLineChars(), startupText.NormalizeNewLineChars());
 
             StringAssert.Contains(@"Microsoft.AspNetCore.Owin", csProjContent);
             StringAssert.Contains(@"Microsoft.AspNetCore.Diagnostics", csProjContent);
@@ -51,8 +49,6 @@ namespace CTA.Rules.Test
             //Check that correct version is used
             Assert.True(csProjContent.IndexOf(string.Concat(">", version, "<")) > 0);
         }
-
-
 
         [TestCase(TargetFramework.Dotnet6)]
         [TestCase(TargetFramework.Dotnet5)]
@@ -68,9 +64,9 @@ namespace CTA.Rules.Test
             var displayText = File.ReadAllText(Path.Combine(projectDir, "DisplayBreadCrumbs.cs"));
             var addText = File.ReadAllText(Path.Combine(projectDir, "AddBreadCrumbMiddleware.cs"));
 
-            StringAssert.AreEqualIgnoringCase(ExpectedOutputConstants.BranchingPipelinesDisplayBreadCrumbs, displayText);
-            StringAssert.AreEqualIgnoringCase(ExpectedOutputConstants.BranchingPipelinesAddBreadCrumbMiddleware, addText);
-            StringAssert.AreEqualIgnoringCase(ExpectedOutputConstants.BranchingPipelinesStartup, startupText);
+            StringAssert.AreEqualIgnoringCase(ExpectedOutputConstants.BranchingPipelinesDisplayBreadCrumbs.NormalizeNewLineChars(), displayText.NormalizeNewLineChars());
+            StringAssert.AreEqualIgnoringCase(ExpectedOutputConstants.BranchingPipelinesAddBreadCrumbMiddleware.NormalizeNewLineChars(), addText.NormalizeNewLineChars());
+            StringAssert.AreEqualIgnoringCase(ExpectedOutputConstants.BranchingPipelinesStartup.NormalizeNewLineChars(), startupText.NormalizeNewLineChars());
 
             //Check that package has been added:
             StringAssert.Contains(@"Microsoft.AspNetCore.Owin", csProjContent);
@@ -96,8 +92,8 @@ namespace CTA.Rules.Test
             var startupText = File.ReadAllText(Path.Combine(projectDir, "Startup.cs"));
             var programText = File.ReadAllText(Path.Combine(projectDir, "Program.cs"));
 
-            StringAssert.AreEqualIgnoringCase(ExpectedOutputConstants.EmbeddedStartup, startupText);
-            StringAssert.AreEqualIgnoringCase(ExpectedOutputConstants.EmbeddedProgram, programText);
+            StringAssert.AreEqualIgnoringCase(ExpectedOutputConstants.EmbeddedStartup.NormalizeNewLineChars(), startupText.NormalizeNewLineChars());
+            StringAssert.AreEqualIgnoringCase(ExpectedOutputConstants.EmbeddedProgram.NormalizeNewLineChars(), programText.NormalizeNewLineChars());
 
             //Check that package has been added:
             StringAssert.Contains(@"Microsoft.AspNetCore.Owin", csProjContent);
@@ -125,8 +121,8 @@ namespace CTA.Rules.Test
             var startupText = File.ReadAllText(Path.Combine(myApp.ProjectDirectory, "Startup.cs"));
             var programText = File.ReadAllText(Path.Combine(myApp.ProjectDirectory, "Program.cs"));
 
-            StringAssert.AreEqualIgnoringCase(ExpectedOutputConstants.CustomServerProgram, programText);
-            StringAssert.AreEqualIgnoringCase(ExpectedOutputConstants.CustomServerStartup, startupText);
+            StringAssert.AreEqualIgnoringCase(ExpectedOutputConstants.CustomServerProgram.NormalizeNewLineChars(), programText.NormalizeNewLineChars());
+            StringAssert.AreEqualIgnoringCase(ExpectedOutputConstants.CustomServerStartup.NormalizeNewLineChars(), startupText.NormalizeNewLineChars());
 
             //Check for comment on how to implement a custom server here in program
 
@@ -165,7 +161,7 @@ namespace CTA.Rules.Test
 
             var startupText = File.ReadAllText(Path.Combine(projectDir, "Startup.cs"));
 
-            StringAssert.AreEqualIgnoringCase(ExpectedOutputConstants.HelloWorldStartup, startupText);
+            StringAssert.AreEqualIgnoringCase(ExpectedOutputConstants.HelloWorldStartup.NormalizeNewLineChars(), startupText.NormalizeNewLineChars());
 
             //Check that package has been added:
             StringAssert.Contains(@"Microsoft.AspNetCore.Owin", csProjContent);
@@ -186,7 +182,7 @@ namespace CTA.Rules.Test
             var csProjContent = results.ProjectResults.FirstOrDefault().CsProjectContent;
             var startupText = File.ReadAllText(Path.Combine(projectDir, "Startup.cs"));
 
-            StringAssert.AreEqualIgnoringCase(ExpectedOutputConstants.HelloWorldRawOwinStartup, startupText);
+            StringAssert.AreEqualIgnoringCase(ExpectedOutputConstants.HelloWorldRawOwinStartup.NormalizeNewLineChars(), startupText.NormalizeNewLineChars());
 
             //Check that package has been added:
             StringAssert.Contains(@"Microsoft.AspNetCore.Diagnostics", csProjContent);
@@ -207,8 +203,8 @@ namespace CTA.Rules.Test
             var startupText = File.ReadAllText(Path.Combine(projectDir, "Startup.cs"));
             var programText = File.ReadAllText(Path.Combine(projectDir, "Program.cs"));
 
-            StringAssert.AreEqualIgnoringCase(ExpectedOutputConstants.OwinSelfHostProgram, programText);
-            StringAssert.AreEqualIgnoringCase(ExpectedOutputConstants.OwinSelfHostStartup, startupText);
+            StringAssert.AreEqualIgnoringCase(ExpectedOutputConstants.OwinSelfHostProgram.NormalizeNewLineChars(), programText.NormalizeNewLineChars());
+            StringAssert.AreEqualIgnoringCase(ExpectedOutputConstants.OwinSelfHostStartup.NormalizeNewLineChars(), startupText.NormalizeNewLineChars());
 
             //Check that package has been added:
             StringAssert.Contains(@"Microsoft.AspNetCore.Diagnostics", csProjContent);
@@ -231,8 +227,8 @@ namespace CTA.Rules.Test
             var startupText = File.ReadAllText(Path.Combine(projectDir, "Startup.cs"));
             var programText = File.ReadAllText(Path.Combine(projectDir, "Program.cs"));
 
-            StringAssert.AreEqualIgnoringCase(ExpectedOutputConstants.SignalRProgram, programText);
-            StringAssert.AreEqualIgnoringCase(ExpectedOutputConstants.SignalRStartup, startupText);
+            StringAssert.AreEqualIgnoringCase(ExpectedOutputConstants.SignalRProgram.NormalizeNewLineChars(), programText.NormalizeNewLineChars());
+            StringAssert.AreEqualIgnoringCase(ExpectedOutputConstants.SignalRStartup.NormalizeNewLineChars(), startupText.NormalizeNewLineChars());
 
             //Check that package has been added:
             StringAssert.Contains(@"Microsoft.AspNetCore.Diagnostics", csProjContent);
@@ -256,8 +252,8 @@ namespace CTA.Rules.Test
             var startupText = File.ReadAllText(Path.Combine(projectDir, "Startup.cs"));
             var programText = File.ReadAllText(Path.Combine(projectDir, "Program.cs"));
 
-            StringAssert.AreEqualIgnoringCase(ExpectedOutputConstants.StaticFilesSampleProgram, programText);
-            StringAssert.AreEqualIgnoringCase(ExpectedOutputConstants.StaticFilesSampleStartup, startupText);
+            StringAssert.AreEqualIgnoringCase(ExpectedOutputConstants.StaticFilesSampleProgram.NormalizeNewLineChars(), programText.NormalizeNewLineChars());
+            StringAssert.AreEqualIgnoringCase(ExpectedOutputConstants.StaticFilesSampleStartup.NormalizeNewLineChars(), startupText.NormalizeNewLineChars());
 
             //Check that package has been added:
             StringAssert.Contains(@"Microsoft.AspNetCore.Diagnostics", csProjContent);
@@ -282,7 +278,7 @@ namespace CTA.Rules.Test
             var csProjContent = results.ProjectResults.FirstOrDefault().CsProjectContent;
             var startupText = File.ReadAllText(Path.Combine(projectDir, "Startup.cs"));
 
-            StringAssert.AreEqualIgnoringCase(ExpectedOutputConstants.OwinWebApiStartup, startupText);
+            StringAssert.AreEqualIgnoringCase(ExpectedOutputConstants.OwinWebApiStartup.NormalizeNewLineChars(), startupText.NormalizeNewLineChars());
 
             //Check that package has been added:
             StringAssert.Contains(new []{TargetFramework.Dotnet5, TargetFramework.Dotnet6}.Contains(version) 
@@ -343,7 +339,7 @@ namespace CTA.Rules.Test
 
             var programText = File.ReadAllText(Path.Combine(projectDir, "Program.cs"));
 
-            StringAssert.AreEqualIgnoringCase(ExpectedOutputConstants.OwinExtraAPIProgram, programText);
+            StringAssert.AreEqualIgnoringCase(ExpectedOutputConstants.OwinExtraAPIProgram.NormalizeNewLineChars(), programText.NormalizeNewLineChars());
 
             //Check that correct version is used
             Assert.True(csProjContent.IndexOf(string.Concat(">", version, "<")) > 0);
@@ -362,6 +358,5 @@ namespace CTA.Rules.Test
             var buildErrors = GetSolutionBuildErrors(results.SolutionRunResult.SolutionPath);
             Assert.AreEqual(0, buildErrors.Count);
         }
-
     }
 }
