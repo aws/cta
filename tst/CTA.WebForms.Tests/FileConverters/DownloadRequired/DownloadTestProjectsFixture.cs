@@ -33,8 +33,7 @@ namespace CTA.WebForms.Tests.FileConverters.DownloadRequired
             var targetDir = "w2b";
             _eShopOnBlazorSolutionFilePath = CopySolutionFolderToTemp("eShopOnBlazor.sln", _tempDir);
             _eShopOnBlazorSolutionPath = Directory.GetParent(EShopOnBlazorSolutionFilePath).FullName;
-
-            _testRunFolder = Directory.GetParent(EShopOnBlazorSolutionPath).FullName;
+            _testRunFolder = EShopOnBlazorSolutionPath;
 
             _eShopLegacyWebFormsProjectPath = Utils.GetProjectPaths(EShopOnBlazorSolutionPath)
                 .First(filePath =>
