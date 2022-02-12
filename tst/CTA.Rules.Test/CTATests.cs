@@ -209,15 +209,18 @@ namespace CTA.Rules.Test
         }
 
         [Test]
-        public void TestProjectOutsideSolutionFolder()
+        public void TestProjectsOutsideSolutionPath_Are_Ported()
         {
             var results = AnalyzeSolution("Application_Proj_diff_folder.sln", tempDir, downloadLocation, version);
+
+            FileAssert.Exists(results.ProjectResults[0].CsProjectPath);
+            FileAssert.Exists(results.ProjectResults[1].CsProjectPath);
 
             var csProjContent1 = results.ProjectResults[0].CsProjectContent;
             var csProjContent2 = results.ProjectResults[1].CsProjectContent;
 
-            Assert.True(csProjContent1.IndexOf(string.Concat(">", version, "<")) > 0);
-            Assert.True(csProjContent2.IndexOf(string.Concat(">", version, "<")) > 0);
+            StringAssert.Contains(string.Concat(">", version, "<"), csProjContent1);
+            StringAssert.Contains(string.Concat(">", version, "<"), csProjContent2);
         }
 
         [Test]
