@@ -11,6 +11,7 @@ using System.IO.Compression;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace CTA.Rules.Test
 {
@@ -226,7 +227,7 @@ namespace CTA.Rules.Test
             var files = source.GetFiles();
             foreach (var file in files)
             {
-                file.CopyTo(Path.Combine(target.FullName, file.Name));
+                file.CopyTo(Path.Combine(target.FullName, file.Name),true);
             }
 
             var dirs = source.GetDirectories();
@@ -242,10 +243,52 @@ namespace CTA.Rules.Test
             var solutionPath = Directory.EnumerateFiles(searchDir, solutionName, SearchOption.AllDirectories).FirstOrDefault(s => !s.Contains(string.Concat(Path.DirectorySeparatorChar, CopyFolder, Path.DirectorySeparatorChar)));
             var solutionDir = Directory.GetParent(solutionPath).FullName;
             var newTempDir = Path.Combine(GetTstPath(this.GetType()), CopyFolder, Guid.NewGuid().ToString());
-            CopyDirectory(new DirectoryInfo(solutionDir), new DirectoryInfo(newTempDir));
+
+            if (solutionPath.Contains(".sln") && File.Exists(solutionPath))
+            {
+                IEnumerable<string> projects = Utils.GetProjectPaths(solutionPath);
+
+                newTempDir = BuildRelativeFolderStructureToIncludeAllExternalProjects(projects, newTempDir, solutionDir);
+
+                CopyDirectory(new DirectoryInfo(solutionDir), new DirectoryInfo(newTempDir));
+
+                FindAndCopyProjectsOutsideSolutionPath(projects, solutionDir, newTempDir);
+            }
+            else
+            {
+                CopyDirectory(new DirectoryInfo(solutionDir), new DirectoryInfo(newTempDir));
+            }
 
             var newSolutionPath = Directory.EnumerateFiles(newTempDir, solutionName, SearchOption.AllDirectories).FirstOrDefault();
             return newSolutionPath;
+        }
+
+        private string BuildRelativeFolderStructureToIncludeAllExternalProjects(IEnumerable<string> projects, string newTempDir, string solutionDir)
+        {
+            int folderCount = 1;
+            int depths = projects.ToList().Max(p => Regex.Matches(Path.GetRelativePath(solutionDir, p), Regex.Escape("..")).Count);
+            for (int i = 0; i < depths; i++)
+            {
+                newTempDir += "\\Folder" + folderCount++;
+            }
+            return newTempDir;
+        }
+
+        private void FindAndCopyProjectsOutsideSolutionPath(IEnumerable<string> projects, string solutionDir, string newTempDir)
+        {
+            foreach (string project in projects)
+            {
+                string projPath = Directory.GetParent(project).FullName;
+
+                if (!Utils.IsSubPathOf(solutionDir, projPath))
+                {
+                    string relativeSrc = Path.GetRelativePath(solutionDir, projPath);
+                    string projName = Path.GetFileName(project);
+                    string newRelDir = Path.Combine(newTempDir, relativeSrc);
+
+                    Utils.CopyFolderToTemp(projName, projPath, newRelDir);
+                }
+            }
         }
 
 

@@ -18,6 +18,7 @@ namespace CTA.Rules.Test
         public string tempDir = "";
         public string downloadLocation;
         public List<string> ctaFiles;
+        public string version = "net5.0"; //We don't care about version for CTA-only rules:
 
         [SetUp]
         public void Setup()
@@ -47,9 +48,6 @@ namespace CTA.Rules.Test
 
         private TestSolutionAnalysis runCTAFile(string solutionName, string projectName = null) 
         {
-            //We don't care about version for CTA-only rules:
-            string version = "net5.0";
-
             var solutionPath = CopySolutionFolderToTemp(solutionName, downloadLocation);
             var solutionDir = Directory.GetParent(solutionPath).FullName;
 
@@ -208,6 +206,21 @@ namespace CTA.Rules.Test
 
             FileAssert.Exists(Path.Combine(results.ProjectDirectory, Constants.MonolithService + ".cs"));
             StringAssert.Contains(@"return Content(MonolithService.CreateRequest(Request, this.ControllerContext.RouteData));", houseControllerText);
+        }
+
+        [Test]
+        public void TestProjectsOutsideSolutionPath_Are_Ported()
+        {
+            var results = AnalyzeSolution("Application_Proj_diff_folder.sln", tempDir, downloadLocation, version);
+
+            FileAssert.Exists(results.ProjectResults[0].CsProjectPath);
+            FileAssert.Exists(results.ProjectResults[1].CsProjectPath);
+
+            var csProjContent1 = results.ProjectResults[0].CsProjectContent;
+            var csProjContent2 = results.ProjectResults[1].CsProjectContent;
+
+            StringAssert.Contains(string.Concat(">", version, "<"), csProjContent1);
+            StringAssert.Contains(string.Concat(">", version, "<"), csProjContent2);
         }
 
         [Test]

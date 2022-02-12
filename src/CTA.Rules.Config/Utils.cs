@@ -212,7 +212,7 @@ namespace CTA.Rules.Config
                   
                     if (!IsSubPathOf(slnDirPath, projPath))
                     {
-                        relativeSrc = Path.GetRelativePath(solutionPath, projPath);
+                        relativeSrc = Path.GetRelativePath(slnDirPath, projPath);
                         string projName = Path.GetFileName(project);
                         string relDestPath = Path.Combine(destPath, relativeSrc);
                         CopyFolderToTemp(projName, projPath, relDestPath);
@@ -246,7 +246,7 @@ namespace CTA.Rules.Config
         /// </summary>
         /// <param name="source">Source directory</param>
         /// <param name="target">Destination directory</param>
-        public static void CopyDirectory(DirectoryInfo source, DirectoryInfo target)
+        private static void CopyDirectory(DirectoryInfo source, DirectoryInfo target)
         {
             if (!Directory.Exists(target.FullName))
             {
@@ -314,7 +314,7 @@ namespace CTA.Rules.Config
             bool isParent = false;
             while (baseDir.Parent != null)
             {
-                if (baseDir.Parent.FullName == subDir.FullName)
+                if (baseDir.Parent.FullName == subDir.FullName || baseDir.FullName == subDir.FullName)
                 {
                     isParent = true;
                     break;
