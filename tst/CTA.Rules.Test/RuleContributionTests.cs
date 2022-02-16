@@ -39,6 +39,7 @@ class RuleContributionTests : AwsRulesBaseTest
         };
     }
     
+    [TestCase(TargetFramework.DotnetCoreApp31)]
     [TestCase(TargetFramework.Dotnet5)]
     [TestCase(TargetFramework.Dotnet6)]
     public void TestProjectFilePortingResults(string version)
@@ -52,6 +53,9 @@ class RuleContributionTests : AwsRulesBaseTest
             .First(file => file.EndsWith(csFileName));
         var ruleContributionsFileContent = File.ReadAllText(ruleContributionsFile);
 
+        // Verify there are no build errors after porting
+        CollectionAssert.IsEmpty(solutionPortingResult.SolutionRunResult.BuildErrors);
+
         // Verify expected package is in .csproj
         StringAssert.Contains(@"PackageReference Include=""System.Linq.Dynamic.Core""", ruleContributionsResult.CsProjectContent);
 
@@ -59,5 +63,4 @@ class RuleContributionTests : AwsRulesBaseTest
         StringAssert.Contains("using System.Linq.Dynamic.Core;", ruleContributionsFileContent);
         StringAssert.DoesNotContain("using System.Linq.Dynamic;", ruleContributionsFileContent);
     }
-
 } 
