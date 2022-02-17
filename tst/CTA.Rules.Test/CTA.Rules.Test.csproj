@@ -50,8 +50,8 @@
     </None>
   </ItemGroup>
 
-	<ItemGroup>
-		<Folder Include="TempRules\" />
-	</ItemGroup>
+  <ItemGroup>
+    <Folder Include="TempRules\" />
+  </ItemGroup>
 
 </Project>
