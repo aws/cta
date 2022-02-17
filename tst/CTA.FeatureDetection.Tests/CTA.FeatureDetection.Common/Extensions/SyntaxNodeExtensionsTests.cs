@@ -2,16 +2,11 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using NUnit.Framework;
-using System.Text.RegularExpressions;
 
 namespace CTA.FeatureDetection.Tests.CTA.FeatureDetection.Common.Extensions
 {
     public class SyntaxNodeExtensionsTests
     {
-        //[SetUp]
-        //public void Setup()
-        //{ }
-
         [Test]
         public void RemoveCommentsFromSyntaxTree_Returns_True_If_NoComments()
         {
