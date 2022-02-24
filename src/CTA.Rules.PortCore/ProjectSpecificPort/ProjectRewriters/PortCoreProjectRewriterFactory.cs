@@ -14,7 +14,6 @@ namespace CTA.Rules.PortCore
             {
                 ProjectType.WCFCodeBasedService => new WCFProjectRewriter(analyzerResult, projectConfiguration),
                 ProjectType.WCFConfigBasedService => new WCFProjectRewriter(analyzerResult, projectConfiguration),
-                ProjectType.WebForms => new WebFormsProjectRewriter(analyzerResult, projectConfiguration),
                 _ => new ProjectRewriter(analyzerResult, projectConfiguration)
             };
             return projectRewriter;
@@ -27,7 +26,6 @@ namespace CTA.Rules.PortCore
             {
                 ProjectType.WCFCodeBasedService => new WCFProjectRewriter(ideProjectResult, projectConfiguration),
                 ProjectType.WCFConfigBasedService => new WCFProjectRewriter(ideProjectResult, projectConfiguration),
-                ProjectType.WebForms => new WebFormsProjectRewriter(ideProjectResult, projectConfiguration),
                 _ => new ProjectRewriter(ideProjectResult, projectConfiguration)
             };
             return projectRewriter;

@@ -8,6 +8,7 @@
     <ProjectReference Include="..\CTA.Rules.Config\CTA.Rules.Config.csproj" />
     <ProjectReference Include="..\CTA.Rules.Models\CTA.Rules.Models.csproj" />
     <ProjectReference Include="..\CTA.Rules.ProjectFile\CTA.Rules.ProjectFile.csproj" />
+    <ProjectReference Include="..\CTA.WebForms\CTA.WebForms.csproj" />
   </ItemGroup>
 
   <ItemGroup>

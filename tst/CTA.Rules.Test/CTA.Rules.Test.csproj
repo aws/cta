@@ -51,6 +51,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="TempTemplates\" />
     <Folder Include="TempRules\" />
   </ItemGroup>
 

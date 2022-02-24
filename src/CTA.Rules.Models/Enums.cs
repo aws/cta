@@ -17,7 +17,8 @@
         ElementAccess,
         MemberAccess,
         Project,
-        ProjectFile
+        ProjectFile,
+        ProjectType
     }
     public enum ProjectType
     {

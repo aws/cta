@@ -71,10 +71,6 @@ namespace CTA.WebForms.Factories
                     fc = new CodeFileConverter(_sourceProjectPath, document.FullName, _blazorWorkspaceManager,
                         _webFormsProjectAnalyzer, _classConverterFactory, _taskManagerService, _metricsContext);
                 }
-                else if (extension.Equals(Constants.WebFormsConfigFileExtension))
-                {
-                    fc = new ConfigFileConverter(_sourceProjectPath, document.FullName, _taskManagerService, _metricsContext);
-                }
                 else if (extension.Equals(Constants.WebFormsPageMarkupFileExtension)
                          || extension.Equals(Constants.WebFormsControlMarkupFileExtenion)
                          || extension.Equals(Constants.WebFormsMasterPageMarkupFileExtension)
@@ -82,11 +78,6 @@ namespace CTA.WebForms.Factories
                 {
                     fc = new ViewFileConverter(_sourceProjectPath, document.FullName, _viewImportService,
                         _taskManagerService, _metricsContext);
-                }
-                else if (extension.Equals(Constants.CSharpProjectFileExtension))
-                {
-                    fc = new ProjectFileConverter(_sourceProjectPath, document.FullName, _blazorWorkspaceManager,
-                        _webFormsProjectAnalyzer, _taskManagerService, _metricsContext);
                 }
                 else if (StaticResourceExtensions.Contains(extension))
                 {
