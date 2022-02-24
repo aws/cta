@@ -264,7 +264,7 @@ namespace CTA.Rules.Update
 
                 if (string.IsNullOrEmpty(actionValidation.CheckComments) || !bool.Parse(actionValidation.CheckComments))
                 {
-                    trimmedResult = Utils.EscapeAllWhitespace(root.NoComments().NormalizeWhitespace().ToFullString());
+                    trimmedResult = root.RemoveAllTrivia().ToFullString();
                 }
                 else
                 {
