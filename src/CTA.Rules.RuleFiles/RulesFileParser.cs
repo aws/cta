@@ -653,6 +653,24 @@ namespace CTA.Rules.RuleFiles
                                 }
                                 break;
                             }
+                        case ActionTypes.ProjectType:
+                            {
+                                var actionFunc = actionsLoader.GetProjectTypeActions(action.Name, action.Value);
+                                if (actionFunc != null)
+                                {
+                                    nodeToken.ProjectTypeActions.Add(new ProjectLevelAction()
+                                    {
+                                        Key = nodeToken.Key,
+                                        Value = GetActionValue(action.Value),
+                                        Description = action.Description,
+                                        ActionValidation = action.ActionValidation,
+                                        Name = action.Name,
+                                        Type = action.Type,
+                                        ProjectTypeActionFunc = actionFunc
+                                    });
+                                }
+                                break;
+                            }
                         case ActionTypes.Package:
                             {
                                 PackageAction packageAction = new PackageAction();

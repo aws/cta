@@ -25,6 +25,7 @@ namespace CTA.Rules.Models.Tokens
             InterfaceDeclarationActions = new List<InterfaceDeclarationAction>();
             ProjectLevelActions = new List<ProjectLevelAction>();
             ProjectFileActions = new List<ProjectLevelAction>();
+            ProjectTypeActions = new List<ProjectLevelAction>();
             TargetCPU = new List<string>();
             TextChanges = new List<TextChange>();
         }
@@ -53,6 +54,7 @@ namespace CTA.Rules.Models.Tokens
         public List<PackageAction> PackageActions { get; set; }
         public List<ProjectLevelAction> ProjectLevelActions { get; set; }
         public List<ProjectLevelAction> ProjectFileActions { get; set; }
+        public List<ProjectLevelAction> ProjectTypeActions { get; set; }
 
         public NodeToken Clone()
         {
@@ -75,6 +77,7 @@ namespace CTA.Rules.Models.Tokens
             cloned.PackageActions = cloned.PackageActions.Select(action => action.Clone()).ToList();
             cloned.ProjectLevelActions = cloned.ProjectLevelActions.Select(action => action.Clone<ProjectLevelAction>()).ToList();
             cloned.ProjectFileActions = cloned.ProjectFileActions.Select(action => action.Clone<ProjectLevelAction>()).ToList();
+            cloned.ProjectTypeActions = cloned.ProjectTypeActions.Select(action => action.Clone<ProjectLevelAction>()).ToList();
             return cloned;
         }
 

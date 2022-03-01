@@ -104,8 +104,11 @@ namespace CTA.Rules.Update
                     projectActions.PackageActions.Add(new PackageAction() { Name = p.Key, OriginalVersion = p.Value.Item1, Version = p.Value.Item2 });
                 }
                 MergePackages(projectActions.PackageActions);
-                projectActions.ProjectLevelActions = projectRules.ProjectTokens.SelectMany(p => p.ProjectLevelActions).Distinct().ToList();
-                projectActions.ProjectLevelActions.AddRange(projectRules.ProjectTokens.SelectMany(p => p.ProjectFileActions));
+
+                projectActions.ProjectLevelActions = projectRules.ProjectTokens.SelectMany(p => p.ProjectTypeActions).Distinct().ToList();
+                projectActions.ProjectLevelActions.AddRange(projectRules.ProjectTokens.SelectMany(p => p.ProjectLevelActions).Distinct());
+                projectActions.ProjectLevelActions.AddRange(projectRules.ProjectTokens.SelectMany(p => p.ProjectFileActions).Distinct());
+
                 projectActions.ProjectRules = projectRules;
                 _projectResult.ProjectActions = projectActions;
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Codelyzer.Analysis;
 
 namespace CTA.Rules.Models
 {
@@ -7,6 +8,7 @@ namespace CTA.Rules.Models
     {
         public Func<string, ProjectType, string> ProjectLevelActionFunc { get; set; }
         public Func<string, ProjectType, List<string>, Dictionary<string, string>, List<string>, List<string>, string> ProjectFileActionFunc { get; set; }
+        public Func<ProjectType, ProjectConfiguration, ProjectResult, AnalyzerResult, string> ProjectTypeActionFunc { get; set; }
 
         public override bool Equals(object obj)
         {
@@ -15,15 +17,17 @@ namespace CTA.Rules.Models
                 && action?.Value == this.Value
                 &&
                 (
-                (action.ProjectLevelActionFunc != null && this.ProjectLevelActionFunc != null && action.ProjectLevelActionFunc.Method.Name == this.ProjectLevelActionFunc.Method.Name)
-                ||
-                (action.ProjectFileActionFunc != null && this.ProjectFileActionFunc != null && action.ProjectFileActionFunc.Method.Name == this.ProjectFileActionFunc.Method.Name)
+                    (action.ProjectLevelActionFunc != null && ProjectLevelActionFunc != null && action.ProjectLevelActionFunc.Method.Name == ProjectLevelActionFunc.Method.Name)
+                    ||
+                    (action.ProjectFileActionFunc != null && ProjectFileActionFunc != null && action.ProjectFileActionFunc.Method.Name == ProjectFileActionFunc.Method.Name)
+                    ||
+                    (action.ProjectTypeActionFunc != null && ProjectTypeActionFunc != null && action.ProjectTypeActionFunc.Method.Name == ProjectTypeActionFunc.Method.Name)
                 );
         }
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(Value, ProjectLevelActionFunc?.Method.Name, ProjectFileActionFunc?.Method.Name);
+            return HashCode.Combine(Value, ProjectLevelActionFunc?.Method.Name, ProjectFileActionFunc?.Method.Name, ProjectTypeActionFunc?.Method.Name);
         }
     }
 }

@@ -142,6 +142,7 @@ namespace CTA.Rules.Test
 
                     SolutionPort solutionPort = new SolutionPort(solutionPath, solutionPortConfiguration);
                     CopyTestRules();
+                    CopyTestTemplates();
                     var analysisRunResult = solutionPort.AnalysisRun();
 
                     StringBuilder str = new StringBuilder();
@@ -156,7 +157,6 @@ namespace CTA.Rules.Test
                         str.Append(projectResults);
                     }
                     result.SolutionAnalysisResult = str.ToString();
-
 
                     var runResult = solutionPort.Run();
 
@@ -204,7 +204,13 @@ namespace CTA.Rules.Test
 
         private void CopyTestRules()
         {
-            var tempRulesDir = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "TempRules");
+            var assemblyDir = Assembly.GetExecutingAssembly().Location;
+            var netVersionDir = Path.GetDirectoryName(assemblyDir);
+            var debugDir = Path.GetDirectoryName(netVersionDir);
+            var binDir = Path.GetDirectoryName(debugDir);
+            var projectDir = Path.GetDirectoryName(binDir);
+
+            var tempRulesDir = Path.Combine(projectDir, "TempRules");
             if (Directory.Exists(tempRulesDir))
             {
                 var files = Directory.EnumerateFiles(tempRulesDir, "*.json");
@@ -212,6 +218,32 @@ namespace CTA.Rules.Test
                 foreach (var file in files)
                 {
                     string targetFile = Path.Combine(Constants.RulesDefaultPath, Path.GetFileName(file));
+
+                    File.Copy(file, targetFile, true);
+                }
+            }
+        }
+
+        private void CopyTestTemplates()
+        {
+            var assemblyDir = Assembly.GetExecutingAssembly().Location;
+            var netVersionDir = Path.GetDirectoryName(assemblyDir);
+            var debugDir = Path.GetDirectoryName(netVersionDir);
+            var binDir = Path.GetDirectoryName(debugDir);
+            var projectDir = Path.GetDirectoryName(binDir);
+
+            var tempTemplatesDir = Path.Combine(projectDir, "TempTemplates");
+            if (Directory.Exists(tempTemplatesDir))
+            {
+                var files = Directory.EnumerateFiles(tempTemplatesDir, "*", SearchOption.AllDirectories);
+
+                foreach (var file in files)
+                {
+                    var relativePath = Path.GetRelativePath(tempTemplatesDir, file);
+                    var targetFile = Path.Combine(Constants.ResourcesExtractedPath, relativePath);
+                    var targetFileDir = Path.GetDirectoryName(targetFile);
+
+                    Directory.CreateDirectory(targetFileDir);
                     File.Copy(file, targetFile, true);
                 }
             }

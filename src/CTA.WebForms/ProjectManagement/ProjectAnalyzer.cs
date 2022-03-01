@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Codelyzer.Analysis;
 using CTA.Rules.Models;
-using CTA.Rules.Update;
 using Microsoft.Extensions.Logging;
 using CTA.Rules.Config;
 

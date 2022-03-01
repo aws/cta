@@ -12,11 +12,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CTA.Rules.Actions\CTA.Rules.Actions.csproj" />
+    <Compile Remove="Helpers\RuleActions.cs" />
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="Helpers\RuleActions.cs" />
+    <ProjectReference Include="..\CTA.Rules.Models\CTA.Rules.Models.csproj" />
   </ItemGroup>
 
   <ItemGroup>

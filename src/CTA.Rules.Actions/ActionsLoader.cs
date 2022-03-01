@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Loader;
+using Codelyzer.Analysis;
 using CTA.Rules.Config;
 using CTA.Rules.Models;
 using Microsoft.CodeAnalysis;
@@ -19,11 +20,11 @@ namespace CTA.Rules.Actions
     {
         private readonly List<MethodInfo> compilationUnitActions, attributeActions, attributeListActions, classActions,
         identifierNameActions, invocationExpressionActions, expressionActions, methodDeclarationActions, elementAccessActions,
-        objectCreationExpressionActions, memberAccessActions, namespaceActions, projectLevelActions, projectFileActions, interfaceActions;
+        objectCreationExpressionActions, memberAccessActions, namespaceActions, projectLevelActions, projectFileActions, projectTypeActions, interfaceActions;
 
         private readonly object attributeObject, attributeListObject, classObject, interfaceObject, compilationUnitObject, identifierNameObject
             , invocationExpressionObject, expressionObject, methodDeclarationObject, elementAccessObject, memberAccessObject, objectExpressionObject, namespaceObject, projectLevelObject,
-            projectFileObject;
+            projectFileObject, projectTypeObject;
 
         /// <summary>
         /// Initializes a new ActionLoader that loads the default actions
@@ -46,6 +47,7 @@ namespace CTA.Rules.Actions
             projectLevelActions = new List<MethodInfo>();
             interfaceActions = new List<MethodInfo>();
             projectFileActions = new List<MethodInfo>();
+            projectTypeActions = new List<MethodInfo>();
 
             var actionsAssembly = AppDomain.CurrentDomain.GetAssemblies().Where(a => a.FullName.Contains("CTA.Rules.Actions")).FirstOrDefault();
 
@@ -88,6 +90,7 @@ namespace CTA.Rules.Actions
                     projectLevelObject = Activator.CreateInstance(types.FirstOrDefault(t => t.Name == Constants.ProjectLevelActions));
                     interfaceObject = Activator.CreateInstance(types.FirstOrDefault(t => t.Name == Constants.InterfaceActions));
                     projectFileObject = Activator.CreateInstance(types.FirstOrDefault(t => t.Name == Constants.ProjectFileActions));
+                    projectTypeObject = Activator.CreateInstance(types.FirstOrDefault(t => t.Name == Constants.ProjectTypeActions));
 
 
                     foreach (var t in types)
@@ -169,6 +172,11 @@ namespace CTA.Rules.Actions
                                     projectFileActions.AddRange(GetFuncMethods(t));
                                     break;
                                 }
+                            case Constants.ProjectTypeActions:
+                                {
+                                    projectTypeActions.AddRange(GetFuncMethods(t));
+                                    break;
+                                }
                             default:
                                 {
                                     LogHelper.LogError(string.Format("Action type {0} is not found", t.Name));
@@ -229,6 +237,9 @@ namespace CTA.Rules.Actions
         public Func<string, ProjectType, List<string>, Dictionary<string, string>, List<string>, List<string>, string> GetProjectFileActions(string name, dynamic value) =>
             GetAction<Func<string, ProjectType, List<string>, Dictionary<string, string>, List<string>, List<string>, string>>
                 (projectFileActions, projectFileObject, name, value);
+        public Func<ProjectType, ProjectConfiguration, ProjectResult, AnalyzerResult, string> GetProjectTypeActions(string name, dynamic value) =>
+            GetAction<Func<ProjectType, ProjectConfiguration, ProjectResult, AnalyzerResult, string>>
+                (projectTypeActions, projectTypeObject, name, value);
         public Func<SyntaxGenerator, ElementAccessExpressionSyntax, ElementAccessExpressionSyntax> GetElementAccessExpressionActions(string name, dynamic value) =>
             GetAction<Func<SyntaxGenerator, ElementAccessExpressionSyntax, ElementAccessExpressionSyntax>>
                 (elementAccessActions, elementAccessObject, name, value);

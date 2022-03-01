@@ -188,6 +188,19 @@ namespace CTA.Rules.Update
                             LogHelper.LogError(actionExecutionException);
                         }
                     }
+                    else if (projectLevelAction.ProjectTypeActionFunc != null)
+                    {
+                        try
+                        {
+                            runResult = projectLevelAction.ProjectTypeActionFunc(projectType, _projectConfiguration, _projectResult, _analyzerResult);
+                        }
+                        catch (Exception ex)
+                        {
+                            var actionExecutionException = new ActionExecutionException(projectLevelAction.Name, projectLevelAction.Key, ex);
+                            projectActionExecution.InvalidExecutions = 1;
+                            LogHelper.LogError(actionExecutionException);
+                        }
+                    }
                 }
                 if (!string.IsNullOrEmpty(runResult))
                 {

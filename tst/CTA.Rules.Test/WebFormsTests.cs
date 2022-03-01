@@ -3,10 +3,6 @@ using NUnit.Framework;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using Codelyzer.Analysis;
-using CTA.Rules.Config;
-using Microsoft.Extensions.Logging;
 
 namespace CTA.Rules.Test
 {
@@ -38,7 +34,7 @@ namespace CTA.Rules.Test
             var startupText = File.ReadAllText(Path.Combine(projectDir, "Startup.cs"));
             var programText = File.ReadAllText(Path.Combine(projectDir, "Program.cs"));
 
-            StringAssert.AreEqualIgnoringCase(Regex.Replace(ExpectedOutputConstants.WebFormsStartupText, @"\r|\n|\t", ""), 
+            StringAssert.AreEqualIgnoringCase(Regex.Replace(ExpectedOutputConstants.WebFormsStartupText, @"\r|\n|\t", ""),
                 Regex.Replace(startupText, @"\r|\n|\t", ""));
             StringAssert.AreEqualIgnoringCase(Regex.Replace(ExpectedOutputConstants.WebFormsProgramText, @"\r|\n|\t", ""),
                 Regex.Replace(programText, @"\r|\n|\t", ""));
@@ -56,7 +52,7 @@ namespace CTA.Rules.Test
             var someMvcResult = results.ProjectResults.First(proj => proj.CsProjectPath.EndsWith("SomeMvc.csproj"));
             var someWebFormsResult = results.ProjectResults.First(proj => proj.CsProjectPath.EndsWith("SomeWebForms.csproj"));
             var otherWebFormsResult = results.ProjectResults.First(proj => proj.CsProjectPath.EndsWith("OtherWebForms.csproj"));
-            
+
             // Verify MVC porting is unaffected
             StringAssert.Contains($"<TargetFramework>{version}</TargetFramework>", someMvcResult.CsProjectContent);
             StringAssert.Contains(@"<PackageReference Include=""Microsoft.EntityFrameworkCore"" Version=""5.0.12"" />", someMvcResult.CsProjectContent);
@@ -66,6 +62,9 @@ namespace CTA.Rules.Test
             // Verify both WebForms projects ported as expected
             VerifyWebForms(version, someWebFormsResult);
             VerifyWebForms(version, otherWebFormsResult);
+
+            // Verify that MVC did not have WebForms porting applied to it
+            VerifyMvc(someMvcResult);
         }
 
         public void VerifyWebForms(string targetFramework, ProjectResult webFormsProjectResult)
@@ -137,6 +136,20 @@ namespace CTA.Rules.Test
             StringAssert.Contains(ExpectedOutputConstants.BlazorConfigureFunctionText, startupText);
             StringAssert.Contains(ExpectedOutputConstants.BlazorProgramText, programText);
             StringAssert.Contains(ExpectedOutputConstants.BlazorWebRequestInfoText, webRequestInfoText);
+        }
+
+        public void VerifyMvc(ProjectResult mvcProjectResult)
+        {
+            var projectDir = Path.GetDirectoryName(mvcProjectResult.CsProjectPath);
+
+            // These files will only exist if WebForms porting was run on the project
+            var appRazorLocation = Path.Combine(projectDir, "App.razor");
+            var importsRazorLocation = Path.Combine(projectDir, "_Imports.razor");
+            var hostCshtmlLocation = Path.Combine(projectDir, "Pages", "_Host.cshtml");
+
+            Assert.False(File.Exists(appRazorLocation));
+            Assert.False(File.Exists(importsRazorLocation));
+            Assert.False(File.Exists(hostCshtmlLocation));
         }
     }
 }
