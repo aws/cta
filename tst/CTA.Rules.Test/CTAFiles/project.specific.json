@@ -24,7 +24,7 @@
       "Type": "Project",
       "Actions": [
         {
-          "Name": "CreateMonolithService",
+          "Name": "CreateMonolithServiceWebAPI",
           "Type": "Project",
           "Value": {
             "namespaceString": "SampleWebApi.Controllers",

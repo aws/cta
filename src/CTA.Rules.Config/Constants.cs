@@ -130,6 +130,7 @@ namespace CTA.Rules.Config
         public const string Public = "public";
         public const string DotResult = ".Result";
         public const string MonolithService = "MonolithService";
+        public const string MonolithServiceMvc = "MonolithServiceMvc";
         public const string MonolithServiceComment = "Modified to call the extracted logic.";
 
 
@@ -143,6 +144,7 @@ namespace CTA.Rules.Config
             new List<string> {"mvc","Program.cs"},
             new List<string> {"mvc","Startup.cs" },
             new List<string> {"monolithservice","MonolithService.cs" },
+            new List<string> {"monolithservice","MonolithServiceMvc.cs" },
             new List<string> {"webclasslibrary","appsettings.json" },
             new List<string> { "wcfcodebasedservice", "Program.cs"},
             new List<string> { "wcfcodebasedservice", "Startup.cs"},
