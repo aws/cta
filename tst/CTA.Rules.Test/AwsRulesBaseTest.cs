@@ -204,13 +204,11 @@ namespace CTA.Rules.Test
 
         private void CopyTestRules()
         {
-            var assemblyDir = Assembly.GetExecutingAssembly().Location;
-            var netVersionDir = Path.GetDirectoryName(assemblyDir);
-            var debugDir = Path.GetDirectoryName(netVersionDir);
-            var binDir = Path.GetDirectoryName(debugDir);
-            var projectDir = Path.GetDirectoryName(binDir);
+            // Set each file in the TempRules directory to copy to output directory using file
+            // properties menu or the test rules will not work
+            var assemblyDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
-            var tempRulesDir = Path.Combine(projectDir, "TempRules");
+            var tempRulesDir = Path.Combine(assemblyDir, "TempRules");
             if (Directory.Exists(tempRulesDir))
             {
                 var files = Directory.EnumerateFiles(tempRulesDir, "*.json");
@@ -226,13 +224,11 @@ namespace CTA.Rules.Test
 
         private void CopyTestTemplates()
         {
-            var assemblyDir = Assembly.GetExecutingAssembly().Location;
-            var netVersionDir = Path.GetDirectoryName(assemblyDir);
-            var debugDir = Path.GetDirectoryName(netVersionDir);
-            var binDir = Path.GetDirectoryName(debugDir);
-            var projectDir = Path.GetDirectoryName(binDir);
+            // Set each file in the TempTemplates directory to copy to output directory using file
+            // properties menu or the test templates will not work
+            var assemblyDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
-            var tempTemplatesDir = Path.Combine(projectDir, "TempTemplates");
+            var tempTemplatesDir = Path.Combine(assemblyDir, "TempTemplates");
             if (Directory.Exists(tempTemplatesDir))
             {
                 var files = Directory.EnumerateFiles(tempTemplatesDir, "*", SearchOption.AllDirectories);
