@@ -13,116 +13,116 @@ updates:
       - porting-assistant-nuget
       - nuget-org
     schedule:
-      interval: "daily"
+      interval: "weekly"
   - package-ecosystem: "nuget"
     directory: "/src/CTA.FeatureDetection.AuthType"
     registries:
       - porting-assistant-nuget
       - nuget-org
     schedule:
-      interval: "daily"
+      interval: "weekly"
   - package-ecosystem: "nuget"
     directory: "/src/CTA.FeatureDetection.Common"
     registries:
       - porting-assistant-nuget
       - nuget-org
     schedule:
-      interval: "daily"
+      interval: "weekly"
   - package-ecosystem: "nuget"
     directory: "/src/CTA.FeatureDetection.Load"
     registries:
       - porting-assistant-nuget
       - nuget-org
     schedule:
-      interval: "daily"
+      interval: "weekly"
   - package-ecosystem: "nuget"
     directory: "/src/CTA.FeatureDetection.ProjectType"
     registries:
       - porting-assistant-nuget
       - nuget-org
     schedule:
-      interval: "daily"
+      interval: "weekly"
   - package-ecosystem: "nuget"
     directory: "/tst/CTA.FeatureDetection.Tests"
     registries:
       - porting-assistant-nuget
       - nuget-org
     schedule:
-      interval: "daily"
+      interval: "weekly"
   - package-ecosystem: "nuget"
     directory: "/src/CTA.Rules.Actions"
     registries:
       - porting-assistant-nuget
       - nuget-org
     schedule:
-      interval: "daily"
+      interval: "weekly"
   - package-ecosystem: "nuget"
     directory: "/src/CTA.Rules.Analysis"
     registries:
       - porting-assistant-nuget
       - nuget-org
     schedule:
-      interval: "daily"
+      interval: "weekly"
   - package-ecosystem: "nuget"
     directory: "/src/CTA.Rules.Common"
     registries:
       - porting-assistant-nuget
       - nuget-org
     schedule:
-      interval: "daily"
+      interval: "weekly"
   - package-ecosystem: "nuget"
     directory: "/src/CTA.Rules.Config"
     registries:
       - porting-assistant-nuget
       - nuget-org
     schedule:
-      interval: "daily"
+      interval: "weekly"
   - package-ecosystem: "nuget"
     directory: "/src/CTA.Rules.Metrics"
     registries:
       - porting-assistant-nuget
       - nuget-org
     schedule:
-      interval: "daily"
+      interval: "weekly"
   - package-ecosystem: "nuget"
     directory: "/src/CTA.Rules.Models"
     registries:
       - porting-assistant-nuget
       - nuget-org
     schedule:
-      interval: "daily"
+      interval: "weekly"
   - package-ecosystem: "nuget"
     directory: "/src/CTA.Rules.PortCore"
     registries:
       - porting-assistant-nuget
       - nuget-org
     schedule:
-      interval: "daily"
+      interval: "weekly"
   - package-ecosystem: "nuget"
     directory: "/src/CTA.Rules.ProjectFile"
     registries:
       - porting-assistant-nuget
       - nuget-org
     schedule:
-      interval: "daily"
+      interval: "weekly"
   - package-ecosystem: "nuget"
     directory: "/src/CTA.Rules.RuleFiles"
     registries:
       - porting-assistant-nuget
       - nuget-org
     schedule:
-      interval: "daily"
+      interval: "weekly"
   - package-ecosystem: "nuget"
     directory: "/tst/CTA.Rules.Test"
     registries:
       - porting-assistant-nuget
       - nuget-org
     schedule:
-      interval: "daily"
+      interval: "weekly"
   - package-ecosystem: "nuget"
     directory: "/src/CTA.Rules.Update"
     registries:
       - porting-assistant-nuget
       - nuget-org
     schedule:
-      interval: "daily"
+      interval: "weekly"
