@@ -106,31 +106,45 @@ namespace CTA.Rules.Actions
         {
             string func(string projectDir, ProjectType projectType)
             {
-                if(projectDir != null && projectDir.Length > 0)
-                {
-                    if(string.Equals(Path.GetFileNameWithoutExtension(projectDir), projectName))
-                    {
-                        UpdateCsprojReference(projectDir);
-
-                        var pathOnly = Path.GetDirectoryName(projectDir);
-                        var file = Path.Combine(pathOnly, string.Concat(FileTypeCreation.MonolithService.ToString(), ".cs"));
-                        if (File.Exists(file))
-                        {
-                            if (File.Exists(string.Concat(file, ".bak")))
-                            {
-                                File.Delete(string.Concat(file, ".bak"));
-                            }
-                            File.Move(file, string.Concat(file, ".bak"));
-                        }
-                        File.WriteAllText(file, TemplateHelper.GetTemplateFileContent(namespaceString, ProjectType.MonolithService, FileTypeCreation.MonolithService.ToString() + ".cs"));
-
-                        LogHelper.LogInformation(string.Format("Created {0}.cs file using {1} template", FileTypeCreation.MonolithService.ToString(), ProjectType.MonolithService.ToString()));
-                    }
-                }
-
+                AddMonolithFile(namespaceString, projectName, projectDir, projectType, FileTypeCreation.MonolithServiceMvc.ToString());
                 return "";
             }
             return func;
+        }
+
+        public Func<string, ProjectType, string> GetCreateMonolithServiceWebAPIAction(string namespaceString, string projectName)
+        {
+            string func(string projectDir, ProjectType projectType)
+            {
+                AddMonolithFile(namespaceString, projectName, projectDir, projectType, FileTypeCreation.MonolithService.ToString());
+                return "";
+            }
+            return func;
+        }
+
+        private void AddMonolithFile(string namespaceString, string projectName, string projectDir, ProjectType projectType, string templateFilename)
+        {
+            if (projectDir != null && projectDir.Length > 0)
+            {
+                if (string.Equals(Path.GetFileNameWithoutExtension(projectDir), projectName))
+                {
+                    UpdateCsprojReference(projectDir);
+                    var pathOnly = Path.GetDirectoryName(projectDir);
+                    var file = Path.Combine(pathOnly, string.Concat(templateFilename, ".cs"));
+                    if (File.Exists(file))
+                    {
+                        if (File.Exists(string.Concat(file, ".bak")))
+                        {
+                            File.Delete(string.Concat(file, ".bak"));
+                        }
+                        File.Move(file, string.Concat(file, ".bak"));
+                    }
+                    File.WriteAllText(file, TemplateHelper.GetTemplateFileContent(namespaceString, ProjectType.MonolithService, templateFilename + ".cs"));
+                    LogHelper.LogInformation(string.Format("Created {0}.cs file using {1} template", templateFilename, ProjectType.MonolithService.ToString()));
+
+                }
+            }
+
         }
 
         private void UpdateCsprojReference(string projectFile)

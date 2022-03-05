@@ -188,12 +188,12 @@ namespace CTA.Rules.Test
 
         [Test]
         public void TestMonolithReplacementsMVC()
-        {
+         {
             var results = runCTAFile("MvcMusicStore.sln").ProjectResults.FirstOrDefault();
 
             var storeManagerControllerText = File.ReadAllText(Path.Combine(results.ProjectDirectory, "Controllers", "StoreManagerController.cs"));
 
-            FileAssert.Exists(Path.Combine(results.ProjectDirectory, Constants.MonolithService + ".cs"));
+            FileAssert.Exists(Path.Combine(results.ProjectDirectory, Constants.MonolithServiceMvc + ".cs"));
             StringAssert.Contains(@"return Content(MonolithService.CreateRequest(Request, this.ControllerContext.RouteData));", storeManagerControllerText);
         }
 
