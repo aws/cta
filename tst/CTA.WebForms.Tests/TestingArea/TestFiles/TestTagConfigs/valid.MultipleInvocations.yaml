@@ -1,0 +1,11 @@
+﻿!Template
+CodeBehindType: Namespace.TypeName
+CodeBehindHandler: Default
+Conditions: []
+Invocations:
+  - !AddNugetPackage
+    PackageName: Some.Other.Package
+  - !AddUsingDirective
+    NamespaceName: X.Y.Z
+Templates:
+    Default: "<p>Default template</p>"

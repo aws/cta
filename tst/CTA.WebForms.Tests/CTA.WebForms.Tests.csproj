@@ -23,4 +23,24 @@
 	<ProjectReference Include="..\CTA.Rules.Test\CTA.Rules.Test.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+	<Content Include="TestingArea\TestFiles\TestTagConfigs\*">
+		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="TestingArea\TestFiles\TestTagConfigs\invalid.AddNugetPackageExtraProperties.yaml" />
+    <None Remove="TestingArea\TestFiles\TestTagConfigs\invalid.AnyConditionExtraProperties.yaml" />
+    <None Remove="TestingArea\TestFiles\TestTagConfigs\invalid.HasAttributeExtraProperties.yaml" />
+    <None Remove="TestingArea\TestFiles\TestTagConfigs\valid.AddNugetPackage.yaml" />
+    <None Remove="TestingArea\TestFiles\TestTagConfigs\valid.AddUsingDirective.yaml" />
+    <None Remove="TestingArea\TestFiles\TestTagConfigs\valid.AllConditions.yaml" />
+    <None Remove="TestingArea\TestFiles\TestTagConfigs\valid.AnyCondition.yaml" />
+    <None Remove="TestingArea\TestFiles\TestTagConfigs\valid.HasAttributeWithValue.yaml" />
+    <None Remove="TestingArea\TestFiles\TestTagConfigs\valid.HasGrandparent.yaml" />
+    <None Remove="TestingArea\TestFiles\TestTagConfigs\valid.HasParent.yaml" />
+    <None Remove="TestingArea\TestFiles\TestTagConfigs\valid.MultipleConditions.yaml" />
+    <None Remove="TestingArea\TestFiles\TestTagConfigs\valid.MultipleInvocations.yaml" />
+  </ItemGroup>
 </Project>

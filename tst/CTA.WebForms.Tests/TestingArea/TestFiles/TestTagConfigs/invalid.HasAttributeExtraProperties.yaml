@@ -1,0 +1,11 @@
+﻿!Template
+CodeBehindType: Namespace.TypeName
+CodeBehindHandler: Default
+Conditions:
+  - !HasAttribute
+    ExtraProperty: Value
+    AttributeName: Attr1
+    ForTemplates: [Default]
+Invocations: []
+Templates:
+    Default: "<p>Default template</p>"
