@@ -26,6 +26,7 @@ namespace CTA.Rules.Config
         public static string DefaultFeaturesFilePath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Templates", "default.json"));
         public static string ResourcesFile = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "resources.zip"));
         public static string ResourcesExtractedPath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Templates"));
+        public static string TagConfigsExtractedPath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "TagConfigs"));
         public static string DefaultCoreVersion = "netcoreapp3.1";
 
         public static string JsonFileSchema = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), Path.Combine(new string[] { "..", "..", "..", "..", ".." })
@@ -34,7 +35,7 @@ namespace CTA.Rules.Config
         public const string S3RootUrl = "https://s3.us-west-2.amazonaws.com/aws.portingassistant.dotnet.datastore";
         public const string S3RecommendationsBucketUrl = S3RootUrl + "/recommendationsync/recommendation";
         public const string S3TemplatesBucketUrl = S3RootUrl + "/recommendationsync/Templates";
-        
+        public const string S3TagConfigsBucketUrl = S3RootUrl + "/recommendationsync/tagconfigs";
 
         public const int ThreadCount = 10;
         public const int MaxRecursionDepth = 100000;
