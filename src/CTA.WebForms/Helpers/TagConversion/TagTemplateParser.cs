@@ -12,7 +12,7 @@ namespace CTA.WebForms.Helpers.TagConversion
     /// </summary>
     public class TagTemplateParser
     {
-        private CodeBehindReferenceLinkerService _codeBehindLinkerService;
+        private readonly CodeBehindReferenceLinkerService _codeBehindLinkerService;
 
         public const string TargetAttributeGroup = "TargetAttribute";
         public const string SourceAttributeGroup = "SourceAttribute";

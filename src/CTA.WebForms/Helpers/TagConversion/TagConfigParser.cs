@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -35,7 +36,7 @@ namespace CTA.WebForms.Helpers.TagConversion
         /// <returns>A dictionary mapping tag name to corresponding <see cref="TagConverter"/>.</returns>
         public IDictionary<string, TagConverter> GetConfigMap()
         {
-            var result = new Dictionary<string, TagConverter>();
+            var result = new ConcurrentDictionary<string, TagConverter>(StringComparer.InvariantCultureIgnoreCase);
             var filePaths = Directory.EnumerateFiles(_configsDir, "*.yaml");
 
             foreach (var filePath in filePaths)
@@ -45,13 +46,13 @@ namespace CTA.WebForms.Helpers.TagConversion
                     var tagName = GetTagNameForFile(filePath);
                     var converter = GetConverterForFile(filePath);
 
-                    if (converter.Validate())
-                    {
-                        result.Add(tagName, converter);
-                    }
-                    else
+                    if (!converter.Validate())
                     {
                         LogHelper.LogError($"{Rules.Config.Constants.WebFormsErrorTag}Failed to validate generated converter for config at {filePath}");
+                    }
+                    else if (!result.TryAdd(tagName, converter))
+                    {
+                        LogHelper.LogError($"{Rules.Config.Constants.WebFormsErrorTag}Failed to add valid converter to concurrent dictionary for config at {filePath}");
                     }
                 }
                 catch (Exception e)

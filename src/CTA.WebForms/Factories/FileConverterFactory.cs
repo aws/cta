@@ -5,6 +5,7 @@ using System.Linq;
 using CTA.Rules.Config;
 using CTA.WebForms.FileConverters;
 using CTA.WebForms.Helpers;
+using CTA.WebForms.Helpers.TagConversion;
 using CTA.WebForms.Metrics;
 using CTA.WebForms.ProjectManagement;
 using CTA.WebForms.Services;
@@ -17,9 +18,11 @@ namespace CTA.WebForms.Factories
         private readonly WorkspaceManagerService _blazorWorkspaceManager;
         private readonly ProjectAnalyzer _webFormsProjectAnalyzer;
         private readonly ViewImportService _viewImportService;
+        private readonly CodeBehindReferenceLinkerService _codeBehindLinkerService;
         private readonly ClassConverterFactory _classConverterFactory;
         private readonly HostPageService _hostPageService;
         private readonly TaskManagerService _taskManagerService;
+        private readonly TagConfigParser _tagConfigParser;
         private readonly WebFormMetricContext _metricsContext;
 
         // TODO: Organize these into "types" and force
@@ -37,18 +40,22 @@ namespace CTA.WebForms.Factories
             WorkspaceManagerService blazorWorkspaceManager,
             ProjectAnalyzer webFormsProjectAnalyzer,
             ViewImportService viewImportService,
+            CodeBehindReferenceLinkerService codeBehindLinkerService,
             ClassConverterFactory classConverterFactory,
             HostPageService hostPageService,
             TaskManagerService taskManagerService,
+            TagConfigParser tagConfigParser,
             WebFormMetricContext metricsContext)
         {
             _sourceProjectPath = sourceProjectPath;
             _blazorWorkspaceManager = blazorWorkspaceManager;
             _webFormsProjectAnalyzer = webFormsProjectAnalyzer;
             _viewImportService = viewImportService;
+            _codeBehindLinkerService = codeBehindLinkerService;
             _classConverterFactory = classConverterFactory;
             _hostPageService = hostPageService;
             _taskManagerService = taskManagerService;
+            _tagConfigParser = tagConfigParser;
             _metricsContext = metricsContext;
         }
 
@@ -77,7 +84,7 @@ namespace CTA.WebForms.Factories
                          || extension.Equals(Constants.WebFormsGlobalMarkupFileExtension))
                 {
                     fc = new ViewFileConverter(_sourceProjectPath, document.FullName, _viewImportService,
-                        _taskManagerService, _metricsContext);
+                        _codeBehindLinkerService, _taskManagerService, _tagConfigParser, _metricsContext);
                 }
                 else if (StaticResourceExtensions.Contains(extension))
                 {
