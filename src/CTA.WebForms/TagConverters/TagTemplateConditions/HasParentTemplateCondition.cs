@@ -1,5 +1,4 @@
-﻿using System;
-using HtmlAgilityPack;
+﻿using HtmlAgilityPack;
 
 namespace CTA.WebForms.TagConverters.TagTemplateConditions
 {
@@ -16,9 +15,15 @@ namespace CTA.WebForms.TagConverters.TagTemplateConditions
         public string ParentTagName { get; set; }
 
         /// <inheritdoc/>
+        public override bool Validate(bool isBaseCondition)
+        {
+            return base.Validate(isBaseCondition) && !string.IsNullOrEmpty(ParentTagName);
+        }
+
+        /// <inheritdoc/>
         public override bool ConditionIsMet(HtmlNode node)
         {
-            throw new NotImplementedException();
+            return node.ParentNode?.Name.Equals(ParentTagName) ?? false;
         }
     }
 }

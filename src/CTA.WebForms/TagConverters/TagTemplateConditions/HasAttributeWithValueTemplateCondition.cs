@@ -1,5 +1,4 @@
-﻿using System;
-using HtmlAgilityPack;
+﻿using HtmlAgilityPack;
 
 namespace CTA.WebForms.TagConverters.TagTemplateConditions
 {
@@ -22,9 +21,19 @@ namespace CTA.WebForms.TagConverters.TagTemplateConditions
         public string AttributeValue { get; set; }
 
         /// <inheritdoc/>
+        public override bool Validate(bool isBaseCondition)
+        {
+            return base.Validate(isBaseCondition) && !string.IsNullOrEmpty(AttributeName) && !string.IsNullOrEmpty(AttributeValue);
+        }
+
+        /// <inheritdoc/>
         public override bool ConditionIsMet(HtmlNode node)
         {
-            throw new NotImplementedException();
+            return AttributeName switch
+            {
+                "InnerHtml" => node.InnerHtml != null && node.InnerHtml.Equals(AttributeValue),
+                _ => node.GetAttributeValue(AttributeName, null)?.Equals(AttributeValue) ?? false
+            };
         }
     }
 }

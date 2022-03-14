@@ -17,17 +17,38 @@ namespace CTA.WebForms.TagConverters.TagTemplateConditions
         public IEnumerable<string> ForTemplates { get; set; }
 
         /// <summary>
-        /// Checks whether the condition is met by <paramref name="node"/> and returns the result.
+        /// Checks whether the current condition should be checked when evaluating if a given template
+        /// should be used.
         /// </summary>
-        /// <param name="node">The <see cref="HtmlNode"/> that the converter is running on.</param>
-        /// <returns><c>true</c> if condition is met, <c>false</c> otherwise.</returns>
-        public abstract bool ConditionIsMet(HtmlNode node);
-
+        /// <param name="templateName">The template that is currently being evaluated.</param>
+        /// <returns><c>true</c> if the condition should be checked, <c>false</c> otherwise.</returns>
         public bool ShouldCheckCondition(string templateName)
         {
             return ForTemplates == null
                 || ForTemplates.Count() == 0
                 || ForTemplates.Contains(templateName);
         }
+
+        /// <summary>
+        /// Checks whether the properties of this condition form a valid configuration.
+        /// </summary>
+        /// <param name="isBaseCondition">Whether or not this condition is at the base level of
+        /// the converter's condition set (i.e. not a sub condition of <see cref="AnyConditionTemplateCondition"/>
+        /// or <see cref="AllConditionsTemplateCondition"/>.</param>
+        /// <returns><c>true</c> if the condition has been initialized to a valid configuration,
+        /// <c>false</c> otherwise.</returns>
+        public virtual bool Validate(bool isBaseCondition)
+        {
+            // We only want base conditions to specify templates that they
+            // apply to for simplicity's sake
+            return isBaseCondition || ForTemplates == null;
+        }
+
+        /// <summary>
+        /// Checks whether the condition is met by <paramref name="node"/> and returns the result.
+        /// </summary>
+        /// <param name="node">The <see cref="HtmlNode"/> that the converter is running on.</param>
+        /// <returns><c>true</c> if condition is met, <c>false</c> otherwise.</returns>
+        public abstract bool ConditionIsMet(HtmlNode node);
     }
 }

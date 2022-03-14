@@ -16,6 +16,12 @@ namespace CTA.WebForms.TagConverters.TagTemplateInvokables
         public string PackageName { get; set; }
 
         /// <inheritdoc/>
+        public bool Validate()
+        {
+            return !string.IsNullOrEmpty(PackageName);
+        }
+
+        /// <inheritdoc/>
         public void Invoke(HtmlNode node)
         {
             throw new NotImplementedException();

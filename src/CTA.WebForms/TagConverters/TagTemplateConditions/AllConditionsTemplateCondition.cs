@@ -1,5 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Linq;
 using HtmlAgilityPack;
 
 namespace CTA.WebForms.TagConverters.TagTemplateConditions
@@ -16,9 +16,18 @@ namespace CTA.WebForms.TagConverters.TagTemplateConditions
         public IEnumerable<TemplateCondition> Conditions { get; set; }
 
         /// <inheritdoc/>
+        public override bool Validate(bool isBaseCondition)
+        {
+            return base.Validate(isBaseCondition)
+                && Conditions != null
+                && Conditions.Any()
+                && Conditions.All(condition => condition.Validate(false));
+        }
+
+        /// <inheritdoc/>
         public override bool ConditionIsMet(HtmlNode node)
         {
-            throw new NotImplementedException();
+            return Conditions?.All(condition => condition.ConditionIsMet(node)) ?? true;
         }
     }
 }
