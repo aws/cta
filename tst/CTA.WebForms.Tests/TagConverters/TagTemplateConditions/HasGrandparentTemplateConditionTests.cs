@@ -1,4 +1,5 @@
-﻿using CTA.WebForms.TagConverters.TagTemplateConditions;
+﻿using CTA.WebForms.Helpers.TagConversion;
+using CTA.WebForms.TagConverters.TagTemplateConditions;
 using HtmlAgilityPack;
 using NUnit.Framework;
 
@@ -64,7 +65,7 @@ namespace CTA.WebForms.Tests.TagConverters.TagTemplateConditions
         }
 
         [Test]
-        public void Validate_Returns_True_For_Valid_Configuration_As_Base_Condition()
+        public void Validate_Does_Not_Throw_Exception_For_Valid_Configuration_As_Base_Condition()
         {
             var condition = new HasGrandparentTemplateCondition()
             {
@@ -72,30 +73,30 @@ namespace CTA.WebForms.Tests.TagConverters.TagTemplateConditions
                 ForTemplates = new[] { "Default" }
             };
 
-            Assert.True(condition.Validate(true));
+            Assert.DoesNotThrow(() => condition.Validate(true));
         }
 
         [Test]
-        public void Validate_Returns_True_For_Valid_Configuration_As_Non_Base_Condition()
+        public void Validate_Does_Not_Throw_Exception_For_Valid_Configuration_As_Non_Base_Condition()
         {
             var condition = new HasGrandparentTemplateCondition()
             {
                 GrandparentTagName = "div"
             };
 
-            Assert.True(condition.Validate(false));
+            Assert.DoesNotThrow(() => condition.Validate(false));
         }
 
         [Test]
-        public void Validate_Returns_False_When_GrandparentTagName_Missing()
+        public void Validate_Throws_Exception_When_GrandparentTagName_Missing()
         {
             var condition = new HasGrandparentTemplateCondition();
 
-            Assert.False(condition.Validate(false));
+            Assert.Throws(typeof(ConfigValidationException), () => condition.Validate(false));
         }
 
         [Test]
-        public void Validate_Returns_False_When_Not_Base_Condition_And_For_Templates_Has_Value()
+        public void Validate_Throws_Exception_When_Not_Base_Condition_And_For_Templates_Has_Value()
         {
             var condition = new HasGrandparentTemplateCondition()
             {
@@ -103,7 +104,7 @@ namespace CTA.WebForms.Tests.TagConverters.TagTemplateConditions
                 ForTemplates = new[] { "Default" }
             };
 
-            Assert.False(condition.Validate(false));
+            Assert.Throws(typeof(ConfigValidationException), () => condition.Validate(false));
         }
     }
 }

@@ -19,8 +19,6 @@ namespace CTA.WebForms.TagConverters.TagTemplateInvokables
         /// <summary>
         /// Checks whether the properties of this invokable form a valid configuration.
         /// </summary>
-        /// <returns><c>true</c> if the invokable has been initialized to a valid configuration,
-        /// <c>false</c> otherwise.</returns>
-        public bool Validate();
+        public void Validate();
     }
 }

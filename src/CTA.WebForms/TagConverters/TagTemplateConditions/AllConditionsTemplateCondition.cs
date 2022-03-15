@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using CTA.WebForms.Helpers.TagConversion;
 using HtmlAgilityPack;
 
 namespace CTA.WebForms.TagConverters.TagTemplateConditions
@@ -16,12 +17,20 @@ namespace CTA.WebForms.TagConverters.TagTemplateConditions
         public IEnumerable<TemplateCondition> Conditions { get; set; }
 
         /// <inheritdoc/>
-        public override bool Validate(bool isBaseCondition)
+        public override void Validate(bool isBaseCondition)
         {
-            return base.Validate(isBaseCondition)
-                && Conditions != null
-                && Conditions.Any()
-                && Conditions.All(condition => condition.Validate(false));
+            base.Validate(isBaseCondition);
+
+            if (Conditions == null || !Conditions.Any())
+            {
+                throw new ConfigValidationException($"{Rules.Config.Constants.WebFormsErrorTag}Failed to validate template condition, " +
+                    $"expected Conditions to have a value but was null or empty");
+            }
+
+            foreach (var condition in Conditions ?? Enumerable.Empty<TemplateCondition>())
+            {
+                condition.Validate(false);
+            }
         }
 
         /// <inheritdoc/>

@@ -45,14 +45,11 @@ namespace CTA.WebForms.Helpers.TagConversion
                     var tagName = GetTagNameForFile(filePath);
                     var converter = GetConverterForFile(filePath);
 
-                    if (converter.Validate())
-                    {
-                        result.Add(tagName, converter);
-                    }
-                    else
-                    {
-                        LogHelper.LogError($"{Rules.Config.Constants.WebFormsErrorTag}Failed to validate generated converter for config at {filePath}");
-                    }
+                    // If validation fails, an exception will be thrown and we will enter the catch
+                    // block before we attempt to add the converter to the results dictionary
+                    converter.Validate();
+
+                    result.Add(tagName, converter);
                 }
                 catch (Exception e)
                 {

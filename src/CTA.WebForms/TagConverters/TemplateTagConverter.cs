@@ -53,13 +53,23 @@ namespace CTA.WebForms.TagConverters
         }
 
         /// <inheritdoc/>
-        public override bool Validate()
+        public override void Validate()
         {
-            var codeBehindHandlerIsValid = CodeBehindHandler == null || GetCodeBehindHandlerType() != null;
-            var conditionsAreValid = Conditions?.All(condition => condition.Validate(true)) ?? true;
-            var invocationsAreValid = Invocations?.All(invocation => invocation.Validate()) ?? true;
+            if (CodeBehindHandler != null && GetCodeBehindHandlerType() == null)
+            {
+                throw new ConfigValidationException($"{Rules.Config.Constants.WebFormsErrorTag}Failed to validate template tag converter, " +
+                    $"CodeBehindHandler type {CodeBehindHandler} could not be found");
+            }
 
-            return codeBehindHandlerIsValid && conditionsAreValid && invocationsAreValid;
+            foreach (var condition in Conditions ?? Enumerable.Empty<TemplateCondition>())
+            {
+                condition.Validate(true);
+            }
+
+            foreach (var invocation in Invocations ?? Enumerable.Empty<ITemplateInvokable>())
+            {
+                invocation.Validate();
+            }
         }
 
         /// <inheritdoc/>

@@ -1,4 +1,5 @@
-﻿using HtmlAgilityPack;
+﻿using CTA.WebForms.Helpers.TagConversion;
+using HtmlAgilityPack;
 
 namespace CTA.WebForms.TagConverters.TagTemplateConditions
 {
@@ -21,9 +22,21 @@ namespace CTA.WebForms.TagConverters.TagTemplateConditions
         public string AttributeValue { get; set; }
 
         /// <inheritdoc/>
-        public override bool Validate(bool isBaseCondition)
+        public override void Validate(bool isBaseCondition)
         {
-            return base.Validate(isBaseCondition) && !string.IsNullOrEmpty(AttributeName) && !string.IsNullOrEmpty(AttributeValue);
+            base.Validate(isBaseCondition);
+
+            if (string.IsNullOrEmpty(AttributeName))
+            {
+                throw new ConfigValidationException($"{Rules.Config.Constants.WebFormsErrorTag}Failed to validate template condition, " +
+                    $"expected AttributeName to have a value but was null or empty");
+            }
+
+            if (string.IsNullOrEmpty(AttributeValue))
+            {
+                throw new ConfigValidationException($"{Rules.Config.Constants.WebFormsErrorTag}Failed to validate template condition, " +
+                    $"expected AttributeValue to have a value but was null or empty");
+            }
         }
 
         /// <inheritdoc/>
