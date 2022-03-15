@@ -10,7 +10,7 @@ namespace CTA.WebForms.Helpers.TagConversion
 {
     /// <summary>
     /// Responsible for reading downloaded tag config files and parsing them
-    /// into types derived from <see cref="ITagConverter"/>.
+    /// into types derived from <see cref="TagConverter"/>.
     /// </summary>
     public class TagConfigParser
     {
@@ -29,13 +29,13 @@ namespace CTA.WebForms.Helpers.TagConversion
         }
 
         /// <summary>
-        /// Generates a dictionary mapping tag name to corresponding <see cref="ITagConverter"/> from
+        /// Generates a dictionary mapping tag name to corresponding <see cref="TagConverter"/> from
         /// discovered tag config files.
         /// </summary>
-        /// <returns>A dictionary mapping tag name to corresponding <see cref="ITagConverter"/>.</returns>
-        public IDictionary<string, ITagConverter> GetConfigMap()
+        /// <returns>A dictionary mapping tag name to corresponding <see cref="TagConverter"/>.</returns>
+        public IDictionary<string, TagConverter> GetConfigMap()
         {
-            var result = new Dictionary<string, ITagConverter>();
+            var result = new Dictionary<string, TagConverter>();
             var filePaths = Directory.EnumerateFiles(_configsDir, "*.yaml");
 
             foreach (var filePath in filePaths)
@@ -45,7 +45,9 @@ namespace CTA.WebForms.Helpers.TagConversion
                     var tagName = GetTagNameForFile(filePath);
                     var converter = GetConverterForFile(filePath);
 
-                    // TODO: Validate converter here
+                    // If validation fails, an exception will be thrown and we will enter the catch
+                    // block before we attempt to add the converter to the results dictionary
+                    converter.Validate();
 
                     result.Add(tagName, converter);
                 }
@@ -81,20 +83,20 @@ namespace CTA.WebForms.Helpers.TagConversion
         }
 
         /// <summary>
-        /// Uses a yaml deserializer to generate corresponding <see cref="ITagConverter"/> from the
+        /// Uses a yaml deserializer to generate corresponding <see cref="TagConverter"/> from the
         /// contents of a tag config file.
         /// </summary>
         /// <param name="filePath">The file path of the tag config file.</param>
-        /// <returns>The corresponding <see cref="ITagConverter"/> for the tag config file.</returns>
+        /// <returns>The corresponding <see cref="TagConverter"/> for the tag config file.</returns>
         /// <exception cref="ArgumentException">Throws if file at <paramref name="filePath"/> is
         /// not a valid tag config.</exception>
-        private ITagConverter GetConverterForFile(string filePath)
+        private TagConverter GetConverterForFile(string filePath)
         {
-            ITagConverter result = null;
+            TagConverter result = null;
 
             using (var reader = new StreamReader(filePath))
             {
-                result = _deserializer.Deserialize(reader) as ITagConverter;
+                result = _deserializer.Deserialize(reader) as TagConverter;
             }
 
             if (result == null)
@@ -106,9 +108,9 @@ namespace CTA.WebForms.Helpers.TagConversion
         }
 
         /// <summary>
-        /// Generates a yaml deserializer configured for <see cref="ITagConverter"/> deserialization.
+        /// Generates a yaml deserializer configured for <see cref="TagConverter"/> deserialization.
         /// </summary>
-        /// <returns>A yaml deserializer configured for <see cref="ITagConverter"/> deserialization.</returns>
+        /// <returns>A yaml deserializer configured for <see cref="TagConverter"/> deserialization.</returns>
         private static IDeserializer GenerateDeserializer()
         {
             var webFormsAssembly = AppDomain.CurrentDomain

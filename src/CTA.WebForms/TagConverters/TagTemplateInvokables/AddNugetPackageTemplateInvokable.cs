@@ -1,4 +1,5 @@
 ﻿using System;
+using CTA.WebForms.Helpers.TagConversion;
 using HtmlAgilityPack;
 
 namespace CTA.WebForms.TagConverters.TagTemplateInvokables
@@ -14,6 +15,16 @@ namespace CTA.WebForms.TagConverters.TagTemplateInvokables
         /// The name of the nuget package to be included.
         /// </summary>
         public string PackageName { get; set; }
+
+        /// <inheritdoc/>
+        public void Validate()
+        {
+            if (string.IsNullOrEmpty(PackageName))
+            {
+                throw new ConfigValidationException($"{Rules.Config.Constants.WebFormsErrorTag}Failed to validate template invokable, " +
+                    $"expected PackageName to have a value but was null or empty");
+            }
+        }
 
         /// <inheritdoc/>
         public void Invoke(HtmlNode node)
