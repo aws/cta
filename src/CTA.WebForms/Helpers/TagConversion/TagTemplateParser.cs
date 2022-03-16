@@ -20,12 +20,50 @@ namespace CTA.WebForms.Helpers.TagConversion
         public const string Context1Group = "Context1";
 
         /// <summary>
-        /// Regular expression that matches attribute assignments with template replacement for values.
+        /// Regular expression that matches attribute assignments with template holders for values.
+        /// 
+        /// <list type="bullet">
+        ///     <listheader>
+        ///         <term>This will match strings following any of these general formats</term>
+        ///     </listheader>
+        ///     <item>
+        ///         <description>{TargetAttribute}=#{SourceAttribute}#</description>
+        ///     </item>
+        ///     <item>
+        ///         <description>{TargetAttribute}=#{SourceAttribute}:{TargetType}#</description>
+        ///     </item>
+        ///     <item>
+        ///         <description>{TargetAttribute}=#{SourceAttribute}:{CodeBehindName}:{TargetType}#</description>
+        ///     </item>
+        /// </list>
+        ///     
+        /// Spaces are allowed and ignored adjacent to separating characters in the pattern such
+        /// as "=", ":", and "#" but nowhere else.
         /// </summary>
         public static Regex AttributeReplacementRegex =>
             new Regex(@"(?<TargetAttribute>[\w\-]+)\s*=\s*\#\s*(?<SourceAttribute>[^:\#\s]+)(?:\s*:\s*(?<Context0>[^:\#\s]+))?(?:\s*:\s*(?<Context1>[^:\#\s]+))?\s*\#");
         /// <summary>
-        /// Regular expression that matches only template replacements.
+        /// Regular expression that matches only template placeholders. Note that this regular
+        /// expression will match the the tail end of any matches made by
+        /// <see cref="TagTemplateParser"/>.<see cref="AttributeReplacementRegex"/>.
+        /// 
+        /// <list type="bullet">
+        ///     <listheader>
+        ///         <term>This will match strings following any of these general formats</term>
+        ///     </listheader>
+        ///     <item>
+        ///         <description>#{SourceAttribute}#</description>
+        ///     </item>
+        ///     <item>
+        ///         <description>#{SourceAttribute}:{TargetType}#</description>
+        ///     </item>
+        ///     <item>
+        ///         <description>#{SourceAttribute}:{CodeBehindName}:{TargetType}#</description>
+        ///     </item>
+        /// </list>
+        /// 
+        /// Spaces are allowed and ignored adjacent to separating characters in the pattern such
+        /// as ":" and "#" but nowhere else.
         /// </summary>
         public static Regex BasicReplacementRegex =>
             new Regex(@"\#\s*(?<SourceAttribute>[^:\#\s]+)(?:\s*:\s*(?<Context0>[^:\#\s]+))?(?:\s*:\s*(?<Context1>[^:\#\s]+))?\s*\#");

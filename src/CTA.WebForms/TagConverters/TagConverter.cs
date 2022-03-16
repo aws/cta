@@ -33,8 +33,6 @@ namespace CTA.WebForms.TagConverters
         /// <summary>
         /// Checks whether the properties of this converter form a valid configuration.
         /// </summary>
-        /// <returns><c>true</c> if the converter has been initialized to a valid configuration,
-        /// <c>false</c> otherwise.</returns>
-        public abstract bool Validate();
+        public abstract void Validate();
     }
 }

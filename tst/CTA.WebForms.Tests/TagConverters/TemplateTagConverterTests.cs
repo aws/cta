@@ -1,4 +1,5 @@
-﻿using CTA.WebForms.Services;
+﻿using CTA.WebForms.Helpers.TagConversion;
+using CTA.WebForms.Services;
 using CTA.WebForms.TagConverters;
 using CTA.WebForms.TagConverters.TagTemplateConditions;
 using CTA.WebForms.TagConverters.TagTemplateInvokables;
@@ -11,7 +12,7 @@ namespace CTA.WebForms.Tests.TagConverters
     public class TemplateTagConverterTests
     {
         [Test]
-        public void Validate_Returns_True_When_Configuration_Is_Valid()
+        public void Validate_Does_Not_Throw_Exception_When_Configuration_Is_Valid()
         {
             var templateConverter = new TemplateTagConverter()
             {
@@ -30,11 +31,11 @@ namespace CTA.WebForms.Tests.TagConverters
                 }
             };
 
-            Assert.True(templateConverter.Validate());
+            Assert.DoesNotThrow(() => templateConverter.Validate());
         }
 
         [Test]
-        public void Validate_Returns_True_When_Optional_Properties_Not_Set()
+        public void Validate_Does_Not_Throw_Exception_When_Optional_Properties_Not_Set()
         {
             var templateConverter = new TemplateTagConverter()
             {
@@ -44,22 +45,22 @@ namespace CTA.WebForms.Tests.TagConverters
                 }
             };
 
-            Assert.True(templateConverter.Validate());
+            Assert.DoesNotThrow(() => templateConverter.Validate());
         }
 
         [Test]
-        public void Validate_Returns_False_When_CodeBehindHandler_Not_Valid()
+        public void Validate_Throws_Exception_When_CodeBehindHandler_Not_Valid()
         {
             var templateConverter = new TemplateTagConverter()
             {
                 CodeBehindHandler = "NonExistentType",
             };
 
-            Assert.False(templateConverter.Validate());
+            Assert.Throws(typeof(ConfigValidationException), () => templateConverter.Validate());
         }
 
         [Test]
-        public void Validate_Returns_False_When_Some_Conditions_Not_Valid()
+        public void Validate_Throws_Exception_When_Some_Conditions_Not_Valid()
         {
             var templateConverter = new TemplateTagConverter()
             {
@@ -78,11 +79,11 @@ namespace CTA.WebForms.Tests.TagConverters
                 }
             };
 
-            Assert.False(templateConverter.Validate());
+            Assert.Throws(typeof(ConfigValidationException), () => templateConverter.Validate());
         }
 
         [Test]
-        public void Validate_Returns_False_When_Some_Invocations_Not_Valid()
+        public void Validate_Throws_Exception_When_Some_Invocations_Not_Valid()
         {
             var templateConverter = new TemplateTagConverter()
             {
@@ -101,7 +102,7 @@ namespace CTA.WebForms.Tests.TagConverters
                 }
             };
 
-            Assert.False(templateConverter.Validate());
+            Assert.Throws(typeof(ConfigValidationException), () => templateConverter.Validate());
         }
 
         [Test]

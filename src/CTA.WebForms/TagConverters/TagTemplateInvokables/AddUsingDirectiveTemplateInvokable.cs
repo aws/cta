@@ -1,4 +1,5 @@
 ﻿using System;
+using CTA.WebForms.Helpers.TagConversion;
 using HtmlAgilityPack;
 
 namespace CTA.WebForms.TagConverters.TagTemplateInvokables
@@ -16,9 +17,13 @@ namespace CTA.WebForms.TagConverters.TagTemplateInvokables
         public string NamespaceName { get; set; }
 
         /// <inheritdoc/>
-        public bool Validate()
+        public void Validate()
         {
-            return !string.IsNullOrEmpty(NamespaceName);
+            if (string.IsNullOrEmpty(NamespaceName))
+            {
+                throw new ConfigValidationException($"{Rules.Config.Constants.WebFormsErrorTag}Failed to validate template invokable, " +
+                    $"expected NamespaceName to have a value but was null or empty");
+            }
         }
 
         /// <inheritdoc/>

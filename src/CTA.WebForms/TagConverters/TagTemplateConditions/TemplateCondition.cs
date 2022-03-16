@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using CTA.WebForms.Helpers.TagConversion;
 using HtmlAgilityPack;
 
 namespace CTA.WebForms.TagConverters.TagTemplateConditions
@@ -35,13 +37,15 @@ namespace CTA.WebForms.TagConverters.TagTemplateConditions
         /// <param name="isBaseCondition">Whether or not this condition is at the base level of
         /// the converter's condition set (i.e. not a sub condition of <see cref="AnyConditionTemplateCondition"/>
         /// or <see cref="AllConditionsTemplateCondition"/>.</param>
-        /// <returns><c>true</c> if the condition has been initialized to a valid configuration,
-        /// <c>false</c> otherwise.</returns>
-        public virtual bool Validate(bool isBaseCondition)
+        public virtual void Validate(bool isBaseCondition)
         {
             // We only want base conditions to specify templates that they
             // apply to for simplicity's sake
-            return isBaseCondition || ForTemplates == null;
+            if (!isBaseCondition && ForTemplates != null)
+            {
+                throw new ConfigValidationException($"{Rules.Config.Constants.WebFormsErrorTag}Failed to validate template condition, " +
+                    $"ForTemplates has been set despite not being a base condition");
+            }
         }
 
         /// <summary>
