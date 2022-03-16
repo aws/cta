@@ -1,0 +1,8 @@
+﻿!Template
+TagName: asp:GridView
+CodeBehindType: System.UI.Web.WebControls.GridView
+CodeBehindHandler: Default
+Conditions: []
+Invocations: []
+Templates:
+    Default: ""

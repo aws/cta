@@ -1,0 +1,8 @@
+﻿!Template
+TagName: asp:ListView
+CodeBehindType: System.UI.Web.WebControls.ListView
+CodeBehindHandler: Default
+Conditions: []
+Invocations: []
+Templates:
+    Default: ""

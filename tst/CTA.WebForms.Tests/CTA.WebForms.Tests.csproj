@@ -27,6 +27,9 @@
 	<Content Include="TestingArea\TestFiles\TestTagConfigs\*">
 		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	</Content>
+	<Content Include="TempTagConfigs\*">
+		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</Content>
   </ItemGroup>
 
   <ItemGroup>
@@ -47,5 +50,9 @@
 	<None Remove="TestingArea\TestFiles\TestTagConfigs\valid.MinimalNulls.yaml" />
     <None Remove="TestingArea\TestFiles\TestTagConfigs\valid.MultipleConditions.yaml" />
     <None Remove="TestingArea\TestFiles\TestTagConfigs\valid.MultipleInvocations.yaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="TempTagConfigs\" />
   </ItemGroup>
 </Project>
