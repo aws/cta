@@ -50,17 +50,20 @@ namespace CTA.WebForms.FileConverters
         private HtmlDocument GetRazorContents(string htmlString)
         {
             var htmlDoc = new HtmlDocument();
-            htmlDoc.LoadHtml(htmlString);
 
             // This ensures that the document will output the original case when called by .WriteTo()
             // otherwise, all nodes and attribute names will be in lowercase
             htmlDoc.OptionOutputOriginalCase = true;
-            
+            htmlDoc.LoadHtml(htmlString);
+
             // Collect valid actions to execute
             FindConversionActions(htmlDoc.DocumentNode);
 
             // Modify HtmlDocument nodes using actions found above
             ConvertNodes();
+
+            // Fix spacing issues
+            Utilities.NormalizeHtmlContent(htmlDoc.DocumentNode);
 
             return htmlDoc;
         }
@@ -88,18 +91,12 @@ namespace CTA.WebForms.FileConverters
             if (_tagConverterMap.ContainsKey(node.Name))
             {
                 var converter = _tagConverterMap[node.Name];
-                converter.Initialize(_codeBehindLinkerService);
+                converter.Initialize(_codeBehindLinkerService, _viewImportService);
                 converterType = converter.GetType().Name;
                 _tagConversionActions.Add((node, converter));
             }
-            // TODO: Properly do custom user control mapping between these two conditions, this old code incorrectly
-            // handled this case previously and will need an overhaul for the new config-based conversions
-            // else if (SupportedControls.UserControls.UserControlRulesMap.ContainsKey(node.Name))
-            // {
-            //     var conversionAction = new ControlConversionAction(node, parent, SupportedControls.UserControls.UserControlRulesMap[node.Name]);
-            //     controlConverterType = conversionAction.ControlConverter.GetType().Name;
-            //     _controlActions.Add(conversionAction);
-            // }
+            // TODO: Properly do custom user control mapping between these two conditions, previously we
+            // handled this case incorrectly and will need an overhaul for the new config-based conversions
             else if (ControlTagNameRegex.IsMatch(node.Name))
             {
                 converterType = UnSupportedControlConverter;
@@ -145,7 +142,7 @@ namespace CTA.WebForms.FileConverters
 
                 // Convert the Web Forms controls to Blazor equivalent
                 var migratedDocument = GetRazorContents(htmlString);
-                var contents = migratedDocument.DocumentNode.WriteTo();
+                var contents = migratedDocument.DocumentNode.WriteTo().Trim();
 
                 // We comment out the unknown user controls here instead of during
                 // traversal because the post-order nature may comment out controls

@@ -23,6 +23,14 @@ namespace CTA.WebForms.Tests.Helpers.TagConversion
             new object[] { "ComponentBoolean", "true", $"{TargetAttr}=\"True\"", "True" },
             new object[] { "ComponentBoolean", "false", $"{TargetAttr}=\"False\"", "False" },
             new object[] { "ComponentBoolean", "SomeText", $"{TargetAttr}=\"False\"", "False" },
+            new object[] { "InvertedHtmlBoolean", SourceAttr, "", "" },
+            new object[] { "InvertedHtmlBoolean", "true", "", "" },
+            new object[] { "InvertedHtmlBoolean", "false", TargetAttr, "" },
+            new object[] { "InvertedHtmlBoolean", "SomeText", TargetAttr, "" },
+            new object[] { "InvertedComponentBoolean", SourceAttr, $"{TargetAttr}=\"False\"", "False" },
+            new object[] { "InvertedComponentBoolean", "true", $"{TargetAttr}=\"False\"", "False" },
+            new object[] { "InvertedComponentBoolean", "false", $"{TargetAttr}=\"True\"", "True" },
+            new object[] { "InvertedComponentBoolean", "SomeText", $"{TargetAttr}=\"True\"", "True" },
             new object[] { "EventCallback", "EventCallbackMethod", $"{TargetAttr}=\"EventCallbackMethod\"", "EventCallbackMethod" },
             new object[] { "EventHandler", "EventHandlerMethod", $"{TargetAttr}=\"(args) => EventHandlerMethod(null, args)\"", "(args) => EventHandlerMethod(null, args)" }
         };

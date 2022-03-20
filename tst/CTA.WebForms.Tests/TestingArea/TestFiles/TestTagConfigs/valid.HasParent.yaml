@@ -1,4 +1,5 @@
 ﻿!Template
+TagName: valid:HasParent
 CodeBehindType: Namespace.TypeName
 CodeBehindHandler: Default
 Conditions:

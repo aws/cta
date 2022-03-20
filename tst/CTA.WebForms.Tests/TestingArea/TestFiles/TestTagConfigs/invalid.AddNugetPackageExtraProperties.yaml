@@ -1,4 +1,5 @@
 ﻿!Template
+TagName: invalid:AddNugetPackageExtraProperties
 CodeBehindType: Namespace.TypeName
 CodeBehindHandler: Default
 Conditions: []

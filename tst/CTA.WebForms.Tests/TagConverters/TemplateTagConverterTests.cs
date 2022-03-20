@@ -16,6 +16,7 @@ namespace CTA.WebForms.Tests.TagConverters
         {
             var templateConverter = new TemplateTagConverter()
             {
+                TagName = "TestTag",
                 CodeBehindHandler = "Default",
                 Conditions = new[]
                 {
@@ -39,6 +40,7 @@ namespace CTA.WebForms.Tests.TagConverters
         {
             var templateConverter = new TemplateTagConverter()
             {
+                TagName = "TestTag",
                 Templates = new Dictionary<string, string>
                 {
                     { "Default", "<p>#Attr0#</p>" }
@@ -49,10 +51,40 @@ namespace CTA.WebForms.Tests.TagConverters
         }
 
         [Test]
+        public void Validate_Throws_Exception_When_TagName_Not_Set()
+        {
+            var templateConverter = new TemplateTagConverter()
+            {
+                Templates = new Dictionary<string, string>
+                {
+                    { "Default", "<p>#Attr0#</p>" }
+                }
+            };
+
+            Assert.Throws(typeof(ConfigValidationException), () => templateConverter.Validate());
+        }
+
+        [Test]
+        public void Validate_Throws_Exception_When_TagName_Is_Empty()
+        {
+            var templateConverter = new TemplateTagConverter()
+            {
+                TagName = string.Empty,
+                Templates = new Dictionary<string, string>
+                {
+                    { "Default", "<p>#Attr0#</p>" }
+                }
+            };
+
+            Assert.Throws(typeof(ConfigValidationException), () => templateConverter.Validate());
+        }
+
+        [Test]
         public void Validate_Throws_Exception_When_CodeBehindHandler_Not_Valid()
         {
             var templateConverter = new TemplateTagConverter()
             {
+                TagName = "TestTag",
                 CodeBehindHandler = "NonExistentType",
             };
 
@@ -64,6 +96,7 @@ namespace CTA.WebForms.Tests.TagConverters
         {
             var templateConverter = new TemplateTagConverter()
             {
+                TagName = "TestTag",
                 CodeBehindHandler = "Default",
                 Conditions = new[]
                 {
@@ -87,6 +120,7 @@ namespace CTA.WebForms.Tests.TagConverters
         {
             var templateConverter = new TemplateTagConverter()
             {
+                TagName = "TestTag",
                 CodeBehindHandler = "Default",
                 Conditions = new[]
                 {
@@ -117,6 +151,7 @@ namespace CTA.WebForms.Tests.TagConverters
 
             var templateConverter = new TemplateTagConverter()
             {
+                TagName = "TestTag",
                 Conditions = new[]
                 {
                     new HasAttributeTemplateCondition() {
@@ -136,7 +171,7 @@ namespace CTA.WebForms.Tests.TagConverters
                     { "Default", "<span>This is a placeholder for your link...</span>" }
                 }
             };
-            templateConverter.Initialize(new CodeBehindReferenceLinkerService());
+            templateConverter.Initialize(new CodeBehindReferenceLinkerService(), new ViewImportService());
 
             templateConverter.MigrateTag(node);
 
@@ -155,6 +190,7 @@ namespace CTA.WebForms.Tests.TagConverters
 
             var templateConverter = new TemplateTagConverter()
             {
+                TagName = "TestTag",
                 Conditions = new[]
                 {
                     new HasAttributeTemplateCondition() {

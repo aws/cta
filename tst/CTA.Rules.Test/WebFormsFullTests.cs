@@ -184,8 +184,7 @@ namespace CTA.Rules.Test
             StringAssert.DoesNotContain("asp:PlaceHolder", defaultRazor);
             StringAssert.Contains("@itemPlaceHolder", defaultRazor);
             StringAssert.Contains("EmptyDataTemplate", defaultRazor);
-            StringAssert.DoesNotContain("<LayoutTemplate>", defaultRazor);
-            StringAssert.Contains(@"<LayoutTemplate Context=""itemPlaceHolder"">", defaultRazor);
+            StringAssert.Contains("LayoutTemplate", defaultRazor);
             StringAssert.DoesNotContain("<%#", defaultRazor);
             StringAssert.DoesNotContain("%>", defaultRazor);
         }
@@ -203,28 +202,31 @@ namespace CTA.Rules.Test
             StringAssert.Contains(@"@page ""/OtherPage""", otherPageRazor);
             StringAssert.Contains(@"@layout Site", otherPageRazor);
             StringAssert.Contains(@"@inherits WebFormsFull.OtherPage", otherPageRazor);
-            StringAssert.DoesNotContain("<h2><%: Title %></h2>", otherPageRazor);
-            StringAssert.Contains(@"<h2>@(Title)</h2>", otherPageRazor);
+            StringAssert.DoesNotContain("<%: Title %>", otherPageRazor);
+            StringAssert.Contains(@"@(Title)", otherPageRazor);
             StringAssert.DoesNotContain("<br />", otherPageRazor);
             StringAssert.Contains(@"<br>", otherPageRazor);
-            StringAssert.DoesNotContain("<h2><%: Title %></h2>", otherPageRazor);
-            StringAssert.Contains(@"<h2>@(Title)</h2>", otherPageRazor);
-            StringAssert.DoesNotContain(@"<asp:TextBox ID=""SLTTB"" Text=""Single Line Textbox"" TextMode=""SingleLine"" runat=""server""/>", otherPageRazor);
-            StringAssert.DoesNotContain(@"<asp:TextBox ID=""PWTB"" TextMode=""Password"" runat=""server""/>", otherPageRazor);
-            StringAssert.DoesNotContain(@"<asp:TextBox ID=""MLTB"" Text=""Multi Line TextBox"" TextMode=""MultiLine"" runat=""server""/>", otherPageRazor);
-            StringAssert.DoesNotContain(@"<asp:RadioButton ID=""RadioTest11"" GroupName=""TestGroup1"" Text=""Radio Test 1-1"" runat=""server""/>", otherPageRazor);
-            StringAssert.DoesNotContain(@"<asp:RadioButton ID=""RadioTest12"" GroupName=""TestGroup1"" Text=""Radio Test 1-2"" runat=""server""/>", otherPageRazor);
-            StringAssert.DoesNotContain(@"<asp:RadioButton ID=""RadioTest13"" GroupName=""TestGroup1"" Text=""Radio Test 1-3"" runat=""server""/>", otherPageRazor);
-            StringAssert.DoesNotContain(@"<asp:RadioButton ID=""RadioTest21"" GroupName=""TestGroup2"" Text=""Radio Test 2-1"" runat=""server""/>", otherPageRazor);
-            StringAssert.DoesNotContain(@"<asp:RadioButton ID=""RadioTest22"" GroupName=""TestGroup2"" Text=""Radio Test 2-2"" runat=""server""/>", otherPageRazor);
-            StringAssert.Contains(@"<input id=""SLTTB"" value=""Single Line Textbox"">", otherPageRazor);
-            StringAssert.Contains(@"<input id=""PWTB"" value=""Single Line Textbox"" type=""password"">", otherPageRazor);
-            StringAssert.Contains(@"<textarea id=""MLTB"" value=""Single Line Textbox"" type=""password"">Multi Line TextBox</textarea>", otherPageRazor);
-            StringAssert.Contains(@"<div><input id=""RadioTest11"" name=""TestGroup1"" type=""radio""><label for=""RadioTest11"">Radio Test 1-1</label></div>", otherPageRazor);
-            StringAssert.Contains(@"<div><input id=""RadioTest12"" name=""TestGroup1"" type=""radio""><label for=""RadioTest12"">Radio Test 1-2</label></div>", otherPageRazor);
-            StringAssert.Contains(@"<div><input id=""RadioTest13"" name=""TestGroup1"" type=""radio""><label for=""RadioTest13"">Radio Test 1-3</label></div>", otherPageRazor);
-            StringAssert.Contains(@"<div><input id=""RadioTest21"" name=""TestGroup2"" type=""radio""><label for=""RadioTest21"">Radio Test 2-1</label></div>", otherPageRazor);
-            StringAssert.Contains(@"<div><input id=""RadioTest22"" name=""TestGroup2"" type=""radio""><label for=""RadioTest22"">Radio Test 2-2</label></div>", otherPageRazor);
+            StringAssert.DoesNotContain(@"<asp:TextBox ID=""SLTTB"" Text=""Single Line Textbox"" TextMode=""SingleLine""/>", otherPageRazor);
+            StringAssert.DoesNotContain(@"<asp:TextBox ID=""PWTB"" TextMode=""Password""/>", otherPageRazor);
+            StringAssert.DoesNotContain(@"<asp:TextBox ID=""MLTB"" Text=""Multi Line TextBox"" TextMode=""MultiLine""/>", otherPageRazor);
+            StringAssert.DoesNotContain(@"<asp:RadioButton ID=""RadioTest11"" GroupName=""TestGroup1"" Text=""Radio Test 1-1""/>", otherPageRazor);
+            StringAssert.DoesNotContain(@"<asp:RadioButton ID=""RadioTest12"" GroupName=""TestGroup1"" Text=""Radio Test 1-2""/>", otherPageRazor);
+            StringAssert.DoesNotContain(@"<asp:RadioButton ID=""RadioTest13"" GroupName=""TestGroup1"" Text=""Radio Test 1-3""/>", otherPageRazor);
+            StringAssert.DoesNotContain(@"<asp:RadioButton ID=""RadioTest21"" GroupName=""TestGroup2"" Text=""Radio Test 2-1""/>", otherPageRazor);
+            StringAssert.DoesNotContain(@"<asp:RadioButton ID=""RadioTest22"" GroupName=""TestGroup2"" Text=""Radio Test 2-2""/>", otherPageRazor);
+            StringAssert.Contains(@"<input id=""SLTTB"" value=""Single Line Textbox"" type=""text"">", otherPageRazor);
+            StringAssert.Contains(@"<input id=""PWTB"" type=""password"">", otherPageRazor);
+            StringAssert.Contains(@"<textarea id=""MLTB"">", otherPageRazor);
+            StringAssert.Contains(@"<input id=""RadioTest11"" type=""radio"" name=""TestGroup1"">", otherPageRazor);
+            StringAssert.Contains(@"<label for=""RadioTest11"">", otherPageRazor);
+            StringAssert.Contains(@"<input id=""RadioTest12"" type=""radio"" name=""TestGroup1"">", otherPageRazor);
+            StringAssert.Contains(@"<label for=""RadioTest12"">", otherPageRazor);
+            StringAssert.Contains(@"<input id=""RadioTest13"" type=""radio"" name=""TestGroup1"">", otherPageRazor);
+            StringAssert.Contains(@"<label for=""RadioTest13"">", otherPageRazor);
+            StringAssert.Contains(@"<input id=""RadioTest21"" type=""radio"" name=""TestGroup2"">", otherPageRazor);
+            StringAssert.Contains(@"<label for=""RadioTest21"">", otherPageRazor);
+            StringAssert.Contains(@"<input id=""RadioTest22"" type=""radio"" name=""TestGroup2"">", otherPageRazor);
+            StringAssert.Contains(@"<label for=""RadioTest22"">", otherPageRazor);
         }
 
         [TestCase(TargetFramework.DotnetCoreApp31)]

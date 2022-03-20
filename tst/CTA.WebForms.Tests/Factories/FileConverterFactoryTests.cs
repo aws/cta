@@ -10,6 +10,8 @@ using CTA.WebForms.Services;
 using CTA.WebForms.FileConverters;
 using CTA.WebForms.Metrics;
 using CTA.WebForms.ProjectManagement;
+using CTA.WebForms.Helpers.TagConversion;
+
 namespace CTA.WebForms.Tests.Factories
 {
     [TestFixture]
@@ -49,9 +51,13 @@ namespace CTA.WebForms.Tests.Factories
                 blazorWorkspaceManager,
                 webFormsProjectAnalyzer,
                 new ViewImportService(),
-                new ClassConverterFactory(string.Empty, new LifecycleManagerService(), taskManagerService, metricContext),
+                new CodeBehindReferenceLinkerService(),
+                new ClassConverterFactory(
+                    string.Empty,
+                    new LifecycleManagerService(), taskManagerService, metricContext),
                 new HostPageService(),
                 taskManagerService,
+                new TagConfigParser(Rules.Config.Constants.TagConfigsExtractedPath),
                 metricContext);
         }
 

@@ -107,6 +107,9 @@ namespace CTA.WebForms
             LogHelper.LogInformation(string.Format(Constants.GenericInformationLogTemplate, GetType().Name, MigrationTasksCompletedLogAction));
 
             WriteServiceDerivedFiles();
+            
+            // TODO: Get new nuget packages from view import service and add to project references
+            
             var result = new WebFormsPortingResult() { Metrics = _metricsContext.Transform() };
 
             // TODO: Any necessary cleanup or last checks on new project

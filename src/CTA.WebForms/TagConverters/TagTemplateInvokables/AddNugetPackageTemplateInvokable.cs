@@ -1,6 +1,4 @@
-﻿using System;
-using CTA.WebForms.Helpers.TagConversion;
-using HtmlAgilityPack;
+﻿using CTA.WebForms.Helpers.TagConversion;
 
 namespace CTA.WebForms.TagConverters.TagTemplateInvokables
 {
@@ -9,7 +7,7 @@ namespace CTA.WebForms.TagConverters.TagTemplateInvokables
     /// nuget package is included in the WebForms project that is currently
     /// being ported.
     /// </summary>
-    public class AddNugetPackageTemplateInvokable : ITemplateInvokable
+    public class AddNugetPackageTemplateInvokable : TemplateInvokable
     {
         /// <summary>
         /// The name of the nuget package to be included.
@@ -17,7 +15,7 @@ namespace CTA.WebForms.TagConverters.TagTemplateInvokables
         public string PackageName { get; set; }
 
         /// <inheritdoc/>
-        public void Validate()
+        public override void Validate()
         {
             if (string.IsNullOrEmpty(PackageName))
             {
@@ -27,9 +25,9 @@ namespace CTA.WebForms.TagConverters.TagTemplateInvokables
         }
 
         /// <inheritdoc/>
-        public void Invoke(HtmlNode node)
+        public override void Invoke()
         {
-            throw new NotImplementedException();
+            _viewImportService.AddNuGetPackage(PackageName);
         }
     }
 }

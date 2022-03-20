@@ -41,7 +41,7 @@ namespace CTA.WebForms.Helpers.TagConversion
         /// as "=", ":", and "#" but nowhere else.
         /// </summary>
         public static Regex AttributeReplacementRegex =>
-            new Regex(@"(?<TargetAttribute>[\w\-]+)\s*=\s*\#\s*(?<SourceAttribute>[^:\#\s]+)(?:\s*:\s*(?<Context0>[^:\#\s]+))?(?:\s*:\s*(?<Context1>[^:\#\s]+))?\s*\#");
+            new Regex(@"(?<TargetAttribute>[@\w\-]+)\s*=\s*\#\s*(?<SourceAttribute>[^:\#\s]+)(?:\s*:\s*(?<Context0>[^:\#\s]+))?(?:\s*:\s*(?<Context1>[^:\#\s]+))?\s*\#");
         /// <summary>
         /// Regular expression that matches only template placeholders. Note that this regular
         /// expression will match the the tail end of any matches made by
@@ -225,10 +225,21 @@ namespace CTA.WebForms.Helpers.TagConversion
             try
             {
                 var sourceValue = sourceAttribute.Equals("InnerHtml", StringComparison.InvariantCultureIgnoreCase) 
-                    ? node.InnerHtml
-                    : node.Attributes.Where(attr => attr.OriginalName.Equals(sourceAttribute)).FirstOrDefault()?.Value;
-                // TODO: Send targetAttribute to ConvertToType
+                    // We specifically choose to trim only the spaces beyond and including the first and last
+                    // continuous sets of new line characters, this is to prevent us from accidentally messing
+                    // with inner tab distance while removing the impact of optionally placing the first line
+                    // of the inner html on the next line
+                    ? node.InnerHtml.Trim(' ', '\t').Trim('\r', '\n')
+                    : node.Attributes.Where(attr => attr.OriginalName.Equals(sourceAttribute, StringComparison.InvariantCultureIgnoreCase))
+                        .FirstOrDefault()?.Value;
+
+                if (sourceValue == null)
+                {
+                    return string.Empty;
+                }
+
                 var convertedSourceValue = TagTypeConverter.ConvertToType(sourceAttribute, sourceValue, targetAttribute, targetType);
+                
                 // TODO: Use proper context arguments for below method to check code behind binding
                 // var codeBehindRefBinding = _codeBehindLinkerService.GetBindingValueIfExists();
 

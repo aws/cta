@@ -17,27 +17,12 @@ namespace CTA.WebForms.TagConverters
     /// </summary>
     public class TemplateTagConverter : TagConverter
     {
-        /// <summary>
-        /// The type representation of the source tag in code behind
-        /// files, if such a type exists.
-        /// </summary>
-        public string CodeBehindType { get; set; }
-        /// <summary>
-        /// The name of the type to be used for conversion of code behind
-        /// references to the source tag. In most cases <see cref="DefaultTagCodeBehindHandler"/>
-        /// will be sufficient.
-        /// </summary>
-        public string CodeBehindHandler { get; set; }
-        /// <summary>
-        /// The set of conditions used to decide which template to use on any
-        /// given source tag.
-        /// </summary>
         public IEnumerable<TemplateCondition> Conditions { get; set; }
         /// <summary>
         /// The set of actions to be taken outside of normal view or code
         /// behind conversion.
         /// </summary>
-        public IEnumerable<ITemplateInvokable> Invocations { get; set; }
+        public IEnumerable<TemplateInvokable> Invocations { get; set; }
         /// <summary>
         /// The set of temlate options to be used for source tags of the
         /// given type.
@@ -45,9 +30,16 @@ namespace CTA.WebForms.TagConverters
         public IDictionary<string, string> Templates { get; set; }
 
         /// <inheritdoc/>
-        public override void Initialize(CodeBehindReferenceLinkerService codeBehindLinkerService)
+        public override void Initialize(
+            CodeBehindReferenceLinkerService codeBehindLinkerService,
+            ViewImportService viewImportService)
         {
-            base.Initialize(codeBehindLinkerService);
+            base.Initialize(codeBehindLinkerService, viewImportService);
+
+            foreach (var invokable in Invocations ?? Enumerable.Empty<TemplateInvokable>())
+            {
+                invokable.Initialize(viewImportService);
+            }
 
             // TODO: Interactions with code behind linker service to register converter
         }
@@ -55,6 +47,12 @@ namespace CTA.WebForms.TagConverters
         /// <inheritdoc/>
         public override void Validate()
         {
+            if (string.IsNullOrEmpty(TagName))
+            {
+                throw new ConfigValidationException($"{Rules.Config.Constants.WebFormsErrorTag}Failed to validate template tag converter, " +
+                    $"expected TagName to have a value but was null or empty");
+            }
+
             if (CodeBehindHandler != null && GetCodeBehindHandlerType() == null)
             {
                 throw new ConfigValidationException($"{Rules.Config.Constants.WebFormsErrorTag}Failed to validate template tag converter, " +
@@ -66,7 +64,7 @@ namespace CTA.WebForms.TagConverters
                 condition.Validate(true);
             }
 
-            foreach (var invocation in Invocations ?? Enumerable.Empty<ITemplateInvokable>())
+            foreach (var invocation in Invocations ?? Enumerable.Empty<TemplateInvokable>())
             {
                 invocation.Validate();
             }
@@ -88,9 +86,10 @@ namespace CTA.WebForms.TagConverters
 
             ReplaceNode(node, replacementText);
 
-            foreach(var invocation in Invocations ?? Enumerable.Empty<ITemplateInvokable>())
+            var validInvocations = Invocations?.Where(invokable => invokable.ShouldInvoke(template));
+            foreach (var invocation in validInvocations ?? Enumerable.Empty<TemplateInvokable>())
             {
-                invocation.Invoke(node);
+                invocation.Invoke();
             }
         }
 
@@ -104,9 +103,9 @@ namespace CTA.WebForms.TagConverters
         {
             foreach (var kvp in Templates)
             {
-                var shouldUseTemplate = Conditions
+                var shouldUseTemplate = Conditions?
                     .Where(condition => condition.ShouldCheckCondition(kvp.Key))
-                    .All(condition => condition.ConditionIsMet(node));
+                    .All(condition => condition.ConditionIsMet(node)) ?? true;
 
                 if (shouldUseTemplate)
                 {
@@ -175,14 +174,18 @@ namespace CTA.WebForms.TagConverters
             var parent = node.ParentNode;
             var current = node;
 
-            // Can't create multiple nodes at once, so instead we set replacement
-            // text as innerhtml of a temp node and let HtmlAgilityPack generate
+            // Can't create multiple nodes at once, so instead we load the replacement
+            // text into a new temporary html document and let HtmlAgilityPack generate
             // the nodes as children.
-            var temp = HtmlNode.CreateNode("<div></div>");
-            temp.InnerHtml = nodeReplacementText;
+            var tempDoc = new HtmlDocument();
 
-            foreach (var child in temp.ChildNodes)
+            tempDoc.OptionOutputOriginalCase = true;
+            tempDoc.LoadHtml(nodeReplacementText);
+
+            foreach (var child in tempDoc.DocumentNode.ChildNodes)
             {
+                child.OwnerDocument.OptionOutputOriginalCase = true;
+
                 parent.InsertAfter(child, current);
                 current = child;
             }

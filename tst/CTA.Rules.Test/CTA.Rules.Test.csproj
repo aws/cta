@@ -27,6 +27,83 @@
 	<Content Include="TempTemplates\*">
 	  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	</Content>
+	<Content Include="TempConfigs\*">
+		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="TempTagConfigs\asp.BoundField.yaml" />
+    <None Remove="TempTagConfigs\asp.Button.yaml" />
+    <None Remove="TempTagConfigs\asp.ButtonField.yaml" />
+    <None Remove="TempTagConfigs\asp.Content.yaml" />
+    <None Remove="TempTagConfigs\asp.ContentPlaceHolder.yaml" />
+    <None Remove="TempTagConfigs\asp.GridView.yaml" />
+    <None Remove="TempTagConfigs\asp.HyperLink.yaml" />
+    <None Remove="TempTagConfigs\asp.HyperLinkField.yaml" />
+    <None Remove="TempTagConfigs\asp.Label.yaml" />
+    <None Remove="TempTagConfigs\asp.ListView.yaml" />
+    <None Remove="TempTagConfigs\asp.PlaceHolder.yaml" />
+    <None Remove="TempTagConfigs\asp.RadioButton.yaml" />
+    <None Remove="TempTagConfigs\asp.TemplateField.yaml" />
+    <None Remove="TempTagConfigs\asp.TextBox.yaml" />
+    <None Remove="TempTagConfigs\body.yaml" />
+    <None Remove="TempTagConfigs\head.yaml" />
+    <None Remove="TempTagConfigs\html.yaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="TempTagConfigs\asp.BoundField.yaml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TempTagConfigs\asp.Button.yaml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TempTagConfigs\asp.ButtonField.yaml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TempTagConfigs\asp.Content.yaml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TempTagConfigs\asp.ContentPlaceHolder.yaml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TempTagConfigs\asp.GridView.yaml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TempTagConfigs\asp.HyperLink.yaml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TempTagConfigs\asp.HyperLinkField.yaml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TempTagConfigs\asp.Label.yaml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TempTagConfigs\asp.ListView.yaml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TempTagConfigs\asp.PlaceHolder.yaml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TempTagConfigs\asp.RadioButton.yaml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TempTagConfigs\asp.TemplateField.yaml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TempTagConfigs\asp.TextBox.yaml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TempTagConfigs\body.yaml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TempTagConfigs\head.yaml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TempTagConfigs\html.yaml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 	
   <ItemGroup>
