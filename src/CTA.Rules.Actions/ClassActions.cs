@@ -507,6 +507,49 @@ namespace CTA.Rules.Actions
             }
             return ReplaceMethodModifiers;
         }
+        public Func<SyntaxGenerator, ClassDeclarationSyntax, ClassDeclarationSyntax> GetReplaceCoreControllerMethodsBodyAction(string expression)
+        {
+            ClassDeclarationSyntax ReplaceMethodModifiers(SyntaxGenerator syntaxGenerator, ClassDeclarationSyntax node)
+            {
+                var allMembers = node.Members.ToList();
+                var allMethods = allMembers.OfType<MethodDeclarationSyntax>().Where(m => m.Modifiers.Any(mod => mod.Text == Constants.Public))
+                    .Select(m => GetMethodId(m)).ToList();
+
+                foreach (var method in allMethods)
+                {
+                    var currentMethod = node.Members.OfType<MethodDeclarationSyntax>().FirstOrDefault(m => GetMethodId(m) == method);
+                    var originalMethod = currentMethod;
+
+                    bool asyncCheck = currentMethod.Modifiers.Any(mod => mod.Text == Constants.AsyncModifier);
+                    bool voidReturn = currentMethod.Modifiers.Any(mod => mod.Text == Constants.VoidModifier);
+                    string returnType = "";
+                    if (!voidReturn)
+                    {
+                        returnType = asyncCheck ? Constants.TaskIActionResult : Constants.IActionResult;
+                    }
+
+                    var newExpression = expression;
+                    if (expression.Contains(Constants.MonolithService + "." + Constants.CreateRequest) && asyncCheck)
+                    {
+                        newExpression = expression.Insert(expression.IndexOf(Constants.MonolithService), Constants.Await + " ");
+                        newExpression = newExpression.Insert(newExpression.IndexOf(Constants.CreateRequest) + Constants.CreateRequest.Length, Constants.AsyncWord);
+                    }
+
+                    currentMethod = currentMethod.WithBody(null).WithLeadingTrivia(currentMethod.GetLeadingTrivia());
+                    currentMethod = currentMethod.WithBody(SyntaxFactory.Block(SyntaxFactory.ParseStatement(newExpression))).WithLeadingTrivia(currentMethod.GetLeadingTrivia());
+                    if (!string.IsNullOrEmpty(returnType))
+                    {
+                        currentMethod = currentMethod.WithReturnType(SyntaxFactory.ParseTypeName(returnType)).WithLeadingTrivia(currentMethod.GetLeadingTrivia());
+                    }
+                    currentMethod = currentMethod.NormalizeWhitespace();
+
+                    node = node.ReplaceNode(originalMethod, currentMethod.WithLeadingTrivia(currentMethod.GetLeadingTrivia()));
+                }
+
+                return node;
+            }
+            return ReplaceMethodModifiers;
+        }
 
         private string GetMethodId(MethodDeclarationSyntax method)
         {
