@@ -71,7 +71,9 @@ namespace CTA.WebForms.Helpers
         }
 
         /// <summary>
-        /// 
+        /// Removes any text children of the given node that contain only whitespace
+        /// characters. Multiple text children in a row can cause spacing issues if
+        /// some contain only space characters. For use only by <see cref="NormalizeHtmlContent(HtmlNode)"/>.
         /// </summary>
         /// <param name="node">The node currently being processed.</param>
         private static void RemoveSpaceTextChildren(HtmlNode node)

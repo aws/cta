@@ -15,8 +15,8 @@ namespace CTA.WebForms.Tests.TagConfigs
         private protected ViewImportService _viewImportService;
         private protected CodeBehindReferenceLinkerService _codeBehindLinkerService;
 
-        [SetUp]
-        public void SetUp()
+        [OneTimeSetUp]
+        public void OneTimeSetUp()
         {
             _codeBehindLinkerService = new CodeBehindReferenceLinkerService();
             _viewImportService = new ViewImportService();
