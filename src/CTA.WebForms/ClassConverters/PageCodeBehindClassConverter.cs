@@ -19,6 +19,7 @@ namespace CTA.WebForms.ClassConverters
     public class PageCodeBehindClassConverter : ClassConverter
     {
         private const string ActionName = "PageCodeBehindClassConverter";
+        private readonly CodeBehindReferenceLinkerService _codeBehindLinkerService;
         private WebFormMetricContext _metricsContext;
 
         private IDictionary<BlazorComponentLifecycleEvent, IEnumerable<StatementSyntax>> _newLifecycleLines;
@@ -30,14 +31,16 @@ namespace CTA.WebForms.ClassConverters
             TypeDeclarationSyntax originalDeclarationSyntax,
             INamedTypeSymbol originalClassSymbol,
             TaskManagerService taskManager,
+            CodeBehindReferenceLinkerService codeBehindLinkerService,
             WebFormMetricContext metricsContext)
             : base(relativePath, sourceProjectPath, sourceFileSemanticModel, originalDeclarationSyntax, originalClassSymbol, taskManager)
         {
             _newLifecycleLines = new Dictionary<BlazorComponentLifecycleEvent, IEnumerable<StatementSyntax>>();
+            _codeBehindLinkerService = codeBehindLinkerService;
             _metricsContext = metricsContext;
         }
 
-        public override Task<IEnumerable<FileInformation>> MigrateClassAsync()
+        public override async Task<IEnumerable<FileInformation>> MigrateClassAsync()
         {
             LogStart();
 
@@ -117,6 +120,8 @@ namespace CTA.WebForms.ClassConverters
                 currentClassDeclaration = currentClassDeclaration.AddBaseType(Constants.DisposableInterface);
             }
 
+            currentClassDeclaration = await DoTagCodeBehindConversions(currentClassDeclaration);
+
             var namespaceNode = CodeSyntaxHelper.BuildNamespace(_originalClassSymbol.ContainingNamespace?.ToDisplayString(), currentClassDeclaration);
             var fileText = CodeSyntaxHelper.GetFileSyntaxAsString(namespaceNode, CodeSyntaxHelper.BuildUsingStatements(requiredNamespaceNames));
 
@@ -125,7 +130,33 @@ namespace CTA.WebForms.ClassConverters
 
             var result = new[] { new FileInformation(GetNewRelativePath(), Encoding.UTF8.GetBytes(fileText)) };
 
-            return Task.FromResult((IEnumerable<FileInformation>)result);
+            return result;
+        }
+
+        /// <summary>
+        /// Handles conversion of references to controls in the current code behind file.
+        /// </summary>
+        /// <param name="classDeclaration">The class declaration within which to convert references.</param>
+        /// <returns>The modified class declaration.</returns>
+        private async Task<ClassDeclarationSyntax> DoTagCodeBehindConversions(ClassDeclarationSyntax classDeclaration)
+        {
+            var viewFilePath = Path.ChangeExtension(FullPath, null);
+
+            try
+            {
+                return await _taskManager.ManagedRun(_taskId, (token) => _codeBehindLinkerService.ExecuteTagCodeBehindHandlers(viewFilePath, classDeclaration, token));
+            }
+            catch (OperationCanceledException e)
+            {
+                LogHelper.LogError(e, string.Format(
+                    Constants.CaneledServiceCallLogTemplate,
+                    Rules.Config.Constants.WebFormsErrorTag,
+                    GetType().Name,
+                    typeof(CodeBehindReferenceLinkerService).Name,
+                    "ExecuteTagCodeBehindHandlers()"));
+
+                return classDeclaration;
+            }
         }
 
         private string GetNewRelativePath()

@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CTA.Rules.Config;
 using CTA.Rules.Models;
 using CTA.WebForms.Extensions;
 using CTA.WebForms.FileInformationModel;
@@ -17,7 +19,9 @@ namespace CTA.WebForms.ClassConverters
     public class ControlCodeBehindClassConverter : ClassConverter
     {
         private const string ActionName = "ControlCodeBehindClassConverter";
+        private readonly CodeBehindReferenceLinkerService _codeBehindLinkerService;
         private WebFormMetricContext _metricsContext;
+
         public ControlCodeBehindClassConverter(
             string relativePath,
             string sourceProjectPath,
@@ -25,14 +29,15 @@ namespace CTA.WebForms.ClassConverters
             TypeDeclarationSyntax originalDeclarationSyntax,
             INamedTypeSymbol originalClassSymbol,
             TaskManagerService taskManager,
+            CodeBehindReferenceLinkerService codeBehindLinkerService,
             WebFormMetricContext metricsContext)
             : base(relativePath, sourceProjectPath, sourceFileSemanticModel, originalDeclarationSyntax, originalClassSymbol, taskManager)
         {
+            _codeBehindLinkerService = codeBehindLinkerService;
             _metricsContext = metricsContext;
-            // TODO: Register with the necessary services
         }
 
-        public override Task<IEnumerable<FileInformation>> MigrateClassAsync()
+        public override async Task<IEnumerable<FileInformation>> MigrateClassAsync()
         {
             LogStart();
             _metricsContext.CollectActionMetrics(WebFormsActionType.ClassConversion, ActionName);
@@ -54,6 +59,8 @@ namespace CTA.WebForms.ClassConverters
                 // normal razor components
                 .AddBaseType(Constants.ComponentBaseClass);
 
+            modifiedClass = await DoTagCodeBehindConversions(modifiedClass);
+
             var namespaceNode = CodeSyntaxHelper.BuildNamespace(_originalClassSymbol.ContainingNamespace?.ToDisplayString(), modifiedClass);
 
             DoCleanUp();
@@ -63,7 +70,33 @@ namespace CTA.WebForms.ClassConverters
             var fileContent = CodeSyntaxHelper.GetFileSyntaxAsString(namespaceNode, usingStatements);
             var result = new[] { new FileInformation(newRelativePath, Encoding.UTF8.GetBytes(fileContent)) };
 
-            return Task.FromResult((IEnumerable<FileInformation>)result);
+            return result;
+        }
+
+        /// <summary>
+        /// Handles conversion of references to controls in the current code behind file.
+        /// </summary>
+        /// <param name="classDeclaration">The class declaration within which to convert references.</param>
+        /// <returns>The modified class declaration.</returns>
+        private async Task<ClassDeclarationSyntax> DoTagCodeBehindConversions(ClassDeclarationSyntax classDeclaration)
+        {
+            var viewFilePath = Path.ChangeExtension(FullPath, null);
+
+            try
+            {
+                return await _taskManager.ManagedRun(_taskId, (token) => _codeBehindLinkerService.ExecuteTagCodeBehindHandlers(viewFilePath, classDeclaration, token));
+            }
+            catch (OperationCanceledException e)
+            {
+                LogHelper.LogError(e, string.Format(
+                    Constants.CaneledServiceCallLogTemplate,
+                    Rules.Config.Constants.WebFormsErrorTag,
+                    GetType().Name,
+                    typeof(CodeBehindReferenceLinkerService).Name,
+                    "ExecuteTagCodeBehindHandlers()"));
+
+                return classDeclaration;
+            }
         }
 
         private string GetNewRelativePath()

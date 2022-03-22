@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -26,7 +25,7 @@ namespace CTA.WebForms.FileConverters
         private readonly Regex ControlTagNameRegex = new Regex(@"\w+:\w+");
         private readonly ViewImportService _viewImportService;
         private readonly CodeBehindReferenceLinkerService _codeBehindLinkerService;
-        private readonly List<(HtmlNode node, TagConverter converter)> _tagConversionActions;
+        private readonly List<TagConversionAction> _tagConversionActions;
         private readonly IDictionary<string, TagConverter> _tagConverterMap;
         private readonly WebFormMetricContext _metricsContext;
         
@@ -42,9 +41,11 @@ namespace CTA.WebForms.FileConverters
         {
             _viewImportService = viewImportService;
             _codeBehindLinkerService = codeBehindLinkerService;
-            _tagConversionActions = new List<(HtmlNode, TagConverter)>();
+            _tagConversionActions = new List<TagConversionAction>();
             _tagConverterMap = tagConfigParser.GetConfigMap();
             _metricsContext = metricsContext;
+
+            _codeBehindLinkerService.RegisterViewFile(FullPath);
         }
 
         private HtmlDocument GetRazorContents(string htmlString)
@@ -61,6 +62,8 @@ namespace CTA.WebForms.FileConverters
 
             // Modify HtmlDocument nodes using actions found above
             ConvertNodes();
+
+            _codeBehindLinkerService.NotifyAllHandlersExecuted(FullPath);
 
             // Fix spacing issues
             Utilities.NormalizeHtmlContent(htmlDoc.DocumentNode);
@@ -91,9 +94,10 @@ namespace CTA.WebForms.FileConverters
             if (_tagConverterMap.ContainsKey(node.Name))
             {
                 var converter = _tagConverterMap[node.Name];
-                converter.Initialize(_codeBehindLinkerService, _viewImportService);
+                converter.Initialize(_taskManager, _codeBehindLinkerService, _viewImportService);
                 converterType = converter.GetType().Name;
-                _tagConversionActions.Add((node, converter));
+
+                _tagConversionActions.Add(new TagConversionAction(node, converter));
             }
             // TODO: Properly do custom user control mapping between these two conditions, previously we
             // handled this case incorrectly and will need an overhaul for the new config-based conversions
@@ -111,13 +115,18 @@ namespace CTA.WebForms.FileConverters
             {
                 try
                 {
-                    tagConversionAction.converter.MigrateTag(tagConversionAction.node);
+                    // TODO: Pass code behind handler here
+                    tagConversionAction.Converter.MigrateTag(
+                        tagConversionAction.Node,
+                        FullPath,
+                        tagConversionAction.CodeBehindHandler,
+                        _taskId);
                 }
                 catch (Exception e)
                 {
                     LogHelper.LogError(e, $"{Rules.Config.Constants.WebFormsErrorTag}Error converting node, " +
-                                          $"Converter type: {tagConversionAction.converter.GetType().Name}, " +
-                                          $"Node name: {tagConversionAction.node.Name}");
+                                          $"Converter type: {tagConversionAction?.Converter?.GetType().Name}, " +
+                                          $"Node name: {tagConversionAction?.Node?.Name}");
                 }
             }
         }
