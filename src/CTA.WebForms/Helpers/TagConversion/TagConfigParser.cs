@@ -51,7 +51,8 @@ namespace CTA.WebForms.Helpers.TagConversion
 
                     if (!result.TryAdd(converter.TagName, converter))
                     {
-                        LogHelper.LogError($"{Rules.Config.Constants.WebFormsErrorTag}Failed to add valid converter to concurrent dictionary for config at {filePath}");
+                        LogHelper.LogError($"{Rules.Config.Constants.WebFormsErrorTag}Failed to add valid converter of type " +
+                            $"{converter?.GetType().Name} for {converter?.TagName} to concurrent dictionary for config at {filePath}");
                     }
                 }
                 catch (Exception e)
