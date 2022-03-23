@@ -25,6 +25,11 @@ namespace CTA.WebForms.Helpers.TagConversion
             string targetAttribute = null,
             AttributeTargetTypes targetType = AttributeTargetTypes.String)
         {
+            if (sourceValue == null)
+            {
+                return string.Empty;
+            }
+
             var embeddingConverted = EmbeddedCodeReplacers.ReplaceOneWayDataBinds(sourceValue);
             embeddingConverted = EmbeddedCodeReplacers.ReplaceRawExprs(embeddingConverted);
             embeddingConverted = EmbeddedCodeReplacers.ReplaceHTMLEncodedExprs(embeddingConverted);
@@ -41,6 +46,8 @@ namespace CTA.WebForms.Helpers.TagConversion
             {
                 AttributeTargetTypes.HtmlBoolean => ConvertToHtmlBoolean(sourceAttribute, sourceValue, targetAttribute),
                 AttributeTargetTypes.ComponentBoolean => ConvertToComponentBoolean(sourceAttribute, sourceValue, targetAttribute),
+                AttributeTargetTypes.InvertedHtmlBoolean => ConvertToHtmlBoolean(sourceAttribute, sourceValue, targetAttribute, true),
+                AttributeTargetTypes.InvertedComponentBoolean => ConvertToComponentBoolean(sourceAttribute, sourceValue, targetAttribute, true),
                 AttributeTargetTypes.EventHandler => ConvertToEventHandler(sourceValue, targetAttribute),
                 // default is same as String and EventCallback (no modification required)
                 _ => FormatConvertedAttribute(targetAttribute, sourceValue)
@@ -54,6 +61,11 @@ namespace CTA.WebForms.Helpers.TagConversion
             string targetAttribute = null,
             string targetType = "String")
         {
+            if (sourceValue == null)
+            {
+                return string.Empty;
+            }
+
             var targetTypeEnum = (AttributeTargetTypes)Enum.Parse(typeof(AttributeTargetTypes), targetType);
 
             return ConvertToType(sourceAttribute, sourceValue, targetAttribute, targetTypeEnum);
@@ -66,14 +78,17 @@ namespace CTA.WebForms.Helpers.TagConversion
         /// <param name="sourceValue">The value of the source attribute being converted.</param>
         /// <param name="targetAttribute">The name of the attribute that takes the converted value,
         /// if one exists.</param>
+        /// <param name="inverted">Whether or not this conversion should invert the result.</param>
         /// <returns>The <paramref name="sourceValue"/> as an html boolean.</returns>
-        private static string ConvertToHtmlBoolean(string sourceAttribute, string sourceValue, string targetAttribute)
+        private static string ConvertToHtmlBoolean(string sourceAttribute, string sourceValue, string targetAttribute, bool inverted = false)
         {
-            if (sourceValue.Equals(true.ToString(), StringComparison.InvariantCultureIgnoreCase)
+            var isTrue = sourceValue.Equals(true.ToString(), StringComparison.InvariantCultureIgnoreCase)
                 // For an html boolean <attribute>=<attribute> means true
                 || sourceValue.Equals(sourceAttribute, StringComparison.InvariantCultureIgnoreCase)
                 // For an html boolean <attribute>, <attribute>="", and <attribute>='' all mean true
-                || sourceValue.Equals(string.Empty))
+                || sourceValue.Equals(string.Empty);
+
+            if ((!inverted && isTrue) || (inverted && !isTrue))
             {
                 // For an html boolean, just including the attribute name with no value is the
                 // easiest way to set it to true
@@ -94,16 +109,18 @@ namespace CTA.WebForms.Helpers.TagConversion
         /// <param name="sourceValue">The value of the source attribute being converted.</param>
         /// <param name="targetAttribute">The name of the attribute that takes the converted value,
         /// if one exists.</param>
+        /// <param name="inverted">Whether or not this conversion should invert the result.</param>
         /// <returns>The <paramref name="sourceValue"/> as a component boolean.</returns>
-        private static string ConvertToComponentBoolean(string sourceAttribute, string sourceValue, string targetAttribute = null)
+        private static string ConvertToComponentBoolean(string sourceAttribute, string sourceValue, string targetAttribute, bool inverted = false)
         {
             var result = false.ToString();
-
-            if (sourceValue.Equals(true.ToString(), StringComparison.InvariantCultureIgnoreCase)
+            var isTrue = sourceValue.Equals(true.ToString(), StringComparison.InvariantCultureIgnoreCase)
                 // For an html boolean <attribute>=<attribute> means true
                 || sourceValue.Equals(sourceAttribute, StringComparison.InvariantCultureIgnoreCase)
                 // For an html boolean <attribute>, <attribute>="", and <attribute>='' all mean true
-                || sourceValue.Equals(string.Empty))
+                || sourceValue.Equals(string.Empty);
+
+            if ((!inverted && isTrue) || (inverted && !isTrue))
             {
                 result = true.ToString();
             }
@@ -139,7 +156,15 @@ namespace CTA.WebForms.Helpers.TagConversion
         /// <returns>The formatted attribute conversion result.</returns>
         private static string FormatConvertedAttribute(string attribute, string value)
         {
-            return attribute == null ? value : $"{attribute}=\"{value}\"";
+            if (attribute == null)
+            {
+                return value;
+            }
+            else
+            {
+                value = value.Replace('\"', '\'');
+                return $"{attribute}=\"{value}\"";
+            }
         }
     }
 }

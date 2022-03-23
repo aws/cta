@@ -1,7 +1,7 @@
 <div>
     <asp:GridView ID="GridView1" runat="server" AutoGenerateColumns="false" ItemType="People" SelectMethod="People.GetPeople">
         <Columns>
-            <asp:BoundField  DataField="Name" HeaderText="First Name" ItemType="Random"/>
+            <asp:BoundField  DataField="Name" HeaderText="First Name"/>
             <asp:BoundField  DataField="LastName" HeaderText="Last Name" />
             <asp:BoundField  DataField="Position" HeaderText="Person Type" />
         </Columns>

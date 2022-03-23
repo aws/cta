@@ -1,4 +1,5 @@
 ﻿!Template
+TagName: valid:AddUsingDirective
 CodeBehindType: Namespace.TypeName
 CodeBehindHandler: Default
 Conditions: []

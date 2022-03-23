@@ -11,8 +11,10 @@ using CTA.WebForms.ControlConverters;
 using CTA.WebForms.FileInformationModel;
 using CTA.WebForms.Helpers;
 using CTA.WebForms.Helpers.ControlHelpers;
+using CTA.WebForms.Helpers.TagConversion;
 using CTA.WebForms.Metrics;
 using CTA.WebForms.Services;
+using CTA.WebForms.TagConverters;
 using HtmlAgilityPack;
 
 namespace CTA.WebForms.FileConverters
@@ -21,44 +23,53 @@ namespace CTA.WebForms.FileConverters
     {
         private const string ChildActionType = "ViewFileConverter";
         private const string UnSupportedControlConverter = "UnSupportedControlConverter";
-        private Regex AspControlsRegex = new Regex(@"\w+:\w+");
-        private ViewImportService _viewImportService;
-        private List<ControlConversionAction> _controlActions;
+        private readonly Regex ControlTagNameRegex = new Regex(@"\w+:\w+");
+        private readonly ViewImportService _viewImportService;
+        private readonly CodeBehindReferenceLinkerService _codeBehindLinkerService;
+        private readonly List<(HtmlNode node, TagConverter converter)> _tagConversionActions;
+        private readonly IDictionary<string, TagConverter> _tagConverterMap;
         private readonly WebFormMetricContext _metricsContext;
         
         public ViewFileConverter(
             string sourceProjectPath,
             string fullPath,
             ViewImportService viewImportService,
+            CodeBehindReferenceLinkerService codeBehindLinkerService,
             TaskManagerService taskManagerService,
+            TagConfigParser tagConfigParser,
             WebFormMetricContext metricsContext) 
             : base(sourceProjectPath, fullPath, taskManagerService)
         {
             _viewImportService = viewImportService;
-            _controlActions = new List<ControlConversionAction>();
+            _codeBehindLinkerService = codeBehindLinkerService;
+            _tagConversionActions = new List<(HtmlNode, TagConverter)>();
+            _tagConverterMap = tagConfigParser.GetConfigMap();
             _metricsContext = metricsContext;
         }
 
         private HtmlDocument GetRazorContents(string htmlString)
         {
             var htmlDoc = new HtmlDocument();
-            htmlDoc.LoadHtml(htmlString);
 
             // This ensures that the document will output the original case when called by .WriteTo()
             // otherwise, all nodes and attribute names will be in lowercase
             htmlDoc.OptionOutputOriginalCase = true;
-            
+            htmlDoc.LoadHtml(htmlString);
+
             // Collect valid actions to execute
-            FindConversionActions(htmlDoc.DocumentNode, null);
+            FindConversionActions(htmlDoc.DocumentNode);
 
             // Modify HtmlDocument nodes using actions found above
             ConvertNodes();
+
+            // Fix spacing issues
+            Utilities.NormalizeHtmlContent(htmlDoc.DocumentNode);
 
             return htmlDoc;
         }
 
         // Performs a DFS traversal of the HTML tree, adding nodes to be converted in postorder
-        private void FindConversionActions(HtmlNode node, HtmlNode parent)
+        private void FindConversionActions(HtmlNode node)
         {
             if (node == null)
             {
@@ -67,56 +78,46 @@ namespace CTA.WebForms.FileConverters
 
             foreach (HtmlNode child in node.ChildNodes)
             {
-                FindConversionActions(child, node);
+                FindConversionActions(child);
             }
 
-            GetActions(node, parent);
+            GetActions(node);
         }
 
-        private void GetActions(HtmlNode node, HtmlNode parent)
+        private void GetActions(HtmlNode node)
         {
-            string controlConverterType = "NonWebFormsControl";
-            if (SupportedControls.ControlRulesMap.ContainsKey(node.Name))
+            string converterType = "NonWebFormsControl";
+
+            if (_tagConverterMap.ContainsKey(node.Name))
             {
-                var conversionAction = new ControlConversionAction(node, parent, SupportedControls.ControlRulesMap[node.Name]);
-                controlConverterType = conversionAction.ControlConverter.GetType().Name;
-                _controlActions.Add(conversionAction);
-            } 
-            else if (SupportedControls.UserControls.UserControlRulesMap.ContainsKey(node.Name))
-            {
-                var conversionAction = new ControlConversionAction(node, parent, SupportedControls.UserControls.UserControlRulesMap[node.Name]);
-                controlConverterType = conversionAction.ControlConverter.GetType().Name;
-                _controlActions.Add(conversionAction);
+                var converter = _tagConverterMap[node.Name];
+                converter.Initialize(_codeBehindLinkerService, _viewImportService);
+                converterType = converter.GetType().Name;
+                _tagConversionActions.Add((node, converter));
             }
-            else
+            // TODO: Properly do custom user control mapping between these two conditions, previously we
+            // handled this case incorrectly and will need an overhaul for the new config-based conversions
+            else if (ControlTagNameRegex.IsMatch(node.Name))
             {
-                Match aspControlTagRegex = AspControlsRegex.Match(node.Name);
-                if (aspControlTagRegex.Success)
-                {
-                    controlConverterType = UnSupportedControlConverter;
-                }
+                converterType = UnSupportedControlConverter;
             }
-            _metricsContext.CollectActionMetrics(WebFormsActionType.ControlConversion, controlConverterType, node.Name);
+
+            _metricsContext.CollectActionMetrics(WebFormsActionType.ControlConversion, converterType, node.Name);
         }
 
         private void ConvertNodes()
         {
-            foreach (var controlConversionAction in _controlActions)
+            foreach (var tagConversionAction in _tagConversionActions)
             {
                 try
                 {
-                    HtmlNode convertedNode = controlConversionAction.ControlConverter.Convert2Blazor(controlConversionAction.Node);
-                    if (convertedNode != null)
-                    {
-                        controlConversionAction.Parent.ReplaceChild(convertedNode, controlConversionAction.Node);
-                    }
+                    tagConversionAction.converter.MigrateTag(tagConversionAction.node);
                 }
                 catch (Exception e)
                 {
-                    // TODO: add conversion failure metrics
-                    LogHelper.LogError(e, $"{Rules.Config.Constants.WebFormsErrorTag}Error converting node. " +
-                                          $"Converter type: {controlConversionAction.ControlConverter.GetType()}, " +
-                                          $"Node name: {controlConversionAction.Node.Name}");
+                    LogHelper.LogError(e, $"{Rules.Config.Constants.WebFormsErrorTag}Error converting node, " +
+                                          $"Converter type: {tagConversionAction.converter.GetType().Name}, " +
+                                          $"Node name: {tagConversionAction.node.Name}");
                 }
             }
         }
@@ -137,9 +138,11 @@ namespace CTA.WebForms.FileConverters
                 var projectName = Path.GetFileName(ProjectPath);
                 htmlString = EmbeddedCodeReplacers.ReplaceDirectives(htmlString, RelativePath, projectName, _viewImportService, _metricsContext);
 
+                // TODO: Add wait here for all directives to be replaced
+
                 // Convert the Web Forms controls to Blazor equivalent
                 var migratedDocument = GetRazorContents(htmlString);
-                var contents = migratedDocument.DocumentNode.WriteTo();
+                var contents = migratedDocument.DocumentNode.WriteTo().Trim();
 
                 // We comment out the unknown user controls here instead of during
                 // traversal because the post-order nature may comment out controls

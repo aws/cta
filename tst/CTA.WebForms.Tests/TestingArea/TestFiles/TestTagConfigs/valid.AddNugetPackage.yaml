@@ -1,4 +1,5 @@
 ﻿!Template
+TagName: valid:AddNugetPackage
 CodeBehindType: Namespace.TypeName
 CodeBehindHandler: Default
 Conditions: []

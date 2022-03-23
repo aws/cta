@@ -56,51 +56,53 @@
       },
       "Codelyzer.Analysis": {
         "type": "Transitive",
-        "resolved": "2.3.24-alpha-gd8748c2835",
-        "contentHash": "fMsnQEatUzz4VYBh1pJn27Lf9BpewwoYdmLS5xKSIGOXTODPucmzAKJJ5sApA9DKfUyOIJ6wIGbFO/Tly8kgcA==",
+        "resolved": "2.3.26-alpha-g81125b408b",
+        "contentHash": "Bc5itLjyT2B/FDMOIgr1jefCyfURW9h2QU8Alx3JuuCkvD2BNVP98Lu71tyCDvLyzQ4iwZwsmOOmgyB6+BPMjQ==",
         "dependencies": {
-          "Codelyzer.Analysis.Build": "2.3.24-alpha-gd8748c2835",
-          "Codelyzer.Analysis.CSharp": "2.3.24-alpha-gd8748c2835",
+          "Codelyzer.Analysis.Build": "2.3.26-alpha-g81125b408b",
+          "Codelyzer.Analysis.CSharp": "2.3.26-alpha-g81125b408b",
           "CommandLineParser": "2.8.0",
-          "Microsoft.Extensions.Logging.Console": "6.0.0"
+          "Microsoft.Extensions.Logging.Console": "6.0.0",
+          "Microsoft.VisualStudio.Setup.Configuration.Interop": "3.1.2196"
         }
       },
       "Codelyzer.Analysis.Build": {
         "type": "Transitive",
-        "resolved": "2.3.24-alpha-gd8748c2835",
-        "contentHash": "pRuAcp/ILRt5XY5EUfIQal/6BQ0DmtiZxylGq5HxTuWt6FEjmpus0MQnkfbgJb/lF9iYB5gO9LdFQmbBri0lTg==",
+        "resolved": "2.3.26-alpha-g81125b408b",
+        "contentHash": "079ZZ/3WgYba9gLEXB9DP/r3wfOOo1G2o+XIekSzR/z0LkjU+EakpW9CiP5Y7qfE2NwPrXXURccW0TGFcc1hnQ==",
         "dependencies": {
           "Buildalyzer": "3.2.8",
           "Buildalyzer.Logger": "3.2.8",
           "Buildalyzer.Workspaces": "3.2.8",
-          "Codelyzer.Analysis.CSharp": "2.3.24-alpha-gd8748c2835",
+          "Codelyzer.Analysis.CSharp": "2.3.26-alpha-g81125b408b",
           "Microsoft.Extensions.Logging": "6.0.0",
           "NuGet.Packaging": "6.0.0"
         }
       },
       "Codelyzer.Analysis.Common": {
         "type": "Transitive",
-        "resolved": "2.3.24-alpha-gd8748c2835",
-        "contentHash": "dkDrT8wbBR4VL42Mqvb3gxhsjxH5pULnCpZ8Lvb+R0YRoKACciD7HZYK3KkKD8M3Bm/1bZ4MTO1OhG8oz0+msw==",
+        "resolved": "2.3.26-alpha-g81125b408b",
+        "contentHash": "oHRk1nXlstnf8sW5nZ7SQGoMhFdGqTj0vYArrSMwexP6qdcoG3OnzpE+1kFoGLNyZ3f1GUv2dAu8Ozs/eS3pyA==",
         "dependencies": {
-          "Codelyzer.Analysis.Model": "2.3.24-alpha-gd8748c2835",
+          "Codelyzer.Analysis.Model": "2.3.26-alpha-g81125b408b",
           "Microsoft.Build": "17.0.0",
+          "Microsoft.VisualStudio.Setup.Configuration.Interop": "3.1.2196",
           "Newtonsoft.Json": "13.0.1"
         }
       },
       "Codelyzer.Analysis.CSharp": {
         "type": "Transitive",
-        "resolved": "2.3.24-alpha-gd8748c2835",
-        "contentHash": "vxKzOJxBRXmZm9KhTGsph4vN8ThTs1bl6cIFsFwfK7SHUgmxseje51J9fmKLbUUH3aSzQ3OiTSy+rW87FGsdpA==",
+        "resolved": "2.3.26-alpha-g81125b408b",
+        "contentHash": "XdUe/w6DQgR2QjO6CPhnvml4sr94dh8tvLsHJ0hpUVsb6F+tbPBMz1/Jn0trYaMXvxoWcQdA+ly5RGWx/oIgNg==",
         "dependencies": {
-          "Codelyzer.Analysis.Common": "2.3.24-alpha-gd8748c2835",
-          "Codelyzer.Analysis.Model": "2.3.24-alpha-gd8748c2835"
+          "Codelyzer.Analysis.Common": "2.3.26-alpha-g81125b408b",
+          "Codelyzer.Analysis.Model": "2.3.26-alpha-g81125b408b"
         }
       },
       "Codelyzer.Analysis.Model": {
         "type": "Transitive",
-        "resolved": "2.3.24-alpha-gd8748c2835",
-        "contentHash": "RwRNQVblcKYueICBBkVT72nHcAI09nRqJTM1MIoRtnF5ajVhNhroMqeyyQ2YBExAmjeWvETQBVS7KKG/phupOw==",
+        "resolved": "2.3.26-alpha-g81125b408b",
+        "contentHash": "SRDdZ1TT3nmg6pI+cnKqJVhgALSkZqPF6CE3Boa/d7F3IaJPSiMFhQN9OUehFhhSBjtlUiNd2C8Uf6ub3Ifiug==",
         "dependencies": {
           "Microsoft.CodeAnalysis": "4.0.1",
           "Microsoft.CodeAnalysis.CSharp": "4.0.1",
@@ -452,6 +454,11 @@
         "type": "Transitive",
         "resolved": "1.1.1",
         "contentHash": "WMcGpWKrmJmzrNeuaEb23bEMnbtR/vLmvZtkAP5qWu7vQsY59GqfRJd65sFpBszbd2k/bQ8cs8eWawQKAabkVg=="
+      },
+      "Microsoft.VisualStudio.Setup.Configuration.Interop": {
+        "type": "Transitive",
+        "resolved": "3.1.2196",
+        "contentHash": "5v1W9qwgVEZ5geY+MJNyDMJKs4zckM3TXeJ8Mzs6JQx7KK4VRh+bcaOvCnE7swB66ztj4oL8D1zNNDGC7PRXAA=="
       },
       "Microsoft.Win32.Primitives": {
         "type": "Transitive",
@@ -1684,8 +1691,8 @@
       "cta.rules.config": {
         "type": "Project",
         "dependencies": {
-          "Codelyzer.Analysis": "2.3.24-alpha-gd8748c2835",
-          "Codelyzer.Analysis.Model": "2.3.24-alpha-gd8748c2835",
+          "Codelyzer.Analysis": "2.3.26-alpha-g81125b408b",
+          "Codelyzer.Analysis.Model": "2.3.26-alpha-g81125b408b",
           "Microsoft.Extensions.Logging": "6.0.0",
           "Microsoft.Extensions.Logging.Abstractions": "6.0.0",
           "Microsoft.Extensions.Logging.Console": "6.0.0",

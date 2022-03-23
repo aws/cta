@@ -68,6 +68,8 @@ namespace CTA.WebForms
         String,
         HtmlBoolean,
         ComponentBoolean,
+        InvertedHtmlBoolean,
+        InvertedComponentBoolean,
         EventCallback,
         EventHandler
     }

@@ -131,7 +131,8 @@ namespace WebFormsFull
     }
 }";
 
-        public const string StartupFile = @"using Autofac;
+        public const string StartupFile =
+@"using Autofac;
 using Autofac.Integration.Web;
 using WebFormsFull.Models;
 using WebFormsFull.Models.Infrastructure;
@@ -242,7 +243,7 @@ namespace WebFormsFull
         private void ConfigureContainer()
         {
             var builder = new ContainerBuilder();
-            var mockData = bool.Parse(ConfigurationManager.Configuration.GetSection(""appSettings"")[""UseMockData""]);
+            var mockData = bool.Parse(ConfigurationManager.AppSettings[""UseMockData""]);
             builder.RegisterModule(new ApplicationModule(mockData));
             container = builder.Build();
             _containerProvider = new ContainerProvider(container);
@@ -250,7 +251,7 @@ namespace WebFormsFull
 
         private void ConfigDataBase()
         {
-            var mockData = bool.Parse(ConfigurationManager.Configuration.GetSection(""appSettings"")[""UseMockData""]);
+            var mockData = bool.Parse(ConfigurationManager.AppSettings[""UseMockData""]);
             if (!mockData)
             {
                 Database.SetInitializer<CatalogDBContext>(container.Resolve<CatalogDBInitializer>());

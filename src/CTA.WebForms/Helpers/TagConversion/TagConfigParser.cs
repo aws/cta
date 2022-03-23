@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -35,21 +36,24 @@ namespace CTA.WebForms.Helpers.TagConversion
         /// <returns>A dictionary mapping tag name to corresponding <see cref="TagConverter"/>.</returns>
         public IDictionary<string, TagConverter> GetConfigMap()
         {
-            var result = new Dictionary<string, TagConverter>();
+            var result = new ConcurrentDictionary<string, TagConverter>(StringComparer.InvariantCultureIgnoreCase);
             var filePaths = Directory.EnumerateFiles(_configsDir, "*.yaml");
 
             foreach (var filePath in filePaths)
             {
                 try
                 {
-                    var tagName = GetTagNameForFile(filePath);
                     var converter = GetConverterForFile(filePath);
 
                     // If validation fails, an exception will be thrown and we will enter the catch
                     // block before we attempt to add the converter to the results dictionary
                     converter.Validate();
 
-                    result.Add(tagName, converter);
+                    if (!result.TryAdd(converter.TagName, converter))
+                    {
+                        LogHelper.LogError($"{Rules.Config.Constants.WebFormsErrorTag}Failed to add valid converter of type " +
+                            $"{converter?.GetType().Name} for {converter?.TagName} to concurrent dictionary for config at {filePath}");
+                    }
                 }
                 catch (Exception e)
                 {
@@ -58,28 +62,6 @@ namespace CTA.WebForms.Helpers.TagConversion
             }
 
             return result;
-        }
-
-        /// <summary>
-        /// Uses the path to a tag config file to generate the tag name that it
-        /// corresponds to.
-        /// </summary>
-        /// <param name="filePath">The file path of the tag config file.</param>
-        /// <returns>The tag name for the specified file.</returns>
-        /// <exception cref="ArgumentException">Throws if the file name does not follow the
-        /// tagPrefix.tagName.yaml naming convention.</exception>
-        private static string GetTagNameForFile(string filePath)
-        {
-            var fileName = Path.GetFileNameWithoutExtension(filePath ?? string.Empty);
-
-            var nameComponents = fileName.Split(".");
-
-            if (nameComponents.Length != 2)
-            {
-                throw new ArgumentException($"File at {filePath} does not follow correct naming convention (tagPrefix.tagName.yaml)");
-            }
-
-            return $"{nameComponents[0]}:{nameComponents[1]}";
         }
 
         /// <summary>

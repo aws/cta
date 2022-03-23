@@ -1,6 +1,4 @@
-﻿using System;
-using CTA.WebForms.Helpers.TagConversion;
-using HtmlAgilityPack;
+﻿using CTA.WebForms.Helpers.TagConversion;
 
 namespace CTA.WebForms.TagConverters.TagTemplateInvokables
 {
@@ -9,7 +7,7 @@ namespace CTA.WebForms.TagConverters.TagTemplateInvokables
     /// <c>@using</c> directive is included at the top of the view file
     /// that is currently being ported.
     /// </summary>
-    public class AddUsingDirectiveTemplateInvokable : ITemplateInvokable
+    public class AddUsingDirectiveTemplateInvokable : TemplateInvokable
     {
         /// <summary>
         /// The namespace to be included with the <c>@using</c> directive.
@@ -17,7 +15,7 @@ namespace CTA.WebForms.TagConverters.TagTemplateInvokables
         public string NamespaceName { get; set; }
 
         /// <inheritdoc/>
-        public void Validate()
+        public override void Validate()
         {
             if (string.IsNullOrEmpty(NamespaceName))
             {
@@ -27,9 +25,9 @@ namespace CTA.WebForms.TagConverters.TagTemplateInvokables
         }
 
         /// <inheritdoc/>
-        public void Invoke(HtmlNode node)
+        public override void Invoke()
         {
-            throw new NotImplementedException();
+            _viewImportService.AddViewImport($"@using {NamespaceName}");
         }
     }
 }
