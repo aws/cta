@@ -40,7 +40,8 @@
         Startup,
         Program,
         MonolithService,
-        MonolithServiceMvc
+        MonolithServiceMvc,
+        MonolithServiceCore
     }
     public enum WebServerConfigAttributes
     {
