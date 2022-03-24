@@ -2,6 +2,7 @@
 using CTA.WebForms.Services;
 using HtmlAgilityPack;
 using NUnit.Framework;
+using System.Threading.Tasks;
 
 namespace CTA.WebForms.Tests.Helpers.TagConversion
 {
@@ -13,7 +14,9 @@ namespace CTA.WebForms.Tests.Helpers.TagConversion
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
-            _templateParser = new TagTemplateParser(new CodeBehindReferenceLinkerService());
+            _templateParser = new TagTemplateParser(
+                new TaskManagerService(),
+                new CodeBehindReferenceLinkerService());
         }
 
         [Test]
@@ -155,7 +158,7 @@ namespace CTA.WebForms.Tests.Helpers.TagConversion
         }
 
         [Test]
-        public void ParseTemplate_Correctly_Handles_Template_With_Only_Attribute_Replacements()
+        public async Task ParseTemplate_Correctly_Handles_Template_With_Only_Attribute_Replacements()
         {
             var node = HtmlNode.CreateNode("<p stringAttr=\"value0\" booleanAttr>Content a, b, c</p>");
             var template =
@@ -166,11 +169,11 @@ namespace CTA.WebForms.Tests.Helpers.TagConversion
 @"<div newStringAttr=""value0"" newBooleanAttr>
 </div>";
 
-            Assert.AreEqual(expectedResult, _templateParser.ParseTemplate(template, node));
+            Assert.AreEqual(expectedResult, await _templateParser.ParseTemplate(template, node, "TestPath", null, 0));
         }
 
         [Test]
-        public void ParseTemplate_Correctly_Handles_Template_With_Only_Basic_Replacements()
+        public async Task ParseTemplate_Correctly_Handles_Template_With_Only_Basic_Replacements()
         {
             var node = HtmlNode.CreateNode("<p stringAttr=\"value0\" booleanAttr>true</p>");
             var template =
@@ -183,11 +186,11 @@ namespace CTA.WebForms.Tests.Helpers.TagConversion
 
 True"; ;
 
-            Assert.AreEqual(expectedResult, _templateParser.ParseTemplate(template, node));
+            Assert.AreEqual(expectedResult, await _templateParser.ParseTemplate(template, node, "TestPath", null, 0));
         }
 
         [Test]
-        public void ParseTemplate_Correctly_Handles_Template_With_Mixed_Replacements()
+        public async Task ParseTemplate_Correctly_Handles_Template_With_Mixed_Replacements()
         {
             var node = HtmlNode.CreateNode("<p stringAttr=\"value0\" booleanAttr>Content a, b, c</p>");
             var template =
@@ -200,7 +203,7 @@ True"; ;
     <p><b>InnerHtml:</b> Content a, b, c</p>
 </div>";
 
-            Assert.AreEqual(expectedResult, _templateParser.ParseTemplate(template, node));
+            Assert.AreEqual(expectedResult, await _templateParser.ParseTemplate(template, node, "TestPath", null, 0));
         }
     }
 }

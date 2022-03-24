@@ -6,7 +6,6 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using CTA.Rules.Config;
 using CTA.Rules.Models;
-using CTA.WebForms.ControlConverters;
 using CTA.WebForms.FileInformationModel;
 using CTA.WebForms.Helpers;
 using CTA.WebForms.Helpers.ControlHelpers;
@@ -26,7 +25,7 @@ namespace CTA.WebForms.FileConverters
         private readonly ViewImportService _viewImportService;
         private readonly CodeBehindReferenceLinkerService _codeBehindLinkerService;
         private readonly List<TagConversionAction> _tagConversionActions;
-        private readonly IDictionary<string, TagConverter> _tagConverterMap;
+        private readonly TagConfigParser _tagConfigParser;
         private readonly WebFormMetricContext _metricsContext;
         
         public ViewFileConverter(
@@ -42,13 +41,13 @@ namespace CTA.WebForms.FileConverters
             _viewImportService = viewImportService;
             _codeBehindLinkerService = codeBehindLinkerService;
             _tagConversionActions = new List<TagConversionAction>();
-            _tagConverterMap = tagConfigParser.GetConfigMap();
+            _tagConfigParser = tagConfigParser;
             _metricsContext = metricsContext;
 
             _codeBehindLinkerService.RegisterViewFile(FullPath);
         }
 
-        private HtmlDocument GetRazorContents(string htmlString)
+        private async Task<HtmlDocument> GetRazorContents(string htmlString)
         {
             var htmlDoc = new HtmlDocument();
 
@@ -61,9 +60,9 @@ namespace CTA.WebForms.FileConverters
             FindConversionActions(htmlDoc.DocumentNode);
 
             // Modify HtmlDocument nodes using actions found above
-            ConvertNodes();
+            await ConvertNodes();
 
-            _codeBehindLinkerService.NotifyAllHandlersExecuted(FullPath);
+            _codeBehindLinkerService.NotifyAllHandlerConversionsStaged(FullPath);
 
             // Fix spacing issues
             Utilities.NormalizeHtmlContent(htmlDoc.DocumentNode);
@@ -91,13 +90,19 @@ namespace CTA.WebForms.FileConverters
         {
             string converterType = "NonWebFormsControl";
 
-            if (_tagConverterMap.ContainsKey(node.Name))
+            var converter = _tagConfigParser.GetConfigForNode(node.Name);
+
+            if (converter != null)
             {
-                var converter = _tagConverterMap[node.Name];
                 converter.Initialize(_taskManager, _codeBehindLinkerService, _viewImportService);
                 converterType = converter.GetType().Name;
 
-                _tagConversionActions.Add(new TagConversionAction(node, converter));
+                var conversionAction = new TagConversionAction(node, converter);
+                if (conversionAction.CodeBehindHandler != null)
+                {
+                    _codeBehindLinkerService.RegisterCodeBehindHandler(FullPath, conversionAction.CodeBehindHandler);
+                }
+                _tagConversionActions.Add(conversionAction);
             }
             // TODO: Properly do custom user control mapping between these two conditions, previously we
             // handled this case incorrectly and will need an overhaul for the new config-based conversions
@@ -109,14 +114,13 @@ namespace CTA.WebForms.FileConverters
             _metricsContext.CollectActionMetrics(WebFormsActionType.ControlConversion, converterType, node.Name);
         }
 
-        private void ConvertNodes()
+        private async Task ConvertNodes()
         {
             foreach (var tagConversionAction in _tagConversionActions)
             {
                 try
                 {
-                    // TODO: Pass code behind handler here
-                    tagConversionAction.Converter.MigrateTag(
+                    await tagConversionAction.Converter.MigrateTag(
                         tagConversionAction.Node,
                         FullPath,
                         tagConversionAction.CodeBehindHandler,
@@ -133,7 +137,7 @@ namespace CTA.WebForms.FileConverters
 
         // View file converters will return razor file contents with
         // only view layer, code behind will be created in another file
-        public override Task<IEnumerable<FileInformation>> MigrateFileAsync()
+        public override async Task<IEnumerable<FileInformation>> MigrateFileAsync()
         {
             LogStart();
             _metricsContext.CollectActionMetrics(WebFormsActionType.FileConversion, ChildActionType);
@@ -147,17 +151,15 @@ namespace CTA.WebForms.FileConverters
                 var projectName = Path.GetFileName(ProjectPath);
                 htmlString = EmbeddedCodeReplacers.ReplaceDirectives(htmlString, RelativePath, projectName, _viewImportService, _metricsContext);
 
-                // TODO: Add wait here for all directives to be replaced
-
                 // Convert the Web Forms controls to Blazor equivalent
-                var migratedDocument = GetRazorContents(htmlString);
+                var migratedDocument = await GetRazorContents(htmlString);
                 var contents = migratedDocument.DocumentNode.WriteTo().Trim();
 
                 // We comment out the unknown user controls here instead of during
                 // traversal because the post-order nature may comment out controls
                 // that are migrated as part of an ancestor control before that ancestor
                 // can be processed
-                contents = ControlConverter.ConvertEmbeddedCode(contents, RelativePath, _viewImportService);
+                contents = ConvertEmbeddedCode(contents);
                 contents = UnknownControlRemover.RemoveUnknownTags(contents);
 
                 // Currently just changing extension to .razor, keeping filename and directory the same
@@ -198,7 +200,19 @@ namespace CTA.WebForms.FileConverters
                 LogHelper.LogError(e, $"{Rules.Config.Constants.WebFormsErrorTag}Error migrating view file {FullPath}. A new file could not be generated.");
             }
 
-            return Task.FromResult((IEnumerable<FileInformation>)result);
+            return result;
+        }
+
+        public static string ConvertEmbeddedCode(string htmlString)
+        {
+            htmlString = EmbeddedCodeReplacers.ReplaceOneWayDataBinds(htmlString);
+            htmlString = EmbeddedCodeReplacers.ReplaceRawExprs(htmlString);
+            htmlString = EmbeddedCodeReplacers.ReplaceHTMLEncodedExprs(htmlString);
+            htmlString = EmbeddedCodeReplacers.ReplaceAspExprs(htmlString);
+            htmlString = EmbeddedCodeReplacers.ReplaceAspComments(htmlString);
+            htmlString = EmbeddedCodeReplacers.ReplaceEmbeddedCodeBlocks(htmlString);
+
+            return htmlString;
         }
     }
 }

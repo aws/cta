@@ -6,6 +6,7 @@ using CTA.WebForms.TagConverters.TagTemplateInvokables;
 using HtmlAgilityPack;
 using NUnit.Framework;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace CTA.WebForms.Tests.TagConverters
 {
@@ -140,7 +141,7 @@ namespace CTA.WebForms.Tests.TagConverters
         }
 
         [Test]
-        public void MigrateTag_Replaces_Node_Using_Correct_Template()
+        public async Task MigrateTag_Replaces_Node_Using_Correct_Template()
         {
             var expectedInnerHtml = "<div><p>https://aws.amazon.com</p></div>";
 
@@ -171,15 +172,15 @@ namespace CTA.WebForms.Tests.TagConverters
                     { "Default", "<span>This is a placeholder for your link...</span>" }
                 }
             };
-            templateConverter.Initialize(new CodeBehindReferenceLinkerService(), new ViewImportService());
+            templateConverter.Initialize(new TaskManagerService(), new CodeBehindReferenceLinkerService(), new ViewImportService());
 
-            templateConverter.MigrateTag(node);
+            await templateConverter.MigrateTag(node, "testpath", null, 0);
 
             Assert.AreEqual(expectedInnerHtml, parent.InnerHtml);
         }
 
         [Test]
-        public void MigrateTag_Does_Nothing_When_No_Suitable_Template_Is_Found()
+        public async Task MigrateTag_Does_Nothing_When_No_Suitable_Template_Is_Found()
         {
             var expectedInnerHtml = "<span></span>";
 
@@ -203,8 +204,9 @@ namespace CTA.WebForms.Tests.TagConverters
                     { "Default", "<p>#Attr0#</p>" }
                 }
             };
+            templateConverter.Initialize(new TaskManagerService(), new CodeBehindReferenceLinkerService(), new ViewImportService());
 
-            templateConverter.MigrateTag(node);
+            await templateConverter.MigrateTag(node, "testpath", null, 0);
 
             Assert.AreEqual(expectedInnerHtml, parent.InnerHtml);
         }

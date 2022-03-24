@@ -102,7 +102,7 @@ namespace CTA.WebForms.Helpers.TagConversion
             string template,
             HtmlNode node,
             string viewFilePath,
-            ITagCodeBehindHandler handler,
+            TagCodeBehindHandler handler,
             int taskId)
         {
             var result = template;
@@ -130,7 +130,7 @@ namespace CTA.WebForms.Helpers.TagConversion
             Match m,
             HtmlNode node,
             string viewFilePath,
-            ITagCodeBehindHandler handler,
+            TagCodeBehindHandler handler,
             int taskId)
         {
             var targetAttribute = m.Groups[TargetAttributeGroup].Captures.SingleOrDefault()?.Value;
@@ -179,7 +179,7 @@ namespace CTA.WebForms.Helpers.TagConversion
             Match m,
             HtmlNode node,
             string viewFilePath,
-            ITagCodeBehindHandler handler,
+            TagCodeBehindHandler handler,
             int taskId)
         {
             var nullablePlaceHolderValues = ParsePlaceholder(m);
@@ -267,9 +267,12 @@ namespace CTA.WebForms.Helpers.TagConversion
             string targetAttribute,
             string targetType,
             string viewFilePath,
-            ITagCodeBehindHandler handler,
+            TagCodeBehindHandler handler,
             int taskId)
         {
+            string convertedSourceValue = null;
+            string codeBehindRefBinding = null;
+
             try
             {
                 var sourceValue = sourceAttribute.Equals("InnerHtml", StringComparison.InvariantCultureIgnoreCase) 
@@ -281,31 +284,35 @@ namespace CTA.WebForms.Helpers.TagConversion
                     : node.Attributes.Where(attr => attr.OriginalName.Equals(sourceAttribute, StringComparison.InvariantCultureIgnoreCase))
                         .FirstOrDefault()?.Value;
 
-                var convertedSourceValue = sourceValue == null
+                convertedSourceValue = sourceValue == null
                     ? null
                     : TagTypeConverter.ConvertToType(sourceAttribute, sourceValue, targetAttribute, targetType);
 
-                var idValue = node.Attributes
-                    .Where(attr => attr.Name.Equals("id", StringComparison.InvariantCultureIgnoreCase))
-                    .FirstOrDefault();
-
-                if (idValue == null)
+                if (handler != null)
                 {
-                    return convertedSourceValue ?? string.Empty;
+                    codeBehindRefBinding = await _taskManagerService.ManagedRun(taskId,
+                        (token) => _codeBehindLinkerService.HandleCodeBehindForAttribute(
+                            viewFilePath,
+                            codeBehindName,
+                            convertedSourceValue,
+                            targetAttribute,
+                            handler,
+                            token));
+
+                    if (codeBehindRefBinding != null)
+                    {
+                        var x = codeBehindRefBinding;
+                    }
                 }
-
-                string codeBehindRefBinding = null;
-                
-                codeBehindRefBinding = await _taskManagerService.ManagedRun(taskId, 
-                    (token) => _codeBehindLinkerService.HandleCodeBehindForAttribute(
-                        viewFilePath,
-                        idValue.Value,
-                        codeBehindName,
-                        convertedSourceValue,
-                        handler,
-                        token));
-
-                return codeBehindRefBinding ?? convertedSourceValue ?? string.Empty;
+            }
+            catch (OperationCanceledException e)
+            {
+                LogHelper.LogError(e, string.Format(
+                    Constants.CaneledServiceCallLogTemplate,
+                    Rules.Config.Constants.WebFormsErrorTag,
+                    GetType().Name,
+                    nameof(CodeBehindReferenceLinkerService),
+                    nameof(CodeBehindReferenceLinkerService.HandleCodeBehindForAttribute)));
             }
             catch (Exception e)
             {
@@ -313,7 +320,7 @@ namespace CTA.WebForms.Helpers.TagConversion
                     $"replacement for {sourceAttribute} on node {node.Name}");
             }
 
-            return string.Empty;
+            return codeBehindRefBinding ?? convertedSourceValue ?? string.Empty;
         }
     }
 }

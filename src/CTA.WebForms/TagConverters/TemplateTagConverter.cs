@@ -70,7 +70,7 @@ namespace CTA.WebForms.TagConverters
         }
 
         /// <inheritdoc/>
-        public override async Task MigrateTag(HtmlNode node, string viewFilePath, ITagCodeBehindHandler handler, int taskId)
+        public override async Task MigrateTag(HtmlNode node, string viewFilePath, TagCodeBehindHandler handler, int taskId)
         {
             var template = SelectTemplate(node);
             if (template == null)

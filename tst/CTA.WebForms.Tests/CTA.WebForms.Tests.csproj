@@ -30,6 +30,9 @@
 	<Content Include="TempTagConfigs\*">
 		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	</Content>
+	<Content Include="TestingArea\TestFiles\TestAssemblies\*">
+		<CopyToOutputDirectory>Always</CopyToOutputDirectory>	  
+	</Content>
   </ItemGroup>
 
   <ItemGroup>

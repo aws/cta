@@ -54,7 +54,10 @@ namespace CTA.WebForms.Tests.Factories
                 new CodeBehindReferenceLinkerService(),
                 new ClassConverterFactory(
                     string.Empty,
-                    new LifecycleManagerService(), taskManagerService, metricContext),
+                    new LifecycleManagerService(),
+                    taskManagerService,
+                    new CodeBehindReferenceLinkerService(),
+                    metricContext),
                 new HostPageService(),
                 taskManagerService,
                 new TagConfigParser(Rules.Config.Constants.TagConfigsExtractedPath),

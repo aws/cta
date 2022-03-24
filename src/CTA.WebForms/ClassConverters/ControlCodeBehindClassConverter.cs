@@ -46,20 +46,20 @@ namespace CTA.WebForms.ClassConverters
             //var requiredNamespaces = _sourceFileSemanticModel.GetNamespacesReferencedByType(_originalDeclarationSyntax);
             //var namespaceNames = requiredNamespaces.Select(namespaceSymbol => namespaceSymbol.ToDisplayString()).Append(Constants.BlazorComponentsNamespace);
 
+            var modifiedClass = await DoTagCodeBehindConversions((ClassDeclarationSyntax)_originalDeclarationSyntax);
+
             var requiredNamespaces = _sourceFileSemanticModel.GetOriginalUsingNamespaces().Append(Constants.BlazorComponentsNamespace);
             requiredNamespaces = CodeSyntaxHelper.RemoveFrameworkUsings(requiredNamespaces);
 
             var usingStatements = CodeSyntaxHelper.BuildUsingStatements(requiredNamespaces);
 
-            var modifiedClass = ((ClassDeclarationSyntax)_originalDeclarationSyntax)
+            modifiedClass = modifiedClass
                 // Remove outdated base type references
                 // TODO: Scan and remove specific base types in the future
                 .ClearBaseTypes()
                 // ComponentBase base class is added because user controls become
                 // normal razor components
                 .AddBaseType(Constants.ComponentBaseClass);
-
-            modifiedClass = await DoTagCodeBehindConversions(modifiedClass);
 
             var namespaceNode = CodeSyntaxHelper.BuildNamespace(_originalClassSymbol.ContainingNamespace?.ToDisplayString(), modifiedClass);
 
@@ -84,7 +84,8 @@ namespace CTA.WebForms.ClassConverters
 
             try
             {
-                return await _taskManager.ManagedRun(_taskId, (token) => _codeBehindLinkerService.ExecuteTagCodeBehindHandlers(viewFilePath, classDeclaration, token));
+                return await _taskManager.ManagedRun(_taskId, (token) =>
+                    _codeBehindLinkerService.ExecuteTagCodeBehindHandlers(viewFilePath, _sourceFileSemanticModel, classDeclaration, token));
             }
             catch (OperationCanceledException e)
             {
@@ -92,11 +93,16 @@ namespace CTA.WebForms.ClassConverters
                     Constants.CaneledServiceCallLogTemplate,
                     Rules.Config.Constants.WebFormsErrorTag,
                     GetType().Name,
-                    typeof(CodeBehindReferenceLinkerService).Name,
-                    "ExecuteTagCodeBehindHandlers()"));
-
-                return classDeclaration;
+                    nameof(CodeBehindReferenceLinkerService),
+                    nameof(CodeBehindReferenceLinkerService.ExecuteTagCodeBehindHandlers)));
             }
+            catch (Exception e)
+            {
+                LogHelper.LogError(e, $"{Rules.Config.Constants.WebFormsErrorTag}Failed to do tag code behind conversions " +
+                    $"for file at path {FullPath}");
+            }
+
+            return classDeclaration;
         }
 
         private string GetNewRelativePath()

@@ -5,6 +5,7 @@ using CTA.WebForms.TagConverters;
 using HtmlAgilityPack;
 using NUnit.Framework;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace CTA.WebForms.Tests.TagConfigs
 {
@@ -12,7 +13,7 @@ namespace CTA.WebForms.Tests.TagConfigs
     public class AspControlTests : TagConfigsTestFixture
     {
         [Test]
-        public void AspBoundField_Is_Properly_Converted()
+        public async Task AspBoundField_Is_Properly_Converted()
         {
             var inputText =
 @"<asp:BoundField DataField=""Field"" DataFormatString=""Data: {0}"" HeaderText=""This is a header"" Visible=""True"">
@@ -24,14 +25,14 @@ namespace CTA.WebForms.Tests.TagConfigs
 </BoundField>";
 
             expectedOutput = expectedOutput.Trim().Replace("\r\n", "\n");
-            var output = GetConverterOutput(inputText).Trim().Replace("\r\n", "\n");
+            var output = (await GetConverterOutput(inputText)).Trim().Replace("\r\n", "\n");
 
             Assert.AreEqual(expectedOutput, output);
             Assert.True(_viewImportService.ViewUsingDirectives.Contains("@using BlazorWebFormsComponents"));
         }
 
         [Test]
-        public void AspButton_Is_Properly_Converted()
+        public async Task AspButton_Is_Properly_Converted()
         {
             var inputText =
 @"<asp:Button ID=""Identifier0"" CssClass=""Class0"" OnClick=""ClickHandler0"" Text=""Some text..."" Enabled=""False""/>";
@@ -41,13 +42,13 @@ namespace CTA.WebForms.Tests.TagConfigs
 </button>";
 
             expectedOutput = expectedOutput.Trim().Replace("\r\n", "\n");
-            var output = GetConverterOutput(inputText).Trim().Replace("\r\n", "\n");
+            var output = (await GetConverterOutput(inputText)).Trim().Replace("\r\n", "\n");
 
             Assert.AreEqual(expectedOutput, output);
         }
 
         [Test]
-        public void AspButtonField_Is_Properly_Converted()
+        public async Task AspButtonField_Is_Properly_Converted()
         {
             var inputText =
 @"<asp:ButtonField
@@ -66,14 +67,14 @@ namespace CTA.WebForms.Tests.TagConfigs
 </ButtonField>";
 
             expectedOutput = expectedOutput.Trim().Replace("\r\n", "\n");
-            var output = GetConverterOutput(inputText).Trim().Replace("\r\n", "\n");
+            var output = (await GetConverterOutput(inputText)).Trim().Replace("\r\n", "\n");
 
             Assert.AreEqual(expectedOutput, output);
             Assert.True(_viewImportService.ViewUsingDirectives.Contains("@using BlazorWebFormsComponents"));
         }
 
         [Test]
-        public void AspContent_Is_Properly_Removed()
+        public async Task AspContent_Is_Properly_Removed()
         {
             var inputText =
 @"<asp:Content>
@@ -97,25 +98,25 @@ namespace CTA.WebForms.Tests.TagConfigs
 </div>";
 
             expectedOutput = expectedOutput.Trim().Replace("\r\n", "\n");
-            var output = GetConverterOutput(inputText).Trim().Replace("\r\n", "\n");
+            var output = (await GetConverterOutput(inputText)).Trim().Replace("\r\n", "\n");
 
             Assert.AreEqual(expectedOutput, output);
         }
 
         [Test]
-        public void AspContentPlaceHolder_Is_Properly_Converted()
+        public async Task AspContentPlaceHolder_Is_Properly_Converted()
         {
             var inputText = "<asp:ContentPlaceHolder></asp:ContentPlaceHolder>";
             var expectedOutput = "@Body";
 
             expectedOutput = expectedOutput.Trim().Replace("\r\n", "\n");
-            var output = GetConverterOutput(inputText).Trim().Replace("\r\n", "\n");
+            var output = (await GetConverterOutput(inputText)).Trim().Replace("\r\n", "\n");
 
             Assert.AreEqual(expectedOutput, output);
         }
 
         [Test]
-        public void AspGridView_Is_Properly_Converted()
+        public async Task AspGridView_Is_Properly_Converted()
         {
             var inputText =
 @"<asp:GridView
@@ -150,13 +151,13 @@ namespace CTA.WebForms.Tests.TagConfigs
 </GridView>";
 
             expectedOutput = expectedOutput.Trim().Replace("\r\n", "\n");
-            var output = GetConverterOutput(inputText).Trim().Replace("\r\n", "\n");
+            var output = (await GetConverterOutput(inputText)).Trim().Replace("\r\n", "\n");
 
             Assert.AreEqual(expectedOutput, output);
         }
 
         [Test]
-        public void AspHyperLink_With_InnerHtml_Is_Properly_Converted()
+        public async Task AspHyperLink_With_InnerHtml_Is_Properly_Converted()
         {
             var inputText =
 @"<asp:HyperLink ID=""Identifier0"" CssClass=""Class0"" NavigateUrl=""https://aws.amazon.com"">
@@ -168,14 +169,14 @@ namespace CTA.WebForms.Tests.TagConfigs
 </a>";
 
             expectedOutput = expectedOutput.Trim().Replace("\r\n", "\n");
-            var output = GetConverterOutput(inputText).Trim().Replace("\r\n", "\n");
+            var output = (await GetConverterOutput(inputText)).Trim().Replace("\r\n", "\n");
 
             Assert.AreEqual(expectedOutput, output);
         }
 
 
         [Test]
-        public void AspHyperLink_With_Text_Is_Properly_Converted()
+        public async Task AspHyperLink_With_Text_Is_Properly_Converted()
         {
             var inputText =
 @"<asp:HyperLink ID=""Identifier0"" CssClass=""Class0"" Text=""Some text..."" NavigateUrl=""https://aws.amazon.com""/>";
@@ -185,13 +186,13 @@ namespace CTA.WebForms.Tests.TagConfigs
 </a>";
 
             expectedOutput = expectedOutput.Trim().Replace("\r\n", "\n");
-            var output = GetConverterOutput(inputText).Trim().Replace("\r\n", "\n");
+            var output = (await GetConverterOutput(inputText)).Trim().Replace("\r\n", "\n");
 
             Assert.AreEqual(expectedOutput, output);
         }
 
         [Test]
-        public void AspHyperLinkField_Is_Properly_Converted()
+        public async Task AspHyperLinkField_Is_Properly_Converted()
         {
             var inputText =
 @"<asp:HyperLinkField
@@ -213,14 +214,14 @@ namespace CTA.WebForms.Tests.TagConfigs
 </HyperLinkField>";
 
             expectedOutput = expectedOutput.Trim().Replace("\r\n", "\n");
-            var output = GetConverterOutput(inputText).Trim().Replace("\r\n", "\n");
+            var output = (await GetConverterOutput(inputText)).Trim().Replace("\r\n", "\n");
 
             Assert.AreEqual(expectedOutput, output);
             Assert.True(_viewImportService.ViewUsingDirectives.Contains("@using BlazorWebFormsComponents"));
         }
 
         [Test]
-        public void AspLabel_With_InnerHtml_Is_Properly_Converted()
+        public async Task AspLabel_With_InnerHtml_Is_Properly_Converted()
         {
             var inputText =
 @"<asp:Label ID=""Identifier0"" CssClass=""Class0"">
@@ -232,13 +233,13 @@ namespace CTA.WebForms.Tests.TagConfigs
 </label>";
 
             expectedOutput = expectedOutput.Trim().Replace("\r\n", "\n");
-            var output = GetConverterOutput(inputText).Trim().Replace("\r\n", "\n");
+            var output = (await GetConverterOutput(inputText)).Trim().Replace("\r\n", "\n");
 
             Assert.AreEqual(expectedOutput, output);
         }
 
         [Test]
-        public void AspLabel_With_Text_Is_Properly_Converted()
+        public async Task AspLabel_With_Text_Is_Properly_Converted()
         {
             var inputText =
 @"<asp:Label ID=""Identifier0"" CssClass=""Class0"" Text=""Some text...""/>";
@@ -248,13 +249,13 @@ namespace CTA.WebForms.Tests.TagConfigs
 </label>";
 
             expectedOutput = expectedOutput.Trim().Replace("\r\n", "\n");
-            var output = GetConverterOutput(inputText).Trim().Replace("\r\n", "\n");
+            var output = (await GetConverterOutput(inputText)).Trim().Replace("\r\n", "\n");
 
             Assert.AreEqual(expectedOutput, output);
         }
 
         [Test]
-        public void AspListView_Is_Properly_Converted()
+        public async Task AspListView_Is_Properly_Converted()
         {
             var inputText =
 @"<asp:ListView
@@ -312,26 +313,26 @@ namespace CTA.WebForms.Tests.TagConfigs
 </ListView>";
 
             expectedOutput = expectedOutput.Trim().Replace("\r\n", "\n");
-            var output = GetConverterOutput(inputText).Trim().Replace("\r\n", "\n");
+            var output = (await GetConverterOutput(inputText)).Trim().Replace("\r\n", "\n");
 
             Assert.AreEqual(expectedOutput, output);
             Assert.True(_viewImportService.ViewUsingDirectives.Contains("@using BlazorWebFormsComponents"));
         }
 
         [Test]
-        public void AspPlaceHolder_Is_Properly_Converted()
+        public async Task AspPlaceHolder_Is_Properly_Converted()
         {
             var inputText = @"<asp:PlaceHolder ID=""PlaceHolderId""></asp:PlaceHolder>";
             var expectedOutput = @"@PlaceHolderId";
 
             expectedOutput = expectedOutput.Trim().Replace("\r\n", "\n");
-            var output = GetConverterOutput(inputText).Trim().Replace("\r\n", "\n");
+            var output = (await GetConverterOutput(inputText)).Trim().Replace("\r\n", "\n");
 
             Assert.AreEqual(expectedOutput, output);
         }
 
         [Test]
-        public void AspRadioButton_Is_Properly_Converted_With_Label()
+        public async Task AspRadioButton_Is_Properly_Converted_With_Label()
         {
             var inputText =
 @"<asp:RadioButton ID=""Identifier0"" CssClass=""Class0"" GroupName=""RadioGroup"" Text=""Some text..."" Checked=""True"" Enabled=""True""/>";
@@ -342,13 +343,13 @@ namespace CTA.WebForms.Tests.TagConfigs
 </label>";
 
             expectedOutput = expectedOutput.Trim().Replace("\r\n", "\n");
-            var output = GetConverterOutput(inputText).Trim().Replace("\r\n", "\n");
+            var output = (await GetConverterOutput(inputText)).Trim().Replace("\r\n", "\n");
 
             Assert.AreEqual(expectedOutput, output);
         }
 
         [Test]
-        public void AspRadioButton_Is_Properly_Converted_Without_Label()
+        public async Task AspRadioButton_Is_Properly_Converted_Without_Label()
         {
             var inputText =
 @"<asp:RadioButton ID=""Identifier0"" CssClass=""Class0"" GroupName=""RadioGroup"" Checked=""True"" Enabled=""True""/>";
@@ -356,13 +357,13 @@ namespace CTA.WebForms.Tests.TagConfigs
 @"<input id=""Identifier0"" class=""Class0"" type=""radio"" name=""RadioGroup"" checked="""">";
 
             expectedOutput = expectedOutput.Trim().Replace("\r\n", "\n");
-            var output = GetConverterOutput(inputText).Trim().Replace("\r\n", "\n");
+            var output = (await GetConverterOutput(inputText)).Trim().Replace("\r\n", "\n");
 
             Assert.AreEqual(expectedOutput, output);
         }
 
         [Test]
-        public void AspTemplateField_Is_Properly_Converted()
+        public async Task AspTemplateField_Is_Properly_Converted()
         {
             var inputText =
 @"<asp:TemplateField ItemTemplate=""TemplateName"" HeaderText=""This is a header"" Visible=""True"">
@@ -374,14 +375,14 @@ namespace CTA.WebForms.Tests.TagConfigs
 </TemplateField>";
 
             expectedOutput = expectedOutput.Trim().Replace("\r\n", "\n");
-            var output = GetConverterOutput(inputText).Trim().Replace("\r\n", "\n");
+            var output = (await GetConverterOutput(inputText)).Trim().Replace("\r\n", "\n");
 
             Assert.AreEqual(expectedOutput, output);
             Assert.True(_viewImportService.ViewUsingDirectives.Contains("@using BlazorWebFormsComponents"));
         }
 
         [Test]
-        public void AspTextBox_Is_Properly_Converted_To_TextArea()
+        public async Task AspTextBox_Is_Properly_Converted_To_TextArea()
         {
             var inputText =
 @"<asp:TextBox
@@ -402,13 +403,13 @@ namespace CTA.WebForms.Tests.TagConfigs
 </textarea>";
 
             expectedOutput = expectedOutput.Trim().Replace("\r\n", "\n");
-            var output = GetConverterOutput(inputText).Trim().Replace("\r\n", "\n");
+            var output = (await GetConverterOutput(inputText)).Trim().Replace("\r\n", "\n");
 
             Assert.AreEqual(expectedOutput, output);
         }
 
         [Test]
-        public void AspTextBox_Is_Properly_Converted_To_Password_Input()
+        public async Task AspTextBox_Is_Properly_Converted_To_Password_Input()
         {
             var inputText =
 @"<asp:TextBox
@@ -425,13 +426,13 @@ namespace CTA.WebForms.Tests.TagConfigs
 @"<input id=""Identifier0"" class=""Class0"" value=""Some text..."" maxlength=""100"" type=""password"" @onchange=""(args) => OnTextChangedEventHandler(null, args)"" readonly="""" disabled="""">";
 
             expectedOutput = expectedOutput.Trim().Replace("\r\n", "\n");
-            var output = GetConverterOutput(inputText).Trim().Replace("\r\n", "\n");
+            var output = (await GetConverterOutput(inputText)).Trim().Replace("\r\n", "\n");
 
             Assert.AreEqual(expectedOutput, output);
         }
 
         [Test]
-        public void AspTextBox_Is_Properly_Converted_To_Default_Input()
+        public async Task AspTextBox_Is_Properly_Converted_To_Default_Input()
         {
             var inputText =
 @"<asp:TextBox
@@ -447,7 +448,7 @@ namespace CTA.WebForms.Tests.TagConfigs
 @"<input id=""Identifier0"" class=""Class0"" value=""Some text..."" maxlength=""100"" type=""text"" @onchange=""(args) => OnTextChangedEventHandler(null, args)"" readonly="""" disabled="""">";
 
             expectedOutput = expectedOutput.Trim().Replace("\r\n", "\n");
-            var output = GetConverterOutput(inputText).Trim().Replace("\r\n", "\n");
+            var output = (await GetConverterOutput(inputText)).Trim().Replace("\r\n", "\n");
 
             Assert.AreEqual(expectedOutput, output);
         }

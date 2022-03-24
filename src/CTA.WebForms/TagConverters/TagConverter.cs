@@ -62,13 +62,15 @@ namespace CTA.WebForms.TagConverters
         /// Retrieves an instance of the specified code behind handler class
         /// if one exists.
         /// </summary>
+        /// <param name="idValue">The value of the ID attribute for the node which this
+        /// handler will be used on.</param>
         /// <returns>An instance of the converter's code behind handler class if
         /// one was specified, otherwise null.</returns>
         /// <exception cref="InvalidOperationException">Throws if code behind handler
         /// is specified but class couldn't be found.</exception>
-        public ITagCodeBehindHandler GetCodeBehindHandlerInstance()
+        public TagCodeBehindHandler GetCodeBehindHandlerInstance(string idValue)
         {
-            if (CodeBehindHandler == null)
+            if (CodeBehindHandler == null || idValue == null)
             {
                 return null;
             }
@@ -80,7 +82,7 @@ namespace CTA.WebForms.TagConverters
                 throw new InvalidOperationException($"Code behind handler type {CodeBehindHandler} could not be found");
             }
 
-            return (ITagCodeBehindHandler)Activator.CreateInstance(handlerType);
+            return (TagCodeBehindHandler)Activator.CreateInstance(handlerType, CodeBehindType, idValue);
         }
 
         /// <summary>
@@ -119,7 +121,7 @@ namespace CTA.WebForms.TagConverters
         /// <param name="viewFilePath">The path of the view file being modified.</param>
         /// <param name="handler">The code behind handler to be used on this node, if one exists.</param>
         /// <param name="taskId">The task id of the view file converter that called this method.</param>
-        public abstract Task MigrateTag(HtmlNode node, string viewFilePath, ITagCodeBehindHandler handler, int taskId);
+        public abstract Task MigrateTag(HtmlNode node, string viewFilePath, TagCodeBehindHandler handler, int taskId);
 
         /// <summary>
         /// Checks whether the properties of this converter form a valid configuration.

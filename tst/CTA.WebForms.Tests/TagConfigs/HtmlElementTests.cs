@@ -1,11 +1,12 @@
 ﻿using NUnit.Framework;
+using System.Threading.Tasks;
 
 namespace CTA.WebForms.Tests.TagConfigs
 {
     public class HtmlElementTests : TagConfigsTestFixture
     {
         [Test]
-        public void Body_Is_Properly_Removed()
+        public async Task Body_Is_Properly_Removed()
         {
             var inputText =
 @"<body>
@@ -29,13 +30,13 @@ namespace CTA.WebForms.Tests.TagConfigs
 </div>";
 
             expectedOutput = expectedOutput.Trim().Replace("\r\n", "\n");
-            var output = GetConverterOutput(inputText).Trim().Replace("\r\n", "\n");
+            var output = (await GetConverterOutput(inputText)).Trim().Replace("\r\n", "\n");
 
             Assert.AreEqual(expectedOutput, output);
         }
 
         [Test]
-        public void Head_Is_Properly_Removed()
+        public async Task Head_Is_Properly_Removed()
         {
             var inputText =
 @"<head>
@@ -53,13 +54,13 @@ namespace CTA.WebForms.Tests.TagConfigs
 *@";
 
             expectedOutput = expectedOutput.Trim().Replace("\r\n", "\n");
-            var output = GetConverterOutput(inputText).Trim().Replace("\r\n", "\n");
+            var output = (await GetConverterOutput(inputText)).Trim().Replace("\r\n", "\n");
 
             Assert.AreEqual(expectedOutput, output);
         }
 
         [Test]
-        public void Html_Is_Properly_Removed()
+        public async Task Html_Is_Properly_Removed()
         {
             var inputText =
 @"<html>
@@ -83,7 +84,7 @@ namespace CTA.WebForms.Tests.TagConfigs
 </div>";
 
             expectedOutput = expectedOutput.Trim().Replace("\r\n", "\n");
-            var output = GetConverterOutput(inputText).Trim().Replace("\r\n", "\n");
+            var output = (await GetConverterOutput(inputText)).Trim().Replace("\r\n", "\n");
 
             Assert.AreEqual(expectedOutput, output);
         }

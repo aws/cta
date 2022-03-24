@@ -1,17 +1,16 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using CTA.Rules.Metrics;
-using CTA.WebForms.ControlConverters;
 using CTA.WebForms.FileConverters;
 using CTA.WebForms.FileInformationModel;
 using CTA.WebForms.Helpers.TagConversion;
 using CTA.WebForms.Metrics;
 using CTA.WebForms.Services;
-using HtmlAgilityPack;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using NUnit.Framework;
 
 namespace CTA.WebForms.Tests.FileConverters
@@ -19,18 +18,42 @@ namespace CTA.WebForms.Tests.FileConverters
     [TestFixture]
     public class ViewFileConverterTests : WebFormsTestBase
     {
+        private SemanticModel _testSemanticModel;
+        private ClassDeclarationSyntax _testClassDeclaration;
+
+        [OneTimeSetUp]
+        public void OneTimeSetup()
+        {
+            var testTree = CSharpSyntaxTree.ParseText("namespace Test { public class TestClass { } }");
+            var mscorlib = MetadataReference.CreateFromFile(typeof(object).Assembly.Location);
+            var testCompilation = CSharpCompilation.Create(
+                "Test",
+                syntaxTrees: new[] { testTree },
+                references: new[] { mscorlib });
+
+            _testSemanticModel = testCompilation.GetSemanticModel(testTree);
+            _testClassDeclaration = testTree.GetRoot().DescendantNodes().OfType<ClassDeclarationSyntax>().FirstOrDefault();
+        }
+
         [Test]
         public async Task HyperLinkControlConverter_Returns_Href_Node()
         {
+            var cbLinkerService = new CodeBehindReferenceLinkerService();
+
             FileConverter fc = new ViewFileConverter(
                 FileConverterSetupFixture.TestProjectPath, 
                 FileConverterSetupFixture.TestHyperLinkControlFilePath,
                 new ViewImportService(),
-                new CodeBehindReferenceLinkerService(),
+                cbLinkerService,
                 new TaskManagerService(),
                 new TagConfigParser(Rules.Config.Constants.TagConfigsExtractedPath),
                 new WebFormMetricContext());
-            
+
+            cbLinkerService.RegisterClassDeclaration(
+                FileConverterSetupFixture.TestHyperLinkControlFilePath,
+                _testSemanticModel,
+                _testClassDeclaration);
+
             IEnumerable<FileInformation> fileList = await fc.MigrateFileAsync();
             FileInformation fi = fileList.Single();
             
@@ -76,15 +99,22 @@ namespace CTA.WebForms.Tests.FileConverters
         [Test]
         public async Task ButtonControlConverter_Returns_Button_Node()
         {
+            var cbLinkerService = new CodeBehindReferenceLinkerService();
+
             FileConverter fc = new ViewFileConverter(
                 FileConverterSetupFixture.TestProjectPath, 
                 FileConverterSetupFixture.TestButtonControlFilePath,
                 new ViewImportService(),
-                new CodeBehindReferenceLinkerService(),
+                cbLinkerService,
                 new TaskManagerService(),
                 new TagConfigParser(Rules.Config.Constants.TagConfigsExtractedPath),
                 new WebFormMetricContext());
-            
+
+            cbLinkerService.RegisterClassDeclaration(
+                FileConverterSetupFixture.TestButtonControlFilePath,
+                _testSemanticModel,
+                _testClassDeclaration);
+
             IEnumerable<FileInformation> fileList = await fc.MigrateFileAsync();
             FileInformation fi = fileList.Single();
             
@@ -116,15 +146,22 @@ namespace CTA.WebForms.Tests.FileConverters
         [Test]
         public async Task LabelControlConverter_Returns_DynamicText()
         {
+            var cbLinkerService = new CodeBehindReferenceLinkerService();
+
             FileConverter fc = new ViewFileConverter(
                 FileConverterSetupFixture.TestProjectPath, 
                 FileConverterSetupFixture.TestLabelControlFilePath,
                 new ViewImportService(),
-                new CodeBehindReferenceLinkerService(),
+                cbLinkerService,
                 new TaskManagerService(),
                 new TagConfigParser(Rules.Config.Constants.TagConfigsExtractedPath),
                 new WebFormMetricContext());
-            
+
+            cbLinkerService.RegisterClassDeclaration(
+                FileConverterSetupFixture.TestLabelControlFilePath,
+                _testSemanticModel,
+                _testClassDeclaration);
+
             IEnumerable<FileInformation> fileList = await fc.MigrateFileAsync();
             FileInformation fi = fileList.Single();
             
@@ -217,15 +254,22 @@ namespace CTA.WebForms.Tests.FileConverters
         [Test]
         public async Task ListViewControlConverter_Returns_ListView_Node()
         {
+            var cbLinkerService = new CodeBehindReferenceLinkerService();
+
             FileConverter fc = new ViewFileConverter(
                 FileConverterSetupFixture.TestProjectPath, 
                 FileConverterSetupFixture.TestListViewControlFilePath,
                 new ViewImportService(),
-                new CodeBehindReferenceLinkerService(),
+                cbLinkerService,
                 new TaskManagerService(),
                 new TagConfigParser(Rules.Config.Constants.TagConfigsExtractedPath),
                 new WebFormMetricContext());
-            
+
+            cbLinkerService.RegisterClassDeclaration(
+                FileConverterSetupFixture.TestListViewControlFilePath,
+                _testSemanticModel,
+                _testClassDeclaration);
+
             IEnumerable<FileInformation> fileList = await fc.MigrateFileAsync();
             FileInformation fi = fileList.Single();
             
@@ -281,15 +325,22 @@ namespace CTA.WebForms.Tests.FileConverters
         [Test]
         public async Task TestViewFileConverter_Returns_GridView_Node()
         {
+            var cbLinkerService = new CodeBehindReferenceLinkerService();
+
             FileConverter fc = new ViewFileConverter(
                 FileConverterSetupFixture.TestProjectPath, 
                 FileConverterSetupFixture.TestGridViewControlFilePath,
                 new ViewImportService(),
-                new CodeBehindReferenceLinkerService(),
+                cbLinkerService,
                 new TaskManagerService(),
                 new TagConfigParser(Rules.Config.Constants.TagConfigsExtractedPath),
                 new WebFormMetricContext());
-            
+
+            cbLinkerService.RegisterClassDeclaration(
+                FileConverterSetupFixture.TestGridViewControlFilePath,
+                _testSemanticModel,
+                _testClassDeclaration);
+
             IEnumerable<FileInformation> fileList = await fc.MigrateFileAsync();
             FileInformation fi = fileList.Single();
             
@@ -336,15 +387,22 @@ namespace CTA.WebForms.Tests.FileConverters
         [Test]
         public async Task TestViewFileConverter_Returns_ContentPlaceHolderNode_As_Body_Directive()
         {
+            var cbLinkerService = new CodeBehindReferenceLinkerService();
+
             FileConverter fc = new ViewFileConverter(
                 FileConverterSetupFixture.TestProjectPath, 
                 FileConverterSetupFixture.TestContentPlaceHolderControlFilePath,
                 new ViewImportService(),
-                new CodeBehindReferenceLinkerService(),
+                cbLinkerService,
                 new TaskManagerService(),
                 new TagConfigParser(Rules.Config.Constants.TagConfigsExtractedPath),
                 new WebFormMetricContext());
-            
+
+            cbLinkerService.RegisterClassDeclaration(
+                FileConverterSetupFixture.TestContentPlaceHolderControlFilePath,
+                _testSemanticModel,
+                _testClassDeclaration);
+
             IEnumerable<FileInformation> fileList = await fc.MigrateFileAsync();
             FileInformation fi = fileList.Single();
             
@@ -367,15 +425,22 @@ namespace CTA.WebForms.Tests.FileConverters
         [Test]
         public async Task TestViewFileConverter_Returns_ContentNode_As_Div()
         {
+            var cbLinkerService = new CodeBehindReferenceLinkerService();
+
             FileConverter fc = new ViewFileConverter(
                 FileConverterSetupFixture.TestProjectPath, 
                 FileConverterSetupFixture.TestContentControlFilePath,
                 new ViewImportService(),
-                new CodeBehindReferenceLinkerService(),
+                cbLinkerService,
                 new TaskManagerService(),
                 new TagConfigParser(Rules.Config.Constants.TagConfigsExtractedPath),
                 new WebFormMetricContext());
-            
+
+            cbLinkerService.RegisterClassDeclaration(
+                FileConverterSetupFixture.TestContentControlFilePath,
+                _testSemanticModel,
+                _testClassDeclaration);
+
             IEnumerable<FileInformation> fileList = await fc.MigrateFileAsync();
             FileInformation fi = fileList.Single();
             
@@ -409,15 +474,22 @@ namespace CTA.WebForms.Tests.FileConverters
         [Test]
         public async Task TestViewFileConverter_Converts_Directives()
         {
+            var cbLinkerService = new CodeBehindReferenceLinkerService();
+
             FileConverter fc = new ViewFileConverter(
                 FileConverterSetupFixture.TestProjectPath, 
                 FileConverterSetupFixture.TestDirectiveFilePath,
                 new ViewImportService(),
-                new CodeBehindReferenceLinkerService(),
+                cbLinkerService,
                 new TaskManagerService(),
                 new TagConfigParser(Rules.Config.Constants.TagConfigsExtractedPath),
                 new WebFormMetricContext());
-            
+
+            cbLinkerService.RegisterClassDeclaration(
+                FileConverterSetupFixture.TestDirectiveFilePath,
+                _testSemanticModel,
+                _testClassDeclaration);
+
             IEnumerable<FileInformation> fileList = await fc.MigrateFileAsync();
             FileInformation fi = fileList.Single();
             
@@ -457,15 +529,22 @@ namespace CTA.WebForms.Tests.FileConverters
         [Test]
         public async Task TestViewFileConverter_DefaultAspx()
         {
+            var cbLinkerService = new CodeBehindReferenceLinkerService();
+
             FileConverter fc = new ViewFileConverter(
                 FileConverterSetupFixture.TestProjectPath, 
                 FileConverterSetupFixture.TestViewFilePath,
                 new ViewImportService(),
-                new CodeBehindReferenceLinkerService(),
+                cbLinkerService,
                 new TaskManagerService(),
                 new TagConfigParser(Rules.Config.Constants.TagConfigsExtractedPath),
                 new WebFormMetricContext());
-            
+
+            cbLinkerService.RegisterClassDeclaration(
+                FileConverterSetupFixture.TestViewFilePath,
+                _testSemanticModel,
+                _testClassDeclaration);
+
             IEnumerable<FileInformation> fileList = await fc.MigrateFileAsync();
             FileInformation fi = fileList.Single();
             
@@ -550,20 +629,100 @@ namespace CTA.WebForms.Tests.FileConverters
         [Test]
         public async Task TestViewFileConverter_SiteMaster()
         {
+            var cbLinkerService = new CodeBehindReferenceLinkerService();
+
             FileConverter fc = new ViewFileConverter(
                 FileConverterSetupFixture.TestProjectPath, 
                 FileConverterSetupFixture.TestSiteMasterFilePath,
                 new ViewImportService(),
-                new CodeBehindReferenceLinkerService(),
+                cbLinkerService,
                 new TaskManagerService(),
                 new TagConfigParser(Rules.Config.Constants.TagConfigsExtractedPath),
                 new WebFormMetricContext());
-            
+
+            cbLinkerService.RegisterClassDeclaration(
+                FileConverterSetupFixture.TestSiteMasterFilePath,
+                _testSemanticModel,
+                _testClassDeclaration);
+
             IEnumerable<FileInformation> fileList = await fc.MigrateFileAsync();
             FileInformation fi = fileList.Single();
             
             byte[] bytes = fi.FileBytes;
             var fileContents = Encoding.UTF8.GetString(bytes);
+        }
+
+        [Test]
+        public void ConvertEmbeddedCode_Converts_DataBinding()
+        {
+            string htmlString = @"<div class=""esh-table"">
+    <asp:ListView ID=""productList"" ItemPlaceholderID=""itemPlaceHolder"" runat=""server"" ItemType=""eShopLegacyWebForms.Models.CatalogItem"">
+        <ItemTemplate>
+            <tr>
+                <td>
+                    <image class=""esh-thumbnail"" src='/Pics/<%#Item.PictureFileName%>' />
+                </td>
+                <p>
+                    <%#Item.MaxStockThreshold%>
+                </p>
+                <td>
+                    <asp:HyperLink NavigateUrl='<%# GetRouteUrl(""EditProductRoute"", new {id =Item.Id}) %>' runat=""server"" CssClass=""esh-table-link"">
+                        Edit
+                    </asp:HyperLink>
+                </td>
+            </tr>
+        </ItemTemplate>
+    </asp:ListView>
+</div>";
+            string contents = ViewFileConverter.ConvertEmbeddedCode(htmlString);
+
+            string expectedContents = @"<div class=""esh-table"">
+    <asp:ListView ID=""productList"" ItemPlaceholderID=""itemPlaceHolder"" runat=""server"" ItemType=""eShopLegacyWebForms.Models.CatalogItem"">
+        <ItemTemplate>
+            <tr>
+                <td>
+                    <image class=""esh-thumbnail"" src='/Pics/@(Item.PictureFileName)' />
+                </td>
+                <p>
+                    @(Item.MaxStockThreshold)
+                </p>
+                <td>
+                    <asp:HyperLink NavigateUrl='@(GetRouteUrl(""EditProductRoute"", new {id =Item.Id}))' runat=""server"" CssClass=""esh-table-link"">
+                        Edit
+                    </asp:HyperLink>
+                </td>
+            </tr>
+        </ItemTemplate>
+    </asp:ListView>
+</div>";
+            Assert.AreEqual(expectedContents, contents);
+        }
+
+        [Test]
+        public void ConvertEmbeddedCode_Converts_SingExpr()
+        {
+            string htmlString = @"<div class=""esh-pager"">
+    <div class=""container"">
+        <article class=""esh-pager-wrapper row"">
+            <nav>
+                <span class=""esh-pager-item"">Showing <%: Model.ItemsPerPage%> of <%: Model.TotalItems%> products - Page <%: (Model.ActualPage + 1)%> - <%: Model.TotalPages%>
+                </span>
+            </nav>
+        </article>
+    </div>
+</div>";
+            string contents = ViewFileConverter.ConvertEmbeddedCode(htmlString);
+            string expectedContents = @"<div class=""esh-pager"">
+    <div class=""container"">
+        <article class=""esh-pager-wrapper row"">
+            <nav>
+                <span class=""esh-pager-item"">Showing @(Model.ItemsPerPage) of @(Model.TotalItems) products - Page @((Model.ActualPage + 1)) - @(Model.TotalPages)
+                </span>
+            </nav>
+        </article>
+    </div>
+</div>";
+            Assert.AreEqual(expectedContents, contents);
         }
     }
 }
