@@ -124,6 +124,8 @@ namespace CTA.Rules.Config
         public const string ActionResult = "ActionResult";
         public const string TaskIHttpActionResult = "Task<IHttpActionResult>";
         public const string IHttpActionResult = "IHttpActionResult";
+        public const string IActionResult = "IActionResult";
+        public const string TaskIActionResult = "Task<IActionResult>";
         public const string CreateRequest = "CreateRequest";
         public const string AsyncModifier = "async";
         public const string VoidModifier = "void";

@@ -122,6 +122,16 @@ namespace CTA.Rules.Actions
             return func;
         }
 
+        public Func<string, ProjectType, string> GetCreateMonolithServiceCoreAction(string namespaceString, string projectName)
+        {
+            string func(string projectDir, ProjectType projectType)
+            {
+                AddMonolithFile(namespaceString, projectName, projectDir, projectType, FileTypeCreation.MonolithServiceCore.ToString());
+                return "";
+            }
+            return func;
+        }
+
         private void AddMonolithFile(string namespaceString, string projectName, string projectDir, ProjectType projectType, string templateFilename)
         {
             if (projectDir != null && projectDir.Length > 0)
