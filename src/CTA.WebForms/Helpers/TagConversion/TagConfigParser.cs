@@ -130,6 +130,11 @@ namespace CTA.WebForms.Helpers.TagConversion
                 using (var httpClient = new HttpClient())
                 {
                     var fileContents = httpClient.GetStringAsync(s3Url).Result;
+
+                    // No need to check if directory exists, this call takes care
+                    // of it automatically
+                    Directory.CreateDirectory(Path.GetDirectoryName(filePath));
+
                     File.WriteAllText(filePath, fileContents);
                 }
 
