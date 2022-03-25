@@ -88,7 +88,7 @@ namespace CTA.WebForms.TagCodeBehindHandlers
                     if (ancestorStatement != null)
                     {
                         var comment = CodeSyntaxHelper.GetBlankLine().AddComment(ancestorStatement.ToString(), isLeading: false);
-                        StagedConversions.Add(ancestorStatement, comment);
+                        StagedConversions.Add((ancestorStatement, comment));
                     }
                     else
                     {
@@ -153,7 +153,7 @@ namespace CTA.WebForms.TagCodeBehindHandlers
             {
                 var propertyIdentifierSyntax = SyntaxFactory.IdentifierName(newPropertyName);
 
-                StagedConversions.Add(codeBehindReference, propertyIdentifierSyntax);
+                StagedConversions.Add((codeBehindReference, propertyIdentifierSyntax));
             }
         }
 

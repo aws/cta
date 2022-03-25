@@ -36,14 +36,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="TempTagConfigs\asp.BoundField.yaml" />
-    <None Remove="TempTagConfigs\asp.ButtonField.yaml" />
-    <None Remove="TempTagConfigs\asp.HyperLinkField.yaml" />
-    <None Remove="TempTagConfigs\asp.PlaceHolder.yaml" />
-    <None Remove="TempTagConfigs\asp.TemplateField.yaml" />
-    <None Remove="TempTagConfigs\body.yaml" />
-    <None Remove="TempTagConfigs\head.yaml" />
-    <None Remove="TempTagConfigs\html.yaml" />
     <None Remove="TestingArea\TestFiles\TestTagConfigs\invalid.AddNugetPackageExtraProperties.yaml" />
     <None Remove="TestingArea\TestFiles\TestTagConfigs\invalid.AnyConditionExtraProperties.yaml" />
     <None Remove="TestingArea\TestFiles\TestTagConfigs\invalid.HasAttributeExtraProperties.yaml" />
@@ -61,5 +53,9 @@
 	<None Remove="TestingArea\TestFiles\TestTagConfigs\valid.MinimalNulls.yaml" />
     <None Remove="TestingArea\TestFiles\TestTagConfigs\valid.MultipleConditions.yaml" />
     <None Remove="TestingArea\TestFiles\TestTagConfigs\valid.MultipleInvocations.yaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="TempTagConfigs\" />
   </ItemGroup>
 </Project>

@@ -24,9 +24,12 @@ namespace CTA.WebForms.Helpers.TagConversion
         /// </summary>
         public ConcurrentDictionary<string, TagConverter> TagConverterMap { get; }
         /// <summary>
-        /// The list of known tag names which do not have converters.
+        /// The list of known tag names which do not have converters. We use a 
+        /// <see cref="ConcurrentBag{string}"/> here because there is no concurrent/
+        /// thread safe Set class, and potentially having duplicates in the bag doesn't
+        /// cause any issues for us.
         /// </summary>
-        public List<string> NoConverterTags { get; }
+        public ConcurrentBag<string> NoConverterTags { get; }
 
         /// <summary>
         /// Initializes a new instance of <see cref="TagConfigParser"/> for reading
@@ -39,7 +42,7 @@ namespace CTA.WebForms.Helpers.TagConversion
             _deserializer = GenerateDeserializer();
 
             TagConverterMap = new ConcurrentDictionary<string, TagConverter>(StringComparer.InvariantCultureIgnoreCase);
-            NoConverterTags = new List<string>();
+            NoConverterTags = new ConcurrentBag<string>();
         }
 
         /// <summary>
@@ -62,7 +65,7 @@ namespace CTA.WebForms.Helpers.TagConversion
 
             string fileName = GetValidFileName(nodeName);
             string filePath = Path.Combine(_configsDir, fileName);
-            string s3Url = $"{Rules.Config.Constants.TagConfigsExtractedPath}\\{fileName}";
+            string s3Url = $"{Rules.Config.Constants.S3TagConfigsBucketUrl}\\{fileName}";
 
             if (File.Exists(filePath) || DownloadFileFromS3(s3Url, filePath))
             {
@@ -77,7 +80,8 @@ namespace CTA.WebForms.Helpers.TagConversion
                     if (!TagConverterMap.TryAdd(converter.TagName, converter))
                     {
                         LogHelper.LogError($"{Rules.Config.Constants.WebFormsErrorTag}Failed to add valid converter of type " +
-                            $"{converter?.GetType().Name} for {converter?.TagName} to concurrent dictionary for config at {filePath}");
+                            $"{converter?.GetType().Name} for {converter?.TagName} to concurrent dictionary for config at {filePath} " +
+                            $"due to attempted invalid concurrent access");
                     }
 
                     // Even if adding to the dictionary fails, we want to return the validated converter,
@@ -109,7 +113,7 @@ namespace CTA.WebForms.Helpers.TagConversion
                 fileName = fileName.Replace(c.ToString(), string.Empty);
             }
 
-            return fileName;
+            return fileName.ToLower();
         }
 
         /// <summary>
@@ -131,9 +135,16 @@ namespace CTA.WebForms.Helpers.TagConversion
 
                 return true;
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                // Not an error, we just don't have a config for this node type
+                // 404 is not an error, we just don't have a config for this node type. Other
+                // exceptions, however, are "real" errors
+                if (!e.Message.Contains("404"))
+                {
+                    LogHelper.LogError(e, $"{Rules.Config.Constants.WebFormsErrorTag}Failed to download and " +
+                        $"store tag config file from {s3Url} to {filePath}");
+                }
+                
                 return false;
             }
         }

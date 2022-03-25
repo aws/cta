@@ -13,8 +13,8 @@ namespace CTA.WebForms.Extensions
         /// <param name="regex">The regular expression that is being used.</param>
         /// <param name="input">The string that <paramref name="regex"/> is being applied to.</param>
         /// <param name="replacementFn">The function that is used for match replacement.</param>
-        /// <returns>The string <paramref name="input"/> with all matches made by <paramref name="regex"/>
-        /// replaced as specified in <paramref name="replacementFn"/>.</returns>
+        /// <returns>The input string with all matches made by the regular expression
+        /// replaced as specified in the replacement function.</returns>
         public static async Task<string> ReplaceAsync(this Regex regex, string input, Func<Match, Task<string>> replacementFn)
         {
             var sb = new StringBuilder();

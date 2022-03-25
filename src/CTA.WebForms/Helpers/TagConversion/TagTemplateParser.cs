@@ -291,7 +291,7 @@ namespace CTA.WebForms.Helpers.TagConversion
                 if (handler != null)
                 {
                     codeBehindRefBinding = await _taskManagerService.ManagedRun(taskId,
-                        (token) => _codeBehindLinkerService.HandleCodeBehindForAttribute(
+                        (token) => _codeBehindLinkerService.HandleCodeBehindForAttributeAsync(
                             viewFilePath,
                             codeBehindName,
                             convertedSourceValue,
@@ -312,7 +312,7 @@ namespace CTA.WebForms.Helpers.TagConversion
                     Rules.Config.Constants.WebFormsErrorTag,
                     GetType().Name,
                     nameof(CodeBehindReferenceLinkerService),
-                    nameof(CodeBehindReferenceLinkerService.HandleCodeBehindForAttribute)));
+                    nameof(CodeBehindReferenceLinkerService.HandleCodeBehindForAttributeAsync)));
             }
             catch (Exception e)
             {

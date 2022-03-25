@@ -174,7 +174,7 @@ namespace CTA.WebForms.Tests.TagConverters
             };
             templateConverter.Initialize(new TaskManagerService(), new CodeBehindReferenceLinkerService(), new ViewImportService());
 
-            await templateConverter.MigrateTag(node, "testpath", null, 0);
+            await templateConverter.MigrateTagAsync(node, "testpath", null, 0);
 
             Assert.AreEqual(expectedInnerHtml, parent.InnerHtml);
         }
@@ -206,7 +206,7 @@ namespace CTA.WebForms.Tests.TagConverters
             };
             templateConverter.Initialize(new TaskManagerService(), new CodeBehindReferenceLinkerService(), new ViewImportService());
 
-            await templateConverter.MigrateTag(node, "testpath", null, 0);
+            await templateConverter.MigrateTagAsync(node, "testpath", null, 0);
 
             Assert.AreEqual(expectedInnerHtml, parent.InnerHtml);
         }

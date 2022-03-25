@@ -50,7 +50,7 @@ namespace CTA.WebForms.ClassConverters
             //var requiredNamespaces = _sourceFileSemanticModel.GetNamespacesReferencedByType(_originalDeclarationSyntax);
             //var namespaceNames = requiredNamespaces.Select(namespaceSymbol => namespaceSymbol.ToDisplayString()).Append(Constants.BlazorComponentsNamespace);
 
-            var modifiedClass = await DoTagCodeBehindConversions((ClassDeclarationSyntax)_originalDeclarationSyntax);
+            var modifiedClass = await DoTagCodeBehindConversions(_originalDeclarationSyntax as ClassDeclarationSyntax);
 
             var namespaceNames = _sourceFileSemanticModel.GetOriginalUsingNamespaces().Append(Constants.BlazorComponentsNamespace);
             namespaceNames = CodeSyntaxHelper.RemoveFrameworkUsings(namespaceNames);
@@ -85,7 +85,7 @@ namespace CTA.WebForms.ClassConverters
             try
             {
                 return await _taskManager.ManagedRun(_taskId, (token) =>
-                    _codeBehindLinkerService.ExecuteTagCodeBehindHandlers(viewFilePath, _sourceFileSemanticModel, classDeclaration, token));
+                    _codeBehindLinkerService.ExecuteTagCodeBehindHandlersAsync(viewFilePath, _sourceFileSemanticModel, classDeclaration, token));
             }
             catch (OperationCanceledException e)
             {
@@ -94,7 +94,7 @@ namespace CTA.WebForms.ClassConverters
                     Rules.Config.Constants.WebFormsErrorTag,
                     GetType().Name,
                     nameof(CodeBehindReferenceLinkerService),
-                    nameof(CodeBehindReferenceLinkerService.ExecuteTagCodeBehindHandlers)));
+                    nameof(CodeBehindReferenceLinkerService.ExecuteTagCodeBehindHandlersAsync)));
             }
             catch (Exception e)
             {

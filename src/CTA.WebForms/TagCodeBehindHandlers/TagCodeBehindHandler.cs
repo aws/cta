@@ -20,7 +20,7 @@ namespace CTA.WebForms.TagCodeBehindHandlers
         /// Conversions that have been staged for code behind references to the control
         /// that this handler is tasked with handling.
         /// </summary>
-        public IDictionary<SyntaxNode, SyntaxNode> StagedConversions;
+        public ISet<(SyntaxNode input, SyntaxNode replacement)> StagedConversions;
 
         /// <summary>
         /// Initializes a new <see cref="TagCodeBehindHandler"/> instance.
@@ -33,7 +33,7 @@ namespace CTA.WebForms.TagCodeBehindHandlers
         {
             CodeBehindType = codeBehindType;
             IdValue = idValue;
-            StagedConversions = new Dictionary<SyntaxNode, SyntaxNode>();
+            StagedConversions = new HashSet<(SyntaxNode, SyntaxNode)>();
         }
 
         /// <summary>

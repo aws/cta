@@ -53,7 +53,7 @@ namespace CTA.WebForms.ClassConverters
             //     // This is so we can use ComponentBase base class
             //     .Append(Constants.BlazorComponentsNamespace);
 
-            var currentClassDeclaration = await DoTagCodeBehindConversions((ClassDeclarationSyntax)_originalDeclarationSyntax);
+            var currentClassDeclaration = await DoTagCodeBehindConversions(_originalDeclarationSyntax as ClassDeclarationSyntax);
 
             var requiredNamespaceNames = _sourceFileSemanticModel.GetOriginalUsingNamespaces().Append(Constants.BlazorComponentsNamespace);
             requiredNamespaceNames = CodeSyntaxHelper.RemoveFrameworkUsings(requiredNamespaceNames);
@@ -123,8 +123,6 @@ namespace CTA.WebForms.ClassConverters
                 currentClassDeclaration = currentClassDeclaration.AddBaseType(Constants.DisposableInterface);
             }
 
-            // currentClassDeclaration = await DoTagCodeBehindConversions(currentClassDeclaration);
-
             var namespaceNode = CodeSyntaxHelper.BuildNamespace(_originalClassSymbol.ContainingNamespace?.ToDisplayString(), currentClassDeclaration);
             var fileText = CodeSyntaxHelper.GetFileSyntaxAsString(namespaceNode, CodeSyntaxHelper.BuildUsingStatements(requiredNamespaceNames));
 
@@ -148,7 +146,7 @@ namespace CTA.WebForms.ClassConverters
             try
             {
                 return await _taskManager.ManagedRun(_taskId, (token) => 
-                    _codeBehindLinkerService.ExecuteTagCodeBehindHandlers(viewFilePath, _sourceFileSemanticModel, classDeclaration, token));
+                    _codeBehindLinkerService.ExecuteTagCodeBehindHandlersAsync(viewFilePath, _sourceFileSemanticModel, classDeclaration, token));
             }
             catch (OperationCanceledException e)
             {
@@ -157,7 +155,7 @@ namespace CTA.WebForms.ClassConverters
                     Rules.Config.Constants.WebFormsErrorTag,
                     GetType().Name,
                     nameof(CodeBehindReferenceLinkerService),
-                    nameof(CodeBehindReferenceLinkerService.ExecuteTagCodeBehindHandlers)));
+                    nameof(CodeBehindReferenceLinkerService.ExecuteTagCodeBehindHandlersAsync)));
             }
             catch (Exception e)
             {

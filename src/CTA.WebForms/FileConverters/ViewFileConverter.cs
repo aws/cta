@@ -47,7 +47,7 @@ namespace CTA.WebForms.FileConverters
             _codeBehindLinkerService.RegisterViewFile(FullPath);
         }
 
-        private async Task<HtmlDocument> GetRazorContents(string htmlString)
+        private async Task<HtmlDocument> GetRazorContentsAsync(string htmlString)
         {
             var htmlDoc = new HtmlDocument();
 
@@ -120,7 +120,7 @@ namespace CTA.WebForms.FileConverters
             {
                 try
                 {
-                    await tagConversionAction.Converter.MigrateTag(
+                    await tagConversionAction.Converter.MigrateTagAsync(
                         tagConversionAction.Node,
                         FullPath,
                         tagConversionAction.CodeBehindHandler,
@@ -152,7 +152,7 @@ namespace CTA.WebForms.FileConverters
                 htmlString = EmbeddedCodeReplacers.ReplaceDirectives(htmlString, RelativePath, projectName, _viewImportService, _metricsContext);
 
                 // Convert the Web Forms controls to Blazor equivalent
-                var migratedDocument = await GetRazorContents(htmlString);
+                var migratedDocument = await GetRazorContentsAsync(htmlString);
                 var contents = migratedDocument.DocumentNode.WriteTo().Trim();
 
                 // We comment out the unknown user controls here instead of during

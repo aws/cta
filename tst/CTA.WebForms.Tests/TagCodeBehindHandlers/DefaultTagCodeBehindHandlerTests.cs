@@ -49,8 +49,8 @@ namespace Test {
 
             var stagedConversion = _handler.StagedConversions.Single();
 
-            Assert.AreEqual($"{_idValue}.{navigateUrl}", stagedConversion.Key.ToString());
-            Assert.AreEqual($"{_idValue}_{navigateUrl}", stagedConversion.Value.ToString());
+            Assert.AreEqual($"{_idValue}.{navigateUrl}", stagedConversion.input.ToString());
+            Assert.AreEqual($"{_idValue}_{navigateUrl}", stagedConversion.replacement.ToString());
         }
 
         [Test]
@@ -82,8 +82,8 @@ namespace Test {
 
             var stagedConversion = _handler.StagedConversions.Single();
 
-            Assert.AreEqual($"{_idValue}.{navigateUrl}", stagedConversion.Key.ToString());
-            Assert.AreEqual($"{_idValue}_{navigateUrl}", stagedConversion.Value.NormalizeWhitespace().ToFullString());
+            Assert.AreEqual($"{_idValue}.{navigateUrl}", stagedConversion.input.ToString());
+            Assert.AreEqual($"{_idValue}_{navigateUrl}", stagedConversion.replacement.NormalizeWhitespace().ToFullString());
         }
 
         [Test]
@@ -118,11 +118,11 @@ namespace Test {
             var stagedConversion1 = _handler.StagedConversions.First();
             var stagedConversion2 = _handler.StagedConversions.Last();
 
-            Assert.AreEqual($"{_idValue}.{navigateUrl}", stagedConversion1.Key.ToString());
-            Assert.AreEqual($"{_idValue}_{navigateUrl}", stagedConversion1.Value.ToString());
+            Assert.AreEqual($"{_idValue}.{navigateUrl}", stagedConversion1.input.ToString());
+            Assert.AreEqual($"{_idValue}_{navigateUrl}", stagedConversion1.replacement.ToString());
 
-            Assert.AreEqual($"{_idValue}.{cssClass}", stagedConversion2.Key.ToString());
-            Assert.AreEqual($"{_idValue}_{cssClass}", stagedConversion2.Value.ToString());
+            Assert.AreEqual($"{_idValue}.{cssClass}", stagedConversion2.input.ToString());
+            Assert.AreEqual($"{_idValue}_{cssClass}", stagedConversion2.replacement.ToString());
         }
 
         [Test]
@@ -185,8 +185,8 @@ namespace Test {
 
             var stagedConversion = _handler.StagedConversions.Single();
 
-            Assert.AreEqual($"{_idValue}.{navigateUrl}", stagedConversion.Key.ToString());
-            Assert.AreEqual($"{_idValue}_{navigateUrl}", stagedConversion.Value.NormalizeWhitespace().ToFullString());
+            Assert.AreEqual($"{_idValue}.{navigateUrl}", stagedConversion.input.ToString());
+            Assert.AreEqual($"{_idValue}_{navigateUrl}", stagedConversion.replacement.NormalizeWhitespace().ToFullString());
         }
 
         [Test]

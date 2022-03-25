@@ -45,7 +45,7 @@ namespace CTA.WebForms.Services
         /// <exception cref="InvalidOperationException">Throws if view file with path <paramref name="viewFilePath"/>
         /// has not been registered.</exception>
         /// <returns>Property binding text if a bindable property was generated, null otherwise.</returns>
-        public async Task<string> HandleCodeBehindForAttribute(
+        public async Task<string> HandleCodeBehindForAttributeAsync(
             string viewFilePath,
             string codeBehindName,
             string convertedSourceValue,
@@ -112,7 +112,8 @@ namespace CTA.WebForms.Services
 
             var allStagedConversions = currentLink.Handlers
                 .SelectMany(handler => handler.StagedConversions)
-                .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+                .DistinctBy(conversion => conversion.input)
+                .ToDictionary(conversion => conversion.input, conversion => conversion.replacement);
 
             var alteredClass = currentLink.ClassDeclaration
                 .ReplaceNodes(allStagedConversions.Keys, (original, _) => allStagedConversions[original]);
@@ -180,6 +181,7 @@ namespace CTA.WebForms.Services
         /// <param name="classDeclaration">The code behind class declaration</param>
         /// <exception cref="InvalidOperationException">Throws if view file with path <paramref name="viewFilePath"/>
         /// has not been registered.</exception>
+        /// <exception cref="ArgumentNullException">Throws if <paramref name="classDeclaration"/> is null.</exception>
         public void RegisterClassDeclaration(string viewFilePath, SemanticModel semanticModel, ClassDeclarationSyntax classDeclaration)
         {
             if (semanticModel == null)
@@ -243,7 +245,7 @@ namespace CTA.WebForms.Services
         /// <param name="token">A cancellation token for stopping processes if stall occurs.</param>
         /// <returns>The modified class declaration if modifications needed to be made, otherwise
         /// the original value of <paramref name="classDeclaration"/> is returned.</returns>
-        public async Task<ClassDeclarationSyntax> ExecuteTagCodeBehindHandlers(
+        public async Task<ClassDeclarationSyntax> ExecuteTagCodeBehindHandlersAsync(
             string viewFilePath,
             SemanticModel semanticModel,
             ClassDeclarationSyntax classDeclaration,

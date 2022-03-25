@@ -70,7 +70,7 @@ namespace CTA.WebForms.TagConverters
         /// is specified but class couldn't be found.</exception>
         public TagCodeBehindHandler GetCodeBehindHandlerInstance(string idValue)
         {
-            if (CodeBehindHandler == null || idValue == null)
+            if (CodeBehindHandler == null || string.IsNullOrWhiteSpace(idValue))
             {
                 return null;
             }
@@ -98,7 +98,7 @@ namespace CTA.WebForms.TagConverters
             }
 
             var handlerClassName = CodeBehindHandler.Equals("Default", StringComparison.InvariantCultureIgnoreCase)
-                ? "DefaultTagCodeBehindHandler" : CodeBehindHandler;
+                ? nameof(DefaultTagCodeBehindHandler) : CodeBehindHandler;
 
             var webFormsAssembly = AppDomain.CurrentDomain
                 .GetAssemblies()
@@ -121,7 +121,7 @@ namespace CTA.WebForms.TagConverters
         /// <param name="viewFilePath">The path of the view file being modified.</param>
         /// <param name="handler">The code behind handler to be used on this node, if one exists.</param>
         /// <param name="taskId">The task id of the view file converter that called this method.</param>
-        public abstract Task MigrateTag(HtmlNode node, string viewFilePath, TagCodeBehindHandler handler, int taskId);
+        public abstract Task MigrateTagAsync(HtmlNode node, string viewFilePath, TagCodeBehindHandler handler, int taskId);
 
         /// <summary>
         /// Checks whether the properties of this converter form a valid configuration.

@@ -34,7 +34,7 @@ namespace CTA.WebForms.Tests.TagConfigs
 
             var converter = _tagConfigParser.GetConfigForNode(node.Name);
             converter.Initialize(new TaskManagerService(), _codeBehindLinkerService, _viewImportService);
-            await converter.MigrateTag(node, "TestPath", null, 0);
+            await converter.MigrateTagAsync(node, "TestPath", null, 0);
 
             Utilities.NormalizeHtmlContent(doc.DocumentNode);
 
