@@ -169,7 +169,7 @@ namespace CTA.WebForms.Tests.Helpers.TagConversion
 @"<div newStringAttr=""value0"" newBooleanAttr>
 </div>";
 
-            Assert.AreEqual(expectedResult, await _templateParser.ParseTemplate(template, node, "TestPath", null, 0));
+            Assert.AreEqual(expectedResult, await _templateParser.ParseTemplateAsync(template, node, "TestPath", null, 0));
         }
 
         [Test]
@@ -186,7 +186,7 @@ namespace CTA.WebForms.Tests.Helpers.TagConversion
 
 True"; ;
 
-            Assert.AreEqual(expectedResult, await _templateParser.ParseTemplate(template, node, "TestPath", null, 0));
+            Assert.AreEqual(expectedResult, await _templateParser.ParseTemplateAsync(template, node, "TestPath", null, 0));
         }
 
         [Test]
@@ -203,7 +203,7 @@ True"; ;
     <p><b>InnerHtml:</b> Content a, b, c</p>
 </div>";
 
-            Assert.AreEqual(expectedResult, await _templateParser.ParseTemplate(template, node, "TestPath", null, 0));
+            Assert.AreEqual(expectedResult, await _templateParser.ParseTemplateAsync(template, node, "TestPath", null, 0));
         }
     }
 }

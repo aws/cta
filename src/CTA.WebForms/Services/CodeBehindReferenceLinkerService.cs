@@ -44,6 +44,7 @@ namespace CTA.WebForms.Services
         /// <param name="token">A cancellation token for stopping processes if stall occurs.</param>
         /// <exception cref="InvalidOperationException">Throws if view file with path <paramref name="viewFilePath"/>
         /// has not been registered.</exception>
+        /// <exception cref="ArgumentNullException">Throws if <paramref name="handler"/> is null.</exception>
         /// <returns>Property binding text if a bindable property was generated, null otherwise.</returns>
         public async Task<string> HandleCodeBehindForAttributeAsync(
             string viewFilePath,

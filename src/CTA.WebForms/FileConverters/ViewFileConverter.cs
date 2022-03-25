@@ -60,7 +60,7 @@ namespace CTA.WebForms.FileConverters
             FindConversionActions(htmlDoc.DocumentNode);
 
             // Modify HtmlDocument nodes using actions found above
-            await ConvertNodes();
+            await ConvertNodesAsync();
 
             _codeBehindLinkerService.NotifyAllHandlerConversionsStaged(FullPath);
 
@@ -114,7 +114,7 @@ namespace CTA.WebForms.FileConverters
             _metricsContext.CollectActionMetrics(WebFormsActionType.ControlConversion, converterType, node.Name);
         }
 
-        private async Task ConvertNodes()
+        private async Task ConvertNodesAsync()
         {
             foreach (var tagConversionAction in _tagConversionActions)
             {

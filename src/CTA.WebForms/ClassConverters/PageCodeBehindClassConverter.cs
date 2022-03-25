@@ -53,7 +53,7 @@ namespace CTA.WebForms.ClassConverters
             //     // This is so we can use ComponentBase base class
             //     .Append(Constants.BlazorComponentsNamespace);
 
-            var currentClassDeclaration = await DoTagCodeBehindConversions(_originalDeclarationSyntax as ClassDeclarationSyntax);
+            var currentClassDeclaration = await DoTagCodeBehindConversionsAsync(_originalDeclarationSyntax as ClassDeclarationSyntax);
 
             var requiredNamespaceNames = _sourceFileSemanticModel.GetOriginalUsingNamespaces().Append(Constants.BlazorComponentsNamespace);
             requiredNamespaceNames = CodeSyntaxHelper.RemoveFrameworkUsings(requiredNamespaceNames);
@@ -139,7 +139,7 @@ namespace CTA.WebForms.ClassConverters
         /// </summary>
         /// <param name="classDeclaration">The class declaration within which to convert references.</param>
         /// <returns>The modified class declaration.</returns>
-        private async Task<ClassDeclarationSyntax> DoTagCodeBehindConversions(ClassDeclarationSyntax classDeclaration)
+        private async Task<ClassDeclarationSyntax> DoTagCodeBehindConversionsAsync(ClassDeclarationSyntax classDeclaration)
         {
             var viewFilePath = Path.ChangeExtension(FullPath, null);
 

@@ -46,7 +46,7 @@ namespace CTA.WebForms.ClassConverters
             //var requiredNamespaces = _sourceFileSemanticModel.GetNamespacesReferencedByType(_originalDeclarationSyntax);
             //var namespaceNames = requiredNamespaces.Select(namespaceSymbol => namespaceSymbol.ToDisplayString()).Append(Constants.BlazorComponentsNamespace);
 
-            var modifiedClass = await DoTagCodeBehindConversions(_originalDeclarationSyntax as ClassDeclarationSyntax);
+            var modifiedClass = await DoTagCodeBehindConversionsAsync(_originalDeclarationSyntax as ClassDeclarationSyntax);
 
             var requiredNamespaces = _sourceFileSemanticModel.GetOriginalUsingNamespaces().Append(Constants.BlazorComponentsNamespace);
             requiredNamespaces = CodeSyntaxHelper.RemoveFrameworkUsings(requiredNamespaces);
@@ -78,7 +78,7 @@ namespace CTA.WebForms.ClassConverters
         /// </summary>
         /// <param name="classDeclaration">The class declaration within which to convert references.</param>
         /// <returns>The modified class declaration.</returns>
-        private async Task<ClassDeclarationSyntax> DoTagCodeBehindConversions(ClassDeclarationSyntax classDeclaration)
+        private async Task<ClassDeclarationSyntax> DoTagCodeBehindConversionsAsync(ClassDeclarationSyntax classDeclaration)
         {
             var viewFilePath = Path.ChangeExtension(FullPath, null);
 

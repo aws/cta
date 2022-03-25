@@ -98,7 +98,7 @@ namespace CTA.WebForms.Helpers.TagConversion
         /// <param name="handler">The code behind handler to be used on this node, if one exists.</param>
         /// <param name="taskId">The task id of the view file converter that called this method.</param>
         /// <returns>The fully populated template.</returns>
-        public async Task<string> ParseTemplate(
+        public async Task<string> ParseTemplateAsync(
             string template,
             HtmlNode node,
             string viewFilePath,
@@ -108,9 +108,9 @@ namespace CTA.WebForms.Helpers.TagConversion
             var result = template;
 
             result = await AttributeReplacementRegex.ReplaceAsync(result,
-                (Match m) => HandleAttributeReplacement(m, node, viewFilePath, handler, taskId));
+                (Match m) => HandleAttributeReplacementAsync(m, node, viewFilePath, handler, taskId));
             result = await BasicReplacementRegex.ReplaceAsync(result,
-                (Match m) => HandleBasicReplacement(m, node, viewFilePath, handler, taskId));
+                (Match m) => HandleBasicReplacementAsync(m, node, viewFilePath, handler, taskId));
 
             return result;
         }
@@ -126,7 +126,7 @@ namespace CTA.WebForms.Helpers.TagConversion
         /// <param name="taskId">The task id of the view file converter that called this method.</param>
         /// <returns>The fully populated match string, if population is possible. Otherwise,
         /// an empty string.</returns>
-        private async Task<string> HandleAttributeReplacement(
+        private async Task<string> HandleAttributeReplacementAsync(
             Match m,
             HtmlNode node,
             string viewFilePath,
@@ -153,7 +153,7 @@ namespace CTA.WebForms.Helpers.TagConversion
 
             var placeHolderValues = nullablePlaceHolderValues.Value;
 
-            return await GetReplacementText(
+            return await GetReplacementTextAsync(
                 node,
                 placeHolderValues.sourceAttribute,
                 placeHolderValues.codeBehindName,
@@ -175,7 +175,7 @@ namespace CTA.WebForms.Helpers.TagConversion
         /// <param name="taskId">The task id of the view file converter that called this method.</param>
         /// <returns>The fully populated match string, if population is possible. Otherwise,
         /// an empty string.</returns>
-        private async Task<string> HandleBasicReplacement(
+        private async Task<string> HandleBasicReplacementAsync(
             Match m,
             HtmlNode node,
             string viewFilePath,
@@ -191,7 +191,7 @@ namespace CTA.WebForms.Helpers.TagConversion
 
             var placeHolderValues = nullablePlaceHolderValues.Value;
 
-            return await GetReplacementText(
+            return await GetReplacementTextAsync(
                 node,
                 placeHolderValues.sourceAttribute,
                 placeHolderValues.codeBehindName,
@@ -260,7 +260,7 @@ namespace CTA.WebForms.Helpers.TagConversion
         /// <param name="handler">The code behind handler to be used on this node, if one exists.</param>
         /// <param name="taskId">The task id of the view file converter that called this method.</param>
         /// <returns>The text that the given placeholder pattern will be replaced with.</returns>
-        private async Task<string> GetReplacementText(
+        private async Task<string> GetReplacementTextAsync(
             HtmlNode node,
             string sourceAttribute,
             string codeBehindName,
@@ -298,11 +298,6 @@ namespace CTA.WebForms.Helpers.TagConversion
                             targetAttribute,
                             handler,
                             token));
-
-                    if (codeBehindRefBinding != null)
-                    {
-                        var x = codeBehindRefBinding;
-                    }
                 }
             }
             catch (OperationCanceledException e)

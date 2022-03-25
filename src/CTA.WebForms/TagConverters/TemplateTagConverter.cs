@@ -81,7 +81,7 @@ namespace CTA.WebForms.TagConverters
             }
 
             var templateParser = new TagTemplateParser(_taskManagerService, _codeBehindLinkerService);
-            var replacementText = await templateParser.ParseTemplate(template, node, viewFilePath, handler, taskId);
+            var replacementText = await templateParser.ParseTemplateAsync(template, node, viewFilePath, handler, taskId);
 
             ReplaceNode(node, replacementText);
 
