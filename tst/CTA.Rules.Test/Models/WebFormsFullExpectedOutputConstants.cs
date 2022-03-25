@@ -317,8 +317,12 @@ namespace WebFormsFull
         protected void AddPerson(object sender, EventArgs e)
         {
             PeopleModel.Add(new People(""New"", ""New"", ""New""));
-            PeopleGrid.DataBind();
+             // PeopleGrid.DataBind();
         }
+
+        public Object PeopleGrid_DataSource { get; set; }
+
+        public Object productList_DataSource { get; set; }
 
         public override async Task SetParametersAsync(ParameterView parameters)
         {
@@ -353,10 +357,10 @@ namespace WebFormsFull
             Model = CatalogService.GetCatalogItemsPaginated(DefaultPageSize, DefaultPageIndex);
             PeopleModel = new List<People>()
             {new People(""Andy"", ""Wayne"", ""PG""), new People(""Bill"", ""Johnson"", ""SD""), new People(""Caroline"", ""Barry"", ""Manager"")};
-            PeopleGrid.DataSource = PeopleModel;
-            PeopleGrid.DataBind();
-            productList.DataSource = Model.Data;
-            productList.DataBind();
+            PeopleGrid_DataSource = PeopleModel;
+             // PeopleGrid.DataBind();
+            productList_DataSource = Model.Data;
+             // productList.DataBind();
             DataBind();
             
             // This code replaces the original handling

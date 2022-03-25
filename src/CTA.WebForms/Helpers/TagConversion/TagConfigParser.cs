@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using CTA.Rules.Config;
 using CTA.WebForms.TagConverters;
 using YamlDotNet.Serialization;
@@ -19,6 +20,18 @@ namespace CTA.WebForms.Helpers.TagConversion
         private readonly IDeserializer _deserializer;
 
         /// <summary>
+        /// The map of known tag names to converter instances.
+        /// </summary>
+        public ConcurrentDictionary<string, TagConverter> TagConverterMap { get; }
+        /// <summary>
+        /// The list of known tag names which do not have converters. We use a 
+        /// <see cref="ConcurrentBag{string}"/> here because there is no concurrent/
+        /// thread safe Set class, and potentially having duplicates in the bag doesn't
+        /// cause any issues for us.
+        /// </summary>
+        public ConcurrentBag<string> NoConverterTags { get; }
+
+        /// <summary>
         /// Initializes a new instance of <see cref="TagConfigParser"/> for reading
         /// from a specified location.
         /// </summary>
@@ -27,19 +40,34 @@ namespace CTA.WebForms.Helpers.TagConversion
         {
             _configsDir = configsDir;
             _deserializer = GenerateDeserializer();
+
+            TagConverterMap = new ConcurrentDictionary<string, TagConverter>(StringComparer.InvariantCultureIgnoreCase);
+            NoConverterTags = new ConcurrentBag<string>();
         }
 
         /// <summary>
-        /// Generates a dictionary mapping tag name to corresponding <see cref="TagConverter"/> from
-        /// discovered tag config files.
+        /// Gets the tag converter that should be used on a given node.
         /// </summary>
-        /// <returns>A dictionary mapping tag name to corresponding <see cref="TagConverter"/>.</returns>
-        public IDictionary<string, TagConverter> GetConfigMap()
+        /// <param name="nodeName">The node to be converted.</param>
+        /// <returns>The converter to be used on nodes of type <paramref name="nodeName"/>, null
+        /// if no such converter exists.</returns>
+        public TagConverter GetConfigForNode(string nodeName)
         {
-            var result = new ConcurrentDictionary<string, TagConverter>(StringComparer.InvariantCultureIgnoreCase);
-            var filePaths = Directory.EnumerateFiles(_configsDir, "*.yaml");
+            if (NoConverterTags.Contains(nodeName, StringComparer.InvariantCultureIgnoreCase))
+            {
+                return null;
+            }
 
-            foreach (var filePath in filePaths)
+            if (TagConverterMap.ContainsKey(nodeName))
+            {
+                return TagConverterMap[nodeName];
+            }
+
+            string fileName = GetValidFileName(nodeName);
+            string filePath = Path.Combine(_configsDir, fileName);
+            string s3Url = $"{Rules.Config.Constants.S3TagConfigsBucketUrl}\\{fileName}";
+
+            if (File.Exists(filePath) || DownloadFileFromS3(s3Url, filePath))
             {
                 try
                 {
@@ -49,11 +77,16 @@ namespace CTA.WebForms.Helpers.TagConversion
                     // block before we attempt to add the converter to the results dictionary
                     converter.Validate();
 
-                    if (!result.TryAdd(converter.TagName, converter))
+                    if (!TagConverterMap.TryAdd(converter.TagName, converter))
                     {
                         LogHelper.LogError($"{Rules.Config.Constants.WebFormsErrorTag}Failed to add valid converter of type " +
-                            $"{converter?.GetType().Name} for {converter?.TagName} to concurrent dictionary for config at {filePath}");
+                            $"{converter?.GetType().Name} for {converter?.TagName} to concurrent dictionary for config at {filePath} " +
+                            $"due to attempted invalid concurrent access");
                     }
+
+                    // Even if adding to the dictionary fails, we want to return the validated converter,
+                    // the dictionary only serves to improve performance when retrieving converters
+                    return converter;
                 }
                 catch (Exception e)
                 {
@@ -61,7 +94,59 @@ namespace CTA.WebForms.Helpers.TagConversion
                 }
             }
 
-            return result;
+            NoConverterTags.Add(nodeName);
+            return null;
+        }
+
+        /// <summary>
+        /// Constructs a valid file name using the given node name by stripping out invalid
+        /// characters and switching : charcters to . characters.
+        /// </summary>
+        /// <param name="nodeName">The node name to construct the file name from.</param>
+        /// <returns>The new file name.</returns>
+        private string GetValidFileName(string nodeName)
+        {
+            string fileName = $"{nodeName.Replace(":", ".")}.yaml";
+
+            foreach (var c in Path.GetInvalidFileNameChars())
+            {
+                fileName = fileName.Replace(c.ToString(), string.Empty);
+            }
+
+            return fileName.ToLower();
+        }
+
+        /// <summary>
+        /// Attempts to download a config file at the given url to the given file path.
+        /// </summary>
+        /// <param name="s3Url">The url to fetch the file from.</param>
+        /// <param name="filePath">The file path to save the file at should it be found.</param>
+        /// <returns><c>true</c> if the file was retrieved and written to the file system
+        /// successfully, <c>false</c> otherwise.</returns>
+        private bool DownloadFileFromS3(string s3Url, string filePath)
+        {
+            try
+            {
+                using (var httpClient = new HttpClient())
+                {
+                    var fileContents = httpClient.GetStringAsync(s3Url).Result;
+                    File.WriteAllText(filePath, fileContents);
+                }
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                // 404 is not an error, we just don't have a config for this node type. Other
+                // exceptions, however, are "real" errors
+                if (!e.Message.Contains("404"))
+                {
+                    LogHelper.LogError(e, $"{Rules.Config.Constants.WebFormsErrorTag}Failed to download and " +
+                        $"store tag config file from {s3Url} to {filePath}");
+                }
+                
+                return false;
+            }
         }
 
         /// <summary>

@@ -61,5 +61,31 @@ namespace CTA.WebForms.Tests.Services
         {
             Assert.Throws(typeof(ArgumentException), () => _viewImportService.AddViewImport("MyCustomPackage.Custom"));
         }
+
+        [Test]
+        public void AddNuGetPackage_Adds_New_Nuget_Package_To_Set()
+        {
+            var packageName = "Fritz.BlazorWebFormsComponents";
+
+            _viewImportService.AddNuGetPackage(packageName);
+
+            Assert.AreEqual(1, _viewImportService.NewNuGetPackages.Count);
+            Assert.True(_viewImportService.NewNuGetPackages.Contains(packageName));
+        }
+
+        [Test]
+        public void AddNuGetPackage_Does_Not_Add_Duplicates_To_Set()
+        {
+            var packageName1 = "Fritz.BlazorWebFormsComponents";
+            var packageName2 = "Something.Else.Package";
+
+            _viewImportService.AddNuGetPackage(packageName1);
+            _viewImportService.AddNuGetPackage(packageName2);
+            _viewImportService.AddNuGetPackage(packageName1);
+
+            Assert.AreEqual(2, _viewImportService.NewNuGetPackages.Count);
+            Assert.True(_viewImportService.NewNuGetPackages.Contains(packageName1));
+            Assert.True(_viewImportService.NewNuGetPackages.Contains(packageName2));
+        }
     }
 }

@@ -162,7 +162,9 @@ namespace CTA.WebForms
             _classConverterFactory = new ClassConverterFactory(
                 _inputProjectPath,
                 _lifecycleManager,
-                _taskManager, _metricsContext);
+                _taskManager,
+                _codeBehindLinkerService,
+                _metricsContext);
             _fileConverterFactory = new FileConverterFactory(
                 _inputProjectPath,
                 _blazorWorkspaceManager,

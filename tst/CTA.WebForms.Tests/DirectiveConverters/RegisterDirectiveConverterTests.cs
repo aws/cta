@@ -28,15 +28,13 @@ namespace CTA.WebForms.Tests.DirectiveConverters
             @$"<!-- Cannot convert file name to namespace, file path Footer.ascx does not have a directory -->
 <!-- {TestIncorrectSource} -->";
         
-        private readonly RegisteredUserControls _testUserControls = new RegisteredUserControls();
-        
 
         private DirectiveConverter _directiveConverter;
 
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
-            _directiveConverter = new RegisterDirectiveConverter(_testUserControls);
+            _directiveConverter = new RegisterDirectiveConverter();
         }
 
         [Test]

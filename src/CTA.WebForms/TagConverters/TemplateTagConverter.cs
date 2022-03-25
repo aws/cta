@@ -1,6 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using CTA.WebForms.Helpers.TagConversion;
 using CTA.WebForms.Services;
 using CTA.WebForms.TagCodeBehindHandlers;
@@ -31,17 +31,16 @@ namespace CTA.WebForms.TagConverters
 
         /// <inheritdoc/>
         public override void Initialize(
+            TaskManagerService taskManagerService,
             CodeBehindReferenceLinkerService codeBehindLinkerService,
             ViewImportService viewImportService)
         {
-            base.Initialize(codeBehindLinkerService, viewImportService);
+            base.Initialize(taskManagerService, codeBehindLinkerService, viewImportService);
 
             foreach (var invokable in Invocations ?? Enumerable.Empty<TemplateInvokable>())
             {
                 invokable.Initialize(viewImportService);
             }
-
-            // TODO: Interactions with code behind linker service to register converter
         }
 
         /// <inheritdoc/>
@@ -71,7 +70,7 @@ namespace CTA.WebForms.TagConverters
         }
 
         /// <inheritdoc/>
-        public override void MigrateTag(HtmlNode node)
+        public override async Task MigrateTagAsync(HtmlNode node, string viewFilePath, TagCodeBehindHandler handler, int taskId)
         {
             var template = SelectTemplate(node);
             if (template == null)
@@ -81,8 +80,8 @@ namespace CTA.WebForms.TagConverters
                 return;
             }
 
-            var templateParser = new TagTemplateParser(_codeBehindLinkerService);
-            var replacementText = templateParser.ParseTemplate(template, node);
+            var templateParser = new TagTemplateParser(_taskManagerService, _codeBehindLinkerService);
+            var replacementText = await templateParser.ParseTemplateAsync(template, node, viewFilePath, handler, taskId);
 
             ReplaceNode(node, replacementText);
 
@@ -114,54 +113,6 @@ namespace CTA.WebForms.TagConverters
             }
 
             return null;
-        }
-
-        /// <summary>
-        /// Retrieves an instance of the specified code behind handler class
-        /// if one exists.
-        /// </summary>
-        /// <returns>An instance of the converter's code behind handler class if
-        /// one was specified, otherwise null.</returns>
-        /// <exception cref="InvalidOperationException">Throws if code behind handler
-        /// is specified but class couldn't be found.</exception>
-        private ITagCodeBehindHandler GetCodeBehindHandlerInstance()
-        {
-            var handlerType = GetCodeBehindHandlerType();
-
-            if (handlerType == null)
-            {
-                throw new InvalidOperationException($"Code behind handler type {CodeBehindHandler} could not be found");
-            }
-
-            return (ITagCodeBehindHandler)Activator.CreateInstance(handlerType);
-        }
-
-        /// <summary>
-        /// Retrieves the type of the specified code behind handler class
-        /// if one exists.
-        /// </summary>
-        /// <returns>The code behind handler type if it can be found, null otherwise</returns>
-        private Type GetCodeBehindHandlerType()
-        {
-            if (CodeBehindHandler == null)
-            {
-                return null;
-            }
-
-            var handlerClassName = CodeBehindHandler.Equals("Default", StringComparison.InvariantCultureIgnoreCase)
-                ? "DefaultTagCodeBehindHandler" : CodeBehindHandler;
-
-            var webFormsAssembly = AppDomain.CurrentDomain
-                .GetAssemblies()
-                .Where(a => a.FullName.StartsWith("CTA.WebForms") && !a.FullName.Contains("Test"))
-                .FirstOrDefault();
-
-            var handlerType = webFormsAssembly
-                .GetTypes()
-                .Where(t => t.Name.Equals(handlerClassName) && !t.IsAbstract && !t.IsInterface)
-                .FirstOrDefault();
-
-            return handlerType;
         }
 
         /// <summary>

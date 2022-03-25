@@ -185,6 +185,8 @@ namespace CTA.Rules.Test
             StringAssert.Contains("@itemPlaceHolder", defaultRazor);
             StringAssert.Contains("EmptyDataTemplate", defaultRazor);
             StringAssert.Contains("LayoutTemplate", defaultRazor);
+            StringAssert.Contains("DataSource=\"@(PeopleGrid_DataSource)\"", defaultRazor);
+            StringAssert.Contains("DataSource=\"@(productList_DataSource)\"", defaultRazor);
             StringAssert.DoesNotContain("<%#", defaultRazor);
             StringAssert.DoesNotContain("%>", defaultRazor);
         }

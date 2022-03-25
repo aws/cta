@@ -1,8 +1,12 @@
 ﻿using System;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
 using CTA.Rules.Config;
+using CTA.WebForms.Extensions;
 using CTA.WebForms.Services;
+using CTA.WebForms.TagCodeBehindHandlers;
 using HtmlAgilityPack;
 
 namespace CTA.WebForms.Helpers.TagConversion
@@ -12,6 +16,7 @@ namespace CTA.WebForms.Helpers.TagConversion
     /// </summary>
     public class TagTemplateParser
     {
+        private readonly TaskManagerService _taskManagerService;
         private readonly CodeBehindReferenceLinkerService _codeBehindLinkerService;
 
         public const string TargetAttributeGroup = "TargetAttribute";
@@ -45,7 +50,7 @@ namespace CTA.WebForms.Helpers.TagConversion
         /// <summary>
         /// Regular expression that matches only template placeholders. Note that this regular
         /// expression will match the the tail end of any matches made by
-        /// <see cref="TagTemplateParser"/>.<see cref="AttributeReplacementRegex"/>.
+        /// <see cref="AttributeReplacementRegex"/>.
         /// 
         /// <list type="bullet">
         ///     <listheader>
@@ -71,10 +76,15 @@ namespace CTA.WebForms.Helpers.TagConversion
         /// <summary>
         /// Initializes a new instance of <see cref="TagTemplateParser"./>
         /// </summary>
+        /// <param name="taskManagerService">The service instance that is used
+        /// to perform managed calls to other services.</param>
         /// <param name="codeBehindLinkerService">The service instance that will
         /// be used to convert tag code behind references.</param>
-        public TagTemplateParser(CodeBehindReferenceLinkerService codeBehindLinkerService)
+        public TagTemplateParser(
+            TaskManagerService taskManagerService,
+            CodeBehindReferenceLinkerService codeBehindLinkerService)
         {
+            _taskManagerService = taskManagerService;
             _codeBehindLinkerService = codeBehindLinkerService;
         }
 
@@ -84,26 +94,44 @@ namespace CTA.WebForms.Helpers.TagConversion
         /// </summary>
         /// <param name="template">The template string to be used.</param>
         /// <param name="node">The html node that will be replaced.</param>
+        /// <param name="viewFilePath">The path of the view file being modified.</param>
+        /// <param name="handler">The code behind handler to be used on this node, if one exists.</param>
+        /// <param name="taskId">The task id of the view file converter that called this method.</param>
         /// <returns>The fully populated template.</returns>
-        public string ParseTemplate(string template, HtmlNode node)
+        public async Task<string> ParseTemplateAsync(
+            string template,
+            HtmlNode node,
+            string viewFilePath,
+            TagCodeBehindHandler handler,
+            int taskId)
         {
             var result = template;
 
-            result = AttributeReplacementRegex.Replace(result, (Match m) => HandleAttributeReplacement(m, node));
-            result = BasicReplacementRegex.Replace(result, (Match m) => HandleBasicReplacement(m, node));
+            result = await AttributeReplacementRegex.ReplaceAsync(result,
+                (Match m) => HandleAttributeReplacementAsync(m, node, viewFilePath, handler, taskId));
+            result = await BasicReplacementRegex.ReplaceAsync(result,
+                (Match m) => HandleBasicReplacementAsync(m, node, viewFilePath, handler, taskId));
 
             return result;
         }
 
         /// <summary>
-        /// Converts matches made by <see cref="TagTemplateParser"/>.<see cref="AttributeReplacementRegex"/>
+        /// Converts matches made by <see cref="AttributeReplacementRegex"/>
         /// into a fully populated version or an empty string if population is not possible.
         /// </summary>
         /// <param name="m">The match to be converted.</param>
         /// <param name="node">The html node that is being replaced.</param>
+        /// <param name="viewFilePath">The path of the view file being modified.</param>
+        /// <param name="handler">The code behind handler to be used on this node, if one exists.</param>
+        /// <param name="taskId">The task id of the view file converter that called this method.</param>
         /// <returns>The fully populated match string, if population is possible. Otherwise,
         /// an empty string.</returns>
-        private string HandleAttributeReplacement(Match m, HtmlNode node)
+        private async Task<string> HandleAttributeReplacementAsync(
+            Match m,
+            HtmlNode node,
+            string viewFilePath,
+            TagCodeBehindHandler handler,
+            int taskId)
         {
             var targetAttribute = m.Groups[TargetAttributeGroup].Captures.SingleOrDefault()?.Value;
 
@@ -125,23 +153,34 @@ namespace CTA.WebForms.Helpers.TagConversion
 
             var placeHolderValues = nullablePlaceHolderValues.Value;
 
-            return GetReplacementText(
+            return await GetReplacementTextAsync(
                 node,
                 placeHolderValues.sourceAttribute,
                 placeHolderValues.codeBehindName,
                 targetAttribute,
-                placeHolderValues.targetType);
+                placeHolderValues.targetType,
+                viewFilePath,
+                handler,
+                taskId);
         }
 
         /// <summary>
-        /// Converts matches made by <see cref="TagTemplateParser"/>.<see cref="BasicReplacementRegex"/>
+        /// Converts matches made by <see cref="BasicReplacementRegex"/>
         /// into a fully populated version or an empty string if population is not possible.
         /// </summary>
         /// <param name="m">The match to be converted.</param>
         /// <param name="node">The html node that is being replaced.</param>
+        /// <param name="viewFilePath">The path of the view file being modified.</param>
+        /// <param name="handler">The code behind handler to be used on this node, if one exists.</param>
+        /// <param name="taskId">The task id of the view file converter that called this method.</param>
         /// <returns>The fully populated match string, if population is possible. Otherwise,
         /// an empty string.</returns>
-        private string HandleBasicReplacement(Match m, HtmlNode node)
+        private async Task<string> HandleBasicReplacementAsync(
+            Match m,
+            HtmlNode node,
+            string viewFilePath,
+            TagCodeBehindHandler handler,
+            int taskId)
         {
             var nullablePlaceHolderValues = ParsePlaceholder(m);
 
@@ -152,12 +191,15 @@ namespace CTA.WebForms.Helpers.TagConversion
 
             var placeHolderValues = nullablePlaceHolderValues.Value;
 
-            return GetReplacementText(
+            return await GetReplacementTextAsync(
                 node,
                 placeHolderValues.sourceAttribute,
                 placeHolderValues.codeBehindName,
                 null,
-                placeHolderValues.targetType);
+                placeHolderValues.targetType,
+                viewFilePath,
+                handler,
+                taskId);
         }
 
         /// <summary>
@@ -214,14 +256,23 @@ namespace CTA.WebForms.Helpers.TagConversion
         /// to, if one exists</param>
         /// <param name="targetType">The type that the <paramref name="sourceAttribute"/>'s value will be
         /// converted to.</param>
+        /// <param name="viewFilePath">The path of the view file being modified.</param>
+        /// <param name="handler">The code behind handler to be used on this node, if one exists.</param>
+        /// <param name="taskId">The task id of the view file converter that called this method.</param>
         /// <returns>The text that the given placeholder pattern will be replaced with.</returns>
-        private string GetReplacementText(
+        private async Task<string> GetReplacementTextAsync(
             HtmlNode node,
             string sourceAttribute,
             string codeBehindName,
             string targetAttribute,
-            string targetType)
+            string targetType,
+            string viewFilePath,
+            TagCodeBehindHandler handler,
+            int taskId)
         {
+            string convertedSourceValue = null;
+            string codeBehindRefBinding = null;
+
             try
             {
                 var sourceValue = sourceAttribute.Equals("InnerHtml", StringComparison.InvariantCultureIgnoreCase) 
@@ -233,20 +284,30 @@ namespace CTA.WebForms.Helpers.TagConversion
                     : node.Attributes.Where(attr => attr.OriginalName.Equals(sourceAttribute, StringComparison.InvariantCultureIgnoreCase))
                         .FirstOrDefault()?.Value;
 
-                if (sourceValue == null)
+                convertedSourceValue = sourceValue == null
+                    ? null
+                    : TagTypeConverter.ConvertToType(sourceAttribute, sourceValue, targetAttribute, targetType);
+
+                if (handler != null)
                 {
-                    return string.Empty;
+                    codeBehindRefBinding = await _taskManagerService.ManagedRun(taskId,
+                        (token) => _codeBehindLinkerService.HandleCodeBehindForAttributeAsync(
+                            viewFilePath,
+                            codeBehindName,
+                            convertedSourceValue,
+                            targetAttribute,
+                            handler,
+                            token));
                 }
-
-                var convertedSourceValue = TagTypeConverter.ConvertToType(sourceAttribute, sourceValue, targetAttribute, targetType);
-                
-                // TODO: Use proper context arguments for below method to check code behind binding
-                // var codeBehindRefBinding = _codeBehindLinkerService.GetBindingValueIfExists();
-
-                // return codeBehindRefBinding ?? convertedSourceValue ?? string.Empty;
-
-                // TODO: Remove below code when above code is uncommented
-                return convertedSourceValue ?? string.Empty;
+            }
+            catch (OperationCanceledException e)
+            {
+                LogHelper.LogError(e, string.Format(
+                    Constants.CaneledServiceCallLogTemplate,
+                    Rules.Config.Constants.WebFormsErrorTag,
+                    GetType().Name,
+                    nameof(CodeBehindReferenceLinkerService),
+                    nameof(CodeBehindReferenceLinkerService.HandleCodeBehindForAttributeAsync)));
             }
             catch (Exception e)
             {
@@ -254,7 +315,7 @@ namespace CTA.WebForms.Helpers.TagConversion
                     $"replacement for {sourceAttribute} on node {node.Name}");
             }
 
-            return string.Empty;
+            return codeBehindRefBinding ?? convertedSourceValue ?? string.Empty;
         }
     }
 }

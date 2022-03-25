@@ -1,17 +1,16 @@
 ﻿using CTA.WebForms.Helpers;
 using CTA.WebForms.Helpers.TagConversion;
 using CTA.WebForms.Services;
-using CTA.WebForms.TagConverters;
 using HtmlAgilityPack;
 using NUnit.Framework;
-using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace CTA.WebForms.Tests.TagConfigs
 {
     [TestFixture]
     public class TagConfigsTestFixture : WebFormsTestBase
     {
-        private protected IDictionary<string, TagConverter> _configMap;
+        private protected TagConfigParser _tagConfigParser;
         private protected ViewImportService _viewImportService;
         private protected CodeBehindReferenceLinkerService _codeBehindLinkerService;
 
@@ -22,15 +21,10 @@ namespace CTA.WebForms.Tests.TagConfigs
             _viewImportService = new ViewImportService();
 
             var configParser = new TagConfigParser(Rules.Config.Constants.TagConfigsExtractedPath);
-            _configMap = configParser.GetConfigMap();
-
-            foreach (var kvp in _configMap)
-            {
-                kvp.Value.Initialize(_codeBehindLinkerService, _viewImportService);
-            }
+            _tagConfigParser = configParser;
         }
 
-        private protected string GetConverterOutput(string inputText)
+        private protected async Task<string> GetConverterOutput(string inputText)
         {
             var doc = new HtmlDocument();
             doc.OptionOutputOriginalCase = true;
@@ -38,8 +32,9 @@ namespace CTA.WebForms.Tests.TagConfigs
 
             var node = doc.DocumentNode.ChildNodes[0];
 
-            var converter = _configMap[node.Name];
-            converter.MigrateTag(node);
+            var converter = _tagConfigParser.GetConfigForNode(node.Name);
+            converter.Initialize(new TaskManagerService(), _codeBehindLinkerService, _viewImportService);
+            await converter.MigrateTagAsync(node, "TestPath", null, 0);
 
             Utilities.NormalizeHtmlContent(doc.DocumentNode);
 
