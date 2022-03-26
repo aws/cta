@@ -29,6 +29,7 @@ namespace CTA.WebForms.Tests.ClassConverters
                 ClassConverterSetupFixture.TestClassDec,
                 ClassConverterSetupFixture.TestTypeSymbol,
                 new TaskManagerService(),
+                new CodeBehindReferenceLinkerService(),
                 new WebFormMetricContext());
         }
 

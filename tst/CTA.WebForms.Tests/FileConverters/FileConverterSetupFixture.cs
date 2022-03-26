@@ -8,7 +8,7 @@ using NUnit.Framework.Internal;
 namespace CTA.WebForms.Tests.FileConverters
 {
     [SetUpFixture]
-    public class FileConverterSetupFixture
+    public class FileConverterSetupFixture : WebFormsTestBase
     {
         //These are full paths
         public static string TestProjectPath;

@@ -108,6 +108,7 @@ namespace TestNamespace
                 ClassConverterSetupFixture.TestClassDec,
                 ClassConverterSetupFixture.TestTypeSymbol,
                 new TaskManagerService(),
+                new CodeBehindReferenceLinkerService(),
                 new WebFormMetricContext());
         }
 
@@ -133,6 +134,7 @@ namespace TestNamespace
                 complexClassDec,
                 complexTypeSymbol,
                 new TaskManagerService(),
+                new CodeBehindReferenceLinkerService(),
                 new WebFormMetricContext());
 
             var fileInfo = (await complexConverter.MigrateClassAsync()).Single();

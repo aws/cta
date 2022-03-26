@@ -143,6 +143,7 @@ namespace CTA.Rules.Test
                     SolutionPort solutionPort = new SolutionPort(solutionPath, solutionPortConfiguration);
                     CopyTestRules();
                     CopyTestTemplates();
+                    CopyTestTagConfigs();
                     var analysisRunResult = solutionPort.AnalysisRun();
 
                     StringBuilder str = new StringBuilder();
@@ -204,8 +205,8 @@ namespace CTA.Rules.Test
 
         private void CopyTestRules()
         {
-            // Set each file in the TempRules directory to copy to output directory using file
-            // properties menu or the test rules will not work
+            // Project configured to copy TempRules folder to output directory
+            // so no extra action necessary here
             var assemblyDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
             var tempRulesDir = Path.Combine(assemblyDir, "TempRules");
@@ -224,8 +225,8 @@ namespace CTA.Rules.Test
 
         private void CopyTestTemplates()
         {
-            // Set each file in the TempTemplates directory to copy to output directory using file
-            // properties menu or the test templates will not work
+            // Project configured to copy TempTemplates folder to output directory
+            // so no extra action necessary here
             var assemblyDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
             var tempTemplatesDir = Path.Combine(assemblyDir, "TempTemplates");
@@ -237,6 +238,29 @@ namespace CTA.Rules.Test
                 {
                     var relativePath = Path.GetRelativePath(tempTemplatesDir, file);
                     var targetFile = Path.Combine(Constants.ResourcesExtractedPath, relativePath);
+                    var targetFileDir = Path.GetDirectoryName(targetFile);
+
+                    Directory.CreateDirectory(targetFileDir);
+                    File.Copy(file, targetFile, true);
+                }
+            }
+        }
+
+        private void CopyTestTagConfigs()
+        {
+            // Project configured to copy TempTagConfigs folder to output directory
+            // so no extra action necessary here
+            var assemblyDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+
+            var tempTemplatesDir = Path.Combine(assemblyDir, "TempTagConfigs");
+            if (Directory.Exists(tempTemplatesDir))
+            {
+                var files = Directory.EnumerateFiles(tempTemplatesDir, "*", SearchOption.AllDirectories);
+
+                foreach (var file in files)
+                {
+                    var relativePath = Path.GetRelativePath(tempTemplatesDir, file);
+                    var targetFile = Path.Combine(Rules.Config.Constants.TagConfigsExtractedPath, relativePath);
                     var targetFileDir = Path.GetDirectoryName(targetFile);
 
                     Directory.CreateDirectory(targetFileDir);

@@ -279,10 +279,16 @@ namespace CTA.WebForms.ClassConverters
                         {
                             methodName = (methodNameExpr as MemberAccessExpressionSyntax).Name.ToString();
                         }
-                        else
+                        else if (methodNameExpr is IdentifierNameSyntax)
                         {
                             methodName = (methodNameExpr as IdentifierNameSyntax).Identifier.ToString();
                         }
+                        else
+                        {
+                            // This expression is a lambda, which is currently unsupported
+                            continue;
+                        }
+
                         results.Add((methodName, (WebFormsAppLifecycleEvent)lcEvent));
                     }
                     catch (Exception e)

@@ -21,6 +21,15 @@
   </ItemGroup>
 
   <ItemGroup>
+	<Content Include="TempRules\*">
+	  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</Content>
+	<Content Include="TempConfigs\*">
+		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</Content>
+  </ItemGroup>
+	
+  <ItemGroup>
     <None Update="CTAFiles\action.methoddeclaration.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -32,12 +41,6 @@
     </None>
     <None Update="CTAFiles\action.namespace.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="TempRules\project.all.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="TempTemplates\webforms\appsettings.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
 	<None Update="TestFiles\Configs\Web.config">
 	  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -57,7 +60,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="TempTemplates\" />
+    <Folder Include="TempTagConfigs\" />
     <Folder Include="TempRules\" />
   </ItemGroup>
 

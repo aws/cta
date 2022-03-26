@@ -7,6 +7,7 @@ using CTA.Rules.Models;
 using CTA.WebForms.Factories;
 using CTA.WebForms.FileInformationModel;
 using CTA.WebForms.Helpers;
+using CTA.WebForms.Helpers.TagConversion;
 using CTA.WebForms.Metrics;
 using CTA.WebForms.ProjectManagement;
 using CTA.WebForms.Services;
@@ -18,7 +19,6 @@ namespace CTA.WebForms
         private const string MigrationTasksCompletedLogAction = "Migration Tasks Completed";
 
         private readonly string _inputProjectPath;
-        private readonly string _solutionPath;
         private readonly ProjectResult _projectResult;
 
         private readonly ProjectConfiguration _projectConfiguration;
@@ -30,6 +30,7 @@ namespace CTA.WebForms
         private TaskManagerService _taskManager;
         private LifecycleManagerService _lifecycleManager;
         private ViewImportService _viewImportService;
+        private CodeBehindReferenceLinkerService _codeBehindLinkerService;
         private ProgramCsService _programCsService;
         private AppRazorService _appRazorService;
         private HostPageService _hostPageService;
@@ -37,16 +38,17 @@ namespace CTA.WebForms
 
         private ClassConverterFactory _classConverterFactory;
         private FileConverterFactory _fileConverterFactory;
+        private TagConfigParser _tagConfigParser;
         private WebFormMetricContext _metricsContext;
 
         public MigrationManager(string inputProjectPath, AnalyzerResult analyzerResult,
             ProjectConfiguration projectConfiguration, ProjectResult projectResult)
         {
             _inputProjectPath = inputProjectPath;
-            _solutionPath = projectConfiguration.SolutionPath;
             _analyzerResult = analyzerResult;
             _projectConfiguration = projectConfiguration;
             _projectResult = projectResult;
+            _tagConfigParser = new TagConfigParser(Rules.Config.Constants.TagConfigsExtractedPath);
             _metricsContext = new WebFormMetricContext();
         }
 
@@ -105,6 +107,9 @@ namespace CTA.WebForms
             LogHelper.LogInformation(string.Format(Constants.GenericInformationLogTemplate, GetType().Name, MigrationTasksCompletedLogAction));
 
             WriteServiceDerivedFiles();
+            
+            // TODO: Get new nuget packages from view import service and add to project references
+            
             var result = new WebFormsPortingResult() { Metrics = _metricsContext.Transform() };
 
             // TODO: Any necessary cleanup or last checks on new project
@@ -137,6 +142,7 @@ namespace CTA.WebForms
             _taskManager = new TaskManagerService();
             _lifecycleManager = new LifecycleManagerService();
             _viewImportService = new ViewImportService();
+            _codeBehindLinkerService = new CodeBehindReferenceLinkerService();
             _programCsService = new ProgramCsService();
             _appRazorService = new AppRazorService();
             _hostPageService = new HostPageService();
@@ -156,15 +162,20 @@ namespace CTA.WebForms
             _classConverterFactory = new ClassConverterFactory(
                 _inputProjectPath,
                 _lifecycleManager,
-                _taskManager, _metricsContext);
+                _taskManager,
+                _codeBehindLinkerService,
+                _metricsContext);
             _fileConverterFactory = new FileConverterFactory(
                 _inputProjectPath,
                 _blazorWorkspaceManager,
                 _webFormsProjectAnalyzer,
                 _viewImportService,
+                _codeBehindLinkerService,
                 _classConverterFactory,
                 _hostPageService,
-                _taskManager, _metricsContext);
+                _taskManager,
+                _tagConfigParser,
+                _metricsContext);
         }
     }
 }

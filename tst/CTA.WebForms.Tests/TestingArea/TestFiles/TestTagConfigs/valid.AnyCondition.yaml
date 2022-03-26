@@ -1,0 +1,18 @@
+﻿!Template
+TagName: valid:AnyCondition
+CodeBehindType: Namespace.TypeName
+CodeBehindHandler: Default
+Conditions:
+  - !AnyCondition
+    Conditions:
+      - !HasAttribute
+        AttributeName: Attr1
+      - !HasAttributeWithValue
+        AttributeName: Attr2
+        AttributeValue: Val2
+      - !HasParent
+        ParentTagName: div
+    ForTemplates: [Default]
+Invocations: []
+Templates:
+    Default: "<p>Default template</p>"

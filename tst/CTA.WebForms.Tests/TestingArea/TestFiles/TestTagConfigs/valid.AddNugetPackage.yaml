@@ -1,0 +1,10 @@
+﻿!Template
+TagName: valid:AddNugetPackage
+CodeBehindType: Namespace.TypeName
+CodeBehindHandler: Default
+Conditions: []
+Invocations:
+  - !AddNugetPackage
+    PackageName: Some.Other.Package
+Templates:
+    Default: "<p>Default template</p>"

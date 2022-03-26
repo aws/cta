@@ -48,7 +48,12 @@ namespace CTA.WebForms.Tests.Factories
         public void SetUp()
         {
             WebFormMetricContext metricContext = new WebFormMetricContext();
-            _classConverterFactory = new ClassConverterFactory(string.Empty, new LifecycleManagerService(), new TaskManagerService(), metricContext);
+            _classConverterFactory = new ClassConverterFactory(
+                string.Empty,
+                new LifecycleManagerService(),
+                new TaskManagerService(),
+                new CodeBehindReferenceLinkerService(),
+                metricContext);
             _workspaceManager = new WorkspaceManagerService();
             _workspaceManager.CreateSolutionFile();
             _workspaceManager.NotifyNewExpectedProject();
