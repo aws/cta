@@ -126,7 +126,7 @@ namespace CTA.Rules.Actions
         {
             string func(string projectDir, ProjectType projectType)
             {
-                AddMonolithFile(namespaceString, projectName, projectDir, projectType, FileTypeCreation.MonolithServiceCore.ToString());
+                AddMonolithFile(namespaceString, projectName, projectDir, projectType, FileTypeCreation.MonolithServiceCore.ToString(), true);
                 return "";
             }
             return func;
