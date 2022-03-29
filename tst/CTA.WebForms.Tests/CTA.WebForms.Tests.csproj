@@ -36,6 +36,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="TempTagConfigs\head.yaml" />
     <None Remove="TestingArea\TestFiles\TestTagConfigs\invalid.AddNugetPackageExtraProperties.yaml" />
     <None Remove="TestingArea\TestFiles\TestTagConfigs\invalid.AnyConditionExtraProperties.yaml" />
     <None Remove="TestingArea\TestFiles\TestTagConfigs\invalid.HasAttributeExtraProperties.yaml" />
@@ -53,9 +54,5 @@
 	<None Remove="TestingArea\TestFiles\TestTagConfigs\valid.MinimalNulls.yaml" />
     <None Remove="TestingArea\TestFiles\TestTagConfigs\valid.MultipleConditions.yaml" />
     <None Remove="TestingArea\TestFiles\TestTagConfigs\valid.MultipleInvocations.yaml" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="TempTagConfigs\" />
   </ItemGroup>
 </Project>
