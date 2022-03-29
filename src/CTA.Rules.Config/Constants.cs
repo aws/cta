@@ -148,6 +148,7 @@ namespace CTA.Rules.Config
             new List<string> {"mvc","Startup.cs" },
             new List<string> {"monolithservice","MonolithService.cs" },
             new List<string> {"monolithservice","MonolithServiceMvc.cs" },
+            new List<string> {"monolithservice","MonolithServiceCore.cs" },
             new List<string> {"webclasslibrary","appsettings.json" },
             new List<string> { "wcfcodebasedservice", "Program.cs"},
             new List<string> { "wcfcodebasedservice", "Startup.cs"},
