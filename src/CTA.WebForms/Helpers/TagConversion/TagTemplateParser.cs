@@ -106,7 +106,7 @@ namespace CTA.WebForms.Helpers.TagConversion
             int taskId)
         {
             var result = template;
-
+            
             result = await AttributeReplacementRegex.ReplaceAsync(result,
                 (Match m) => HandleAttributeReplacementAsync(m, node, viewFilePath, handler, taskId));
             result = await BasicReplacementRegex.ReplaceAsync(result,

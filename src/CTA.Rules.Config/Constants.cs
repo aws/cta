@@ -150,10 +150,11 @@ namespace CTA.Rules.Config
             new List<string> {"monolithservice","MonolithServiceMvc.cs" },
             new List<string> {"monolithservice","MonolithServiceCore.cs" },
             new List<string> {"webclasslibrary","appsettings.json" },
-            new List<string> { "wcfcodebasedservice", "Program.cs"},
-            new List<string> { "wcfcodebasedservice", "Startup.cs"},
-            new List<string> { "wcfconfigbasedservice", "Program.cs"},
-            new List<string> { "wcfconfigbasedservice", "Startup.cs"}
+            new List<string> {"wcfcodebasedservice","Program.cs"},
+            new List<string> {"wcfcodebasedservice","Startup.cs"},
+            new List<string> {"wcfconfigbasedservice","Program.cs"},
+            new List<string> {"wcfconfigbasedservice","Startup.cs"},
+            new List<string> {"webforms","appsettings.json"}
         };
 
         public const string WCFErrorTag = "WCF Porting Error: ";
