@@ -86,7 +86,6 @@ namespace CTA.WebForms
                 {
                     try
                     {
-                        //_blazorProjectBuilder.DeleteFileAndEmptyDirectories(fileConverter.FullPath, _inputProjectPath);
                         deleteFilesStack.Add((fileConverter.FullPath, _inputProjectPath));
 
                         // It's ok to use Task.Result here because the lambda within
@@ -95,7 +94,6 @@ namespace CTA.WebForms
                         // would force our lambda expression to be async
                         foreach (FileInformation generatedFile in generatedFiles.Result)
                         {
-                            //_blazorProjectBuilder.WriteFileInformationToProject(generatedFile);
                             if (generatedFile != null)
                             {
                                 writeFilesStack.Add(generatedFile);
