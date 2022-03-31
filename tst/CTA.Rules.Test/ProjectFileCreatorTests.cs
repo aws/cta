@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using CTA.Rules.Config;
 using CTA.Rules.Models;
 using CTA.Rules.ProjectFile;
 using NUnit.Framework;
@@ -23,7 +24,8 @@ namespace CTA.Rules.Test
             CreateEmptyXmlDocument(_classLibraryProjectFilePath);
             CreateEmptyXmlDocument(_webClassLibraryProjectFilePath);
 
-            var targetFramework = new List<string> { "netcoreapp3.1" };
+            var targetFramework = new List<string> { Constants.DefaultCoreVersion };
+            var sourceFramework = new List<string> { Constants.DefaultNetFrameworkVersion };
             var packages = new Dictionary<string, string>
             {
                 { "MyFirstPackage", "1.0.0" },
@@ -40,11 +42,11 @@ namespace CTA.Rules.Test
             };
 
             _mvcProjectFileCreator = new ProjectFileCreator(_mvcProjectFilePath, targetFramework, 
-                packages, projectReferences, ProjectType.Mvc, metaRefs);
+                packages, projectReferences, ProjectType.Mvc, metaRefs, sourceFramework);
             _classLibraryProjectFileCreator = new ProjectFileCreator(_classLibraryProjectFilePath, targetFramework, 
-                packages, projectReferences, ProjectType.ClassLibrary, metaRefs);
+                packages, projectReferences, ProjectType.ClassLibrary, metaRefs, sourceFramework);
             _webClassLibraryProjectFileCreator = new ProjectFileCreator(_webClassLibraryProjectFilePath, targetFramework, 
-                packages, projectReferences, ProjectType.WebClassLibrary, metaRefs);
+                packages, projectReferences, ProjectType.WebClassLibrary, metaRefs, sourceFramework);
         }
 
         [TearDown]

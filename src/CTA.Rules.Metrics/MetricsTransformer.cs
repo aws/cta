@@ -52,10 +52,11 @@ namespace CTA.Rules.Metrics
         {
             var projectFile = projectResult.ProjectFile;
             var targetVersions = projectResult.TargetVersions;
+            var sourceVersions = projectResult.SourceVersions;
             var targetVersionMetrics = new List<TargetVersionMetric>();
-            foreach (var targetVersion in targetVersions)
+            for (int i = 0; i < targetVersions.Count; i++)
             {
-                targetVersionMetrics.Add(new TargetVersionMetric(context, targetVersion, projectFile));
+                targetVersionMetrics.Add(new TargetVersionMetric(context, targetVersions[i], projectFile, sourceVersions[i]??null));
             }
 
             return targetVersionMetrics;

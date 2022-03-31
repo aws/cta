@@ -79,6 +79,7 @@ namespace CTA.Rules.Test.Metrics
                 {
                     ProjectFile = projectPath1,
                     TargetVersions = new List<string>() {Constants.DefaultCoreVersion},
+                    SourceVersions = new List<string> {Constants.DefaultNetFrameworkVersion},
                     UpgradePackages = new List<PackageAction>() {new PackageAction() { Name = "Newtonsoft.Json", OriginalVersion="9.0.0", Version="12.0.0" } },
                     MissingMetaReferences = new List<string> { @"C://reference1.dll", @"C://reference2.dll" },
                     ProjectActions = new ProjectActions() {

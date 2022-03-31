@@ -12,6 +12,7 @@ namespace CTA.Rules.ProjectFile
     {
         private readonly string _projectFile;
         private readonly List<string> _targetVersions;
+        private readonly List<string> _sourceVersions;
         private readonly List<string> _metaReferences;
         private Dictionary<string, string> _packages;
         private IEnumerable<string> _projectReferences;
@@ -82,6 +83,27 @@ namespace CTA.Rules.ProjectFile
             List<string> projectReferences, ProjectType projectType, List<string> metaReferences)
         {
             _projectFile = projectFile;
+            _targetVersions = targetVersions;
+            _packages = packages;
+            _projectReferences = projectReferences;
+            _projectType = projectType;
+            _metaReferences = metaReferences;
+
+            try
+            {
+                _projectFileXml = XDocument.Load(projectFile);
+            }
+            catch (Exception ex)
+            {
+                LogHelper.LogError(ex, "Error initializing project file");
+                throw;
+            }
+        }
+
+        public ProjectFileCreator(string projectFile, List<string> targetVersions, Dictionary<string, string> packages,
+            List<string> projectReferences, ProjectType projectType, List<string> metaReferences, List<string> sourceVersions)
+        {
+            _sourceVersions = sourceVersions; _projectFile = projectFile;
             _targetVersions = targetVersions;
             _packages = packages;
             _projectReferences = projectReferences;
