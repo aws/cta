@@ -324,6 +324,10 @@ Target Versions:
 ---------------------------
 netcoreapp3.1
 ---------------------------
+Source Versions:
+---------------------------
+net48
+---------------------------
 Upgrade packages:
 ---------------------------
 Newtonsoft.Json,9.0.0->12.0.0
@@ -401,6 +405,7 @@ Count: 400";
     ""metricsType"": ""CTA"",
     ""metricName"": ""TargetVersion"",
     ""targetVersion"": ""netcoreapp3.1"",
+    ""sourceVersion"": ""net48"",
     ""solutionPath"": ""5fa9de0cb5af2d468dfb1702b1e342f47de2df9a195dabb3be2d04f9c2767482"",
     ""projectGuid"": ""1234-5678""
   },
