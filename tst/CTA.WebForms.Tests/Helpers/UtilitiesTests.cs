@@ -1,4 +1,5 @@
 ﻿using CTA.WebForms.Helpers;
+using HtmlAgilityPack;
 using NUnit.Framework;
 
 namespace CTA.WebForms.Tests.Helpers
@@ -73,6 +74,122 @@ namespace CTA.WebForms.Tests.Helpers
             var output = Utilities.NormalizeNamespaceIdentifier(input);
 
             Assert.AreEqual(expectedOutput, output);
+        }
+
+        [Test]
+        public void NormalizeHtmlContent_Works_On_Html_With_No_New_Lines()
+        {
+            var input =
+@"<div><h1>Section</h1><p> Section Content</p><div><h2>Sub-Section</h2><p>Sub-Section Content</p></div></div>";
+            var expectedOutput =
+@"<div>
+    <h1>
+        Section
+    </h1>
+    <p>
+        Section Content
+    </p>
+    <div>
+        <h2>
+            Sub-Section
+        </h2>
+        <p>
+            Sub-Section Content
+        </p>
+    </div>
+</div>";
+
+            var document = new HtmlDocument();
+            var node = HtmlNode.CreateNode(input);
+            document.DocumentNode.AppendChild(node);
+
+            Utilities.NormalizeHtmlContent(document.DocumentNode);
+
+            Assert.AreEqual(expectedOutput, document.DocumentNode.WriteTo().Trim());
+        }
+
+        [Test]
+        public void NormalizeHtmlContent_Works_On_Super_Messy_Html()
+        {
+            var input =
+@"<div><h1>Section
+</h1>
+                                 <p> Section Content</p><div><h2>Sub-Section</h2>
+   <p>Sub-Section Content</p>    
+    </div>
+</div>";
+            var expectedOutput =
+@"<div>
+    <h1>
+        Section
+    </h1>
+    <p>
+        Section Content
+    </p>
+    <div>
+        <h2>
+            Sub-Section
+        </h2>
+        <p>
+            Sub-Section Content
+        </p>
+    </div>
+</div>";
+
+            var document = new HtmlDocument();
+            var node = HtmlNode.CreateNode(input);
+            document.DocumentNode.AppendChild(node);
+
+            Utilities.NormalizeHtmlContent(document.DocumentNode);
+
+            Assert.AreEqual(expectedOutput, document.DocumentNode.WriteTo().Trim());
+        }
+
+        [Test]
+        public void NormalizeHtmlContent_Does_Nothing_To_Perfect_Html()
+        {
+            var input =
+@"<div>
+    <h1>
+        Section
+    </h1>
+    <p>
+        Section Content
+    </p>
+    <div>
+        <h2>
+            Sub-Section
+        </h2>
+        <p>
+            Sub-Section Content
+        </p>
+    </div>
+</div>";
+            var expectedOutput =
+@"<div>
+    <h1>
+        Section
+    </h1>
+    <p>
+        Section Content
+    </p>
+    <div>
+        <h2>
+            Sub-Section
+        </h2>
+        <p>
+            Sub-Section Content
+        </p>
+    </div>
+</div>";
+
+            var document = new HtmlDocument();
+            var node = HtmlNode.CreateNode(input);
+            document.DocumentNode.AppendChild(node);
+
+            Utilities.NormalizeHtmlContent(document.DocumentNode);
+
+            Assert.AreEqual(expectedOutput, document.DocumentNode.WriteTo().Trim());
         }
     }
 }

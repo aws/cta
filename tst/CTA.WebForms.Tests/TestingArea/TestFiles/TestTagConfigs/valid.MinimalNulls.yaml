@@ -1,0 +1,7 @@
+﻿!Template
+TagName: valid:MinimalNulls
+CodeBehindType: Namespace.TypeName
+CodeBehindHandler: Default
+Conditions: null
+Invocations: null
+Templates: {}

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Codelyzer.Analysis;
@@ -7,6 +9,7 @@ using CTA.Rules.Models;
 using CTA.WebForms.Factories;
 using CTA.WebForms.FileInformationModel;
 using CTA.WebForms.Helpers;
+using CTA.WebForms.Helpers.TagConversion;
 using CTA.WebForms.Metrics;
 using CTA.WebForms.ProjectManagement;
 using CTA.WebForms.Services;
@@ -18,7 +21,6 @@ namespace CTA.WebForms
         private const string MigrationTasksCompletedLogAction = "Migration Tasks Completed";
 
         private readonly string _inputProjectPath;
-        private readonly string _solutionPath;
         private readonly ProjectResult _projectResult;
 
         private readonly ProjectConfiguration _projectConfiguration;
@@ -30,6 +32,7 @@ namespace CTA.WebForms
         private TaskManagerService _taskManager;
         private LifecycleManagerService _lifecycleManager;
         private ViewImportService _viewImportService;
+        private CodeBehindReferenceLinkerService _codeBehindLinkerService;
         private ProgramCsService _programCsService;
         private AppRazorService _appRazorService;
         private HostPageService _hostPageService;
@@ -37,16 +40,17 @@ namespace CTA.WebForms
 
         private ClassConverterFactory _classConverterFactory;
         private FileConverterFactory _fileConverterFactory;
+        private TagConfigParser _tagConfigParser;
         private WebFormMetricContext _metricsContext;
 
         public MigrationManager(string inputProjectPath, AnalyzerResult analyzerResult,
             ProjectConfiguration projectConfiguration, ProjectResult projectResult)
         {
             _inputProjectPath = inputProjectPath;
-            _solutionPath = projectConfiguration.SolutionPath;
             _analyzerResult = analyzerResult;
             _projectConfiguration = projectConfiguration;
             _projectResult = projectResult;
+            _tagConfigParser = new TagConfigParser(Rules.Config.Constants.TagConfigsExtractedPath);
             _metricsContext = new WebFormMetricContext();
         }
 
@@ -67,10 +71,13 @@ namespace CTA.WebForms
             var fileConverterCollection = _fileConverterFactory.BuildMany(_webFormsProjectAnalyzer.GetProjectFileInfo());
 
             var ignorableFileInfo = _webFormsProjectAnalyzer.GetProjectIgnoredFiles();
-            foreach(var fileInfo in ignorableFileInfo)
+            foreach (var fileInfo in ignorableFileInfo)
             {
                 _blazorProjectBuilder.DeleteFileAndEmptyDirectories(fileInfo.FullName, _inputProjectPath);
             }
+
+            var deleteFilesStack = new ConcurrentBag<(string filePath, string pathLimit)>();
+            var writeFilesStack = new ConcurrentBag<FileInformation>();
 
             var migrationTasks = fileConverterCollection.Select(fileConverter =>
                 // ContinueWith specifies the action to be run after each task completes,
@@ -79,7 +86,7 @@ namespace CTA.WebForms
                 {
                     try
                     {
-                        _blazorProjectBuilder.DeleteFileAndEmptyDirectories(fileConverter.FullPath, _inputProjectPath);
+                        deleteFilesStack.Add((fileConverter.FullPath, _inputProjectPath));
 
                         // It's ok to use Task.Result here because the lambda within
                         // the ContinueWith block only executes once the original task
@@ -87,7 +94,10 @@ namespace CTA.WebForms
                         // would force our lambda expression to be async
                         foreach (FileInformation generatedFile in generatedFiles.Result)
                         {
-                            _blazorProjectBuilder.WriteFileInformationToProject(generatedFile);
+                            if (generatedFile != null)
+                            {
+                                writeFilesStack.Add(generatedFile);
+                            }
                         }
                     }
                     catch (Exception e)
@@ -102,9 +112,14 @@ namespace CTA.WebForms
             // Combines migration tasks into a single task we can await
             await Task.WhenAll(migrationTasks).ConfigureAwait(false);
 
+            DeleteUsedSourceFiles(deleteFilesStack);
+            WriteGeneratedFiles(writeFilesStack);
+            WriteServiceDerivedFiles();
+
             LogHelper.LogInformation(string.Format(Constants.GenericInformationLogTemplate, GetType().Name, MigrationTasksCompletedLogAction));
 
-            WriteServiceDerivedFiles();
+            // TODO: Get new nuget packages from view import service and add to project references
+
             var result = new WebFormsPortingResult() { Metrics = _metricsContext.Transform() };
 
             // TODO: Any necessary cleanup or last checks on new project
@@ -116,6 +131,46 @@ namespace CTA.WebForms
                 _inputProjectPath));
 
             return result;
+        }
+
+        private void DeleteUsedSourceFiles(IEnumerable<(string filePath, string pathLimit)> sourceFiles)
+        {
+            foreach (var sourceFile in sourceFiles ?? Enumerable.Empty<(string filePath, string pathLimit)>())
+            {
+                try
+                {
+                    _blazorProjectBuilder.DeleteFileAndEmptyDirectories(sourceFile.filePath, sourceFile.pathLimit);
+                }
+                catch (Exception e)
+                {
+                    LogHelper.LogError(e, $"{Rules.Config.Constants.WebFormsErrorTag}Failed to delete file " +
+                        $"at {sourceFile.filePath}");
+                }
+            }
+        }
+
+        private void WriteGeneratedFiles(IEnumerable<FileInformation> generatedFiles)
+        {
+            foreach (var generatedFile in generatedFiles ?? Enumerable.Empty<FileInformation>())
+            {
+                try
+                {
+                    _blazorProjectBuilder.WriteFileInformationToProject(generatedFile);
+                }
+                catch (Exception e)
+                {
+                    if (generatedFile == null)
+                    {
+                        LogHelper.LogError(e, $"{Rules.Config.Constants.WebFormsErrorTag}Failed to write WebForms porting " +
+                            $"result, file information was null");
+                    }
+                    else
+                    {
+                        LogHelper.LogError(e, $"{Rules.Config.Constants.WebFormsErrorTag}Failed to write WebForms porting " +
+                            $"result to {generatedFile.RelativePath}");
+                    }
+                }
+            }
         }
 
         private void WriteServiceDerivedFiles()
@@ -137,6 +192,7 @@ namespace CTA.WebForms
             _taskManager = new TaskManagerService();
             _lifecycleManager = new LifecycleManagerService();
             _viewImportService = new ViewImportService();
+            _codeBehindLinkerService = new CodeBehindReferenceLinkerService();
             _programCsService = new ProgramCsService();
             _appRazorService = new AppRazorService();
             _hostPageService = new HostPageService();
@@ -156,15 +212,20 @@ namespace CTA.WebForms
             _classConverterFactory = new ClassConverterFactory(
                 _inputProjectPath,
                 _lifecycleManager,
-                _taskManager, _metricsContext);
+                _taskManager,
+                _codeBehindLinkerService,
+                _metricsContext);
             _fileConverterFactory = new FileConverterFactory(
                 _inputProjectPath,
                 _blazorWorkspaceManager,
                 _webFormsProjectAnalyzer,
                 _viewImportService,
+                _codeBehindLinkerService,
                 _classConverterFactory,
                 _hostPageService,
-                _taskManager, _metricsContext);
+                _taskManager,
+                _tagConfigParser,
+                _metricsContext);
         }
     }
 }

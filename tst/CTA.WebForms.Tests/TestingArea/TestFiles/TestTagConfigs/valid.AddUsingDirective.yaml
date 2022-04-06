@@ -1,0 +1,10 @@
+﻿!Template
+TagName: valid:AddUsingDirective
+CodeBehindType: Namespace.TypeName
+CodeBehindHandler: Default
+Conditions: []
+Invocations:
+  - !AddUsingDirective
+    NamespaceName: X.Y.Z
+Templates:
+    Default: "<p>Default template</p>"

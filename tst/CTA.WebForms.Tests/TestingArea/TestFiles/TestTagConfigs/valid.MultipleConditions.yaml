@@ -1,0 +1,20 @@
+﻿!Template
+TagName: valid:MultipleConditions
+CodeBehindType: Namespace.TypeName
+CodeBehindHandler: Default
+Conditions:
+  - !AnyCondition
+    Conditions:
+      - !HasAttribute
+        AttributeName: Attr1
+      - !HasAttributeWithValue
+        AttributeName: Attr2
+        AttributeValue: Val2
+    ForTemplates: [Default]
+  - !HasGrandparent
+    GrandparentTagName: div
+  - !HasAttribute
+    AttributeName: Attr3
+Invocations: []
+Templates:
+    Default: "<p>Default template</p>"

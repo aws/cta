@@ -9,7 +9,6 @@ using NUnit.Framework;
 
 namespace CTA.WebForms.Tests.FileConverters.DownloadRequired
 {
-    [SetUpFixture]
     public class DownloadTestProjectsFixture : AwsRulesBaseTest
     {
         private string _tempDir;

@@ -3,16 +3,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using CTA.WebForms.ControlConverters;
 using CTA.WebForms.Extensions;
 using CTA.WebForms.Helpers;
-using CTA.WebForms.Helpers.ControlHelpers;
 
 namespace CTA.WebForms.DirectiveConverters
 {
     public class RegisterDirectiveConverter : DirectiveConverter
     {
-        private readonly RegisteredUserControls _registeredUserControls;
         private const string IncorrectRegisterDirectiveWarning = "<!-- Register directive missing TagName or TagPrefix -->";
         private const string FileNameDoesNotContainDirectoryErrorTemplate =
             "<!-- Cannot convert file name to namespace, file path {0} does not have a directory -->";
@@ -29,10 +26,6 @@ namespace CTA.WebForms.DirectiveConverters
                     ControlSourceFile,
                 };
             }
-        }
-        public RegisterDirectiveConverter(RegisteredUserControls registeredUserControls)
-        {
-            _registeredUserControls = registeredUserControls;
         }
         
         private protected override IEnumerable<DirectiveMigrationResult> GetMigratedDirectives(string directiveName, string originalFilePath)
@@ -57,7 +50,6 @@ namespace CTA.WebForms.DirectiveConverters
             {
                 var oldControlName = attrMap[ControlTagPrefix] + ":" + attrMap[ControlTagName];
                 var newControlName = Path.GetFileNameWithoutExtension(attrMap[ControlSourceFile]);
-                _registeredUserControls.UserControlRulesMap[oldControlName] = new UserControlConverter(newControlName);
 
                 //_registeredUserControls.UserControlRulesMap.Add(oldControlName, new UserControlConverter(newControlName));
                 var filePath = attrMap[ControlSourceFile];

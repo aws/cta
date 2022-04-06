@@ -126,19 +126,23 @@ namespace CTA.Rules.Actions
         {
             string func(string projectDir, ProjectType projectType)
             {
-                AddMonolithFile(namespaceString, projectName, projectDir, projectType, FileTypeCreation.MonolithServiceCore.ToString());
+                AddMonolithFile(namespaceString, projectName, projectDir, projectType, FileTypeCreation.MonolithServiceCore.ToString(), true);
                 return "";
             }
             return func;
         }
 
-        private void AddMonolithFile(string namespaceString, string projectName, string projectDir, ProjectType projectType, string templateFilename)
+        private void AddMonolithFile(string namespaceString, string projectName, string projectDir, ProjectType projectType, string templateFilename, bool isCore = false)
         {
             if (projectDir != null && projectDir.Length > 0)
             {
                 if (string.Equals(Path.GetFileNameWithoutExtension(projectDir), projectName))
                 {
-                    UpdateCsprojReference(projectDir);
+                    // Update only in case of a framework project
+                    if (!isCore)
+                    {
+                        UpdateCsprojReference(projectDir);
+                    }
                     var pathOnly = Path.GetDirectoryName(projectDir);
                     var file = Path.Combine(pathOnly, string.Concat(templateFilename, ".cs"));
                     if (File.Exists(file))

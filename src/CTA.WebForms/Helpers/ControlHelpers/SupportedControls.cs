@@ -1,42 +1,17 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using CTA.WebForms.ControlConverters;
 using CTA.WebForms.DirectiveConverters;
 
 namespace CTA.WebForms.Helpers.ControlHelpers
 {
     public static class SupportedControls
     {
-        //RegisteredUserControls is a wrapper class for the dictionary UserControlMap
-        //This was done to create a modifiable static dictionary that is passed into every Register directive,
-        //which adds all user controls detected in the file to one overall dictionary
-        public static readonly RegisteredUserControls UserControls = new RegisteredUserControls();
-        
-        public static readonly ConcurrentDictionary<string, ControlConverter> ControlRulesMap = new ConcurrentDictionary<string, ControlConverter>()
-        {
-            ["asp:hyperlink"] = new HyperLinkControlConverter(),
-            ["asp:button"] = new ButtonControlConverter(),
-            ["asp:label"] = new LabelControlConverter(),
-            ["asp:listview"] = new ListViewControlConverter(),
-            ["asp:gridview"] = new GridViewControlConverter(),
-            ["asp:content"] = new RemoveNodeKeepContentsConverter(),
-            ["asp:textbox"] = new TextBoxControlConverter(),
-            ["asp:radiobutton"] = new RadioButtonControlConverter(),
-            ["html"] = new RemoveNodeKeepContentsConverter(),
-            ["body"] = new RemoveNodeKeepContentsConverter(),
-            ["head"] = new RemoveNodeAndContentsConverter(),
-            ["scripts"] = new RemoveNodeAndContentsConverter(),
-            ["!doctype"] = new RemoveNodeAndContentsConverter(),
-            ["asp:contentplaceholder"] = new ContentPlaceHolderControlConverter()
-        };
-
         // NOTE: Directive names appear to be case-insensitive
         public static readonly ConcurrentDictionary<string, DirectiveConverter> DirectiveRulesMap = new ConcurrentDictionary<string, DirectiveConverter>(StringComparer.InvariantCultureIgnoreCase)
         {
             ["Master"] = new MasterDirectiveConverter(),
             ["Page"] = new PageDirectiveConverter(),
-            ["Register"] = new RegisterDirectiveConverter(UserControls),
+            ["Register"] = new RegisterDirectiveConverter(),
             ["Control"] = new ControlDirectiveConverter()
         };
 
