@@ -8,7 +8,6 @@ using System.Reflection;
 
 namespace CTA.WebForms.Tests
 {
-    [TestFixture]
     public class WebFormsTestBase
     {
         public static string AssemblyDir => Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
