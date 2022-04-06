@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -95,6 +96,8 @@ namespace CTA.Rules.Config
         }
         public static string EscapeAllWhitespace(string src) => Regex.Replace(src, @"(\s+)|(\\n)|(\\r)|(\\t)|(\n)|(\r)|(\t)", string.Empty);
 
+        // Only used during manual testing so excluding from coverage
+        [ExcludeFromCodeCoverage]
         public static string DownloadFile(string fileUrl, string destinationFile, int retryCount = Constants.DownloadRetryCount)
         {
             int retryAttempts = 0;
@@ -191,7 +194,8 @@ namespace CTA.Rules.Config
             }
         }
 
-
+        // Only used during manual testing so excluding from coverage
+        [ExcludeFromCodeCoverage]
         public static string CopySolutionToTemp(string solutionPath)
         {
             string slnDirPath = Directory.GetParent(solutionPath).FullName;
@@ -231,6 +235,8 @@ namespace CTA.Rules.Config
         /// <param name="tempDir">The folder the location resides in</param>
         /// <param name="destinationLocation">copied folder location</param>
         /// <returns></returns>
+        // Only used during manual testing so excluding from coverage
+        [ExcludeFromCodeCoverage]
         public static string CopyFolderToTemp(string solutionName, string tempDir, string destinationLocation)
         {
             string solutionPath = Directory.EnumerateFiles(tempDir, solutionName, SearchOption.AllDirectories).FirstOrDefault(s => !s.Contains(string.Concat(Path.DirectorySeparatorChar, Path.DirectorySeparatorChar)));
@@ -246,6 +252,8 @@ namespace CTA.Rules.Config
         /// </summary>
         /// <param name="source">Source directory</param>
         /// <param name="target">Destination directory</param>
+        // Only used during manual testing so excluding from coverage
+        [ExcludeFromCodeCoverage]
         private static void CopyDirectory(DirectoryInfo source, DirectoryInfo target)
         {
             if (!Directory.Exists(target.FullName))

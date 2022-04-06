@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 using Codelyzer.Analysis;
@@ -66,6 +67,8 @@ namespace CTA.Rules.Update
             InitializeProjectRewriters(analyzerResults, solutionConfiguration);
         }
 
+        // IDE Extension
+        [ExcludeFromCodeCoverage]
         public SolutionRewriter(IDEProjectResult projectResult, List<ProjectConfiguration> solutionConfiguration, IProjectRewriterFactory projectRewriterFactory = null)
         {
             DownloadResourceFiles();
