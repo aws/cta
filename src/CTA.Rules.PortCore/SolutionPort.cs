@@ -117,9 +117,7 @@ namespace CTA.Rules.PortCore
             _context = new MetricsContext(solutionFilePath, analyzerResults);
             InitSolutionRewriter(analyzerResults, solutionConfiguration);
         }
-
-        // IDE Extension
-        [ExcludeFromCodeCoverage]
+        
         public SolutionPort(string solutionFilePath, IDEProjectResult projectResult, List<PortCoreConfiguration> solutionConfiguration)
         {
             _solutionPath = solutionFilePath;

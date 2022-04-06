@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using Codelyzer.Analysis;
 using Codelyzer.Analysis.Build;
@@ -56,9 +55,7 @@ namespace CTA.Rules.Update
 
             return _projectResult;
         }
-
-        // IDE Extension
-        [ExcludeFromCodeCoverage]
+        
         public override List<IDEFileActions> RunIncremental(List<string> updatedFiles, RootNodes projectRules)
         {
             base.RunIncremental(updatedFiles, projectRules);

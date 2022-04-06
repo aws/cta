@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using Codelyzer.Analysis;
+﻿using Codelyzer.Analysis;
 using Codelyzer.Analysis.Build;
 using CTA.Rules.Models;
 using CTA.Rules.Update;
@@ -19,8 +18,7 @@ namespace CTA.Rules.PortCore
             };
             return projectRewriter;
         }
-
-        [ExcludeFromCodeCoverage]
+        
         public ProjectRewriter GetInstance(IDEProjectResult ideProjectResult, ProjectConfiguration projectConfiguration)
         {
             var projectType = projectConfiguration.ProjectType;
