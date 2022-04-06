@@ -18,7 +18,7 @@ namespace CTA.Rules.PortCore
             };
             return projectRewriter;
         }
-
+        
         public ProjectRewriter GetInstance(IDEProjectResult ideProjectResult, ProjectConfiguration projectConfiguration)
         {
             var projectType = projectConfiguration.ProjectType;

@@ -55,7 +55,7 @@ namespace CTA.Rules.Update
 
             return _projectResult;
         }
-
+        
         public override List<IDEFileActions> RunIncremental(List<string> updatedFiles, RootNodes projectRules)
         {
             base.RunIncremental(updatedFiles, projectRules);

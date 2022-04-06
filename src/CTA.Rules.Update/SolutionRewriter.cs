@@ -65,7 +65,7 @@ namespace CTA.Rules.Update
             _projectRewriters = new List<ProjectRewriter>();
             InitializeProjectRewriters(analyzerResults, solutionConfiguration);
         }
-
+        
         public SolutionRewriter(IDEProjectResult projectResult, List<ProjectConfiguration> solutionConfiguration, IProjectRewriterFactory projectRewriterFactory = null)
         {
             DownloadResourceFiles();

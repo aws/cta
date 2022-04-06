@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 
 namespace CTA.WebForms.Tests.TagConfigs
 {
-    [TestFixture]
     public class TagConfigsTestFixture : WebFormsTestBase
     {
         private protected TagConfigParser _tagConfigParser;
