@@ -54,9 +54,15 @@ namespace CTA.Rules.Metrics
             var targetVersions = projectResult.TargetVersions;
             var sourceVersions = projectResult.SourceVersions;
             var targetVersionMetrics = new List<TargetVersionMetric>();
+
             for (int i = 0; i < targetVersions.Count; i++)
             {
-                targetVersionMetrics.Add(new TargetVersionMetric(context, targetVersions[i], projectFile, sourceVersions[i]??null));
+                string sourceVersion = null;
+                if (targetVersions.Count == sourceVersions.Count)
+                {
+                    sourceVersion = sourceVersions[i];
+                }
+                targetVersionMetrics.Add(new TargetVersionMetric(context, targetVersions[i], projectFile, sourceVersion));
             }
 
             return targetVersionMetrics;
