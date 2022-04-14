@@ -101,24 +101,9 @@ namespace CTA.Rules.ProjectFile
         }
 
         public ProjectFileCreator(string projectFile, List<string> targetVersions, Dictionary<string, string> packages,
-            List<string> projectReferences, ProjectType projectType, List<string> metaReferences, List<string> sourceVersions)
+            List<string> projectReferences, ProjectType projectType, List<string> metaReferences, List<string> sourceVersions) : this(projectFile, targetVersions, packages, projectReferences, projectType, metaReferences)
         {
-            _sourceVersions = sourceVersions; _projectFile = projectFile;
-            _targetVersions = targetVersions;
-            _packages = packages;
-            _projectReferences = projectReferences;
-            _projectType = projectType;
-            _metaReferences = metaReferences;
-
-            try
-            {
-                _projectFileXml = XDocument.Load(projectFile);
-            }
-            catch (Exception ex)
-            {
-                LogHelper.LogError(ex, "Error initializing project file");
-                throw;
-            }
+            _sourceVersions = sourceVersions;
         }
 
         private string GetTargetVersions()
