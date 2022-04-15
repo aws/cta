@@ -9,6 +9,7 @@ namespace CTA.Rules.Models
         public List<PackageAction> UpgradePackages { get; set; }
         public List<PackageAction> ActionPackages { get; set; }
         public List<string> TargetVersions { get; set; }
+        public List<string> SourceVersions { get; set; }
         public List<string> MetaReferences { get; set; }
         public List<string> MissingMetaReferences { get; set; }
         public List<WebFormsMetricResult> WebFormsMetricResults { get; set; }
@@ -38,6 +39,13 @@ namespace CTA.Rules.Models
                 stringBuilder.AppendLine(version);
             }
 
+            stringBuilder.AppendLine("---------------------------");
+            stringBuilder.AppendLine("Source Versions:");
+            stringBuilder.AppendLine("---------------------------");
+            foreach (var version in SourceVersions)
+            {
+                stringBuilder.AppendLine(version);
+            }
 
             stringBuilder.AppendLine("---------------------------");
             stringBuilder.AppendLine("Upgrade packages:");

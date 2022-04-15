@@ -36,6 +36,7 @@ namespace CTA.Rules.Update
             {
                 ProjectFile = projectConfiguration.ProjectPath,
                 TargetVersions = projectConfiguration.TargetVersions,
+                SourceVersions = projectConfiguration.SourceVersions,
                 UpgradePackages = projectConfiguration.PackageReferences.Select(p => new PackageAction()
                 {
                     Name = p.Key,
@@ -64,6 +65,7 @@ namespace CTA.Rules.Update
             {
                 ProjectFile = projectConfiguration.ProjectPath,
                 TargetVersions = projectConfiguration.TargetVersions,
+                SourceVersions = projectConfiguration.SourceVersions,
                 UpgradePackages = projectConfiguration.PackageReferences.Select(p => new PackageAction()
                 {
                     Name = p.Key,

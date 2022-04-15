@@ -57,7 +57,8 @@ namespace CTA.Rules.PortCore
                         PackageReferences = packageReferences,
                         PortCode = true,
                         PortProject = true,
-                        TargetVersions = new List<string> { cli.Version }
+                        TargetVersions = new List<string> { cli.Version },
+                        SourceVersions = new List<string> { Constants.DefaultNetFrameworkVersion }
                     };
 
                     configs.Add(projectConfiguration);

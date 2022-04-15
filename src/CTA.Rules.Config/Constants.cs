@@ -28,6 +28,7 @@ namespace CTA.Rules.Config
         public static string ResourcesExtractedPath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Templates"));
         public static string TagConfigsExtractedPath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "TagConfigs"));
         public static string DefaultCoreVersion = "netcoreapp3.1";
+        public static string DefaultNetFrameworkVersion = "net48";
 
         public static string JsonFileSchema = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), Path.Combine(new string[] { "..", "..", "..", "..", ".." })
         , Path.Combine(new string[] { "src", "CTA.Rules.RuleFiles", "Schema", "schema.validator.json" })));

@@ -36,7 +36,8 @@ namespace CTA.Rules.Update
                         ProjectPath = proj,
                         RulesDir = cli.RulesDir,
                         IsMockRun = cli.IsMockRun,
-                        TargetVersions = new List<string> { "net5.0" }
+                        TargetVersions = new List<string> { "net5.0" },
+                        SourceVersions = new List<string> { Constants.DefaultNetFrameworkVersion }
                     };
 
                     configs.Add(projectConfiguration);
