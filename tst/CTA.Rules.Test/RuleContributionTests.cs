@@ -77,4 +77,16 @@ class RuleContributionTests : AwsRulesBaseTest
         // Verify expected package is in .csproj
         StringAssert.Contains(@"PackageReference Include=""BouncyCastle.NetCore""", ruleContributionsResult.CsProjectContent);
     }
+
+    [TestCase(TargetFramework.DotnetCoreApp31)]
+    [TestCase(TargetFramework.Dotnet5)]
+    [TestCase(TargetFramework.Dotnet6)]
+    public void NPOI_Package_Is_Added(string version)
+    {
+        var solutionPortingResult = _resultsDict[version];
+        var ruleContributionsResult = solutionPortingResult.ProjectResults.First(proj => proj.CsProjectPath.EndsWith(RuleContributionsProjectFileName));
+
+        // Verify expected package is in .csproj
+        StringAssert.Contains(@"PackageReference Include=""NPOI""", ruleContributionsResult.CsProjectContent);
+    }
 } 
