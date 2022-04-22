@@ -31,7 +31,9 @@ namespace CTA.Rules.Update.Rewriters
             typeof(TypeParameterListSyntax),
             typeof(ParameterSyntax),
             typeof(ObjectCreationExpressionSyntax),
-            typeof(QualifiedNameSyntax)};
+            typeof(QualifiedNameSyntax),
+            typeof(CastExpressionSyntax),
+        };
 
         public ActionsRewriter(SemanticModel semanticModel, SemanticModel preportSemanticModel, SyntaxGenerator syntaxGenerator, string filePath, List<GenericAction> allActions)
         {
