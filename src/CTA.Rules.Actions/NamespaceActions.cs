@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Linq;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Editing;
@@ -15,6 +17,41 @@ namespace CTA.Rules.Actions
                 return node;
             }
             return RenameNamespace;
+        }
+
+        public Func<SyntaxGenerator, NamespaceDeclarationSyntax, NamespaceDeclarationSyntax> GetAddDirectiveAction(string @namespace)
+        {
+            NamespaceDeclarationSyntax AddDirective(SyntaxGenerator syntaxGenerator, NamespaceDeclarationSyntax node)
+            {
+                var allUsings = node.Usings;
+
+                var usingDirective = SyntaxFactory.UsingDirective(SyntaxFactory.ParseName(@namespace)).NormalizeWhitespace();
+                allUsings = allUsings.Add(usingDirective);
+
+                node = node.WithUsings(allUsings).NormalizeWhitespace();
+                return node;
+            }
+            return AddDirective;
+        }
+
+        public Func<SyntaxGenerator, NamespaceDeclarationSyntax, NamespaceDeclarationSyntax> GetRemoveDirectiveAction(string @namespace)
+        {
+            NamespaceDeclarationSyntax RemoveDirective(SyntaxGenerator syntaxGenerator, NamespaceDeclarationSyntax node)
+            {
+                // remove duplicate directive references, don't use List based approach because
+                // since we will be replacing the node after each loop, it update text span which will not remove duplicate namespaces
+                var allUsings = node.Usings;
+                var removeItem = allUsings.FirstOrDefault(u => @namespace == u.Name.ToString());
+
+                if (removeItem == null)
+                    return node;
+
+                allUsings = allUsings.Remove(removeItem);
+
+                node = node.WithUsings(allUsings).NormalizeWhitespace();
+                return RemoveDirective(syntaxGenerator, node);
+            }
+            return RemoveDirective;
         }
     }
 }

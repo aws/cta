@@ -428,6 +428,7 @@ namespace CTA.Rules.Update.Rewriters
         public override SyntaxNode VisitNamespaceDeclaration(NamespaceDeclarationSyntax node)
         {
             NamespaceDeclarationSyntax newNode = (NamespaceDeclarationSyntax)base.VisitNamespaceDeclaration(node);
+            // Handle namespace renaming actions etc.
             foreach (var action in _allActions.OfType<NamespaceAction>())
             {
                 if (action.Key == newNode.Name.ToString())
@@ -450,6 +451,27 @@ namespace CTA.Rules.Update.Rewriters
                     allExecutedActions.Add(actionExecution);
                 }
             }
+            // Handle namespace add or remove using actions.
+            foreach (var action in _allActions.OfType<UsingAction>())
+            {
+                var actionExecution = new GenericActionExecution(action, _filePath)
+                {
+                    TimesRun = 1
+                };
+                try
+                {
+                    newNode = action.NamespaceUsingActionFunc(_syntaxGenerator, newNode);
+                    LogHelper.LogInformation(string.Format("{0}", action.Description));
+                }
+                catch (Exception ex)
+                {
+                    var actionExecutionException = new ActionExecutionException(action.Name, action.Key, ex);
+                    actionExecution.InvalidExecutions = 1;
+                    LogHelper.LogError(actionExecutionException);
+                }
+                allExecutedActions.Add(actionExecution);
+            }
+
             return newNode;
         }
     }
