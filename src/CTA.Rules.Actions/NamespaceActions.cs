@@ -19,21 +19,12 @@ namespace CTA.Rules.Actions
             return RenameNamespace;
         }
 
-        public Func<SyntaxGenerator, NamespaceDeclarationSyntax, NamespaceDeclarationSyntax> GetAddDirectiveAction(string @namespace)
-        {
-            NamespaceDeclarationSyntax AddDirective(SyntaxGenerator syntaxGenerator, NamespaceDeclarationSyntax node)
-            {
-                var allUsings = node.Usings;
-
-                var usingDirective = SyntaxFactory.UsingDirective(SyntaxFactory.ParseName(@namespace)).NormalizeWhitespace();
-                allUsings = allUsings.Add(usingDirective);
-
-                node = node.WithUsings(allUsings).NormalizeWhitespace();
-                return node;
-            }
-            return AddDirective;
-        }
-
+        /// <summary>
+        /// Only support remove using directive actions inside Namespace block.
+        /// The add using directive actions will be happening in CompiliationUnit.
+        /// </summary>
+        /// <param name="namespace"></param>
+        /// <returns></returns>
         public Func<SyntaxGenerator, NamespaceDeclarationSyntax, NamespaceDeclarationSyntax> GetRemoveDirectiveAction(string @namespace)
         {
             NamespaceDeclarationSyntax RemoveDirective(SyntaxGenerator syntaxGenerator, NamespaceDeclarationSyntax node)

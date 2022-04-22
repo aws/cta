@@ -378,7 +378,7 @@ namespace CTA.Rules.Update.Rewriters
                 try
                 {
                     newNode = action.UsingActionFunc(_syntaxGenerator, newNode);
-                    LogHelper.LogInformation(string.Format("{0}", action.Description));
+                    LogHelper.LogInformation(string.Format("{0} in CompilationUnit.", action.Description));
                 }
                 catch (Exception ex)
                 {
@@ -451,9 +451,14 @@ namespace CTA.Rules.Update.Rewriters
                     allExecutedActions.Add(actionExecution);
                 }
             }
-            // Handle namespace add or remove using actions.
+            // Handle namespace remove using actions.
             foreach (var action in _allActions.OfType<UsingAction>())
             {
+                if (action.NamespaceUsingActionFunc == null)
+                {
+                    continue;
+                }
+
                 var actionExecution = new GenericActionExecution(action, _filePath)
                 {
                     TimesRun = 1
@@ -461,7 +466,7 @@ namespace CTA.Rules.Update.Rewriters
                 try
                 {
                     newNode = action.NamespaceUsingActionFunc(_syntaxGenerator, newNode);
-                    LogHelper.LogInformation(string.Format("{0}", action.Description));
+                    LogHelper.LogInformation(string.Format("{0} in Namespace block.", action.Description));
                 }
                 catch (Exception ex)
                 {
