@@ -129,11 +129,34 @@ namespace CTA.Rules.Analyzer
                             }
                         case IdConstants.UsingDirectiveIdName:
                             {
+                                string overrideKey = string.Empty;
+
                                 var compareToken = new UsingDirectiveToken() { Key = child.Identifier };
                                 _rootNodes.Usingdirectivetokens.TryGetValue(compareToken, out var token);
                                 if (token != null)
                                 {
                                     AddActions(fileAction, token, child.TextSpan);
+                                    containsActions = true;
+                                }
+
+                                //Attempt a wildcard search, if applicable. This is using directive specific because it might want to include all sub-namespaces
+                                if (token == null)
+                                {
+                                    var wildcardMatches = _rootNodes.Usingdirectivetokens.Where(i => i.Key.Contains("*"));
+                                    if (wildcardMatches.Any())
+                                    {
+                                        token = wildcardMatches.FirstOrDefault(i => compareToken.Key.WildcardEquals(i.Key));
+
+                                        if (token != null)
+                                        {
+                                            //We set the key so that we don't do another wildcard search during replacement, we just use the name as it was declared in the code
+                                            overrideKey = compareToken.Key;
+                                        }
+                                    }
+                                }
+                                if (token != null)
+                                {
+                                    AddActions(fileAction, token, child.TextSpan, overrideKey);
                                     containsActions = true;
                                 }
                                 break;
