@@ -214,8 +214,10 @@ namespace CTA.Rules.Test.Actions
         public void NamespaceActionsTest()
         {
             var renameNamespace = _actionLoader.GetNamespaceActions("RenameNamespace", "newName");
+            var removeUsingDirective = _actionLoader.GetNamespaceActions("RemoveDirective", "newNamespace");
 
             Assert.IsNotNull(renameNamespace);
+            Assert.IsNotNull(removeUsingDirective);
         }
 
         [Test]

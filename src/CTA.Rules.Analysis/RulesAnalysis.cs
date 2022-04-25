@@ -521,7 +521,8 @@ namespace CTA.Rules.Analyzer
                 Type = a.Type,
                 TextSpan = textSpan,
                 ActionValidation = a.ActionValidation,
-                UsingActionFunc = a.UsingActionFunc
+                UsingActionFunc = a.UsingActionFunc,
+                NamespaceUsingActionFunc = a.NamespaceUsingActionFunc,
             }).ToList());
 
             fileAction.NamespaceActions.UnionWith(token.NamespaceActions.Select(a => new NamespaceAction()

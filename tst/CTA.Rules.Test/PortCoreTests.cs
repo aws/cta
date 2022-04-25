@@ -472,11 +472,24 @@ namespace CTA.Rules.Test
         [TestCase(TargetFramework.DotnetCoreApp31)]
         public void TestBuildableWebApiSolution(string version)
         {
-            TestSolutionAnalysis resultWithoutCodePort = AnalyzeSolution("BuildableWebApi.sln", tempDir, downloadLocation, version, portCode: false);
-            var buildErrorsWithoutPortCode = GetSolutionBuildErrors(resultWithoutCodePort.SolutionRunResult.SolutionPath);
-            Assert.AreEqual(35, buildErrorsWithoutPortCode.Count);
+            TestSolutionAnalysis resultWithoutCodePort = AnalyzeSolution(
+                "BuildableWebApi.sln",
+                tempDir,
+                downloadLocation,
+                version,
+                portCode: false);
 
-            TestSolutionAnalysis results = AnalyzeSolution("BuildableWebApi.sln", tempDir, downloadLocation, version);
+            var buildErrorsWithoutPortCode = GetSolutionBuildErrors(resultWithoutCodePort.SolutionRunResult.SolutionPath);
+            // Build errors were added by 3 because of the PR here:
+            // https://github.com/marknfawaz/TestProjects/pull/71
+            Assert.AreEqual(38, buildErrorsWithoutPortCode.Count);
+
+            TestSolutionAnalysis results = AnalyzeSolution(
+                "BuildableWebApi.sln",
+                tempDir,
+                downloadLocation,
+                version);
+
             var buildErrors = GetSolutionBuildErrors(results.SolutionRunResult.SolutionPath);
             Assert.AreEqual(0, buildErrors.Count);
         }

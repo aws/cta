@@ -458,6 +458,10 @@ namespace CTA.Rules.RuleFiles
                         case ActionTypes.Using:
                             {
                                 var actionFunc = actionsLoader.GetCompilationUnitAction(action.Name, action.Value);
+                                // Using directives can be found in both ComplilationUnit and inside Namespace.
+                                // Need to make sure remove action is taken if it's inside Namespace block.
+                                // Only add using directives in the CompilationUnit as our convention, so it's not added twice.
+                                var namespaceActionFunc = actionsLoader.GetNamespaceActions(action.Name, action.Value);
                                 if (actionFunc != null)
                                 {
                                     nodeToken.UsingActions.Add(new UsingAction()
@@ -468,7 +472,8 @@ namespace CTA.Rules.RuleFiles
                                         ActionValidation = action.ActionValidation,
                                         Name = action.Name,
                                         Type = action.Type,
-                                        UsingActionFunc = actionFunc
+                                        UsingActionFunc = actionFunc,
+                                        NamespaceUsingActionFunc = namespaceActionFunc
                                     });
                                 }
                                 break;
