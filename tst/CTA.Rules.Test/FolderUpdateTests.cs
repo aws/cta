@@ -13,6 +13,8 @@ namespace CTA.Rules.Test
             Directory.GetCurrentDirectory(), "TestProject");
         private string _testProjectPath = Path.Combine(
             Directory.GetCurrentDirectory(), "TestProject", "TestProject.csproj");
+        private string _vbTestProjectPath = Path.Combine(
+            Directory.GetCurrentDirectory(), "TestProject", "TestProject.vbproj");
 
         [SetUp]
         public void Setup()
@@ -193,6 +195,24 @@ namespace CTA.Rules.Test
                 _testProjectDir, FileTypeCreation.Program.ToString() + ".cs")));
             Assert.True(File.Exists(Path.Combine(
                 _testProjectDir, FileTypeCreation.Startup.ToString() + ".cs")));
+
+            Cleanup(_testProjectDir);
+        }
+
+        [Test]
+        public void Folder_Update_for_WebApi_Project_Vb()
+        {
+            // Run FolderUpdate on the test project
+            ProjectType projectType = ProjectType.WebApi;
+            FolderUpdate folderUpdate = new FolderUpdate(
+                _vbTestProjectPath, projectType);
+            folderUpdate.Run();
+
+            // Validate Program.cs and Startup.cs files are created
+            Assert.True(File.Exists(Path.Combine(
+                _testProjectDir, FileTypeCreation.Program.ToString() + FileExtension.VisualBasic)));
+            Assert.True(File.Exists(Path.Combine(
+                _testProjectDir, FileTypeCreation.Startup.ToString() + FileExtension.VisualBasic)));
 
             Cleanup(_testProjectDir);
         }
