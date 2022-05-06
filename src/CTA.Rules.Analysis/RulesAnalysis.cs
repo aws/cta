@@ -201,7 +201,7 @@ namespace CTA.Rules.Analyzer
                                 }
 
                                 token = null;
-                                foreach (string interfaceName in classType.BaseList)
+                                foreach (string interfaceName in classType.BaseList ?? Enumerable.Empty<string>())
                                 {
                                     var baseListToken = new ClassDeclarationToken() { FullKey = interfaceName };
                                     _rootNodes.Classdeclarationtokens.TryGetValue(baseListToken, out token);
