@@ -201,6 +201,8 @@ namespace CTA.Rules.Analyzer
                                 }
 
                                 token = null;
+                                // In case base list is null, we skip the block by substituting an empty enumerab le
+                                // This case may potentially occur when a class implements no interfaces
                                 foreach (string interfaceName in classType.BaseList ?? Enumerable.Empty<string>())
                                 {
                                     var baseListToken = new ClassDeclarationToken() { FullKey = interfaceName };
