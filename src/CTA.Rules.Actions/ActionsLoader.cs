@@ -18,19 +18,45 @@ namespace CTA.Rules.Actions
     /// </summary>
     public class ActionsLoader
     {
-        private readonly List<MethodInfo> compilationUnitActions, attributeActions, attributeListActions, classActions,
-        identifierNameActions, invocationExpressionActions, expressionActions, methodDeclarationActions, elementAccessActions,
-        objectCreationExpressionActions, memberAccessActions, namespaceActions, projectLevelActions, projectFileActions, projectTypeActions, interfaceActions;
+        private readonly List<MethodInfo> compilationUnitActions,
+            attributeActions,
+            attributeListActions,
+            classActions,
+            identifierNameActions,
+            invocationExpressionActions,
+            expressionActions,
+            methodDeclarationActions,
+            elementAccessActions,
+            objectCreationExpressionActions,
+            memberAccessActions,
+            namespaceActions,
+            projectLevelActions,
+            projectFileActions,
+            projectTypeActions,
+            interfaceActions;
 
-        private readonly object attributeObject, attributeListObject, classObject, interfaceObject, compilationUnitObject, identifierNameObject
-            , invocationExpressionObject, expressionObject, methodDeclarationObject, elementAccessObject, memberAccessObject, objectExpressionObject, namespaceObject, projectLevelObject,
-            projectFileObject, projectTypeObject;
+        private readonly object attributeObject,
+            attributeListObject,
+            classObject,
+            interfaceObject,
+            compilationUnitObject,
+            identifierNameObject,
+            invocationExpressionObject,
+            expressionObject,
+            methodDeclarationObject,
+            elementAccessObject,
+            memberAccessObject,
+            objectExpressionObject,
+            namespaceObject,
+            projectLevelObject,
+            projectFileObject,
+            projectTypeObject;
 
         /// <summary>
         /// Initializes a new ActionLoader that loads the default actions
         /// </summary>
         /// <param name="assemblyPaths">A directory containing additional actions to be used</param>
-        public ActionsLoader(List<string> assemblyPaths)
+        public ActionsLoader(List<string> assemblyPaths, ProjectLanguage language)
         {
             compilationUnitActions = new List<MethodInfo>();
             attributeActions = new List<MethodInfo>();
@@ -73,7 +99,10 @@ namespace CTA.Rules.Actions
             {
                 try
                 {
-                    var types = assembly.GetTypes().Where(t => t.Name.EndsWith("Actions"));
+                    var types = assembly.GetTypes()
+                        .Where(t => t.Name.EndsWith("Actions") &&
+                                    (t.Namespace.EndsWith(language.ToString()) ||
+                                     t.Name.StartsWith("Project")));
 
                     attributeObject = Activator.CreateInstance(types.FirstOrDefault(t => t.Name == Constants.AttributeActions));
                     attributeListObject = Activator.CreateInstance(types.FirstOrDefault(t => t.Name == Constants.AttributeListActions));

@@ -9,8 +9,9 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Editing;
+using CSharpExtensions = Microsoft.CodeAnalysis.CSharp.CSharpExtensions;
 
-namespace CTA.Rules.Actions
+namespace CTA.Rules.Actions.Csharp
 {
     /// <summary>
     /// List of actions that can run on Class Declarations
@@ -214,7 +215,7 @@ namespace CTA.Rules.Actions
         {
             ClassDeclarationSyntax RemoveConstructorInitializer(SyntaxGenerator syntaxGenerator, ClassDeclarationSyntax node)
             {
-                var constructor = node.ChildNodes().Where(c => Microsoft.CodeAnalysis.CSharp.CSharpExtensions.Kind(c) == SyntaxKind.ConstructorDeclaration).FirstOrDefault();
+                var constructor = node.ChildNodes().FirstOrDefault(c => c.IsKind(SyntaxKind.ConstructorDeclaration));
                 if (constructor != null)
                 {
                     ConstructorDeclarationSyntax constructorNode = (ConstructorDeclarationSyntax)constructor;
@@ -249,7 +250,7 @@ namespace CTA.Rules.Actions
         {
             ClassDeclarationSyntax AppendConstructorExpression(SyntaxGenerator syntaxGenerator, ClassDeclarationSyntax node)
             {
-                var constructor = node.Members.Where(c => Microsoft.CodeAnalysis.CSharp.CSharpExtensions.Kind(c) == SyntaxKind.ConstructorDeclaration).FirstOrDefault();
+                var constructor = node.Members.FirstOrDefault(c => c.IsKind(SyntaxKind.ConstructorDeclaration));
                 if (constructor != null)
                 {
                     ConstructorDeclarationSyntax constructorNode = (ConstructorDeclarationSyntax)constructor;

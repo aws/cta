@@ -6,7 +6,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Editing;
 
-namespace CTA.Rules.Actions
+namespace CTA.Rules.Actions.Csharp
 {
     public class ExpressionActions
     {

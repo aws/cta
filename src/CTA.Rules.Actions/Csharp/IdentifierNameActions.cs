@@ -4,7 +4,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Editing;
 
-namespace CTA.Rules.Actions
+namespace CTA.Rules.Actions.Csharp
 {
     //TODO shouldn't this be inside ClassActions ?
     /// <summary>

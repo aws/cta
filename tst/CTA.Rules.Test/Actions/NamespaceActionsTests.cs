@@ -1,5 +1,5 @@
 ﻿using CTA.FeatureDetection.Common.Extensions;
-using CTA.Rules.Actions;
+using CTA.Rules.Actions.Csharp;
 using CTA.Rules.Models;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;

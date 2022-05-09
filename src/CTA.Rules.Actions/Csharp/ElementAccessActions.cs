@@ -5,7 +5,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Editing;
 
-namespace CTA.Rules.Update
+namespace CTA.Rules.Update.Csharp
 {
     /// <summary>
     /// List of actions that can run on Element Accesses

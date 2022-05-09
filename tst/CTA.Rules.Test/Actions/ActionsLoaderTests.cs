@@ -17,7 +17,7 @@ namespace CTA.Rules.Test.Actions
         [SetUp]
         public void SetUp()
         {
-            _actionLoader = new ActionsLoader(new List<string>());
+            _actionLoader = new ActionsLoader(new List<string>(), ProjectLanguage.Csharp);
         }
 
         [Test]
