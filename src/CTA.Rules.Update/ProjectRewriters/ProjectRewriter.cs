@@ -6,6 +6,7 @@ using Codelyzer.Analysis;
 using Codelyzer.Analysis.Build;
 using Codelyzer.Analysis.Model;
 using CTA.Rules.Analyzer;
+using CTA.Rules.Common.Helpers;
 using CTA.Rules.Config;
 using CTA.Rules.Models;
 using CTA.Rules.RuleFiles;
@@ -24,6 +25,7 @@ namespace CTA.Rules.Update
         protected readonly ProjectResult _projectResult;
         protected readonly List<string> _metaReferences;
         protected readonly AnalyzerResult _analyzerResult;
+        protected readonly ProjectLanguage _projectLanguage;
 
         /// <summary>
         /// Initializes a new instance of ProjectRewriter using an existing analysis
@@ -53,6 +55,7 @@ namespace CTA.Rules.Update
             _metaReferences = analyzerResult?.ProjectBuildResult?.Project?.MetadataReferences?.Select(m => m.Display).ToList()
                 ?? projectConfiguration.MetaReferences;
             ProjectConfiguration = projectConfiguration;
+            _projectLanguage = VisualBasicUtils.IsVisualBasicProject(ProjectConfiguration.ProjectPath) ? ProjectLanguage.VisualBasic : ProjectLanguage.Csharp;
         }
 
         public ProjectRewriter(IDEProjectResult projectResult, ProjectConfiguration projectConfiguration)
@@ -87,7 +90,7 @@ namespace CTA.Rules.Update
                 var allReferences = _sourceFileResults?.SelectMany(s => s.References)
                         .Union(_sourceFileResults.SelectMany(s => s.Children.OfType<UsingDirective>())?.Select(u => new Reference() { Namespace = u.Identifier, Assembly = u.Identifier }).Distinct())
                         .Union(ProjectConfiguration.AdditionalReferences.Select(r => new Reference { Assembly = r, Namespace = r }));
-                RulesFileLoader rulesFileLoader = new RulesFileLoader(allReferences, ProjectConfiguration.RulesDir, ProjectConfiguration.TargetVersions, string.Empty, ProjectConfiguration.AssemblyDir);
+                RulesFileLoader rulesFileLoader = new RulesFileLoader(allReferences, ProjectConfiguration.RulesDir, ProjectConfiguration.TargetVersions, _projectLanguage, string.Empty, ProjectConfiguration.AssemblyDir);
 
                 var projectRules = rulesFileLoader.Load();
 
@@ -150,7 +153,7 @@ namespace CTA.Rules.Update
             var ideFileActions = new List<IDEFileActions>();
 
             var allReferences = _sourceFileResults?.SelectMany(s => s.References).Distinct();
-            RulesFileLoader rulesFileLoader = new RulesFileLoader(allReferences, Constants.RulesDefaultPath, ProjectConfiguration.TargetVersions, string.Empty, ProjectConfiguration.AssemblyDir);
+            RulesFileLoader rulesFileLoader = new RulesFileLoader(allReferences, Constants.RulesDefaultPath, ProjectConfiguration.TargetVersions, _projectLanguage, string.Empty, ProjectConfiguration.AssemblyDir);
             projectRules = rulesFileLoader.Load();
 
             RulesAnalysis walker = new RulesAnalysis(_sourceFileResults, projectRules, ProjectConfiguration.ProjectType);

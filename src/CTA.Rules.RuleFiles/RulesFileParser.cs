@@ -26,14 +26,27 @@ namespace CTA.Rules.RuleFiles
         private readonly NamespaceRecommendations _namespaceRecommendations;
         private readonly NamespaceRecommendations _overrideNamespaceRecommendations;
 
+        private readonly ProjectLanguage _projectLanguage;
+
         /// <summary>
         /// Runs the rules parser
         /// </summary>
+        /// <param name="overrideNamespaceRecommendations">Override namespace recommendations</param>
         /// <param name="rulesObject">Object containing built in rules</param>
         /// <param name="overrideObject">Object containing override rules</param>
         /// <param name="assembliesDir">Directory containing additional actions assemblies</param>
-        public RulesFileParser(NamespaceRecommendations namespaceRecommendations, NamespaceRecommendations overrideNamespaceRecommendations,
-            Rootobject rulesObject, Rootobject overrideObject, string assembliesDir, string targetFramework)
+        /// <param name="namespaceRecommendations">Namespace recommendations</param>
+        /// <param name="targetFramework">Framework version being targeted for porting</param>
+        /// <param name="projectLanguage">Project language, C# or VB</param>
+        /// 
+        public RulesFileParser(
+            NamespaceRecommendations namespaceRecommendations,
+            NamespaceRecommendations overrideNamespaceRecommendations,
+            Rootobject rulesObject,
+            Rootobject overrideObject,
+            string assembliesDir,
+            string targetFramework,
+            ProjectLanguage projectLanguage)
         {
             _rootNodes = new RootNodes();
             _rootNodes.ProjectTokens.Add(new ProjectToken() { Key = "Project" });
@@ -43,6 +56,7 @@ namespace CTA.Rules.RuleFiles
             _namespaceRecommendations = namespaceRecommendations;
             _overrideNamespaceRecommendations = overrideNamespaceRecommendations;
             _targetFramework = targetFramework;
+            _projectLanguage = projectLanguage;
 
             LoadActions();
         }
@@ -91,7 +105,7 @@ namespace CTA.Rules.RuleFiles
             {
                 assemblies = Directory.EnumerateFiles(_assembliesDir, "*.dll").ToList();
             }
-            actionsLoader = new ActionsLoader(assemblies);
+            actionsLoader = new ActionsLoader(assemblies, _projectLanguage);
         }
 
         /// <summary>

@@ -20,6 +20,7 @@ namespace CTA.Rules.RuleFiles
         private readonly string _overrideFile;
         private readonly string _assembliesDir;
         private readonly IEnumerable<Reference> _projectReferences;
+        private readonly ProjectLanguage _projectLanguage;
 
         /// <summary>
         /// Initializes a new RulesFileLoader
@@ -29,7 +30,8 @@ namespace CTA.Rules.RuleFiles
         /// <param name="targetFramework">Target framework to port to</param>
         /// <param name="overrideFile">Path to rules file containing override rules. The override rules will be added to the built in rules, overriding any matching existing rules</param>
         /// <param name="assembliesDir">Directory containing assemblies containing additional actions</param>
-        public RulesFileLoader(IEnumerable<Reference> projectReferences, string rulesFilesDir, List<string> targetFramework, string overrideFile = "", string assembliesDir = "")
+        /// <param name="projectLanguage">The language the project is written in, C# or VB</param>
+        public RulesFileLoader(IEnumerable<Reference> projectReferences, string rulesFilesDir, List<string> targetFramework, ProjectLanguage projectLanguage, string overrideFile = "", string assembliesDir = "")
         {
             _rulesFilesDir = rulesFilesDir;
             try
@@ -48,6 +50,7 @@ namespace CTA.Rules.RuleFiles
             _overrideFile = overrideFile;
             _assembliesDir = assembliesDir;
             _projectReferences = projectReferences;
+            _projectLanguage = projectLanguage;
         }
 
         /// <summary>
@@ -115,8 +118,8 @@ namespace CTA.Rules.RuleFiles
                 mainFileTask.Result,
                 overrideTask.Result,
                 _assembliesDir,
-                _targetFramework
-                );
+                _targetFramework,
+                _projectLanguage);
             var rootNodes = rulesFileParser.Process();
 
             return rootNodes;
