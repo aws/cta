@@ -86,7 +86,7 @@ namespace CTA.Rules.Actions.VisualBasic
         /// <param name="newMethod">The new method to replace the old method with in the invocation expression.</param>
         /// <param name="newParameters">The new invocation expression parameters to replace the old parameters with.</param>
         /// <returns></returns>
-        public Func<SyntaxGenerator, InvocationExpressionSyntax, InvocationExpressionSyntax> GeReplaceMethodAndParametersAction(string oldMethod, string newMethod, string newParameters)
+        public Func<SyntaxGenerator, InvocationExpressionSyntax, InvocationExpressionSyntax> GetReplaceMethodAndParametersAction(string oldMethod, string newMethod, string newParameters)
         {
             //TODO what's the outcome if newMethod doesn't have a valid signature.. are there any options we could provide to parseexpression ?
             InvocationExpressionSyntax ReplaceOnlyMethod(SyntaxGenerator syntaxGenerator, InvocationExpressionSyntax node)

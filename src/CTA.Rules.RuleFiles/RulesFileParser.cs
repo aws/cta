@@ -105,7 +105,7 @@ namespace CTA.Rules.RuleFiles
             {
                 assemblies = Directory.EnumerateFiles(_assembliesDir, "*.dll").ToList();
             }
-            actionsLoader = new ActionsLoader(assemblies, _projectLanguage);
+            actionsLoader = new ActionsLoader(assemblies);
         }
 
         /// <summary>
