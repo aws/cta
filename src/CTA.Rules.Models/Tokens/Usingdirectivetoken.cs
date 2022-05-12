@@ -3,7 +3,7 @@
 namespace CTA.Rules.Models.Tokens
 {
 
-    public class UsingDirectiveToken : NodeToken
+    public class UsingDirectiveToken : CsharpNodeToken
     {
         public override bool Equals(object obj)
         {

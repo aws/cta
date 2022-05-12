@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using CTA.Rules.Models.Tokens;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace CTA.Rules.Models
 {
@@ -12,18 +13,18 @@ namespace CTA.Rules.Models
             MethodDeclarationActions = new HashSet<MethodDeclarationAction>();
             ElementAccessActions = new HashSet<ElementAccessAction>();
             IdentifierNameActions = new HashSet<IdentifierNameAction>();
-            InvocationExpressionActions = new HashSet<InvocationExpressionAction>();
+            InvocationExpressionActions = new HashSet<InvocationExpressionAction<InvocationExpressionSyntax>>();
             ExpressionActions = new HashSet<ExpressionAction>();
             MemberAccessActions = new HashSet<MemberAccessAction>();
             Usingactions = new HashSet<UsingAction>();
-            NamespaceActions = new HashSet<NamespaceAction>();
+            NamespaceActions = new HashSet<NamespaceAction<NamespaceDeclarationSyntax>>();
             ObjectCreationExpressionActions = new HashSet<ObjectCreationExpressionAction>();
             PackageActions = new HashSet<PackageAction>();
             InterfaceDeclarationActions = new HashSet<InterfaceDeclarationAction>();
-            NodeTokens = new List<NodeToken>();
+            NodeTokens = new List<CsharpNodeToken>();
         }
 
-        public List<NodeToken> NodeTokens { get; set; }
+        public List<CsharpNodeToken> NodeTokens { get; set; }
         public string FilePath { get; set; }
         public HashSet<AttributeAction> AttributeActions { get; set; }
         public HashSet<MethodDeclarationAction> MethodDeclarationActions { get; set; }
@@ -31,12 +32,12 @@ namespace CTA.Rules.Models
         public HashSet<InterfaceDeclarationAction> InterfaceDeclarationActions { get; set; }
         public HashSet<ElementAccessAction> ElementAccessActions { get; set; }
         public HashSet<IdentifierNameAction> IdentifierNameActions { get; set; }
-        public HashSet<InvocationExpressionAction> InvocationExpressionActions { get; set; }
+        public HashSet<InvocationExpressionAction<InvocationExpressionSyntax>> InvocationExpressionActions { get; set; }
         public HashSet<ExpressionAction> ExpressionActions { get; set; }
         public HashSet<MemberAccessAction> MemberAccessActions { get; set; }
         public HashSet<ObjectCreationExpressionAction> ObjectCreationExpressionActions { get; set; }
         public HashSet<UsingAction> Usingactions { get; set; }
-        public HashSet<NamespaceAction> NamespaceActions { get; set; }
+        public HashSet<NamespaceAction<NamespaceDeclarationSyntax>> NamespaceActions { get; set; }
         public HashSet<PackageAction> PackageActions { get; set; }
 
         public List<GenericAction> AllActions

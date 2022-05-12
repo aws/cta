@@ -92,7 +92,7 @@ namespace CTA.Rules.Update
                         .Union(ProjectConfiguration.AdditionalReferences.Select(r => new Reference { Assembly = r, Namespace = r }));
                 RulesFileLoader rulesFileLoader = new RulesFileLoader(allReferences, ProjectConfiguration.RulesDir, ProjectConfiguration.TargetVersions, _projectLanguage, string.Empty, ProjectConfiguration.AssemblyDir);
 
-                var projectRules = rulesFileLoader.Load();
+                var projectRules = rulesFileLoader.Load<CsharpRootNodes>();
 
                 RulesAnalysis walker = new RulesAnalysis(_sourceFileResults, projectRules, ProjectConfiguration.ProjectType);
                 projectActions = walker.Analyze();
@@ -148,13 +148,13 @@ namespace CTA.Rules.Update
             return _projectResult;
         }
 
-        public virtual List<IDEFileActions> RunIncremental(List<string> updatedFiles, RootNodes projectRules)
+        public virtual List<IDEFileActions> RunIncremental(List<string> updatedFiles, CsharpRootNodes projectRules)
         {
             var ideFileActions = new List<IDEFileActions>();
 
             var allReferences = _sourceFileResults?.SelectMany(s => s.References).Distinct();
             RulesFileLoader rulesFileLoader = new RulesFileLoader(allReferences, Constants.RulesDefaultPath, ProjectConfiguration.TargetVersions, _projectLanguage, string.Empty, ProjectConfiguration.AssemblyDir);
-            projectRules = rulesFileLoader.Load();
+            projectRules = rulesFileLoader.Load<CsharpRootNodes>();
 
             RulesAnalysis walker = new RulesAnalysis(_sourceFileResults, projectRules, ProjectConfiguration.ProjectType);
             var projectActions = walker.Analyze();

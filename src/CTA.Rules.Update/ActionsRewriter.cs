@@ -271,7 +271,7 @@ namespace CTA.Rules.Update.Rewriters
 
             var nodeKey = symbol.OriginalDefinition.ToString();
 
-            foreach (var action in _allActions.OfType<InvocationExpressionAction>())
+            foreach (var action in _allActions.OfType<InvocationExpressionAction<InvocationExpressionSyntax>>())
             {
                 if (nodeKey == action.Key)
                 {
@@ -431,7 +431,7 @@ namespace CTA.Rules.Update.Rewriters
         {
             NamespaceDeclarationSyntax newNode = (NamespaceDeclarationSyntax)base.VisitNamespaceDeclaration(node);
             // Handle namespace renaming actions etc.
-            foreach (var action in _allActions.OfType<NamespaceAction>())
+            foreach (var action in _allActions.OfType<NamespaceAction<NamespaceDeclarationSyntax>>())
             {
                 if (action.Key == newNode.Name.ToString())
                 {

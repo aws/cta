@@ -3,9 +3,9 @@ using CTA.Rules.Models.Tokens;
 
 namespace CTA.Rules.Models
 {
-    public class RootNodes
+    public class CsharpRootNodes
     {
-        public RootNodes()
+        public CsharpRootNodes()
         {
             Attributetokens = new HashSet<AttributeToken>();
             Classdeclarationtokens = new HashSet<ClassDeclarationToken>();
@@ -14,6 +14,7 @@ namespace CTA.Rules.Models
             Invocationexpressiontokens = new HashSet<InvocationExpressionToken>();
             Expressiontokens = new HashSet<ExpressionToken>();
             MemberAccesstokens = new HashSet<MemberAccessToken>();
+            Usingdirectivetokens = new HashSet<UsingDirectiveToken>();
             MethodDeclarationTokens = new HashSet<MethodDeclarationToken>();
             ObjectCreationExpressionTokens = new HashSet<ObjectCreationExpressionToken>();
             InterfaceDeclarationTokens = new HashSet<InterfaceDeclarationToken>();
@@ -30,6 +31,7 @@ namespace CTA.Rules.Models
         public HashSet<InvocationExpressionToken> Invocationexpressiontokens { get; set; }
         public HashSet<ExpressionToken> Expressiontokens { get; set; }
         public HashSet<MemberAccessToken> MemberAccesstokens { get; set; }
+        public HashSet<UsingDirectiveToken> Usingdirectivetokens { get; set; }
         public HashSet<MethodDeclarationToken> MethodDeclarationTokens { get; set; }
         public HashSet<NamespaceToken> NamespaceTokens { get; set; }
         public HashSet<ObjectCreationExpressionToken> ObjectCreationExpressionTokens { get; set; }

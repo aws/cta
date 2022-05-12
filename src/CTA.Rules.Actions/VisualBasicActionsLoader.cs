@@ -15,10 +15,13 @@ namespace CTA.Rules.Actions;
 public class VisualBasicActionsLoader
 {
     private readonly List<MethodInfo> _compilationUnitActions,
-        _invocationExpressionActions;
+        _invocationExpressionActions,
+        _namespaceActions;
+        
 
     private readonly object _compilationUnitObject,
-        _invocationExpressionObject;
+        _invocationExpressionObject,
+        _namespaceObject;
     
     /// <summary>
     /// Initializes a new ActionLoader that loads the default actions
@@ -28,6 +31,7 @@ public class VisualBasicActionsLoader
     {
         _compilationUnitActions = new List<MethodInfo>();
         _invocationExpressionActions = new List<MethodInfo>();
+        _namespaceActions = new List<MethodInfo>();
 
         var assemblies = ActionLoaderUtils.GetAssemblies(assemblyPaths);
 
@@ -43,6 +47,8 @@ public class VisualBasicActionsLoader
                     out _compilationUnitObject);
                 ActionLoaderUtils.TryCreateInstance(Constants.InvocationExpressionActions, types,
                     out _invocationExpressionObject);
+                ActionLoaderUtils.TryCreateInstance(Constants.NamespaceActions, types,
+                    out _namespaceObject);
 
                 foreach (var t in types)
                 {
@@ -56,6 +62,11 @@ public class VisualBasicActionsLoader
                         case Constants.InvocationExpressionActions:
                         {
                             _invocationExpressionActions.AddRange(ActionLoaderUtils.GetFuncMethods(t));
+                            break;
+                        }
+                        case Constants.NamespaceActions:
+                        {
+                            _namespaceActions.AddRange(ActionLoaderUtils.GetFuncMethods(t));
                             break;
                         }
                         default:
@@ -125,12 +136,13 @@ public class VisualBasicActionsLoader
         throw new NotImplementedException();
     }
     */
-    /*
-    public Func<SyntaxGenerator, NamespaceDeclarationSyntax, NamespaceDeclarationSyntax> GetNamespaceActions(string name, dynamic value)
+    
+    public Func<SyntaxGenerator, NamespaceBlockSyntax, NamespaceBlockSyntax> GetNamespaceActions(string name, dynamic value)
     {
-        throw new NotImplementedException();
+        return ActionLoaderUtils.GetAction<Func<SyntaxGenerator, NamespaceBlockSyntax, NamespaceBlockSyntax>>
+            (_namespaceActions, _namespaceObject, name, value);
     }
-    */
+    
 
     public Func<SyntaxGenerator, ObjectCreationExpressionSyntax, ExpressionSyntax> GetObjectCreationExpressionActions(string name, dynamic value)
     {

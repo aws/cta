@@ -107,7 +107,7 @@ namespace CTA.Rules.Update
             return _solutionResult;
         }
 
-        public List<IDEFileActions> RunIncremental(RootNodes projectRules, List<string> updatedFiles)
+        public List<IDEFileActions> RunIncremental(CsharpRootNodes projectRules, List<string> updatedFiles)
         {
             var ideFileActions = new BlockingCollection<IDEFileActions>();
             var options = new ParallelOptions { MaxDegreeOfParallelism = Constants.ThreadCount };

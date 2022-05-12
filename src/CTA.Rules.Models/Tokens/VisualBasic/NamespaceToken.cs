@@ -1,9 +1,8 @@
 ﻿using System;
 
-namespace CTA.Rules.Models.Tokens
+namespace CTA.Rules.Models.Tokens.VisualBasic
 {
-
-    public class NamespaceToken : CsharpNodeToken
+    public class NamespaceToken : VisualBasicNodeToken
     {
         public override bool Equals(object obj)
         {

@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using System.Collections.Generic;
 using CTA.Rules.Config;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using TextSpan = Codelyzer.Analysis.Model.TextSpan;
 
 namespace CTA.Rules.Models.Tokens
@@ -12,14 +13,11 @@ namespace CTA.Rules.Models.Tokens
             AttributeActions = new List<AttributeAction>();
             AttributeListActions = new List<AttributeAction>();
             ClassDeclarationActions = new List<ClassDeclarationAction>();
-            UsingActions = new List<UsingAction>();
             IdentifierNameActions = new List<IdentifierNameAction>();
-            InvocationExpressionActions = new List<InvocationExpressionAction>();
             ExpressionActions = new List<ExpressionAction>();
             MethodDeclarationActions = new List<MethodDeclarationAction>();
             ElementAccessActions = new List<ElementAccessAction>();
             MemberAccessActions = new List<MemberAccessAction>();
-            NamespaceActions = new List<NamespaceAction>();
             ObjectCreationExpressionActions = new List<ObjectCreationExpressionAction>();
             PackageActions = new List<PackageAction>();
             InterfaceDeclarationActions = new List<InterfaceDeclarationAction>();
@@ -45,20 +43,17 @@ namespace CTA.Rules.Models.Tokens
         public List<MethodDeclarationAction> MethodDeclarationActions { get; set; }
         public List<ElementAccessAction> ElementAccessActions { get; set; }
         public List<MemberAccessAction> MemberAccessActions { get; set; }
-        public List<UsingAction> UsingActions { get; set; }
         public List<IdentifierNameAction> IdentifierNameActions { get; set; }
-        public List<InvocationExpressionAction> InvocationExpressionActions { get; set; }
         public List<ExpressionAction> ExpressionActions { get; set; }
-        public List<NamespaceAction> NamespaceActions { get; set; }
         public List<ObjectCreationExpressionAction> ObjectCreationExpressionActions { get; set; }
         public List<PackageAction> PackageActions { get; set; }
         public List<ProjectLevelAction> ProjectLevelActions { get; set; }
         public List<ProjectLevelAction> ProjectFileActions { get; set; }
         public List<ProjectLevelAction> ProjectTypeActions { get; set; }
 
-        public NodeToken Clone()
+        public CsharpNodeToken Clone()
         {
-            NodeToken cloned = (NodeToken)this.MemberwiseClone();
+            CsharpNodeToken cloned = (CsharpNodeToken)this.MemberwiseClone();
             cloned.TextChanges = cloned.TextChanges?.Select(textChange => textChange.Clone()).ToList();
             cloned.TargetCPU = cloned.TargetCPU?.ToList();
             cloned.AttributeActions = cloned.AttributeActions?.Select(action => action.Clone<AttributeAction>())?.ToList();
@@ -68,11 +63,8 @@ namespace CTA.Rules.Models.Tokens
             cloned.MethodDeclarationActions = cloned.MethodDeclarationActions.Select(action => action.Clone<MethodDeclarationAction>()).ToList();
             cloned.ElementAccessActions = cloned.ElementAccessActions.Select(action => action.Clone<ElementAccessAction>()).ToList();
             cloned.MemberAccessActions = cloned.MemberAccessActions.Select(action => action.Clone<MemberAccessAction>()).ToList();
-            cloned.UsingActions = cloned.UsingActions.Select(action => action.Clone<UsingAction>()).ToList();
             cloned.IdentifierNameActions = cloned.IdentifierNameActions.Select(action => action.Clone<IdentifierNameAction>()).ToList();
-            cloned.InvocationExpressionActions = cloned.InvocationExpressionActions.Select(action => action.Clone<InvocationExpressionAction>()).ToList();
             cloned.ExpressionActions = cloned.ExpressionActions.Select(action => action.Clone<ExpressionAction>()).ToList();
-            cloned.NamespaceActions = cloned.NamespaceActions.Select(action => action.Clone<NamespaceAction>()).ToList();
             cloned.ObjectCreationExpressionActions = cloned.ObjectCreationExpressionActions.Select(action => action.Clone<ObjectCreationExpressionAction>()).ToList();
             cloned.PackageActions = cloned.PackageActions.Select(action => action.Clone()).ToList();
             cloned.ProjectLevelActions = cloned.ProjectLevelActions.Select(action => action.Clone<ProjectLevelAction>()).ToList();
@@ -81,7 +73,7 @@ namespace CTA.Rules.Models.Tokens
             return cloned;
         }
 
-        public List<GenericAction> AllActions
+        public virtual List<GenericAction> AllActions
         {
             get
             {
@@ -94,12 +86,9 @@ namespace CTA.Rules.Models.Tokens
                 allActions.AddRange(ElementAccessActions);
                 allActions.AddRange(MemberAccessActions);
                 allActions.AddRange(IdentifierNameActions);
-                allActions.AddRange(InvocationExpressionActions);
                 allActions.AddRange(ExpressionActions);
                 allActions.AddRange(MemberAccessActions);
-                allActions.AddRange(UsingActions);
                 allActions.AddRange(ObjectCreationExpressionActions);
-                allActions.AddRange(NamespaceActions);
                 return allActions;
             }
         }

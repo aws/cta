@@ -4,7 +4,7 @@ using CTA.Rules.Models.Tokens;
 
 namespace CTA.Rules.Models
 {
-    public class ElementAccessToken : NodeToken
+    public class ElementAccessToken : CsharpNodeToken
     {
         public override bool Equals(object obj)
         {

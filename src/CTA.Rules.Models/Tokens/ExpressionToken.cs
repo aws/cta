@@ -3,7 +3,7 @@ using CTA.Rules.Config;
 
 namespace CTA.Rules.Models.Tokens
 {
-    public class ExpressionToken : NodeToken
+    public class ExpressionToken : CsharpNodeToken
     {
         public override bool Equals(object obj)
         {

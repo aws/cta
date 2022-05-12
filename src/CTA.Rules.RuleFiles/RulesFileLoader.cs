@@ -57,7 +57,7 @@ namespace CTA.Rules.RuleFiles
         /// Loads rules from the main rules file and override file
         /// </summary>
         /// <returns>A RootNodes object containing all the rules after being merged</returns>
-        public RootNodes Load()
+        public T Load<T>()
         {
             var mainNamespaceFileTasks = new Task<NamespaceRecommendations>(() =>
             {
@@ -113,16 +113,29 @@ namespace CTA.Rules.RuleFiles
 
             Task.WaitAll(mainNamespaceFileTasks, overrideNamespaceFileTasks, mainFileTask, overrideTask);
 
-            RulesFileParser rulesFileParser = new RulesFileParser(mainNamespaceFileTasks.Result,
-                overrideNamespaceFileTasks.Result,
-                mainFileTask.Result,
-                overrideTask.Result,
-                _assembliesDir,
-                _targetFramework,
-                _projectLanguage);
-            var rootNodes = rulesFileParser.Process();
+            if (_projectLanguage == ProjectLanguage.VisualBasic)
+            {
+                var rulesFileParser = new VisualBasicRulesFileParser(mainNamespaceFileTasks.Result,
+                    overrideNamespaceFileTasks.Result,
+                    mainFileTask.Result,
+                    overrideTask.Result,
+                    _assembliesDir,
+                    _targetFramework);
+                var rootNodes = rulesFileParser.Process();
+                return (T)Convert.ChangeType(rootNodes, typeof(T));
+            }
+            else
+            {
+                RulesFileParser rulesFileParser = new RulesFileParser(mainNamespaceFileTasks.Result,
+                    overrideNamespaceFileTasks.Result,
+                    mainFileTask.Result,
+                    overrideTask.Result,
+                    _assembliesDir,
+                    _targetFramework);
+                var rootNodes = rulesFileParser.Process();
 
-            return rootNodes;
+                return (T)Convert.ChangeType(rootNodes, typeof(T));
+            }
         }
 
 

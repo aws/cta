@@ -2,7 +2,7 @@
 
 namespace CTA.Rules.Models.Tokens
 {
-    public class MethodDeclarationToken : NodeToken
+    public class MethodDeclarationToken : CsharpNodeToken
     {
         public override bool Equals(object obj)
         {

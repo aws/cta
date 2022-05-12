@@ -1,9 +1,9 @@
 ﻿using System;
 using CTA.Rules.Config;
 
-namespace CTA.Rules.Models.Tokens
+namespace CTA.Rules.Models.Tokens.VisualBasic
 {
-    public class InvocationExpressionToken : CsharpNodeToken
+    public class InvocationExpressionToken : VisualBasicNodeToken
     {
         public override bool Equals(object obj)
         {

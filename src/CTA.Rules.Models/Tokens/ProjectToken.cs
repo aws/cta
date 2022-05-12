@@ -1,6 +1,6 @@
 ﻿namespace CTA.Rules.Models.Tokens
 {
-    public class ProjectToken : NodeToken
+    public class ProjectToken : CsharpNodeToken
     {
     }
 }

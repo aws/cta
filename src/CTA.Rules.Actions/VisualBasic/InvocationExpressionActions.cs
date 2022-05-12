@@ -68,11 +68,12 @@ namespace CTA.Rules.Actions.VisualBasic
 
                 if (typeToAdd != null)
                 {
-                    var argumentList = SyntaxFactory.ParseArgumentList($"(typeof({typeToAdd.Arguments.ToString()}))");
+                    var argumentList = SyntaxFactory.ParseArgumentList($"(TypeOf {typeToAdd.Arguments.ToString()})");
                     node = node.WithArgumentList(argumentList).WithLeadingTrivia(node.GetLeadingTrivia());
                 }
-
-                node = node.WithExpression(SyntaxFactory.ParseExpression(newMethod)).WithLeadingTrivia(node.GetLeadingTrivia()).NormalizeWhitespace();
+                
+                // in the test, the NormalizeWhitespace() was added weird white spaces .GetService(TypeOf Object  )"
+                node = node.WithExpression(SyntaxFactory.ParseExpression(newMethod)).WithLeadingTrivia(node.GetLeadingTrivia());
                 return node;
             }
             return ReplaceMethod;
@@ -139,14 +140,16 @@ namespace CTA.Rules.Actions.VisualBasic
         {
             InvocationExpressionSyntax ReplaceMethod(SyntaxGenerator syntaxGenerator, InvocationExpressionSyntax node)
             {
-                //todo: apparently '!' is also a valid operator token? 
-                SyntaxToken operatorToken = node.DescendantTokens().FirstOrDefault(t => Microsoft.CodeAnalysis.VisualBasicExtensions.IsKind(t, Microsoft.CodeAnalysis.VisualBasic.SyntaxKind.DotToken));
+                var operatorToken = node.DescendantTokens().FirstOrDefault(t => t.IsKind(SyntaxKind.DotToken));
                 node = SyntaxFactory.InvocationExpression(
                     SyntaxFactory.MemberAccessExpression(
-                        Microsoft.CodeAnalysis.VisualBasic.SyntaxKind.SimpleMemberAccessExpression,
+                        SyntaxKind.SimpleMemberAccessExpression,
+                        SyntaxFactory.InvocationExpression(node),
                         operatorToken,
-                        SyntaxFactory.IdentifierName(SyntaxFactory.ParseName(appendMethod).ToString())),
-                    SyntaxFactory.ArgumentList()).NormalizeWhitespace();
+                        SyntaxFactory.IdentifierName(SyntaxFactory.ParseName(appendMethod).ToString())
+                    ),
+                    SyntaxFactory.ArgumentList()
+                ).NormalizeWhitespace();
                 return node;
             }
             return ReplaceMethod;

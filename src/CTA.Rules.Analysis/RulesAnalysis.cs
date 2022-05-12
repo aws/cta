@@ -8,6 +8,7 @@ using CTA.Rules.Common.Extensions;
 using CTA.Rules.Config;
 using CTA.Rules.Models;
 using CTA.Rules.Models.Tokens;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace CTA.Rules.Analyzer
 {
@@ -16,7 +17,7 @@ namespace CTA.Rules.Analyzer
     /// </summary>
     public class RulesAnalysis
     {
-        private readonly RootNodes _rootNodes;
+        private readonly CsharpRootNodes _csharpRootNodes;
         private readonly List<RootUstNode> _sourceFileResults;
         private readonly ProjectActions _projectActions;
         private readonly ProjectType _projectType;
@@ -25,12 +26,12 @@ namespace CTA.Rules.Analyzer
         /// Initializes an RulesAnalysis instance
         /// </summary>
         /// <param name="sourceFileResults">List of analyzed code files</param>
-        /// <param name="rootNodes">List of rules to be applied to the code files</param>
-        public RulesAnalysis(List<RootUstNode> sourceFileResults, RootNodes rootNodes)
+        /// <param name="csharpRootNodes">List of rules to be applied to the code files</param>
+        public RulesAnalysis(List<RootUstNode> sourceFileResults, CsharpRootNodes csharpRootNodes)
         {
             _projectActions = new ProjectActions();
             _sourceFileResults = sourceFileResults;
-            _rootNodes = rootNodes;
+            _csharpRootNodes = csharpRootNodes;
             _projectType = ProjectType.ClassLibrary;
         }
 
@@ -38,13 +39,13 @@ namespace CTA.Rules.Analyzer
         /// Initializes a RulesAnalysis instance
         /// </summary>
         /// <param name="sourceFileResults">List of analyzed code files</param>
-        /// <param name="rootNodes">List of rules to be applied to the code files</param>
+        /// <param name="csharpRootNodes">List of rules to be applied to the code files</param>
         /// <param name="projectType">Type of project</param>
-        public RulesAnalysis(List<RootUstNode> sourceFileResults, RootNodes rootNodes, ProjectType projectType = ProjectType.ClassLibrary)
+        public RulesAnalysis(List<RootUstNode> sourceFileResults, CsharpRootNodes csharpRootNodes, ProjectType projectType = ProjectType.ClassLibrary)
         {
             _projectActions = new ProjectActions();
             _sourceFileResults = sourceFileResults;
-            _rootNodes = rootNodes;
+            _csharpRootNodes = csharpRootNodes;
             _projectType = projectType;
         }
 
@@ -64,7 +65,7 @@ namespace CTA.Rules.Analyzer
                 }
             });
 
-            AddPackages(_rootNodes.ProjectTokens.Where(p => p.FullKey == _projectType.ToString())?.SelectMany(p => p.PackageActions)?.Distinct()?.ToList(), null);
+            AddPackages(_csharpRootNodes.ProjectTokens.Where(p => p.FullKey == _projectType.ToString())?.SelectMany(p => p.PackageActions)?.Distinct()?.ToList(), null);
             
             return _projectActions;
         }
@@ -119,7 +120,7 @@ namespace CTA.Rules.Analyzer
                             {
                                 var annotation = (Annotation)child;
                                 var compareToken = new AttributeToken() { Key = annotation.Identifier, Namespace = annotation.Reference.Namespace, Type = annotation.SemanticClassType };
-                                _rootNodes.Attributetokens.TryGetValue(compareToken, out var token);
+                                _csharpRootNodes.Attributetokens.TryGetValue(compareToken, out var token);
                                 if (token != null)
                                 {
                                     AddActions(fileAction, token, child.TextSpan);
@@ -132,7 +133,7 @@ namespace CTA.Rules.Analyzer
                                 string overrideKey = string.Empty;
 
                                 var compareToken = new UsingDirectiveToken() { Key = child.Identifier };
-                                _rootNodes.Usingdirectivetokens.TryGetValue(compareToken, out var token);
+                                _csharpRootNodes.Usingdirectivetokens.TryGetValue(compareToken, out var token);
                                 if (token != null)
                                 {
                                     AddActions(fileAction, token, child.TextSpan);
@@ -142,7 +143,7 @@ namespace CTA.Rules.Analyzer
                                 //Attempt a wildcard search, if applicable. This is using directive specific because it might want to include all sub-namespaces
                                 if (token == null)
                                 {
-                                    var wildcardMatches = _rootNodes.Usingdirectivetokens.Where(i => i.Key.Contains("*"));
+                                    var wildcardMatches = _csharpRootNodes.Usingdirectivetokens.Where(i => i.Key.Contains("*"));
                                     if (wildcardMatches.Any())
                                     {
                                         token = wildcardMatches.FirstOrDefault(i => compareToken.Key.WildcardEquals(i.Key));
@@ -164,7 +165,7 @@ namespace CTA.Rules.Analyzer
                         case IdConstants.NamespaceIdName:
                             {
                                 var compareToken = new NamespaceToken() { Key = child.Identifier };
-                                _rootNodes.NamespaceTokens.TryGetValue(compareToken, out var token);
+                                _csharpRootNodes.NamespaceTokens.TryGetValue(compareToken, out var token);
                                 if (token != null)
                                 {
                                     AddActions(fileAction, token, child.TextSpan);
@@ -177,7 +178,7 @@ namespace CTA.Rules.Analyzer
                             {
                                 var classType = (ClassDeclaration)child;
                                 var baseToken = new ClassDeclarationToken() { FullKey = classType.BaseType };
-                                _rootNodes.Classdeclarationtokens.TryGetValue(baseToken, out var token);
+                                _csharpRootNodes.Classdeclarationtokens.TryGetValue(baseToken, out var token);
 
                                 if (token != null)
                                 {
@@ -190,7 +191,7 @@ namespace CTA.Rules.Analyzer
                                 token = null;
                                 string name = string.Concat(classType.Reference != null ? string.Concat(classType.Reference.Namespace, ".") : string.Empty, classType.Identifier);
                                 var nameToken = new ClassDeclarationToken() { FullKey = name };
-                                _rootNodes.Classdeclarationtokens.TryGetValue(nameToken, out token);
+                                _csharpRootNodes.Classdeclarationtokens.TryGetValue(nameToken, out token);
 
                                 if (token != null)
                                 {
@@ -204,7 +205,7 @@ namespace CTA.Rules.Analyzer
                                 foreach (string interfaceName in classType.BaseList)
                                 {
                                     var baseListToken = new ClassDeclarationToken() { FullKey = interfaceName };
-                                    _rootNodes.Classdeclarationtokens.TryGetValue(baseListToken, out token);
+                                    _csharpRootNodes.Classdeclarationtokens.TryGetValue(baseListToken, out token);
 
                                     if (token != null)
                                     {
@@ -226,7 +227,7 @@ namespace CTA.Rules.Analyzer
 
                                 if (!string.IsNullOrEmpty(interfaceType.BaseType))
                                 {
-                                    _rootNodes.InterfaceDeclarationTokens.TryGetValue(baseToken, out token);
+                                    _csharpRootNodes.InterfaceDeclarationTokens.TryGetValue(baseToken, out token);
                                 }
 
                                 if (token != null)
@@ -240,7 +241,7 @@ namespace CTA.Rules.Analyzer
                                 token = null;
                                 string name = string.Concat(interfaceType.Reference != null ? string.Concat(interfaceType.Reference.Namespace, ".") : string.Empty, interfaceType.Identifier);
                                 var nameToken = new InterfaceDeclarationToken() { FullKey = name };
-                                _rootNodes.InterfaceDeclarationTokens.TryGetValue(nameToken, out token);
+                                _csharpRootNodes.InterfaceDeclarationTokens.TryGetValue(nameToken, out token);
 
                                 if (token != null)
                                 {
@@ -256,7 +257,7 @@ namespace CTA.Rules.Analyzer
                         case IdConstants.MethodIdName:
                             {
                                 var compareToken = new MethodDeclarationToken() { FullKey = string.Concat(child.Identifier) };
-                                _rootNodes.MethodDeclarationTokens.TryGetValue(compareToken, out var token);
+                                _csharpRootNodes.MethodDeclarationTokens.TryGetValue(compareToken, out var token);
                                 if (token != null)
                                 {
                                     AddNamedActions(fileAction, token, child.Identifier, child.TextSpan);
@@ -276,12 +277,12 @@ namespace CTA.Rules.Analyzer
                                 if (string.IsNullOrEmpty(invocationExpression.SemanticOriginalDefinition)) break;
 
                                 var compareToken = new InvocationExpressionToken() { Key = invocationExpression.SemanticOriginalDefinition, Namespace = invocationExpression.Reference.Namespace, Type = invocationExpression.SemanticClassType };
-                                _rootNodes.Invocationexpressiontokens.TryGetValue(compareToken, out var token);
+                                _csharpRootNodes.Invocationexpressiontokens.TryGetValue(compareToken, out var token);
 
                                 //Attempt a wildcard search, if applicable. This is invocation expression specific because it has to look inside the invocation expressions only
                                 if(token == null)
                                 {
-                                    var wildcardMatches = _rootNodes.Invocationexpressiontokens.Where(i => i.Key.Contains("*"));
+                                    var wildcardMatches = _csharpRootNodes.Invocationexpressiontokens.Where(i => i.Key.Contains("*"));
                                     if (wildcardMatches.Any())
                                     {
                                         token = wildcardMatches.FirstOrDefault(i => compareToken.Key.WildcardEquals(i.Key) && compareToken.Namespace == i.Namespace && compareToken.Type == i.Type);
@@ -299,7 +300,7 @@ namespace CTA.Rules.Analyzer
                                         {
                                             string semanticClassType = invocationExpression.SemanticClassType.Substring(0,invocationExpression.SemanticClassType.IndexOf('<'));
                                             compareToken = new InvocationExpressionToken() { Key = invocationExpression.SemanticOriginalDefinition, Namespace = invocationExpression.Reference.Namespace, Type = semanticClassType };
-                                            _rootNodes.Invocationexpressiontokens.TryGetValue(compareToken, out token);
+                                            _csharpRootNodes.Invocationexpressiontokens.TryGetValue(compareToken, out token);
                                         }
                                     }
                                 }
@@ -322,7 +323,7 @@ namespace CTA.Rules.Analyzer
                                     Type = elementAccess.SemanticClassType,
                                     Namespace = elementAccess.Reference?.Namespace
                                 };
-                                _rootNodes.ElementAccesstokens.TryGetValue(compareToken, out var token);
+                                _csharpRootNodes.ElementAccesstokens.TryGetValue(compareToken, out var token);
                                 if (token != null)
                                 {
                                     AddActions(fileAction, token, child.TextSpan);
@@ -342,7 +343,7 @@ namespace CTA.Rules.Analyzer
                                     Type = memberAccess.SemanticClassType,
                                     Namespace = memberAccess.Reference?.Namespace
                                 };
-                                _rootNodes.MemberAccesstokens.TryGetValue(compareToken, out var token);
+                                _csharpRootNodes.MemberAccesstokens.TryGetValue(compareToken, out var token);
                                 if (token != null)
                                 {
                                     AddActions(fileAction, token, child.TextSpan);
@@ -355,7 +356,7 @@ namespace CTA.Rules.Analyzer
                             {
                                 var declarationNode = (DeclarationNode)child;
                                 var compareToken = new IdentifierNameToken() { Key = string.Concat(declarationNode.Reference.Namespace, ".", declarationNode.Identifier), Namespace = declarationNode.Reference.Namespace };
-                                _rootNodes.Identifiernametokens.TryGetValue(compareToken, out var token);
+                                _csharpRootNodes.Identifiernametokens.TryGetValue(compareToken, out var token);
                                 if (token != null)
                                 {
                                     AddActions(fileAction, token, child.TextSpan);
@@ -369,7 +370,7 @@ namespace CTA.Rules.Analyzer
                                 var objectCreationNode = (ObjectCreationExpression)child;
                                 //Rules based on Object Creation Parent Hierarchy
                                 var compareToken = new ObjectCreationExpressionToken() { Key = objectCreationNode.Identifier, Namespace = objectCreationNode.Reference?.Namespace, Type = objectCreationNode.SemanticClassType };
-                                _rootNodes.ObjectCreationExpressionTokens.TryGetValue(compareToken, out var token);
+                                _csharpRootNodes.ObjectCreationExpressionTokens.TryGetValue(compareToken, out var token);
                                 if (token != null)
                                 {
                                     AddActions(fileAction, token, child.TextSpan);
@@ -378,7 +379,7 @@ namespace CTA.Rules.Analyzer
 
                                 //Rules based on Object Creation location within code
                                 var compareTokenLocation = new ObjectCreationExpressionToken() { Key = objectCreationNode.Identifier, Namespace = parentNamespace, Type = parentClass };
-                                _rootNodes.ObjectCreationExpressionTokens.TryGetValue(compareTokenLocation, out var tokenLocation);
+                                _csharpRootNodes.ObjectCreationExpressionTokens.TryGetValue(compareTokenLocation, out var tokenLocation);
                                 if (tokenLocation != null)
                                 {
                                     AddActions(fileAction, tokenLocation, child.TextSpan);
@@ -389,7 +390,7 @@ namespace CTA.Rules.Analyzer
                                 if(!string.IsNullOrEmpty(objectCreationNode.SemanticOriginalDefinition))
                                 {
                                     var nameToken = new ObjectCreationExpressionToken() { Key = objectCreationNode.SemanticOriginalDefinition, Namespace = objectCreationNode.SemanticNamespace, Type = objectCreationNode.SemanticClassType };
-                                    _rootNodes.ObjectCreationExpressionTokens.TryGetValue(nameToken, out token);
+                                    _csharpRootNodes.ObjectCreationExpressionTokens.TryGetValue(nameToken, out token);
                                     if (token != null)
                                     {
                                         AddActions(fileAction, token, child.TextSpan);
@@ -436,7 +437,7 @@ namespace CTA.Rules.Analyzer
         /// </summary>
         /// <param name="fileAction">The file to run actions on</param>
         /// <param name="token">The token that matched the file</param>
-        private void AddActions(FileActions fileAction, NodeToken token, TextSpan textSpan, string overrideKey = "")
+        private void AddActions(FileActions fileAction, CsharpNodeToken token, TextSpan textSpan, string overrideKey = "")
         {
             fileAction.AttributeActions.UnionWith(token.AttributeActions.Select(a => new AttributeAction()
             {
@@ -476,7 +477,7 @@ namespace CTA.Rules.Analyzer
                 IdentifierNameActionFunc = a.IdentifierNameActionFunc,
             }).ToList());
 
-            fileAction.InvocationExpressionActions.UnionWith(token.InvocationExpressionActions.Select(a => new InvocationExpressionAction()
+            fileAction.InvocationExpressionActions.UnionWith(token.InvocationExpressionActions.Select(a => new InvocationExpressionAction<InvocationExpressionSyntax>()
             {
                 Key = !string.IsNullOrEmpty(overrideKey) ? overrideKey : a.Key,
                 Description = a.Description,
@@ -525,7 +526,7 @@ namespace CTA.Rules.Analyzer
                 NamespaceUsingActionFunc = a.NamespaceUsingActionFunc,
             }).ToList());
 
-            fileAction.NamespaceActions.UnionWith(token.NamespaceActions.Select(a => new NamespaceAction()
+            fileAction.NamespaceActions.UnionWith(token.NamespaceActions.Select(a => new NamespaceAction<NamespaceDeclarationSyntax>()
             {
                 Key = a.Key,
                 Description = a.Description,
@@ -605,7 +606,7 @@ namespace CTA.Rules.Analyzer
         /// <param name="fileAction"></param>
         /// <param name="token"></param>
         /// <param name="identifier"></param>
-        private void AddNamedActions(FileActions fileAction, NodeToken token, string identifier, TextSpan textSpan)
+        private void AddNamedActions(FileActions fileAction, CsharpNodeToken token, string identifier, TextSpan textSpan)
         {
 
             fileAction.ClassDeclarationActions.UnionWith(token.ClassDeclarationActions

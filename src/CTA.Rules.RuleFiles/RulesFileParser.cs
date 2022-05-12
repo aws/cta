@@ -6,6 +6,7 @@ using CTA.Rules.Actions;
 using CTA.Rules.Config;
 using CTA.Rules.Models;
 using CTA.Rules.Models.Tokens;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Newtonsoft.Json;
 
 namespace CTA.Rules.RuleFiles
@@ -15,7 +16,7 @@ namespace CTA.Rules.RuleFiles
     /// </summary>
     public class RulesFileParser
     {
-        private readonly RootNodes _rootNodes;
+        private readonly CsharpRootNodes _csharpRootNodes;
         private readonly string _assembliesDir;
         private readonly string _targetFramework;
 
@@ -26,8 +27,6 @@ namespace CTA.Rules.RuleFiles
         private readonly NamespaceRecommendations _namespaceRecommendations;
         private readonly NamespaceRecommendations _overrideNamespaceRecommendations;
 
-        private readonly ProjectLanguage _projectLanguage;
-
         /// <summary>
         /// Runs the rules parser
         /// </summary>
@@ -37,7 +36,6 @@ namespace CTA.Rules.RuleFiles
         /// <param name="assembliesDir">Directory containing additional actions assemblies</param>
         /// <param name="namespaceRecommendations">Namespace recommendations</param>
         /// <param name="targetFramework">Framework version being targeted for porting</param>
-        /// <param name="projectLanguage">Project language, C# or VB</param>
         /// 
         public RulesFileParser(
             NamespaceRecommendations namespaceRecommendations,
@@ -45,18 +43,16 @@ namespace CTA.Rules.RuleFiles
             Rootobject rulesObject,
             Rootobject overrideObject,
             string assembliesDir,
-            string targetFramework,
-            ProjectLanguage projectLanguage)
+            string targetFramework)
         {
-            _rootNodes = new RootNodes();
-            _rootNodes.ProjectTokens.Add(new ProjectToken() { Key = "Project" });
+            _csharpRootNodes = new CsharpRootNodes();
+            _csharpRootNodes.ProjectTokens.Add(new ProjectToken() { Key = "Project" });
             _rulesObject = rulesObject;
             _overrideObject = overrideObject;
             _assembliesDir = assembliesDir;
             _namespaceRecommendations = namespaceRecommendations;
             _overrideNamespaceRecommendations = overrideNamespaceRecommendations;
             _targetFramework = targetFramework;
-            _projectLanguage = projectLanguage;
 
             LoadActions();
         }
@@ -65,7 +61,7 @@ namespace CTA.Rules.RuleFiles
         /// Runs the parser to merge the rules
         /// </summary>
         /// <returns>RootNodes object that contains the tokens and their associated actions</returns>
-        public RootNodes Process()
+        public CsharpRootNodes Process()
         {
             //Process overrides first:
             if (_overrideObject.NameSpaces != null)
@@ -92,13 +88,13 @@ namespace CTA.Rules.RuleFiles
                 ProcessObject(_namespaceRecommendations);
             }
 
-            return _rootNodes;
+            return _csharpRootNodes;
         }
 
         /// <summary>
         /// Loads actions from the actions project and additional assemblies
         /// </summary>
-        private void LoadActions()
+        public void LoadActions()
         {
             List<string> assemblies = new List<string>();
             if (!string.IsNullOrEmpty(_assembliesDir))
@@ -112,7 +108,7 @@ namespace CTA.Rules.RuleFiles
         /// Processes each rule object by creating tokens and associated actions
         /// </summary>
         /// <param name="rootobject">An object containing tokens and actions to run on these tokens</param>
-        private void ProcessObject(Rootobject rootobject)
+        public void ProcessObject(Rootobject rootobject)
         {
             var namespaces = rootobject.NameSpaces;
 
@@ -123,7 +119,7 @@ namespace CTA.Rules.RuleFiles
                     //Global Actions:
                     if (@namespace.@namespace == Constants.Project && @namespace.Assembly == Constants.Project)
                     {
-                        var projectToken = _rootNodes.ProjectTokens.FirstOrDefault();
+                        var projectToken = _csharpRootNodes.ProjectTokens.FirstOrDefault();
                         ParseActions(projectToken, @namespace.Actions);
                     }
                     //Namespace specific actions:
@@ -132,8 +128,8 @@ namespace CTA.Rules.RuleFiles
                         var usingToken = new UsingDirectiveToken() { Key = @namespace.@namespace };
                         var namespaceToken = new NamespaceToken() { Key = @namespace.@namespace };
 
-                        if (!_rootNodes.Usingdirectivetokens.Contains(usingToken)) { _rootNodes.Usingdirectivetokens.Add(usingToken); }
-                        if (!_rootNodes.NamespaceTokens.Contains(namespaceToken)) { _rootNodes.NamespaceTokens.Add(namespaceToken); }
+                        if (!_csharpRootNodes.Usingdirectivetokens.Contains(usingToken)) { _csharpRootNodes.Usingdirectivetokens.Add(usingToken); }
+                        if (!_csharpRootNodes.NamespaceTokens.Contains(namespaceToken)) { _csharpRootNodes.NamespaceTokens.Add(namespaceToken); }
 
                         ParseActions(usingToken, @namespace.Actions);
                         ParseActions(namespaceToken, @namespace.Actions);
@@ -146,13 +142,13 @@ namespace CTA.Rules.RuleFiles
                         if (@class.KeyType == CTA.Rules.Config.Constants.BaseClass || @class.KeyType == CTA.Rules.Config.Constants.ClassName)
                         {
                             var token = new ClassDeclarationToken() { Key = @class.FullKey, FullKey = @class.FullKey, Namespace = @namespace.@namespace };
-                            if (!_rootNodes.Classdeclarationtokens.Contains(token)) { _rootNodes.Classdeclarationtokens.Add(token); }
+                            if (!_csharpRootNodes.Classdeclarationtokens.Contains(token)) { _csharpRootNodes.Classdeclarationtokens.Add(token); }
                             ParseActions(token, @class.Actions);
                         }
                         else if (@class.KeyType == CTA.Rules.Config.Constants.Identifier)
                         {
                             var token = new IdentifierNameToken() { Key = @class.FullKey, FullKey = @class.FullKey, Namespace = @namespace.@namespace };
-                            if (!_rootNodes.Identifiernametokens.Contains(token)) { _rootNodes.Identifiernametokens.Add(token); }
+                            if (!_csharpRootNodes.Identifiernametokens.Contains(token)) { _csharpRootNodes.Identifiernametokens.Add(token); }
                             ParseActions(token, @class.Actions);
                         }
                     }
@@ -161,7 +157,7 @@ namespace CTA.Rules.RuleFiles
                         if (attribute.Actions != null && attribute.Actions.Count > 0)
                         {
                             var token = new AttributeToken() { Key = attribute.Key, Namespace = @namespace.@namespace, FullKey = attribute.FullKey, Type = @class.Key };
-                            if (!_rootNodes.Attributetokens.Contains(token)) { _rootNodes.Attributetokens.Add(token); }
+                            if (!_csharpRootNodes.Attributetokens.Contains(token)) { _csharpRootNodes.Attributetokens.Add(token); }
                             ParseActions(token, attribute.Actions);
                         }
                     }
@@ -171,7 +167,7 @@ namespace CTA.Rules.RuleFiles
                         if (method.Actions != null && method.Actions.Count > 0)
                         {
                             var token = new InvocationExpressionToken() { Key = method.Key, Namespace = @namespace.@namespace, FullKey = method.FullKey, Type = @class.Key };
-                            if (!_rootNodes.Invocationexpressiontokens.Contains(token)) { _rootNodes.Invocationexpressiontokens.Add(token); }
+                            if (!_csharpRootNodes.Invocationexpressiontokens.Contains(token)) { _csharpRootNodes.Invocationexpressiontokens.Add(token); }
                             ParseActions(token, method.Actions);
                         }
                     }
@@ -181,7 +177,7 @@ namespace CTA.Rules.RuleFiles
                         if (objectCreation.Actions != null && objectCreation.Actions.Count > 0)
                         {
                             var token = new ObjectCreationExpressionToken() { Key = objectCreation.Key, Namespace = @namespace.@namespace, FullKey = objectCreation.FullKey, Type = @class.Key };
-                            if (!_rootNodes.ObjectCreationExpressionTokens.Contains(token)) { _rootNodes.ObjectCreationExpressionTokens.Add(token); }
+                            if (!_csharpRootNodes.ObjectCreationExpressionTokens.Contains(token)) { _csharpRootNodes.ObjectCreationExpressionTokens.Add(token); }
                             ParseActions(token, objectCreation.Actions);
                         }
                     }
@@ -194,13 +190,13 @@ namespace CTA.Rules.RuleFiles
                         if (@interface.KeyType == CTA.Rules.Config.Constants.BaseClass || @interface.KeyType == CTA.Rules.Config.Constants.InterfaceName)
                         {
                             var token = new InterfaceDeclarationToken() { Key = @interface.FullKey, FullKey = @interface.FullKey, Namespace = @namespace.@namespace };
-                            if (!_rootNodes.InterfaceDeclarationTokens.Contains(token)) { _rootNodes.InterfaceDeclarationTokens.Add(token); }
+                            if (!_csharpRootNodes.InterfaceDeclarationTokens.Contains(token)) { _csharpRootNodes.InterfaceDeclarationTokens.Add(token); }
                             ParseActions(token, @interface.Actions);
                         }
                         else if (@interface.KeyType == CTA.Rules.Config.Constants.Identifier)
                         {
                             var token = new IdentifierNameToken() { Key = @interface.FullKey, FullKey = @interface.FullKey, Namespace = @namespace.@namespace };
-                            if (!_rootNodes.Identifiernametokens.Contains(token)) { _rootNodes.Identifiernametokens.Add(token); }
+                            if (!_csharpRootNodes.Identifiernametokens.Contains(token)) { _csharpRootNodes.Identifiernametokens.Add(token); }
                             ParseActions(token, @interface.Actions);
                         }
                     }
@@ -209,7 +205,7 @@ namespace CTA.Rules.RuleFiles
                         if (attribute.Actions != null && attribute.Actions.Count > 0)
                         {
                             var token = new AttributeToken() { Key = attribute.Key, Namespace = @namespace.@namespace, FullKey = attribute.FullKey, Type = @interface.Key };
-                            if (!_rootNodes.Attributetokens.Contains(token)) { _rootNodes.Attributetokens.Add(token); }
+                            if (!_csharpRootNodes.Attributetokens.Contains(token)) { _csharpRootNodes.Attributetokens.Add(token); }
                             ParseActions(token, attribute.Actions);
                         }
                     }
@@ -219,7 +215,7 @@ namespace CTA.Rules.RuleFiles
                         if (method.Actions != null && method.Actions.Count > 0)
                         {
                             var token = new InvocationExpressionToken() { Key = method.Key, Namespace = @namespace.@namespace, FullKey = method.FullKey, Type = @interface.Key };
-                            if (!_rootNodes.Invocationexpressiontokens.Contains(token)) { _rootNodes.Invocationexpressiontokens.Add(token); }
+                            if (!_csharpRootNodes.Invocationexpressiontokens.Contains(token)) { _csharpRootNodes.Invocationexpressiontokens.Add(token); }
                             ParseActions(token, method.Actions);
                         }
                     }
@@ -232,7 +228,7 @@ namespace CTA.Rules.RuleFiles
         /// Processes each rule object by creating tokens and associated actions
         /// </summary>
         /// <param name="rootobject">An object containing tokens and actions to run on these tokens</param>
-        private void ProcessObject(NamespaceRecommendations namespaceRecommendations)
+        public void ProcessObject(NamespaceRecommendations namespaceRecommendations)
         {
             var namespaces = namespaceRecommendations.NameSpaces;
 
@@ -270,8 +266,8 @@ namespace CTA.Rules.RuleFiles
                                         var usingToken = new UsingDirectiveToken() { Key = recommendation.Value, Description = recommendedActions.Description, TargetCPU = targetCPUs };
                                         var namespaceToken = new NamespaceToken() { Key = recommendation.Value, Description = recommendedActions.Description, TargetCPU = targetCPUs };
 
-                                        if (!_rootNodes.Usingdirectivetokens.Contains(usingToken)) { _rootNodes.Usingdirectivetokens.Add(usingToken); }
-                                        if (!_rootNodes.NamespaceTokens.Contains(namespaceToken)) { _rootNodes.NamespaceTokens.Add(namespaceToken); }
+                                        if (!_csharpRootNodes.Usingdirectivetokens.Contains(usingToken)) { _csharpRootNodes.Usingdirectivetokens.Add(usingToken); }
+                                        if (!_csharpRootNodes.NamespaceTokens.Contains(namespaceToken)) { _csharpRootNodes.NamespaceTokens.Add(namespaceToken); }
 
                                         ParseActions(usingToken, recommendedActions.Actions);
                                         ParseActions(namespaceToken, recommendedActions.Actions);
@@ -282,13 +278,13 @@ namespace CTA.Rules.RuleFiles
                                         if (recommendation.KeyType == CTA.Rules.Config.Constants.BaseClass || recommendation.KeyType == CTA.Rules.Config.Constants.ClassName)
                                         {
                                             var token = new ClassDeclarationToken() { Key = recommendation.Value, Description = recommendedActions.Description, TargetCPU = targetCPUs, FullKey = recommendation.Value, Namespace = @namespace.Name };
-                                            if (!_rootNodes.Classdeclarationtokens.Contains(token)) { _rootNodes.Classdeclarationtokens.Add(token); }
+                                            if (!_csharpRootNodes.Classdeclarationtokens.Contains(token)) { _csharpRootNodes.Classdeclarationtokens.Add(token); }
                                             ParseActions(token, recommendedActions.Actions);
                                         }
                                         else if (recommendation.KeyType == CTA.Rules.Config.Constants.Identifier)
                                         {
                                             var token = new IdentifierNameToken() { Key = recommendation.Value, Description = recommendedActions.Description, TargetCPU = targetCPUs, FullKey = recommendation.Value, Namespace = @namespace.Name };
-                                            if (!_rootNodes.Identifiernametokens.Contains(token)) { _rootNodes.Identifiernametokens.Add(token); }
+                                            if (!_csharpRootNodes.Identifiernametokens.Contains(token)) { _csharpRootNodes.Identifiernametokens.Add(token); }
                                             ParseActions(token, recommendedActions.Actions);
                                         }
                                         break;
@@ -299,13 +295,13 @@ namespace CTA.Rules.RuleFiles
                                         if (recommendation.KeyType == CTA.Rules.Config.Constants.BaseClass || recommendation.KeyType == CTA.Rules.Config.Constants.ClassName)
                                         {
                                             var token = new InterfaceDeclarationToken() { Key = recommendation.Value, Description = recommendedActions.Description, TargetCPU = targetCPUs, FullKey = recommendation.Value, Namespace = @namespace.Name };
-                                            if (!_rootNodes.InterfaceDeclarationTokens.Contains(token)) { _rootNodes.InterfaceDeclarationTokens.Add(token); }
+                                            if (!_csharpRootNodes.InterfaceDeclarationTokens.Contains(token)) { _csharpRootNodes.InterfaceDeclarationTokens.Add(token); }
                                             ParseActions(token, recommendedActions.Actions);
                                         }
                                         else if (recommendation.KeyType == CTA.Rules.Config.Constants.Identifier)
                                         {
                                             var token = new IdentifierNameToken() { Key = recommendation.Value, Description = recommendedActions.Description, TargetCPU = targetCPUs, FullKey = recommendation.Value, Namespace = @namespace.Name };
-                                            if (!_rootNodes.Identifiernametokens.Contains(token)) { _rootNodes.Identifiernametokens.Add(token); }
+                                            if (!_csharpRootNodes.Identifiernametokens.Contains(token)) { _csharpRootNodes.Identifiernametokens.Add(token); }
                                             ParseActions(token, recommendedActions.Actions);
                                         }
                                         break;
@@ -314,21 +310,21 @@ namespace CTA.Rules.RuleFiles
                                 case ActionTypes.Method:
                                     {
                                         var token = new InvocationExpressionToken() { Key = recommendation.Name, Description = recommendedActions.Description, TargetCPU = targetCPUs, Namespace = @namespace.Name, FullKey = recommendation.Value, Type = recommendation.ContainingType };
-                                        if (!_rootNodes.Invocationexpressiontokens.Contains(token)) { _rootNodes.Invocationexpressiontokens.Add(token); }
+                                        if (!_csharpRootNodes.Invocationexpressiontokens.Contains(token)) { _csharpRootNodes.Invocationexpressiontokens.Add(token); }
                                         ParseActions(token, recommendedActions.Actions);
                                         break;
                                     }
                                 case ActionTypes.Expression:
                                     {
                                         var token = new ExpressionToken() { Key = recommendation.Name, Description = recommendedActions.Description, TargetCPU = targetCPUs, Namespace = @namespace.Name, FullKey = recommendation.Value, Type = recommendation.ContainingType };
-                                        if (!_rootNodes.Expressiontokens.Contains(token)) { _rootNodes.Expressiontokens.Add(token); }
+                                        if (!_csharpRootNodes.Expressiontokens.Contains(token)) { _csharpRootNodes.Expressiontokens.Add(token); }
                                         ParseActions(token, recommendedActions.Actions);
                                         break;
                                     }
                                 case ActionTypes.Attribute:
                                     {
                                         var token = new AttributeToken() { Key = recommendation.Name, Description = recommendedActions.Description, TargetCPU = targetCPUs, Namespace = @namespace.Name, FullKey = recommendation.Value, Type = recommendation.ContainingType };
-                                        if (!_rootNodes.Attributetokens.Contains(token)) { _rootNodes.Attributetokens.Add(token); }
+                                        if (!_csharpRootNodes.Attributetokens.Contains(token)) { _csharpRootNodes.Attributetokens.Add(token); }
                                         ParseActions(token, recommendedActions.Actions);
                                         break;
                                     }
@@ -336,7 +332,7 @@ namespace CTA.Rules.RuleFiles
                                 case ActionTypes.ObjectCreation:
                                     {
                                         var token = new ObjectCreationExpressionToken() { Key = recommendation.Name, Description = recommendedActions.Description, TargetCPU = targetCPUs, Namespace = @namespace.Name, FullKey = recommendation.Value, Type = recommendation.ContainingType };
-                                        if (!_rootNodes.ObjectCreationExpressionTokens.Contains(token)) { _rootNodes.ObjectCreationExpressionTokens.Add(token); }
+                                        if (!_csharpRootNodes.ObjectCreationExpressionTokens.Contains(token)) { _csharpRootNodes.ObjectCreationExpressionTokens.Add(token); }
                                         ParseActions(token, recommendedActions.Actions);
                                         break;
                                     }
@@ -344,7 +340,7 @@ namespace CTA.Rules.RuleFiles
                                 case ActionTypes.MethodDeclaration:
                                     {
                                         var token = new MethodDeclarationToken() { Key = recommendation.Name, Description = recommendedActions.Description, TargetCPU = targetCPUs, Namespace = @namespace.Name, FullKey = recommendation.Value, Type = recommendation.ContainingType };
-                                        if (!_rootNodes.MethodDeclarationTokens.Contains(token)) { _rootNodes.MethodDeclarationTokens.Add(token); }
+                                        if (!_csharpRootNodes.MethodDeclarationTokens.Contains(token)) { _csharpRootNodes.MethodDeclarationTokens.Add(token); }
                                         ParseActions(token, recommendedActions.Actions);
                                         break;
                                     }
@@ -352,7 +348,7 @@ namespace CTA.Rules.RuleFiles
                                 case ActionTypes.ElementAccess:
                                     {
                                         var token = new ElementAccessToken() { Key = recommendation.Name, Description = recommendedActions.Description, TargetCPU = targetCPUs, Namespace = @namespace.Name, FullKey = recommendation.Value, Type = recommendation.ContainingType };
-                                        if (!_rootNodes.ElementAccesstokens.Contains(token)) { _rootNodes.ElementAccesstokens.Add(token); }
+                                        if (!_csharpRootNodes.ElementAccesstokens.Contains(token)) { _csharpRootNodes.ElementAccesstokens.Add(token); }
                                         ParseActions(token, recommendedActions.Actions);
                                         break;
                                     }
@@ -360,7 +356,7 @@ namespace CTA.Rules.RuleFiles
                                 case ActionTypes.MemberAccess:
                                     {
                                         var token = new MemberAccessToken() { Key = recommendation.Name, Description = recommendedActions.Description, TargetCPU = targetCPUs, Namespace = @namespace.Name, FullKey = recommendation.Value, Type = recommendation.ContainingType };
-                                        if (!_rootNodes.MemberAccesstokens.Contains(token)) { _rootNodes.MemberAccesstokens.Add(token); }
+                                        if (!_csharpRootNodes.MemberAccesstokens.Contains(token)) { _csharpRootNodes.MemberAccesstokens.Add(token); }
                                         ParseActions(token, recommendedActions.Actions);
                                         break;
                                     }
@@ -368,7 +364,7 @@ namespace CTA.Rules.RuleFiles
                                 case ActionTypes.Project:
                                     {
                                         var token = new ProjectToken() { Key = recommendation.Name, Description = recommendedActions.Description, TargetCPU = targetCPUs, Namespace = @namespace.Name, FullKey = recommendation.Value };
-                                        if (!_rootNodes.ProjectTokens.Contains(token)) { _rootNodes.ProjectTokens.Add(token); }
+                                        if (!_csharpRootNodes.ProjectTokens.Contains(token)) { _csharpRootNodes.ProjectTokens.Add(token); }
                                         ParseActions(token, recommendedActions.Actions);
                                         break;
                                     }
@@ -385,9 +381,9 @@ namespace CTA.Rules.RuleFiles
         /// <summary>
         /// Add actions to each node type
         /// </summary>
-        /// <param name="nodeToken">The token to add the action to</param>
+        /// <param name="csharpNodeToken">The token to add the action to</param>
         /// <param name="actions">The list of actions associated with this token</param>
-        private void ParseActions(NodeToken nodeToken, List<Action> actions)
+        public void ParseActions(CsharpNodeToken csharpNodeToken, List<Action> actions)
         {
             foreach (var action in actions)
             {
@@ -401,9 +397,9 @@ namespace CTA.Rules.RuleFiles
                                 var actionFunc = actionsLoader.GetInvocationExpressionAction(action.Name, action.Value);
                                 if (actionFunc != null)
                                 {
-                                    nodeToken.InvocationExpressionActions.Add(new InvocationExpressionAction()
+                                    csharpNodeToken.InvocationExpressionActions.Add(new InvocationExpressionAction<InvocationExpressionSyntax>()
                                     {
-                                        Key = nodeToken.Key,
+                                        Key = csharpNodeToken.Key,
                                         Value = GetActionValue(action.Value),
                                         Description = action.Description,
                                         ActionValidation = action.ActionValidation,
@@ -419,9 +415,9 @@ namespace CTA.Rules.RuleFiles
                                 var actionFunc = actionsLoader.GetExpressionAction(action.Name, action.Value);
                                 if (actionFunc != null)
                                 {
-                                    nodeToken.ExpressionActions.Add(new ExpressionAction()
+                                    csharpNodeToken.ExpressionActions.Add(new ExpressionAction()
                                     {
-                                        Key = nodeToken.Key,
+                                        Key = csharpNodeToken.Key,
                                         Value = GetActionValue(action.Value),
                                         Description = action.Description,
                                         ActionValidation = action.ActionValidation,
@@ -437,9 +433,9 @@ namespace CTA.Rules.RuleFiles
                                 var actionFunc = actionsLoader.GetClassAction(action.Name, action.Value);
                                 if (actionFunc != null)
                                 {
-                                    nodeToken.ClassDeclarationActions.Add(new ClassDeclarationAction()
+                                    csharpNodeToken.ClassDeclarationActions.Add(new ClassDeclarationAction()
                                     {
-                                        Key = nodeToken.Key,
+                                        Key = csharpNodeToken.Key,
                                         Value = GetActionValue(action.Value),
                                         Description = action.Description,
                                         ActionValidation = action.ActionValidation,
@@ -456,9 +452,9 @@ namespace CTA.Rules.RuleFiles
                                 var actionFunc = actionsLoader.GetInterfaceAction(action.Name, action.Value);
                                 if (actionFunc != null)
                                 {
-                                    nodeToken.InterfaceDeclarationActions.Add(new InterfaceDeclarationAction()
+                                    csharpNodeToken.InterfaceDeclarationActions.Add(new InterfaceDeclarationAction()
                                     {
-                                        Key = nodeToken.Key,
+                                        Key = csharpNodeToken.Key,
                                         Value = GetActionValue(action.Value),
                                         Description = action.Description,
                                         ActionValidation = action.ActionValidation,
@@ -478,9 +474,9 @@ namespace CTA.Rules.RuleFiles
                                 var namespaceActionFunc = actionsLoader.GetNamespaceActions(action.Name, action.Value);
                                 if (actionFunc != null)
                                 {
-                                    nodeToken.UsingActions.Add(new UsingAction()
+                                    csharpNodeToken.UsingActions.Add(new UsingAction()
                                     {
-                                        Key = nodeToken.Key,
+                                        Key = csharpNodeToken.Key,
                                         Value = GetActionValue(action.Value),
                                         Description = action.Description,
                                         ActionValidation = action.ActionValidation,
@@ -497,9 +493,9 @@ namespace CTA.Rules.RuleFiles
                                 var actionFunc = actionsLoader.GetNamespaceActions(action.Name, action.Value);
                                 if (actionFunc != null)
                                 {
-                                    nodeToken.NamespaceActions.Add(new NamespaceAction()
+                                    csharpNodeToken.NamespaceActions.Add(new NamespaceAction<NamespaceDeclarationSyntax>()
                                     {
-                                        Key = nodeToken.Key,
+                                        Key = csharpNodeToken.Key,
                                         Value = GetActionValue(action.Value),
                                         Description = action.Description,
                                         ActionValidation = action.ActionValidation,
@@ -515,9 +511,9 @@ namespace CTA.Rules.RuleFiles
                                 var actionFunc = actionsLoader.GetIdentifierNameAction(action.Name, action.Value);
                                 if (actionFunc != null)
                                 {
-                                    nodeToken.IdentifierNameActions.Add(new IdentifierNameAction()
+                                    csharpNodeToken.IdentifierNameActions.Add(new IdentifierNameAction()
                                     {
-                                        Key = nodeToken.Key,
+                                        Key = csharpNodeToken.Key,
                                         Value = GetActionValue(action.Value),
                                         Description = action.Description,
                                         ActionValidation = action.ActionValidation,
@@ -533,9 +529,9 @@ namespace CTA.Rules.RuleFiles
                                 var actionFunc = actionsLoader.GetAttributeAction(action.Name, action.Value);
                                 if (actionFunc != null)
                                 {
-                                    nodeToken.AttributeActions.Add(new AttributeAction()
+                                    csharpNodeToken.AttributeActions.Add(new AttributeAction()
                                     {
-                                        Key = nodeToken.Key,
+                                        Key = csharpNodeToken.Key,
                                         Value = GetActionValue(action.Value),
                                         Description = action.Description,
                                         ActionValidation = action.ActionValidation,
@@ -551,9 +547,9 @@ namespace CTA.Rules.RuleFiles
                                 var actionFunc = actionsLoader.GetAttributeListAction(action.Name, action.Value);
                                 if (actionFunc != null)
                                 {
-                                    nodeToken.AttributeListActions.Add(new AttributeAction()
+                                    csharpNodeToken.AttributeListActions.Add(new AttributeAction()
                                     {
-                                        Key = nodeToken.Key,
+                                        Key = csharpNodeToken.Key,
                                         Value = GetActionValue(action.Value),
                                         Description = action.Description,
                                         ActionValidation = action.ActionValidation,
@@ -569,9 +565,9 @@ namespace CTA.Rules.RuleFiles
                                 var actionFunc = actionsLoader.GetObjectCreationExpressionActions(action.Name, action.Value);
                                 if (actionFunc != null)
                                 {
-                                    nodeToken.ObjectCreationExpressionActions.Add(new ObjectCreationExpressionAction()
+                                    csharpNodeToken.ObjectCreationExpressionActions.Add(new ObjectCreationExpressionAction()
                                     {
-                                        Key = nodeToken.Key,
+                                        Key = csharpNodeToken.Key,
                                         Value = GetActionValue(action.Value),
                                         Description = action.Description,
                                         ActionValidation = action.ActionValidation,
@@ -587,9 +583,9 @@ namespace CTA.Rules.RuleFiles
                                 var actionFunc = actionsLoader.GetMethodDeclarationAction(action.Name, action.Value);
                                 if (actionFunc != null)
                                 {
-                                    nodeToken.MethodDeclarationActions.Add(new MethodDeclarationAction()
+                                    csharpNodeToken.MethodDeclarationActions.Add(new MethodDeclarationAction()
                                     {
-                                        Key = nodeToken.Key,
+                                        Key = csharpNodeToken.Key,
                                         Value = GetActionValue(action.Value),
                                         Description = action.Description,
                                         ActionValidation = action.ActionValidation,
@@ -605,9 +601,9 @@ namespace CTA.Rules.RuleFiles
                                 var actionFunc = actionsLoader.GetElementAccessExpressionActions(action.Name, action.Value);
                                 if (actionFunc != null)
                                 {
-                                    nodeToken.ElementAccessActions.Add(new ElementAccessAction()
+                                    csharpNodeToken.ElementAccessActions.Add(new ElementAccessAction()
                                     {
-                                        Key = nodeToken.Key,
+                                        Key = csharpNodeToken.Key,
                                         Value = GetActionValue(action.Value),
                                         Description = action.Description,
                                         ActionValidation = action.ActionValidation,
@@ -623,9 +619,9 @@ namespace CTA.Rules.RuleFiles
                                 var actionFunc = actionsLoader.GetMemberAccessExpressionActions(action.Name, action.Value);
                                 if (actionFunc != null)
                                 {
-                                    nodeToken.MemberAccessActions.Add(new MemberAccessAction()
+                                    csharpNodeToken.MemberAccessActions.Add(new MemberAccessAction()
                                     {
-                                        Key = nodeToken.Key,
+                                        Key = csharpNodeToken.Key,
                                         Value = GetActionValue(action.Value),
                                         Description = action.Description,
                                         ActionValidation = action.ActionValidation,
@@ -641,9 +637,9 @@ namespace CTA.Rules.RuleFiles
                                 var actionFunc = actionsLoader.GetProjectLevelActions(action.Name, action.Value);
                                 if (actionFunc != null)
                                 {
-                                    nodeToken.ProjectLevelActions.Add(new ProjectLevelAction()
+                                    csharpNodeToken.ProjectLevelActions.Add(new ProjectLevelAction()
                                     {
-                                        Key = nodeToken.Key,
+                                        Key = csharpNodeToken.Key,
                                         Value = GetActionValue(action.Value),
                                         Description = action.Description,
                                         ActionValidation = action.ActionValidation,
@@ -659,9 +655,9 @@ namespace CTA.Rules.RuleFiles
                                 var actionFunc = actionsLoader.GetProjectFileActions(action.Name, action.Value);
                                 if (actionFunc != null)
                                 {
-                                    nodeToken.ProjectFileActions.Add(new ProjectLevelAction()
+                                    csharpNodeToken.ProjectFileActions.Add(new ProjectLevelAction()
                                     {
-                                        Key = nodeToken.Key,
+                                        Key = csharpNodeToken.Key,
                                         Value = GetActionValue(action.Value),
                                         Description = action.Description,
                                         ActionValidation = action.ActionValidation,
@@ -677,9 +673,9 @@ namespace CTA.Rules.RuleFiles
                                 var actionFunc = actionsLoader.GetProjectTypeActions(action.Name, action.Value);
                                 if (actionFunc != null)
                                 {
-                                    nodeToken.ProjectTypeActions.Add(new ProjectLevelAction()
+                                    csharpNodeToken.ProjectTypeActions.Add(new ProjectLevelAction()
                                     {
-                                        Key = nodeToken.Key,
+                                        Key = csharpNodeToken.Key,
                                         Value = GetActionValue(action.Value),
                                         Description = action.Description,
                                         ActionValidation = action.ActionValidation,
@@ -718,7 +714,7 @@ namespace CTA.Rules.RuleFiles
                                         packageAction.Version = jsonParameters[CTA.Rules.Config.Constants.PackageVersion];
                                     }
                                 }
-                                nodeToken.PackageActions.Add(packageAction);
+                                csharpNodeToken.PackageActions.Add(packageAction);
                                 break;
                             }
                     }
@@ -730,7 +726,7 @@ namespace CTA.Rules.RuleFiles
             }
         }
 
-        private string GetActionValue(dynamic value)
+        public string GetActionValue(dynamic value)
         {
             if (value is string)
             {
