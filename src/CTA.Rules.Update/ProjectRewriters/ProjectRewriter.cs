@@ -9,6 +9,7 @@ using CTA.Rules.Analyzer;
 using CTA.Rules.Common.Helpers;
 using CTA.Rules.Config;
 using CTA.Rules.Models;
+using CTA.Rules.Models.Tokens;
 using CTA.Rules.RuleFiles;
 
 namespace CTA.Rules.Update
@@ -26,6 +27,7 @@ namespace CTA.Rules.Update
         protected readonly List<string> _metaReferences;
         protected readonly AnalyzerResult _analyzerResult;
         protected readonly ProjectLanguage _projectLanguage;
+        private IRulesAnalysis _rulesAnalyzer;
 
         /// <summary>
         /// Initializes a new instance of ProjectRewriter using an existing analysis
@@ -91,11 +93,25 @@ namespace CTA.Rules.Update
                         .Union(_sourceFileResults.SelectMany(s => s.Children.OfType<UsingDirective>())?.Select(u => new Reference() { Namespace = u.Identifier, Assembly = u.Identifier }).Distinct())
                         .Union(ProjectConfiguration.AdditionalReferences.Select(r => new Reference { Assembly = r, Namespace = r }));
                 RulesFileLoader rulesFileLoader = new RulesFileLoader(allReferences, ProjectConfiguration.RulesDir, ProjectConfiguration.TargetVersions, _projectLanguage, string.Empty, ProjectConfiguration.AssemblyDir);
+                
+                var projectRules = rulesFileLoader.Load();
 
-                var projectRules = rulesFileLoader.Load<CsharpRootNodes>();
-
-                RulesAnalysis walker = new RulesAnalysis(_sourceFileResults, projectRules, ProjectConfiguration.ProjectType);
-                projectActions = walker.Analyze();
+                HashSet<NodeToken> projectTokens;
+                if (_projectLanguage == ProjectLanguage.VisualBasic)
+                {
+                    _rulesAnalyzer = new VisualBasicRulesAnalysis(_sourceFileResults, projectRules.VisualBasicRootNodes,
+                        ProjectConfiguration.ProjectType);
+                    projectTokens = projectRules.VisualBasicRootNodes.ProjectTokens;
+                }
+                else
+                {
+                    _rulesAnalyzer = new RulesAnalysis(_sourceFileResults, projectRules.CsharpRootNodes, ProjectConfiguration.ProjectType);
+                    projectTokens = projectRules.CsharpRootNodes.ProjectTokens;
+                }
+                
+                _rulesAnalyzer = _projectLanguage == ProjectLanguage.VisualBasic ? new VisualBasicRulesAnalysis(_sourceFileResults, projectRules.VisualBasicRootNodes, ProjectConfiguration.ProjectType) : new
+                    RulesAnalysis(_sourceFileResults, projectRules.CsharpRootNodes, ProjectConfiguration.ProjectType);
+                projectActions = _rulesAnalyzer.Analyze();
                 _projectReferences.ForEach(p =>
                 {
                     projectActions.ProjectReferenceActions.Add(Config.Utils.GetRelativePath(ProjectConfiguration.ProjectPath, p));
@@ -110,11 +126,12 @@ namespace CTA.Rules.Update
                 }
                 MergePackages(projectActions.PackageActions);
 
-                projectActions.ProjectLevelActions = projectRules.ProjectTokens.SelectMany(p => p.ProjectTypeActions).Distinct().ToList();
-                projectActions.ProjectLevelActions.AddRange(projectRules.ProjectTokens.SelectMany(p => p.ProjectLevelActions).Distinct());
-                projectActions.ProjectLevelActions.AddRange(projectRules.ProjectTokens.SelectMany(p => p.ProjectFileActions).Distinct());
+                projectActions.ProjectLevelActions = projectTokens.SelectMany(p => p.ProjectTypeActions).Distinct().ToList();
+                projectActions.ProjectLevelActions.AddRange(projectTokens.SelectMany(p => p.ProjectLevelActions).Distinct());
+                projectActions.ProjectLevelActions.AddRange(projectTokens.SelectMany(p => p.ProjectFileActions).Distinct());
 
-                projectActions.ProjectRules = projectRules;
+                projectActions.CsharpProjectRules = projectRules.CsharpRootNodes;
+                projectActions.VbProjectRules = projectRules.VisualBasicRootNodes;
                 _projectResult.ProjectActions = projectActions;
 
                 _projectResult.FeatureType = ProjectConfiguration.ProjectType;
@@ -143,7 +160,7 @@ namespace CTA.Rules.Update
         public virtual ProjectResult Run(ProjectActions projectActions)
         {
             _projectResult.ProjectActions = projectActions;
-            CodeReplacer baseReplacer = new CodeReplacer(_sourceFileBuildResults, ProjectConfiguration, _metaReferences, _analyzerResult, projectResult: _projectResult);
+            CodeReplacer baseReplacer = new CodeReplacer(_sourceFileBuildResults, ProjectConfiguration, _metaReferences, _analyzerResult, _projectLanguage, projectResult: _projectResult);
             _projectResult.ExecutedActions = baseReplacer.Run(projectActions, ProjectConfiguration.ProjectType);
             return _projectResult;
         }
@@ -154,12 +171,12 @@ namespace CTA.Rules.Update
 
             var allReferences = _sourceFileResults?.SelectMany(s => s.References).Distinct();
             RulesFileLoader rulesFileLoader = new RulesFileLoader(allReferences, Constants.RulesDefaultPath, ProjectConfiguration.TargetVersions, _projectLanguage, string.Empty, ProjectConfiguration.AssemblyDir);
-            projectRules = rulesFileLoader.Load<CsharpRootNodes>();
+            projectRules = rulesFileLoader.Load().CsharpRootNodes;
 
             RulesAnalysis walker = new RulesAnalysis(_sourceFileResults, projectRules, ProjectConfiguration.ProjectType);
             var projectActions = walker.Analyze();
 
-            CodeReplacer baseReplacer = new CodeReplacer(_sourceFileBuildResults, ProjectConfiguration, _metaReferences, _analyzerResult, updatedFiles, projectResult: _projectResult);
+            CodeReplacer baseReplacer = new CodeReplacer(_sourceFileBuildResults, ProjectConfiguration, _metaReferences, _analyzerResult, _projectLanguage, updatedFiles, projectResult: _projectResult);
             _projectResult.ExecutedActions = baseReplacer.Run(projectActions, ProjectConfiguration.ProjectType);
 
             ideFileActions = projectActions

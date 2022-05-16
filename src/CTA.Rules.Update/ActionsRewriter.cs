@@ -11,7 +11,7 @@ using Microsoft.CodeAnalysis.Editing;
 
 namespace CTA.Rules.Update.Rewriters
 {
-    public class ActionsRewriter : CSharpSyntaxRewriter
+    public class ActionsRewriter : CSharpSyntaxRewriter, ISyntaxRewriter
     {
         private readonly SemanticModel _semanticModel;
         private readonly SemanticModel _preportSemanticModel;
@@ -20,7 +20,7 @@ namespace CTA.Rules.Update.Rewriters
         private readonly string _filePath;
         private readonly List<GenericAction> _allActions;
 
-        public List<GenericActionExecution> allExecutedActions { get; private set; }
+        public List<GenericActionExecution> AllExecutedActions { get; set; }
 
         private static readonly Type[] identifierNameTypes = new Type[] {
             typeof(MethodDeclarationSyntax),
@@ -42,7 +42,7 @@ namespace CTA.Rules.Update.Rewriters
             _syntaxGenerator = syntaxGenerator;
             _filePath = filePath;
             _allActions = allActions;
-            allExecutedActions = new List<GenericActionExecution>();
+            AllExecutedActions = new List<GenericActionExecution>();
         }
 
         public ActionsRewriter(SemanticModel semanticModel, SemanticModel preportSemanticModel, SyntaxGenerator syntaxGenerator, string filePath, GenericAction runningAction)
@@ -52,7 +52,7 @@ namespace CTA.Rules.Update.Rewriters
             _syntaxGenerator = syntaxGenerator;
             _filePath = filePath;
             _allActions = new List<GenericAction>() { runningAction };
-            allExecutedActions = new List<GenericActionExecution>();
+            AllExecutedActions = new List<GenericActionExecution>();
         }
 
         public override SyntaxNode VisitAttributeList(AttributeListSyntax node)
@@ -82,7 +82,7 @@ namespace CTA.Rules.Update.Rewriters
                                 actionExecution.InvalidExecutions = 1;
                                 LogHelper.LogError(actionExecutionException);
                             }
-                            allExecutedActions.Add(actionExecution);
+                            AllExecutedActions.Add(actionExecution);
                         }
                     }
                 }
@@ -115,7 +115,7 @@ namespace CTA.Rules.Update.Rewriters
                             actionExecution.InvalidExecutions = 1;
                             LogHelper.LogError(actionExecutionException);
                         }
-                        allExecutedActions.Add(actionExecution);
+                        AllExecutedActions.Add(actionExecution);
                     }
                 }
             }
@@ -146,7 +146,7 @@ namespace CTA.Rules.Update.Rewriters
                         actionExecution.InvalidExecutions = 1;
                         LogHelper.LogError(actionExecutionException);
                     }
-                    allExecutedActions.Add(actionExecution);
+                    AllExecutedActions.Add(actionExecution);
                 }
             }
             return newNode;
@@ -175,7 +175,7 @@ namespace CTA.Rules.Update.Rewriters
                         actionExecution.InvalidExecutions = 1;
                         LogHelper.LogError(actionExecutionException);
                     }
-                    allExecutedActions.Add(actionExecution);
+                    AllExecutedActions.Add(actionExecution);
                 }
             }
             return newNode;
@@ -207,7 +207,7 @@ namespace CTA.Rules.Update.Rewriters
                             actionExecution.InvalidExecutions = 1;
                             LogHelper.LogError(actionExecutionException);
                         }
-                        allExecutedActions.Add(actionExecution);
+                        AllExecutedActions.Add(actionExecution);
                     }
                 }
             }
@@ -252,7 +252,7 @@ namespace CTA.Rules.Update.Rewriters
                         actionExecution.InvalidExecutions = 1;
                         LogHelper.LogError(actionExecutionException);
                     }
-                    allExecutedActions.Add(actionExecution);
+                    AllExecutedActions.Add(actionExecution);
                 }
             }
             return modifiedNode;
@@ -290,7 +290,7 @@ namespace CTA.Rules.Update.Rewriters
                         actionExecution.InvalidExecutions = 1;
                         LogHelper.LogError(actionExecutionException);
                     }
-                    allExecutedActions.Add(actionExecution);
+                    AllExecutedActions.Add(actionExecution);
                 }
             }
             return newNode;
@@ -325,7 +325,7 @@ namespace CTA.Rules.Update.Rewriters
                             actionExecution.InvalidExecutions = 1;
                             LogHelper.LogError(actionExecutionException);
                         }
-                        allExecutedActions.Add(actionExecution);
+                        AllExecutedActions.Add(actionExecution);
                     }
                 }
             }
@@ -360,7 +360,7 @@ namespace CTA.Rules.Update.Rewriters
                             actionExecution.InvalidExecutions = 1;
                             LogHelper.LogError(actionExecutionException);
                         }
-                        allExecutedActions.Add(actionExecution);
+                        AllExecutedActions.Add(actionExecution);
                     }
                 }
             }
@@ -388,7 +388,7 @@ namespace CTA.Rules.Update.Rewriters
                     actionExecution.InvalidExecutions = 1;
                     LogHelper.LogError(actionExecutionException);
                 }
-                allExecutedActions.Add(actionExecution);
+                AllExecutedActions.Add(actionExecution);
             }
 
             return newNode;
@@ -410,7 +410,7 @@ namespace CTA.Rules.Update.Rewriters
                     {
                         skipChildren = true;
                         newNode = action.ObjectCreationExpressionGenericActionFunc(_syntaxGenerator, (ObjectCreationExpressionSyntax)newNode);
-                        allExecutedActions.Add(actionExecution);
+                        AllExecutedActions.Add(actionExecution);
                         LogHelper.LogInformation(string.Format("{0}", action.Description));
                     }
                     catch (Exception ex)
@@ -450,7 +450,7 @@ namespace CTA.Rules.Update.Rewriters
                         actionExecution.InvalidExecutions = 1;
                         LogHelper.LogError(actionExecutionException);
                     }
-                    allExecutedActions.Add(actionExecution);
+                    AllExecutedActions.Add(actionExecution);
                 }
             }
             // Handle namespace remove using actions.
@@ -476,7 +476,7 @@ namespace CTA.Rules.Update.Rewriters
                     actionExecution.InvalidExecutions = 1;
                     LogHelper.LogError(actionExecutionException);
                 }
-                allExecutedActions.Add(actionExecution);
+                AllExecutedActions.Add(actionExecution);
             }
 
             return newNode;
