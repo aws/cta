@@ -3,13 +3,35 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Loader;
+using CTA.Rules.Models;
+using Codelyzer.Analysis;
 using CTA.Rules.Config;
 using Newtonsoft.Json;
 
 namespace CTA.Rules.Actions;
 
-public class ActionLoaderUtils
+public class ActionLoaderBase
 {
+    protected List<MethodInfo> projectLevelActions,
+        projectFileActions,
+        projectTypeActions;
+
+    protected object projectLevelObject,
+        projectFileObject,
+        projectTypeObject;
+
+    public Func<string, ProjectType, string> GetProjectLevelActions(string name, dynamic value) =>
+        GetAction<Func<string, ProjectType, string>>
+            (projectLevelActions, projectLevelObject, name, value);
+    public Func<string, ProjectType, List<string>, Dictionary<string, string>, List<string>, List<string>, string> GetProjectFileActions(string name, dynamic value) =>
+        GetAction<Func<string, ProjectType, List<string>, Dictionary<string, string>, List<string>, List<string>, string>>
+            (projectFileActions, projectFileObject, name, value);
+    public Func<ProjectType, ProjectConfiguration, ProjectResult, AnalyzerResult, string> GetProjectTypeActions(string name, dynamic value) =>
+        GetAction<Func<ProjectType, ProjectConfiguration, ProjectResult, AnalyzerResult, string>>
+            (projectTypeActions, projectTypeObject, name, value);
+    
+    #region helper functions
+    
     /// <summary>
     /// Gets the action by invoking the methods that will create it
     /// </summary>
@@ -25,14 +47,14 @@ public class ActionLoaderUtils
         try
         {
             string actionName = GetActionName(name);
-            var method = actions.Where(m => m.Name == actionName).FirstOrDefault();
+            var method = actions.FirstOrDefault(m => m.Name == actionName);
             if (method == null)
             {
                 LogHelper.LogDebug(string.Format("No such action {0}", actionName));
             }
             else
             {
-                var parameters = ActionLoaderUtils.GetParameters(value, method);
+                var parameters = GetParameters(value, method);
 
                 if (parameters != null)
                 {
@@ -78,10 +100,10 @@ public class ActionLoaderUtils
     {
         return string.Concat("Get", name, "Action");
     }
-    
-    public static List<MethodInfo> GetFuncMethods(Type t) => t.GetMethods().Where(m => m.ReturnType.ToString().Contains("System.Func")).ToList();
 
-    public static bool TryCreateInstance(string actionName, List<Type> types, out object obj)
+    protected static List<MethodInfo> GetFuncMethods(Type t) => t.GetMethods().Where(m => m.ReturnType.ToString().Contains("System.Func")).ToList();
+
+    protected static bool TryCreateInstance(string actionName, List<Type> types, out object obj)
     {
         obj = null;
         var type = types.FirstOrDefault(t => t.Name == actionName);
@@ -119,52 +141,54 @@ public class ActionLoaderUtils
         return result;
     }
     /// <summary>
-        /// Gets the parameters for the action. The parameters should match the action signature in the provided rules file
-        /// </summary>
-        /// <param name="value">The paramter(s) as a string or JSON object</param>
-        /// <param name="method">The method for these parameters</param>
-        /// <returns></returns>
-        public static string[] GetParameters(dynamic value, MethodInfo method)
-        {
-            List<string> result = new List<string>();
+    /// Gets the parameters for the action. The parameters should match the action signature in the provided rules file
+    /// </summary>
+    /// <param name="value">The paramter(s) as a string or JSON object</param>
+    /// <param name="method">The method for these parameters</param>
+    /// <returns></returns>
+    private static string[] GetParameters(dynamic value, MethodInfo method)
+    {
+        List<string> result = new List<string>();
 
-            try
+        try
+        {
+            if (value is string)
             {
-                if (value is string)
+                var strValue = value.ToString();
+                if (strValue.StartsWith("{"))
                 {
-                    var strValue = value.ToString();
-                    if (strValue.StartsWith("{"))
+                    try
                     {
-                        try
-                        {
-                            result = ActionLoaderUtils.GetJsonParameters(value.ToString(), method);
-                        }
-                        catch (Exception)
-                        {
-                            result = new List<string>() { value };
-                        }
+                        result = GetJsonParameters(value.ToString(), method);
                     }
-                    else
+                    catch (Exception)
                     {
                         result = new List<string>() { value };
-                        var optionalParameters = method.GetParameters().Where(p => p.IsOptional);
-                        // This should only run if optional parameter was not inlcuded originally.
-                        // TODO: We do not support ONLY optional parameters > 1 at this time, this logic would need to be re-written properly, that scenario would fail at val = (T)method.Invoke(invokeObject, parameters);
-                        if (optionalParameters.Any() && method.GetParameters().Count() > 1) 
-                        {
-                            result.AddRange(optionalParameters.Select(p => p.HasDefaultValue && p.DefaultValue != null ? p.DefaultValue.ToString() : null));
-                        }
                     }
                 }
                 else
                 {
-                    result = ActionLoaderUtils.GetJsonParameters(value.ToString(), method);
+                    result = new List<string>() { value };
+                    var optionalParameters = method.GetParameters().Where(p => p.IsOptional);
+                    // This should only run if optional parameter was not inlcuded originally.
+                    // TODO: We do not support ONLY optional parameters > 1 at this time, this logic would need to be re-written properly, that scenario would fail at val = (T)method.Invoke(invokeObject, parameters);
+                    if (optionalParameters.Any() && method.GetParameters().Count() > 1) 
+                    {
+                        result.AddRange(optionalParameters.Select(p => p.HasDefaultValue && p.DefaultValue != null ? p.DefaultValue.ToString() : null));
+                    }
                 }
             }
-            catch (Exception ex)
+            else
             {
-                LogHelper.LogError(ex, "Error while loading parameters for action {0}", method.Name);
+                result = GetJsonParameters(value.ToString(), method);
             }
-            return result.ToArray();
         }
+        catch (Exception ex)
+        {
+            LogHelper.LogError(ex, "Error while loading parameters for action {0}", method.Name);
+        }
+        return result.ToArray();
+    }
+    
+    #endregion
 }

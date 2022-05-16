@@ -15,7 +15,7 @@ namespace CTA.Rules.Actions
     /// <summary>
     /// Loads actions into the current execution context
     /// </summary>
-    public class ActionsLoader
+    public class ActionsLoader : ActionLoaderBase
     {
         private readonly List<MethodInfo> compilationUnitActions,
             attributeActions,
@@ -29,9 +29,6 @@ namespace CTA.Rules.Actions
             objectCreationExpressionActions,
             memberAccessActions,
             namespaceActions,
-            projectLevelActions,
-            projectFileActions,
-            projectTypeActions,
             interfaceActions;
 
         private readonly object attributeObject,
@@ -46,10 +43,7 @@ namespace CTA.Rules.Actions
             elementAccessObject,
             memberAccessObject,
             objectExpressionObject,
-            namespaceObject,
-            projectLevelObject,
-            projectFileObject,
-            projectTypeObject;
+            namespaceObject;
 
         /// <summary>
         /// Initializes a new ActionLoader that loads the default actions
@@ -126,82 +120,82 @@ namespace CTA.Rules.Actions
                         {
                             case Constants.AttributeActions:
                                 {
-                                    attributeActions.AddRange(ActionLoaderUtils.GetFuncMethods(t));
+                                    attributeActions.AddRange(GetFuncMethods(t));
                                     break;
                                 }
                             case Constants.AttributeListActions:
                                 {
-                                    attributeListActions.AddRange(ActionLoaderUtils.GetFuncMethods(t));
+                                    attributeListActions.AddRange(GetFuncMethods(t));
                                     break;
                                 }
                             case Constants.ClassActions:
                                 {
-                                    classActions.AddRange(ActionLoaderUtils.GetFuncMethods(t));
+                                    classActions.AddRange(GetFuncMethods(t));
                                     break;
                                 }
                             case Constants.InterfaceActions:
                                 {
-                                    interfaceActions.AddRange(ActionLoaderUtils.GetFuncMethods(t));
+                                    interfaceActions.AddRange(GetFuncMethods(t));
                                     break;
                                 }
                             case Constants.CompilationUnitActions:
                                 {
-                                    compilationUnitActions.AddRange(ActionLoaderUtils.GetFuncMethods(t));
+                                    compilationUnitActions.AddRange(GetFuncMethods(t));
                                     break;
                                 }
                             case Constants.IdentifierNameActions:
                                 {
-                                    identifierNameActions.AddRange(ActionLoaderUtils.GetFuncMethods(t));
+                                    identifierNameActions.AddRange(GetFuncMethods(t));
                                     break;
                                 }
                             case Constants.InvocationExpressionActions:
                                 {
-                                    invocationExpressionActions.AddRange(ActionLoaderUtils.GetFuncMethods(t));
+                                    invocationExpressionActions.AddRange(GetFuncMethods(t));
                                     break;
                                 }
                             case Constants.ExpressionActions:
                                 {
-                                    expressionActions.AddRange(ActionLoaderUtils.GetFuncMethods(t));
+                                    expressionActions.AddRange(GetFuncMethods(t));
                                     break;
                                 }
                             case Constants.MethodDeclarationActions:
                                 {
-                                    methodDeclarationActions.AddRange(ActionLoaderUtils.GetFuncMethods(t));
+                                    methodDeclarationActions.AddRange(GetFuncMethods(t));
                                     break;
                                 }
                             case Constants.ElementAccessActions:
                                 {
-                                    elementAccessActions.AddRange(ActionLoaderUtils.GetFuncMethods(t));
+                                    elementAccessActions.AddRange(GetFuncMethods(t));
                                     break;
                                 }
                             case Constants.MemberAccessActions:
                                 {
-                                    memberAccessActions.AddRange(ActionLoaderUtils.GetFuncMethods(t));
+                                    memberAccessActions.AddRange(GetFuncMethods(t));
                                     break;
                                 }
                             case Constants.ObjectCreationExpressionActions:
                                 {
-                                    objectCreationExpressionActions.AddRange(ActionLoaderUtils.GetFuncMethods(t));
+                                    objectCreationExpressionActions.AddRange(GetFuncMethods(t));
                                     break;
                                 }
                             case Constants.NamespaceActions:
                                 {
-                                    namespaceActions.AddRange(ActionLoaderUtils.GetFuncMethods(t));
+                                    namespaceActions.AddRange(GetFuncMethods(t));
                                     break;
                                 }
                             case Constants.ProjectLevelActions:
                                 {
-                                    projectLevelActions.AddRange(ActionLoaderUtils.GetFuncMethods(t));
+                                    projectLevelActions.AddRange(GetFuncMethods(t));
                                     break;
                                 }
                             case Constants.ProjectFileActions:
                                 {
-                                    projectFileActions.AddRange(ActionLoaderUtils.GetFuncMethods(t));
+                                    projectFileActions.AddRange(GetFuncMethods(t));
                                     break;
                                 }
                             case Constants.ProjectTypeActions:
                                 {
-                                    projectTypeActions.AddRange(ActionLoaderUtils.GetFuncMethods(t));
+                                    projectTypeActions.AddRange(GetFuncMethods(t));
                                     break;
                                 }
                             default:
@@ -219,52 +213,43 @@ namespace CTA.Rules.Actions
             }
         }
         public Func<SyntaxGenerator, CompilationUnitSyntax, CompilationUnitSyntax> GetCompilationUnitAction(string name, dynamic value)
-            => ActionLoaderUtils.GetAction<Func<SyntaxGenerator, CompilationUnitSyntax, CompilationUnitSyntax>>
+            => GetAction<Func<SyntaxGenerator, CompilationUnitSyntax, CompilationUnitSyntax>>
                 (compilationUnitActions, compilationUnitObject, name, value);
         public Func<SyntaxGenerator, AttributeSyntax, AttributeSyntax> GetAttributeAction(string name, dynamic value) =>
-            ActionLoaderUtils.GetAction<Func<SyntaxGenerator, AttributeSyntax, AttributeSyntax>>
+            GetAction<Func<SyntaxGenerator, AttributeSyntax, AttributeSyntax>>
                 (attributeActions, attributeObject, name, value);
         public Func<SyntaxGenerator, AttributeListSyntax, AttributeListSyntax> GetAttributeListAction(string name, dynamic value) =>
-            ActionLoaderUtils.GetAction<Func<SyntaxGenerator, AttributeListSyntax, AttributeListSyntax>>
+            GetAction<Func<SyntaxGenerator, AttributeListSyntax, AttributeListSyntax>>
                 (attributeListActions, attributeListObject, name, value);
         public Func<SyntaxGenerator, ClassDeclarationSyntax, ClassDeclarationSyntax> GetClassAction(string name, dynamic value) =>
-            ActionLoaderUtils.GetAction<Func<SyntaxGenerator, ClassDeclarationSyntax, ClassDeclarationSyntax>>
+            GetAction<Func<SyntaxGenerator, ClassDeclarationSyntax, ClassDeclarationSyntax>>
                 (classActions, classObject, name, value);
         public Func<SyntaxGenerator, InterfaceDeclarationSyntax, InterfaceDeclarationSyntax> GetInterfaceAction(string name, dynamic value) =>
-            ActionLoaderUtils.GetAction<Func<SyntaxGenerator, InterfaceDeclarationSyntax, InterfaceDeclarationSyntax>>
+            GetAction<Func<SyntaxGenerator, InterfaceDeclarationSyntax, InterfaceDeclarationSyntax>>
                 (interfaceActions, interfaceObject, name, value);
         public Func<SyntaxGenerator, IdentifierNameSyntax, IdentifierNameSyntax> GetIdentifierNameAction(string name, dynamic value) =>
-            ActionLoaderUtils.GetAction<Func<SyntaxGenerator, IdentifierNameSyntax, IdentifierNameSyntax>>
+            GetAction<Func<SyntaxGenerator, IdentifierNameSyntax, IdentifierNameSyntax>>
                 (identifierNameActions, identifierNameObject, name, value);
         public Func<SyntaxGenerator, InvocationExpressionSyntax, InvocationExpressionSyntax> GetInvocationExpressionAction(string name, dynamic value) =>
-            ActionLoaderUtils.GetAction<Func<SyntaxGenerator, InvocationExpressionSyntax, InvocationExpressionSyntax>>
+            GetAction<Func<SyntaxGenerator, InvocationExpressionSyntax, InvocationExpressionSyntax>>
                 (invocationExpressionActions, invocationExpressionObject, name, value);
         public Func<SyntaxGenerator, SyntaxNode, SyntaxNode> GetExpressionAction(string name, dynamic value) =>
-            ActionLoaderUtils.GetAction<Func<SyntaxGenerator, SyntaxNode, SyntaxNode>>
+            GetAction<Func<SyntaxGenerator, SyntaxNode, SyntaxNode>>
                 (expressionActions, expressionObject, name, value);
         public Func<SyntaxGenerator, MethodDeclarationSyntax, MethodDeclarationSyntax> GetMethodDeclarationAction(string name, dynamic value) =>
-            ActionLoaderUtils.GetAction<Func<SyntaxGenerator, MethodDeclarationSyntax, MethodDeclarationSyntax>>
+            GetAction<Func<SyntaxGenerator, MethodDeclarationSyntax, MethodDeclarationSyntax>>
                 (methodDeclarationActions, methodDeclarationObject, name, value);
         public Func<SyntaxGenerator, NamespaceDeclarationSyntax, NamespaceDeclarationSyntax> GetNamespaceActions(string name, dynamic value) =>
-            ActionLoaderUtils.GetAction<Func<SyntaxGenerator, NamespaceDeclarationSyntax, NamespaceDeclarationSyntax>>
+            GetAction<Func<SyntaxGenerator, NamespaceDeclarationSyntax, NamespaceDeclarationSyntax>>
                 (namespaceActions, namespaceObject, name, value);
         public Func<SyntaxGenerator, ObjectCreationExpressionSyntax, ExpressionSyntax> GetObjectCreationExpressionActions(string name, dynamic value) =>
-            ActionLoaderUtils.GetAction<Func<SyntaxGenerator, ObjectCreationExpressionSyntax, ExpressionSyntax>>
+            GetAction<Func<SyntaxGenerator, ObjectCreationExpressionSyntax, ExpressionSyntax>>
                 (objectCreationExpressionActions, objectExpressionObject, name, value);
-        public Func<string, ProjectType, string> GetProjectLevelActions(string name, dynamic value) =>
-            ActionLoaderUtils.GetAction<Func<string, ProjectType, string>>
-                (projectLevelActions, projectLevelObject, name, value);
-        public Func<string, ProjectType, List<string>, Dictionary<string, string>, List<string>, List<string>, string> GetProjectFileActions(string name, dynamic value) =>
-            ActionLoaderUtils.GetAction<Func<string, ProjectType, List<string>, Dictionary<string, string>, List<string>, List<string>, string>>
-                (projectFileActions, projectFileObject, name, value);
-        public Func<ProjectType, ProjectConfiguration, ProjectResult, AnalyzerResult, string> GetProjectTypeActions(string name, dynamic value) =>
-            ActionLoaderUtils.GetAction<Func<ProjectType, ProjectConfiguration, ProjectResult, AnalyzerResult, string>>
-                (projectTypeActions, projectTypeObject, name, value);
         public Func<SyntaxGenerator, ElementAccessExpressionSyntax, ElementAccessExpressionSyntax> GetElementAccessExpressionActions(string name, dynamic value) =>
-            ActionLoaderUtils.GetAction<Func<SyntaxGenerator, ElementAccessExpressionSyntax, ElementAccessExpressionSyntax>>
+            GetAction<Func<SyntaxGenerator, ElementAccessExpressionSyntax, ElementAccessExpressionSyntax>>
                 (elementAccessActions, elementAccessObject, name, value);
         public Func<SyntaxGenerator, SyntaxNode, SyntaxNode> GetMemberAccessExpressionActions(string name, dynamic value) =>
-            ActionLoaderUtils.GetAction<Func<SyntaxGenerator, SyntaxNode, SyntaxNode>>
+            GetAction<Func<SyntaxGenerator, SyntaxNode, SyntaxNode>>
                 (memberAccessActions, memberAccessObject, name, value);
     }
 

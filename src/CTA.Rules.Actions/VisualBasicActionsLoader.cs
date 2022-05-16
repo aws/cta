@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.Loader;
-using Codelyzer.Analysis;
 using CTA.Rules.Config;
 using CTA.Rules.Models;
 using Microsoft.CodeAnalysis;
@@ -12,7 +10,7 @@ using Microsoft.CodeAnalysis.Editing;
 
 namespace CTA.Rules.Actions;
 
-public class VisualBasicActionsLoader
+public class VisualBasicActionsLoader : ActionLoaderBase
 {
     private readonly List<MethodInfo> _compilationUnitActions,
         _invocationExpressionActions,
@@ -32,8 +30,11 @@ public class VisualBasicActionsLoader
         _compilationUnitActions = new List<MethodInfo>();
         _invocationExpressionActions = new List<MethodInfo>();
         _namespaceActions = new List<MethodInfo>();
+        projectLevelActions = new List<MethodInfo>();
+        projectFileActions = new List<MethodInfo>();
+        projectTypeActions = new List<MethodInfo>();
 
-        var assemblies = ActionLoaderUtils.GetAssemblies(assemblyPaths);
+        var assemblies = GetAssemblies(assemblyPaths);
 
         foreach (var assembly in assemblies)
         {
@@ -43,12 +44,16 @@ public class VisualBasicActionsLoader
                     .Where(t => t.Name.EndsWith("Actions") &&
                                 (t.Namespace.EndsWith(ProjectLanguage.VisualBasic.ToString()) ||
                                  t.Name.StartsWith("Project"))).ToList();
-                ActionLoaderUtils.TryCreateInstance(Constants.CompilationUnitActions, types,
+                TryCreateInstance(Constants.CompilationUnitActions, types,
                     out _compilationUnitObject);
-                ActionLoaderUtils.TryCreateInstance(Constants.InvocationExpressionActions, types,
+                TryCreateInstance(Constants.InvocationExpressionActions, types,
                     out _invocationExpressionObject);
-                ActionLoaderUtils.TryCreateInstance(Constants.NamespaceActions, types,
+                TryCreateInstance(Constants.NamespaceActions, types,
                     out _namespaceObject);
+                TryCreateInstance(Constants.ProjectLevelActions, types, out projectLevelObject);
+                TryCreateInstance(Constants.ProjectFileActions, types, out projectFileObject);
+                TryCreateInstance(Constants.ProjectTypeActions, types, out projectTypeObject);
+                
 
                 foreach (var t in types)
                 {
@@ -56,17 +61,32 @@ public class VisualBasicActionsLoader
                     {
                         case Constants.CompilationUnitActions:
                         {
-                            _compilationUnitActions.AddRange(ActionLoaderUtils.GetFuncMethods(t));
+                            _compilationUnitActions.AddRange(GetFuncMethods(t));
                             break;
                         }
                         case Constants.InvocationExpressionActions:
                         {
-                            _invocationExpressionActions.AddRange(ActionLoaderUtils.GetFuncMethods(t));
+                            _invocationExpressionActions.AddRange(GetFuncMethods(t));
                             break;
                         }
                         case Constants.NamespaceActions:
                         {
-                            _namespaceActions.AddRange(ActionLoaderUtils.GetFuncMethods(t));
+                            _namespaceActions.AddRange(GetFuncMethods(t));
+                            break;
+                        }
+                        case Constants.ProjectLevelActions:
+                        {
+                            projectLevelActions.AddRange(GetFuncMethods(t));
+                            break;
+                        }
+                        case Constants.ProjectFileActions:
+                        {
+                            projectFileActions.AddRange(GetFuncMethods(t));
+                            break;
+                        }
+                        case Constants.ProjectTypeActions:
+                        {
+                            projectTypeActions.AddRange(GetFuncMethods(t));
                             break;
                         }
                         default:
@@ -86,14 +106,14 @@ public class VisualBasicActionsLoader
 
     public Func<SyntaxGenerator, InvocationExpressionSyntax, InvocationExpressionSyntax> GetInvocationExpressionAction(string name, dynamic value)
     {
-        return ActionLoaderUtils.GetAction<Func<SyntaxGenerator, InvocationExpressionSyntax, InvocationExpressionSyntax>>
+        return GetAction<Func<SyntaxGenerator, InvocationExpressionSyntax, InvocationExpressionSyntax>>
             (_invocationExpressionActions, _invocationExpressionObject, name, value);
     }
 
     public Func<SyntaxGenerator, CompilationUnitSyntax, CompilationUnitSyntax> GetCompilationUnitAction(string name,
         dynamic value)
     {
-        return ActionLoaderUtils.GetAction<Func<SyntaxGenerator, CompilationUnitSyntax, CompilationUnitSyntax>>
+        return GetAction<Func<SyntaxGenerator, CompilationUnitSyntax, CompilationUnitSyntax>>
             (_compilationUnitActions, _compilationUnitObject, name, value);
     }
 
@@ -139,27 +159,12 @@ public class VisualBasicActionsLoader
     
     public Func<SyntaxGenerator, NamespaceBlockSyntax, NamespaceBlockSyntax> GetNamespaceActions(string name, dynamic value)
     {
-        return ActionLoaderUtils.GetAction<Func<SyntaxGenerator, NamespaceBlockSyntax, NamespaceBlockSyntax>>
+        return GetAction<Func<SyntaxGenerator, NamespaceBlockSyntax, NamespaceBlockSyntax>>
             (_namespaceActions, _namespaceObject, name, value);
     }
     
 
     public Func<SyntaxGenerator, ObjectCreationExpressionSyntax, ExpressionSyntax> GetObjectCreationExpressionActions(string name, dynamic value)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Func<string, ProjectType, string> GetProjectLevelActions(string name, dynamic value)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Func<string, ProjectType, List<string>, Dictionary<string, string>, List<string>, List<string>, string> GetProjectFileActions(string name, dynamic value)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Func<ProjectType, ProjectConfiguration, ProjectResult, AnalyzerResult, string> GetProjectTypeActions(string name, dynamic value)
     {
         throw new NotImplementedException();
     }
