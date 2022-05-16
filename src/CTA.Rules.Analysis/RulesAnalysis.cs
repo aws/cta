@@ -15,7 +15,7 @@ namespace CTA.Rules.Analyzer
     /// <summary>
     /// Object to use for creating an analysis based on a code analysis and a list of rules
     /// </summary>
-    public class RulesAnalysis
+    public class RulesAnalysis : IRulesAnalysis
     {
         private readonly CsharpRootNodes _csharpRootNodes;
         private readonly List<RootUstNode> _sourceFileResults;

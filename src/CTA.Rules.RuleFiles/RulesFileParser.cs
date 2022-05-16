@@ -120,7 +120,7 @@ namespace CTA.Rules.RuleFiles
                     if (@namespace.@namespace == Constants.Project && @namespace.Assembly == Constants.Project)
                     {
                         var projectToken = _csharpRootNodes.ProjectTokens.FirstOrDefault();
-                        ParseActions(projectToken, @namespace.Actions);
+                        ParseActions((ProjectToken)projectToken, @namespace.Actions);
                     }
                     //Namespace specific actions:
                     else

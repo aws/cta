@@ -340,6 +340,9 @@ namespace CTA.Rules.RuleFiles
 
                                 case ActionTypes.Project:
                                 {
+                                    var token = new ProjectToken() { Key = recommendation.Name, Description = recommendedActions.Description, TargetCPU = targetCPUs, Namespace = @namespace.Name, FullKey = recommendation.Value };
+                                    if (!_visualBasicRootNodes.ProjectTokens.Contains(token)) { _visualBasicRootNodes.ProjectTokens.Add(token); }
+                                    ParseActions(token, recommendedActions.Actions);
                                     throw new NotImplementedException();
                                 }
                             }
@@ -467,14 +470,56 @@ namespace CTA.Rules.RuleFiles
                         }
                         case ActionTypes.Project:
                         {
+                            var actionFunc = _actionsLoader.GetProjectLevelActions(action.Name, action.Value);
+                            if (actionFunc != null)
+                            {
+                                visualBasicNodeToken.ProjectLevelActions.Add(new ProjectLevelAction()
+                                {
+                                    Key = visualBasicNodeToken.Key,
+                                    Value = GetActionValue(action.Value),
+                                    Description = action.Description,
+                                    ActionValidation = action.ActionValidation,
+                                    Name = action.Name,
+                                    Type = action.Type,
+                                    ProjectLevelActionFunc = actionFunc
+                                });
+                            }
                             break;
                         }
                         case ActionTypes.ProjectFile:
                         {
+                            var actionFunc = _actionsLoader.GetProjectFileActions(action.Name, action.Value);
+                            if (actionFunc != null)
+                            {
+                                visualBasicNodeToken.ProjectFileActions.Add(new ProjectLevelAction()
+                                {
+                                    Key = visualBasicNodeToken.Key,
+                                    Value = GetActionValue(action.Value),
+                                    Description = action.Description,
+                                    ActionValidation = action.ActionValidation,
+                                    Name = action.Name,
+                                    Type = action.Type,
+                                    ProjectFileActionFunc = actionFunc
+                                });
+                            }
                             break;
                         }
                         case ActionTypes.ProjectType:
                         {
+                            var actionFunc = _actionsLoader.GetProjectTypeActions(action.Name, action.Value);
+                            if (actionFunc != null)
+                            {
+                                visualBasicNodeToken.ProjectTypeActions.Add(new ProjectLevelAction()
+                                {
+                                    Key = visualBasicNodeToken.Key,
+                                    Value = GetActionValue(action.Value),
+                                    Description = action.Description,
+                                    ActionValidation = action.ActionValidation,
+                                    Name = action.Name,
+                                    Type = action.Type,
+                                    ProjectTypeActionFunc = actionFunc
+                                });
+                            }
                             break;
                         }
                         case ActionTypes.Package:

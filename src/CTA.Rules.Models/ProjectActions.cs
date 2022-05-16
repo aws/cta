@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using CTA.Rules.Config;
+using CTA.Rules.Models.VisualBasic;
 
 namespace CTA.Rules.Models
 {
@@ -20,7 +21,8 @@ namespace CTA.Rules.Models
         public BlockingCollection<PackageAction> PackageActions { get; set; }
         public BlockingCollection<string> ProjectReferenceActions { get; set; }
         public List<ProjectLevelAction> ProjectLevelActions { get; set; }
-        public CsharpRootNodes ProjectRules { get; set; }
+        public CsharpRootNodes CsharpProjectRules { get; set; }
+        public VisualBasicRootNodes VbProjectRules { get; set; }
 
         public override string ToString()
         {
@@ -33,39 +35,7 @@ namespace CTA.Rules.Models
                 var actions = new List<string>();
 
                 StringBuilder fileChanges = new StringBuilder();
-                foreach (var action in fileAction.AttributeActions)
-                {
-                    actions.Add(action.Description);
-                }
-                foreach (var action in fileAction.ClassDeclarationActions)
-                {
-                    actions.Add(action.Description);
-                }
-                foreach (var action in fileAction.ElementAccessActions)
-                {
-                    actions.Add(action.Description);
-                }
-                foreach (var action in fileAction.IdentifierNameActions)
-                {
-                    actions.Add(action.Description);
-                }
-                foreach (var action in fileAction.InvocationExpressionActions)
-                {
-                    actions.Add(action.Description);
-                }
-                foreach (var action in fileAction.ExpressionActions)
-                {
-                    actions.Add(action.Description);
-                }
-                foreach (var action in fileAction.MemberAccessActions)
-                {
-                    actions.Add(action.Description);
-                }
-                foreach (var action in fileAction.MethodDeclarationActions)
-                {
-                    actions.Add(action.Description);
-                }
-                foreach (var action in fileAction.Usingactions)
+                foreach (var action in fileAction.AllActions)
                 {
                     actions.Add(action.Description);
                 }
@@ -99,40 +69,7 @@ namespace CTA.Rules.Models
             {
                 var actions = new List<string>();
 
-                StringBuilder fileChanges = new StringBuilder();
-                foreach (var action in fileAction.AttributeActions)
-                {
-                    actions.Add(string.Concat(action.Type, ":", action.Name, ":", action.Key));
-                }
-                foreach (var action in fileAction.ClassDeclarationActions)
-                {
-                    actions.Add(string.Concat(action.Type, ":", action.Name, ":", action.Key));
-                }
-                foreach (var action in fileAction.ElementAccessActions)
-                {
-                    actions.Add(string.Concat(action.Type, ":", action.Name, ":", action.Key));
-                }
-                foreach (var action in fileAction.IdentifierNameActions)
-                {
-                    actions.Add(string.Concat(action.Type, ":", action.Name, ":", action.Key));
-                }
-                foreach (var action in fileAction.InvocationExpressionActions)
-                {
-                    actions.Add(string.Concat(action.Type, ":", action.Name, ":", action.Key));
-                }
-                foreach (var action in fileAction.ExpressionActions)
-                {
-                    actions.Add(string.Concat(action.Type, ":", action.Name, ":", action.Key));
-                }
-                foreach (var action in fileAction.MemberAccessActions)
-                {
-                    actions.Add(string.Concat(action.Type, ":", action.Name, ":", action.Key));
-                }
-                foreach (var action in fileAction.MethodDeclarationActions)
-                {
-                    actions.Add(string.Concat(action.Type, ":", action.Name, ":", action.Key));
-                }
-                foreach (var action in fileAction.Usingactions)
+                foreach (var action in fileAction.AllActions)
                 {
                     actions.Add(string.Concat(action.Type, ":", action.Name, ":", action.Key));
                 }

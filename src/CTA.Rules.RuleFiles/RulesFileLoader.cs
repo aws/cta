@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Codelyzer.Analysis.Model;
 using CTA.Rules.Config;
 using CTA.Rules.Models;
+using CTA.Rules.Models.RulesFiles;
 using Newtonsoft.Json;
 
 namespace CTA.Rules.RuleFiles
@@ -57,7 +58,7 @@ namespace CTA.Rules.RuleFiles
         /// Loads rules from the main rules file and override file
         /// </summary>
         /// <returns>A RootNodes object containing all the rules after being merged</returns>
-        public T Load<T>()
+        public RulesFileLoaderResponse Load()
         {
             var mainNamespaceFileTasks = new Task<NamespaceRecommendations>(() =>
             {
@@ -113,6 +114,8 @@ namespace CTA.Rules.RuleFiles
 
             Task.WaitAll(mainNamespaceFileTasks, overrideNamespaceFileTasks, mainFileTask, overrideTask);
 
+            var response = new RulesFileLoaderResponse();
+            
             if (_projectLanguage == ProjectLanguage.VisualBasic)
             {
                 var rulesFileParser = new VisualBasicRulesFileParser(mainNamespaceFileTasks.Result,
@@ -122,7 +125,7 @@ namespace CTA.Rules.RuleFiles
                     _assembliesDir,
                     _targetFramework);
                 var rootNodes = rulesFileParser.Process();
-                return (T)Convert.ChangeType(rootNodes, typeof(T));
+                response.VisualBasicRootNodes = rootNodes;
             }
             else
             {
@@ -133,9 +136,10 @@ namespace CTA.Rules.RuleFiles
                     _assembliesDir,
                     _targetFramework);
                 var rootNodes = rulesFileParser.Process();
-
-                return (T)Convert.ChangeType(rootNodes, typeof(T));
+                response.CsharpRootNodes = rootNodes;
             }
+
+            return response;
         }
 
 

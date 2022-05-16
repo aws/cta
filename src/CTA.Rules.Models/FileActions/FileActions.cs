@@ -1,6 +1,10 @@
 ﻿using System.Collections.Generic;
 using CTA.Rules.Models.Tokens;
+using CTA.Rules.Models.Tokens.VisualBasic;
+using CTA.Rules.Models.VisualBasic;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.VisualBasic.Syntax;
+using InvocationExpressionSyntax = Microsoft.CodeAnalysis.CSharp.Syntax.InvocationExpressionSyntax;
 
 namespace CTA.Rules.Models
 {
@@ -22,7 +26,20 @@ namespace CTA.Rules.Models
             PackageActions = new HashSet<PackageAction>();
             InterfaceDeclarationActions = new HashSet<InterfaceDeclarationAction>();
             NodeTokens = new List<CsharpNodeToken>();
+
+            VbNodeTokens = new List<VisualBasicNodeToken>();
+            VbInvocationExpressionActions =
+                new HashSet<InvocationExpressionAction<
+                    Microsoft.CodeAnalysis.VisualBasic.Syntax.InvocationExpressionSyntax>>();
+            VbImportActions = new HashSet<ImportAction>();
+            VbNamespaceActions =
+                new HashSet<NamespaceAction<NamespaceBlockSyntax>>();
         }
+
+        public HashSet<NamespaceAction<NamespaceBlockSyntax>> VbNamespaceActions { get; set; }
+        public HashSet<ImportAction> VbImportActions { get; set; }
+        public HashSet<InvocationExpressionAction<Microsoft.CodeAnalysis.VisualBasic.Syntax.InvocationExpressionSyntax>> VbInvocationExpressionActions { get; set; }
+        public List<VisualBasicNodeToken> VbNodeTokens { get; set; }
 
         public List<CsharpNodeToken> NodeTokens { get; set; }
         public string FilePath { get; set; }
@@ -58,6 +75,11 @@ namespace CTA.Rules.Models
                 allActions.AddRange(Usingactions);
                 allActions.AddRange(ObjectCreationExpressionActions);
                 allActions.AddRange(NamespaceActions);
+                
+                // visual basic actions
+                allActions.AddRange(VbImportActions);
+                allActions.AddRange(VbNamespaceActions);
+                allActions.AddRange(VbInvocationExpressionActions);
                 return allActions;
             }
         }
