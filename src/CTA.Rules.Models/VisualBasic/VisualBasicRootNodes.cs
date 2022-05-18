@@ -15,11 +15,13 @@ namespace CTA.Rules.Models.VisualBasic
             ImportStatementTokens = new HashSet<ImportStatementToken>();
             NamespaceTokens = new HashSet<NamespaceToken>();
             ProjectTokens = new HashSet<NodeToken>();
+            IdentifierNameTokens = new HashSet<IdentifierNameToken>();
         }
         
         public HashSet<InvocationExpressionToken> InvocationExpressionTokens { get; set; }
         public HashSet<ImportStatementToken> ImportStatementTokens { get; set; }
         public HashSet<NamespaceToken> NamespaceTokens { get; set; }
         public HashSet<NodeToken> ProjectTokens { get; set; }
+        public HashSet<IdentifierNameToken> IdentifierNameTokens { get; set; }
     }
 }

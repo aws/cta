@@ -6,10 +6,10 @@ using Codelyzer.Analysis.Model;
 using CTA.Rules.Common.Extensions;
 using CTA.Rules.Config;
 using CTA.Rules.Models;
-using CTA.Rules.Models.Tokens;
 using CTA.Rules.Models.Tokens.VisualBasic;
 using CTA.Rules.Models.VisualBasic;
 using Microsoft.CodeAnalysis.VisualBasic.Syntax;
+using IdentifierNameToken = CTA.Rules.Models.VisualBasic.IdentifierNameToken;
 using InvocationExpressionToken = CTA.Rules.Models.Tokens.VisualBasic.InvocationExpressionToken;
 using NamespaceToken = CTA.Rules.Models.Tokens.VisualBasic.NamespaceToken;
 
@@ -253,6 +253,15 @@ public class VisualBasicRulesAnalysis : IRulesAnalysis
                     }
                     case IdConstants.DeclarationNodeIdName:
                     {
+                        var declarationNode = (DeclarationNode)child;
+                        var compareToken = new IdentifierNameToken() { Key = string.Concat(declarationNode.Reference.Namespace, ".", declarationNode.Identifier), Namespace = declarationNode.Reference.Namespace };
+                        _visualBasicRootNodes.IdentifierNameTokens.TryGetValue(compareToken, out var token);
+                        if (token != null)
+                        {
+                            AddActions(fileAction, token, child.TextSpan);
+                            containsActions = true;
+                        }
+                        if (AnalyzeChildren(fileAction, child.Children, ++level, parentNamespace, parentClass)) { containsActions = true; }
                         break;
                     }
                     case IdConstants.ObjectCreationIdName:
@@ -326,9 +335,12 @@ public class VisualBasicRulesAnalysis : IRulesAnalysis
                 NamespaceActionFunc = a.NamespaceActionFunc
             }).ToList());
 
+        fileAction.VbIdentifierNameAction.UnionWith(token.IdentifierNameActions.Select(a => a.Copy()).ToList());
+
         if (fileAction.InvocationExpressionActions.Any()
             || fileAction.VbImportActions.Any()
-            || fileAction.NamespaceActions.Any())
+            || fileAction.NamespaceActions.Any()
+            || fileAction.IdentifierNameActions.Any())
         {
             var nodeToken = token.Clone();
             nodeToken.TextSpan = textSpan;
@@ -365,7 +377,7 @@ public class VisualBasicRulesAnalysis : IRulesAnalysis
     /// <param name="fileAction"></param>
     /// <param name="token"></param>
     /// <param name="identifier"></param>
-    private void AddNamedActions(FileActions fileAction, CsharpNodeToken token, string identifier, TextSpan textSpan)
+    private void AddNamedActions(FileActions fileAction, VisualBasicNodeToken token, string identifier, TextSpan textSpan)
     {
         fileAction.ClassDeclarationActions.UnionWith(token.ClassDeclarationActions
             .Select(c => new ClassDeclarationAction
@@ -415,7 +427,7 @@ public class VisualBasicRulesAnalysis : IRulesAnalysis
             {
                 action.Key = identifier;
             });
-            fileAction.NodeTokens.Add(nodeToken);
+            fileAction.VbNodeTokens.Add(nodeToken);
         }
     }
 }

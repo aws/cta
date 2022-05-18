@@ -465,17 +465,7 @@ namespace CTA.Rules.Analyzer
                 AttributeListActionFunc = a.AttributeListActionFunc
             }).ToList());
 
-            fileAction.IdentifierNameActions.UnionWith(token.IdentifierNameActions.Select(a => new IdentifierNameAction()
-            {
-                Key = a.Key,
-                Description = a.Description,
-                Value = a.Value,
-                Name = a.Name,
-                Type = a.Type,
-                TextSpan = textSpan,
-                ActionValidation = a.ActionValidation,
-                IdentifierNameActionFunc = a.IdentifierNameActionFunc,
-            }).ToList());
+            fileAction.IdentifierNameActions.UnionWith(token.IdentifierNameActions.Select(a => a.Copy()).ToList());
 
             fileAction.InvocationExpressionActions.UnionWith(token.InvocationExpressionActions.Select(a => new InvocationExpressionAction<InvocationExpressionSyntax>()
             {

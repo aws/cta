@@ -1,10 +1,8 @@
 ﻿using System.Linq;
 using System.Collections.Generic;
-using CTA.Rules.Config;
+using System.Configuration;
 using CTA.Rules.Models.VisualBasic;
-using Microsoft.Build.Logging.StructuredLogger;
 using Microsoft.CodeAnalysis.VisualBasic.Syntax;
-using TextSpan = Codelyzer.Analysis.Model.TextSpan;
 
 namespace CTA.Rules.Models.Tokens.VisualBasic
 {
@@ -15,23 +13,25 @@ namespace CTA.Rules.Models.Tokens.VisualBasic
             InvocationExpressionActions = new List<InvocationExpressionAction<InvocationExpressionSyntax>>();
             ImportActions = new List<ImportAction>();
             NamespaceActions = new List<NamespaceAction<NamespaceBlockSyntax>>();
+            IdentifierNameActions = new List<IdentifierNameAction<IdentifierNameSyntax>>();
         }
         
         public List<InvocationExpressionAction<InvocationExpressionSyntax>> InvocationExpressionActions { get; set; }
         public List<ImportAction> ImportActions { get; set; }
         public List<NamespaceAction<NamespaceBlockSyntax>> NamespaceActions { get; set; }
+        public List<IdentifierNameAction<IdentifierNameSyntax>> IdentifierNameActions { get; set; }
 
-        public VisualBasicNodeToken Clone()
+        public override VisualBasicNodeToken Clone()
         {
-            VisualBasicNodeToken cloned = (VisualBasicNodeToken)this.MemberwiseClone();
-            cloned.TextChanges = cloned.TextChanges?.Select(textChange => textChange.Clone()).ToList();
-            cloned.TargetCPU = cloned.TargetCPU?.ToList();
+            VisualBasicNodeToken cloned = (VisualBasicNodeToken)base.Clone();
             cloned.InvocationExpressionActions = cloned.InvocationExpressionActions
                 .Select(action => action.Clone<InvocationExpressionAction<InvocationExpressionSyntax>>()).ToList();
             cloned.ImportActions = cloned.ImportActions
                 .Select(action => action.Clone<ImportAction>()).ToList();
             cloned.NamespaceActions = cloned.NamespaceActions
                 .Select(action => action.Clone<NamespaceAction<NamespaceBlockSyntax>>()).ToList();
+            cloned.IdentifierNameActions = cloned.IdentifierNameActions
+                .Select(action => action.Clone<IdentifierNameAction<IdentifierNameSyntax>>()).ToList();
             return cloned;
         }
 
@@ -43,6 +43,7 @@ namespace CTA.Rules.Models.Tokens.VisualBasic
                 allActions.AddRange(InvocationExpressionActions);
                 allActions.AddRange(NamespaceActions);
                 allActions.AddRange(ImportActions);
+                allActions.AddRange(IdentifierNameActions);
                 allActions.AddRange(base.AllActions);
                 return allActions;
             }

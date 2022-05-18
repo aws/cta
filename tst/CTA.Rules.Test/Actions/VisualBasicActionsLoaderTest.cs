@@ -53,5 +53,15 @@ namespace CTA.Rules.Test.Actions
             Assert.IsNotNull(appendMethod);
             Assert.IsNotNull(addComment);
         }
+        
+        [Test]
+        public void IdentifierNameActionsTest()
+        {
+            var replaceIdentifier = _actionLoader.GetIdentifierNameAction("ReplaceIdentifier", "identifierName");
+            var replaceIdentifierInsideClass = _actionLoader.GetIdentifierNameAction("ReplaceIdentifierInsideClass", "{ identifier: \"identifier\", classFullKey: \"classKey\" }");
+            
+            Assert.IsNotNull(replaceIdentifier);
+            Assert.IsNotNull(replaceIdentifierInsideClass);
+        }
     }
 }

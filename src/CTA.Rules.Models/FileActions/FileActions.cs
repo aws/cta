@@ -4,7 +4,6 @@ using CTA.Rules.Models.Tokens.VisualBasic;
 using CTA.Rules.Models.VisualBasic;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.VisualBasic.Syntax;
-using InvocationExpressionSyntax = Microsoft.CodeAnalysis.CSharp.Syntax.InvocationExpressionSyntax;
 
 namespace CTA.Rules.Models
 {
@@ -16,8 +15,8 @@ namespace CTA.Rules.Models
             ClassDeclarationActions = new HashSet<ClassDeclarationAction>();
             MethodDeclarationActions = new HashSet<MethodDeclarationAction>();
             ElementAccessActions = new HashSet<ElementAccessAction>();
-            IdentifierNameActions = new HashSet<IdentifierNameAction>();
-            InvocationExpressionActions = new HashSet<InvocationExpressionAction<InvocationExpressionSyntax>>();
+            IdentifierNameActions = new HashSet<IdentifierNameAction<Microsoft.CodeAnalysis.CSharp.Syntax.IdentifierNameSyntax>>();
+            InvocationExpressionActions = new HashSet<InvocationExpressionAction<Microsoft.CodeAnalysis.CSharp.Syntax.InvocationExpressionSyntax>>();
             ExpressionActions = new HashSet<ExpressionAction>();
             MemberAccessActions = new HashSet<MemberAccessAction>();
             Usingactions = new HashSet<UsingAction>();
@@ -38,7 +37,10 @@ namespace CTA.Rules.Models
 
         public HashSet<NamespaceAction<NamespaceBlockSyntax>> VbNamespaceActions { get; set; }
         public HashSet<ImportAction> VbImportActions { get; set; }
-        public HashSet<InvocationExpressionAction<Microsoft.CodeAnalysis.VisualBasic.Syntax.InvocationExpressionSyntax>> VbInvocationExpressionActions { get; set; }
+        public HashSet<InvocationExpressionAction<Microsoft.CodeAnalysis.VisualBasic.Syntax.InvocationExpressionSyntax>>
+            VbInvocationExpressionActions { get; set; }
+        public HashSet<IdentifierNameAction<Microsoft.CodeAnalysis.VisualBasic.Syntax.IdentifierNameSyntax>>
+            VbIdentifierNameAction { get; set; }
         public List<VisualBasicNodeToken> VbNodeTokens { get; set; }
 
         public List<CsharpNodeToken> NodeTokens { get; set; }
@@ -48,8 +50,8 @@ namespace CTA.Rules.Models
         public HashSet<ClassDeclarationAction> ClassDeclarationActions { get; set; }
         public HashSet<InterfaceDeclarationAction> InterfaceDeclarationActions { get; set; }
         public HashSet<ElementAccessAction> ElementAccessActions { get; set; }
-        public HashSet<IdentifierNameAction> IdentifierNameActions { get; set; }
-        public HashSet<InvocationExpressionAction<InvocationExpressionSyntax>> InvocationExpressionActions { get; set; }
+        public HashSet<IdentifierNameAction<Microsoft.CodeAnalysis.CSharp.Syntax.IdentifierNameSyntax>> IdentifierNameActions { get; set; }
+        public HashSet<InvocationExpressionAction<Microsoft.CodeAnalysis.CSharp.Syntax.InvocationExpressionSyntax>> InvocationExpressionActions { get; set; }
         public HashSet<ExpressionAction> ExpressionActions { get; set; }
         public HashSet<MemberAccessAction> MemberAccessActions { get; set; }
         public HashSet<ObjectCreationExpressionAction> ObjectCreationExpressionActions { get; set; }

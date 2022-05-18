@@ -10,7 +10,7 @@ using CTA.Rules.Models.Tokens.VisualBasic;
 using Microsoft.Build.Logging.StructuredLogger;
 using Microsoft.CodeAnalysis.VisualBasic.Syntax;
 using Newtonsoft.Json;
-
+using IdentifierNameToken = CTA.Rules.Models.VisualBasic.IdentifierNameToken;
 
 
 namespace CTA.Rules.RuleFiles
@@ -146,22 +146,31 @@ namespace CTA.Rules.RuleFiles
                 }
                 foreach (var @class in @namespace.Classes)
                 {
-                    /*
                     if (@class.Actions != null && @class.Actions.Count > 0)
                     {
+                        /*
                         if (@class.KeyType == CTA.Rules.Config.Constants.BaseClass || @class.KeyType == CTA.Rules.Config.Constants.ClassName)
                         {
                             var token = new ClassDeclarationToken() { Key = @class.FullKey, FullKey = @class.FullKey, Namespace = @namespace.@namespace };
                             if (!_rootNodes.Classdeclarationtokens.Contains(token)) { _rootNodes.Classdeclarationtokens.Add(token); }
                             ParseActions(token, @class.Actions);
                         }
-                        else if (@class.KeyType == CTA.Rules.Config.Constants.Identifier)
+                        */
+                        if (@class.KeyType == CTA.Rules.Config.Constants.Identifier)
                         {
-                            var token = new IdentifierNameToken() { Key = @class.FullKey, FullKey = @class.FullKey, Namespace = @namespace.@namespace };
-                            if (!_rootNodes.Identifiernametokens.Contains(token)) { _rootNodes.Identifiernametokens.Add(token); }
+                            var token = new IdentifierNameToken
+                            {
+                                Key = @class.FullKey, FullKey = @class.FullKey, Namespace = @namespace.@namespace
+                            };
+                            if (!_visualBasicRootNodes.IdentifierNameTokens.Contains(token))
+                            {
+                                _visualBasicRootNodes.IdentifierNameTokens.Add(token);
+                            }
+
                             ParseActions(token, @class.Actions);
                         }
                     }
+                    /*
                     foreach (var attribute in @class.Attributes)
                     {
                         if (attribute.Actions != null && attribute.Actions.Count > 0)
@@ -203,6 +212,18 @@ namespace CTA.Rules.RuleFiles
                         }
                         else if (@interface.KeyType == CTA.Rules.Config.Constants.Identifier)
                         {
+                            var token = new IdentifierNameToken
+                            {
+                                Key = @interface.FullKey,
+                                FullKey = @interface.FullKey,
+                                Namespace = @namespace.@namespace
+                            };
+                            if (!_visualBasicRootNodes.IdentifierNameTokens.Contains(token))
+                            {
+                                _visualBasicRootNodes.IdentifierNameTokens.Add(token);
+                            }
+
+                            ParseActions(token, @interface.Actions);
                         }
                     }
                     foreach (var attribute in @interface.Attributes)
@@ -282,12 +303,52 @@ namespace CTA.Rules.RuleFiles
                                 }
                                 case ActionTypes.Class:
                                 {
-                                    throw new NotImplementedException();
+                                    if (recommendation.KeyType == CTA.Rules.Config.Constants.BaseClass || recommendation.KeyType == CTA.Rules.Config.Constants.ClassName)
+                                    {
+                                    }
+                                    else if (recommendation.KeyType == CTA.Rules.Config.Constants.Identifier)
+                                    {
+                                        var token = new IdentifierNameToken
+                                        {
+                                            Key = recommendation.Value,
+                                            Description = recommendedActions.Description,
+                                            TargetCPU = targetCPUs,
+                                            FullKey = recommendation.Value,
+                                            Namespace = @namespace.Name
+                                        };
+                                        if (!_visualBasicRootNodes.IdentifierNameTokens.Contains(token))
+                                        {
+                                            _visualBasicRootNodes.IdentifierNameTokens.Add(token);
+                                        }
+
+                                        ParseActions(token, recommendedActions.Actions);
+                                    }
+                                    break;
                                 }
 
                                 case ActionTypes.Interface:
                                 {
-                                    throw new NotImplementedException();
+                                    if (recommendation.KeyType == CTA.Rules.Config.Constants.BaseClass || recommendation.KeyType == CTA.Rules.Config.Constants.ClassName)
+                                    {
+                                    }
+                                    else if (recommendation.KeyType == CTA.Rules.Config.Constants.Identifier)
+                                    {
+                                        var token = new IdentifierNameToken
+                                        {
+                                            Key = recommendation.Value,
+                                            Description = recommendedActions.Description,
+                                            TargetCPU = targetCPUs,
+                                            FullKey = recommendation.Value,
+                                            Namespace = @namespace.Name
+                                        };
+                                        if (!_visualBasicRootNodes.IdentifierNameTokens.Contains(token))
+                                        {
+                                            _visualBasicRootNodes.IdentifierNameTokens.Add(token);
+                                        }
+
+                                        ParseActions(token, recommendedActions.Actions);
+                                    }
+                                    break;
                                 }
 
                                 case ActionTypes.Method:
@@ -442,6 +503,20 @@ namespace CTA.Rules.RuleFiles
                         }
                         case ActionTypes.Identifier:
                         {
+                            var actionFunc = _actionsLoader.GetIdentifierNameAction(action.Name, action.Value);
+                            if (actionFunc != null)
+                            {
+                                visualBasicNodeToken.IdentifierNameActions.Add(new IdentifierNameAction<IdentifierNameSyntax>()
+                                {
+                                    Key = visualBasicNodeToken.Key,
+                                    Value = GetActionValue(action.Value),
+                                    Description = action.Description,
+                                    ActionValidation = action.ActionValidation,
+                                    Name = action.Name,
+                                    Type = action.Type,
+                                    IdentifierNameActionFunc = actionFunc
+                                });
+                            }
                             break;
                         }
                         case ActionTypes.Attribute:

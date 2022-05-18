@@ -14,12 +14,14 @@ public class VisualBasicActionsLoader : ActionLoaderBase
 {
     private readonly List<MethodInfo> _compilationUnitActions,
         _invocationExpressionActions,
-        _namespaceActions;
+        _namespaceActions,
+        _identifierNameActions;
         
 
     private readonly object _compilationUnitObject,
         _invocationExpressionObject,
-        _namespaceObject;
+        _namespaceObject,
+        _identifierNameObject;
     
     /// <summary>
     /// Initializes a new ActionLoader that loads the default actions
@@ -30,6 +32,7 @@ public class VisualBasicActionsLoader : ActionLoaderBase
         _compilationUnitActions = new List<MethodInfo>();
         _invocationExpressionActions = new List<MethodInfo>();
         _namespaceActions = new List<MethodInfo>();
+        _identifierNameActions = new List <MethodInfo>();
         projectLevelActions = new List<MethodInfo>();
         projectFileActions = new List<MethodInfo>();
         projectTypeActions = new List<MethodInfo>();
@@ -53,8 +56,8 @@ public class VisualBasicActionsLoader : ActionLoaderBase
                 TryCreateInstance(Constants.ProjectLevelActions, types, out projectLevelObject);
                 TryCreateInstance(Constants.ProjectFileActions, types, out projectFileObject);
                 TryCreateInstance(Constants.ProjectTypeActions, types, out projectTypeObject);
+                TryCreateInstance(Constants.IdentifierNameActions, types, out _identifierNameObject);
                 
-
                 foreach (var t in types)
                 {
                     switch (t.Name)
@@ -87,6 +90,11 @@ public class VisualBasicActionsLoader : ActionLoaderBase
                         case Constants.ProjectTypeActions:
                         {
                             projectTypeActions.AddRange(GetFuncMethods(t));
+                            break;
+                        }
+                        case Constants.IdentifierNameActions:
+                        {
+                            _identifierNameActions.AddRange(GetFuncMethods(t));
                             break;
                         }
                         default:
@@ -142,7 +150,8 @@ public class VisualBasicActionsLoader : ActionLoaderBase
 
     public Func<SyntaxGenerator, IdentifierNameSyntax, IdentifierNameSyntax> GetIdentifierNameAction(string name, dynamic value)
     {
-        throw new NotImplementedException();
+        return GetAction<Func<SyntaxGenerator, IdentifierNameSyntax, IdentifierNameSyntax>>
+            (_identifierNameActions, _identifierNameObject, name, value);
     }
 
     public Func<SyntaxGenerator, SyntaxNode, SyntaxNode> GetExpressionAction(string name, dynamic value)

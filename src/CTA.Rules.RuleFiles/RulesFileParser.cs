@@ -511,7 +511,7 @@ namespace CTA.Rules.RuleFiles
                                 var actionFunc = actionsLoader.GetIdentifierNameAction(action.Name, action.Value);
                                 if (actionFunc != null)
                                 {
-                                    csharpNodeToken.IdentifierNameActions.Add(new IdentifierNameAction()
+                                    csharpNodeToken.IdentifierNameActions.Add(new IdentifierNameAction<IdentifierNameSyntax>()
                                     {
                                         Key = csharpNodeToken.Key,
                                         Value = GetActionValue(action.Value),

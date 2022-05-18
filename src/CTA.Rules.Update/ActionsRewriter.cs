@@ -188,7 +188,7 @@ namespace CTA.Rules.Update.Rewriters
             if (symbol != null)
             {
                 var nodeKey = symbol.OriginalDefinition != null ? symbol.OriginalDefinition.ToString() : symbol.ToString();
-                foreach (var action in _allActions.OfType<IdentifierNameAction>())
+                foreach (var action in _allActions.OfType<IdentifierNameAction<IdentifierNameSyntax>>())
                 {
                     if (nodeKey == action.Key && identifierNameTypes.Contains(identifierNameSyntax.Parent?.GetType()))
                     {
