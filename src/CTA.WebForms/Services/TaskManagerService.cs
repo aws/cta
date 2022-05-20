@@ -17,18 +17,21 @@ namespace CTA.WebForms.Services
         private const string UnstalledLogAction = "Exited Stall";
 
         public enum TaskState { Active, Waiting }
-        public enum TaskStallTimeout { None = 0, Short = 100, Medium = 1000, Long = 10000 }
+        // Predefined timeout periods (in milliseconds) for when the application enters a stall state
+        public enum TaskStallTimeoutMs { None = 0, Short = 100, Medium = 1000, Long = 10000 }
 
         private readonly IDictionary<int, ManagedTask> _managedTasks;
-        private readonly TaskStallTimeout _stallTimeout;
+        // When the application enters a stall state, it has to remain in that state for this many milliseconds
+        // before we cancel the oldest task
+        private readonly TaskStallTimeoutMs _stallTimeoutMs;
         private bool _stalled;
         private int _stallOccurrenceNumber;
         private int _nextAvailableTaskId;
 
-        public TaskManagerService(TaskStallTimeout stallTimeout = TaskStallTimeout.Short)
+        public TaskManagerService(TaskStallTimeoutMs stallTimeout = TaskStallTimeoutMs.Short)
         {
             _managedTasks = new Dictionary<int, ManagedTask>();
-            _stallTimeout = stallTimeout;
+            _stallTimeoutMs = stallTimeout;
         }
 
         public int RegisterNewTask()
@@ -98,7 +101,7 @@ namespace CTA.WebForms.Services
         private async void TryResolveStall()
         {
             var currentStallOccurrence = _stallOccurrenceNumber;
-            await Task.Delay((int)_stallTimeout);
+            await Task.Delay((int)_stallTimeoutMs);
 
             // Ensure that stall state is still active and same occurrence
             if (_stalled && _stallOccurrenceNumber == currentStallOccurrence)
