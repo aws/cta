@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -20,7 +21,7 @@ namespace CTA.WebForms.Services
         // Predefined timeout periods (in milliseconds) for when the application enters a stall state
         public enum TaskStallTimeoutMs { None = 0, Short = 100, Medium = 1000, Long = 10000 }
 
-        private readonly IDictionary<int, ManagedTask> _managedTasks;
+        private readonly ConcurrentDictionary<int, ManagedTask> _managedTasks;
         // When the application enters a stall state, it has to remain in that state for this many milliseconds
         // before we cancel the oldest task
         private readonly TaskStallTimeoutMs _stallTimeoutMs;
@@ -30,7 +31,7 @@ namespace CTA.WebForms.Services
 
         public TaskManagerService(TaskStallTimeoutMs stallTimeout = TaskStallTimeoutMs.Short)
         {
-            _managedTasks = new Dictionary<int, ManagedTask>();
+            _managedTasks = new ConcurrentDictionary<int, ManagedTask>();
             _stallTimeoutMs = stallTimeout;
         }
 
@@ -39,7 +40,12 @@ namespace CTA.WebForms.Services
             var newManagedTask = new ManagedTask(_nextAvailableTaskId);
             _nextAvailableTaskId += 1;
 
-            _managedTasks.Add(newManagedTask.TaskId, newManagedTask);
+            // It should be impossible for the key to already exist in the dictionary, but
+            // if it does we choose to overwrite it to avoid having a stale managed task that
+            // may result in extra stalls
+            _managedTasks.AddOrUpdate(newManagedTask.TaskId,
+                addValueFactory: (key) => newManagedTask,
+                updateValueFactory: (key, managedTask) => newManagedTask);
             UpdateStallState();
 
             return newManagedTask.TaskId;
@@ -71,7 +77,9 @@ namespace CTA.WebForms.Services
 
         public void RetireTask(int taskId)
         {
-            _managedTasks.Remove(taskId);
+            // We don't care to check the result of TryRemove because failure just means that some other
+            // thread has already removed the item, which shouldn't ever happen anyway
+            _managedTasks.TryRemove(taskId, out var _);
             LogHelper.LogInformation(string.Format(TaskStatusUpdateLogTemplate, GetType().Name, taskId, RetiredLogAction));
             UpdateStallState();
         }
