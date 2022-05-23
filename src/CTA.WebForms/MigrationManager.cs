@@ -189,7 +189,7 @@ namespace CTA.WebForms
 
         private void InitializeServices()
         {
-            _taskManager = new TaskManagerService();
+            _taskManager = new TaskManagerService(TaskManagerService.TaskStallTimeoutMs.Medium);
             _lifecycleManager = new LifecycleManagerService();
             _viewImportService = new ViewImportService();
             _codeBehindLinkerService = new CodeBehindReferenceLinkerService();
