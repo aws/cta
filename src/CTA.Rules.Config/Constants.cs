@@ -52,6 +52,7 @@ namespace CTA.Rules.Config
         public const string CommentFormat = @"/* Added by CTA: {0} */";
         public const string VbCommentFormat = @"' Added by CTA: {0}";
         public const string CommentFormatBlank = @"/* {0} */";
+        public const string VbCommentFormatBlank = @"' {0}";
         public const string WebSdkName = "Microsoft.NET.Sdk.Web";
         public const string ClassLibrarySdkName = "Microsoft.NET.Sdk";
 
