@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using CTA.Rules.Metrics;
 using CTA.WebForms.Metrics;
 
 namespace CTA.WebForms.Tests.FileConverters

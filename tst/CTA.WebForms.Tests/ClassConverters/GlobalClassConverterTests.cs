@@ -6,7 +6,6 @@ using NUnit.Framework;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using CTA.Rules.Metrics;
 using CTA.WebForms.Metrics;
 
 namespace CTA.WebForms.Tests.ClassConverters

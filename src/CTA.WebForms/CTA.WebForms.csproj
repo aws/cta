@@ -8,16 +8,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="CTA.Rules.Config" Version="2.3.16-alpha-gae459a7228" />
+    <PackageReference Include="CTA.Rules.Models" Version="2.3.16-alpha-gae459a7228" />
     <PackageReference Include="HtmlAgilityPack" Version="1.11.42" />
     <PackageReference Include="YamlDotNet" Version="11.2.1" />
   </ItemGroup>
 
   <ItemGroup>
     <Compile Remove="Helpers\RuleActions.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\CTA.Rules.Models\CTA.Rules.Models.csproj" />
   </ItemGroup>
 
   <ItemGroup>

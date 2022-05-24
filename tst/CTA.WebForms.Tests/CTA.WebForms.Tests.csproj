@@ -17,10 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-	<ProjectReference Include="..\..\src\CTA.Rules.Actions\CTA.Rules.Actions.csproj" />
 	<ProjectReference Include="..\..\src\CTA.WebForms\CTA.WebForms.csproj" />
-	<ProjectReference Include="..\CTA.FeatureDetection.Tests\CTA.FeatureDetection.Tests.csproj" />
-	<ProjectReference Include="..\CTA.Rules.Test\CTA.Rules.Test.csproj" />
   </ItemGroup>
 
   <ItemGroup>

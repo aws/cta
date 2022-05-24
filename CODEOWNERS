@@ -3,14 +3,5 @@
 # be sent to owner(s) for a review.
 
 
-/src/CTA.Rules.PortCore/SolutionPort.cs @marknfawaz @Beau-Gosse-dev @saikiranakula-amzn
-/src/CTA.Rules.PortCore/ProjectPort.cs @marknfawaz @Beau-Gosse-dev @saikiranakula-amzn
-/src/CTA.Rules.PortCore/Program.cs @marknfawaz @Beau-Gosse-dev @saikiranakula-amzn
-/src/CTA.Rules.PortCore/ @marknfawaz @Beau-Gosse-dev @saikiranakula-amzn
-/src/CTA.Rules.Models/SolutionResult.cs @marknfawaz @Beau-Gosse-dev @saikiranakula-amzn
-/src/CTA.Rules.Models/ProjectActions.cs @marknfawaz @Beau-Gosse-dev @saikiranakula-amzn
-/src/CTA.Rules.Models/ProjectResult.cs @marknfawaz @Beau-Gosse-dev @saikiranakula-amzn
-/src/CTA.Rules.Models/PortCoreConfiguration.cs @marknfawaz @Beau-Gosse-dev @saikiranakula-amzn
-/src/CTA.Rules.Models/PortSolutionResult.cs @marknfawaz @Beau-Gosse-dev @saikiranakula-amzn
-/src/CTA.Rules.Update/SolutionRewriter.cs @marknfawaz @Beau-Gosse-dev @saikiranakula-amzn
+/src/CTA.WebForms/ @comsemer
 

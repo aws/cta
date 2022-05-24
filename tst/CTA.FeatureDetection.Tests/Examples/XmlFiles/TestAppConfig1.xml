@@ -1,6 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<configuration>
-	<connectionStrings>
-		<add name="default" connectionString="Data Source=localhost;Initial Catalog=EF6Example;Integrated Security=True" providerName="System.Data.SqlClient" />
-	</connectionStrings>
-</configuration>
