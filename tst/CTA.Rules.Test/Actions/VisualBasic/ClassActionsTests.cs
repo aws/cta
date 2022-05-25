@@ -422,8 +422,8 @@ End Class";
             var privateMembers = newNode.Members.OfType<MethodStatementSyntax>().Where(m =>
                 m.Modifiers.Any(modifier => modifier.IsKind(Microsoft.CodeAnalysis.CSharp.SyntaxKind.PrivateKeyword)));
 
-            Assert.IsTrue(publicMembers.All(m => m.ToFullString().Contains($"' Replace method body with {newBody}")));
-            Assert.IsTrue(privateMembers.All(m => !m.ToFullString().Contains($"' Replace method body with {newBody}")));
+            Assert.IsTrue(publicMembers.All(m => m.ToFullString().Contains($"'Added by CTA: Replace method body with {newBody}")));
+            Assert.IsTrue(privateMembers.All(m => !m.ToFullString().Contains($"'Added by CTA: Replace method body with {newBody}")));
         }
 
         [Test]

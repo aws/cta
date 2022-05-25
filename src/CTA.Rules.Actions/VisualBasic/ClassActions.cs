@@ -481,7 +481,7 @@ namespace CTA.Rules.Actions.VisualBasic
         
         private ClassBlockSyntax AddCommentToPublicMethods(ClassBlockSyntax node, string expression)
         {
-            var comment = $"' Replace method body with {expression}";
+            var comment = string.Format(Constants.VbCommentFormat, $"Replace method body with {expression}");
 
             var allMembers = node.Members.ToList();
             var allMethods = allMembers.OfType<MethodBlockSyntax>()
