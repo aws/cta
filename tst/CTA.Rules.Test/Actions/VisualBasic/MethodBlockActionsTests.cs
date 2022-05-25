@@ -122,6 +122,17 @@ namespace CTA.Rules.Test.Actions.VisualBasic
         }
 
         [Test]
+        public void AddExpressionToFunction()
+        {
+            const string expression = "Await Task.Delay(1000)";
+            var addExpressionFunc = _methodBlockActions.GetAddExpressionToMethodAction(expression);
+            var newNode = addExpressionFunc(_syntaxGenerator, _functionNode);
+            
+            StringAssert.Contains(expression, newNode.ToFullString());
+            Assert.IsTrue(newNode.Statements.Last().IsKind(SyntaxKind.ReturnStatement));
+        }
+
+        [Test]
         public void AddParametersToMethod()
         {
             var addParamsAction = _methodBlockActions.GetAddParametersToMethodAction("String,String", "param1,param2");
@@ -136,9 +147,11 @@ namespace CTA.Rules.Test.Actions.VisualBasic
             var newNode = changeReturnToTaskFunc(_syntaxGenerator, _subNode);
             
             StringAssert.Contains("Task", newNode.ToFullString());
+            StringAssert.Contains("Async", newNode.ToFullString());
             Assert.True(newNode.SubOrFunctionStatement.IsKind(SyntaxKind.FunctionStatement));
 
             var newFunction = changeReturnToTaskFunc(_syntaxGenerator, _functionNode);
+            StringAssert.Contains("Async", newFunction.ToFullString());
             StringAssert.Contains("Task(Of Integer)", newFunction.ToFullString());
         }
 

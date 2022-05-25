@@ -32,11 +32,14 @@ namespace CTA.Rules.Actions.VisualBasic
             // TODO: This will add an expression at the bottom of a method body, in the future we should add granularity for where to add the expression within a method body
             Func<SyntaxGenerator, MethodBlockSyntax, MethodBlockSyntax> appendExpression = (SyntaxGenerator syntaxGenerator, MethodBlockSyntax node) =>
             {
-                StatementSyntax statementExpression = SyntaxFactory.ParseExecutableStatement(expression);
-                if(!statementExpression.FullSpan.IsEmpty)
+                StatementSyntax statementExpression = expression.Contains("Await")
+                    ? ParseAwaitExpression(expression)
+                    : SyntaxFactory.ParseExecutableStatement(expression);
+                if (!statementExpression.FullSpan.IsEmpty)
                 {
                     node = node.AddStatements(statementExpression).NormalizeWhitespace();
                 }
+
                 return node;
             };
             return appendExpression;
@@ -58,7 +61,7 @@ namespace CTA.Rules.Actions.VisualBasic
             MethodBlockSyntax ChangeMethodToReturnTaskType(SyntaxGenerator syntaxGenerator, MethodBlockSyntax node)
             {
                 var methodStatement = node.SubOrFunctionStatement;
-                SimpleAsClauseSyntax oldAsClause = methodStatement.AsClause;
+                var oldAsClause = methodStatement.AsClause;
                 if (methodStatement.IsKind(SyntaxKind.SubStatement))
                 {
                     // if sub, convert to function and return task
@@ -66,7 +69,7 @@ namespace CTA.Rules.Actions.VisualBasic
                     functionStatement =
                         functionStatement.WithAsClause(
                                 SyntaxFactory.SimpleAsClause(SyntaxFactory.IdentifierName("Task")))
-                            .WithModifiers(methodStatement.Modifiers);
+                            .WithModifiers(methodStatement.Modifiers.Add(SyntaxFactory.Token(SyntaxKind.AsyncKeyword)));
 
                     var newNode = SyntaxFactory.MethodBlock(SyntaxKind.FunctionBlock,
                         functionStatement, node.Statements, SyntaxFactory.EndFunctionStatement());
@@ -76,7 +79,8 @@ namespace CTA.Rules.Actions.VisualBasic
                 // already function, need to wrap return in task
                 var genericName =
                     SyntaxFactory.GenericName("Task", SyntaxFactory.TypeArgumentList(oldAsClause.Type));
-                methodStatement = methodStatement.WithAsClause(SyntaxFactory.SimpleAsClause(genericName));
+                methodStatement = methodStatement.WithAsClause(SyntaxFactory.SimpleAsClause(genericName))
+                    .WithModifiers(methodStatement.Modifiers.Add(SyntaxFactory.Token(SyntaxKind.AsyncKeyword)));
                 return node.WithSubOrFunctionStatement(methodStatement).NormalizeWhitespace();
             }
             return ChangeMethodToReturnTaskType;
@@ -91,7 +95,7 @@ namespace CTA.Rules.Actions.VisualBasic
                     node.SubOrFunctionStatement
                         .WithParameterList(SyntaxFactory.ParameterList(SyntaxFactory.SeparatedList(parameters)))
                         .NormalizeWhitespace();
-                return node.WithSubOrFunctionStatement(newMethodStatement);
+                return node.WithSubOrFunctionStatement(newMethodStatement).NormalizeWhitespace();
             }
             return RemoveMethodParametersAction;
         }
@@ -155,7 +159,7 @@ namespace CTA.Rules.Actions.VisualBasic
                      return addCommentsToMethodFunc(syntaxGenerator, newMethodNode);
                  }
             
-                 return newMethodNode;
+                 return newMethodNode.NormalizeWhitespace();
              }
             return CommentMethodAction;
         }
@@ -165,14 +169,37 @@ namespace CTA.Rules.Actions.VisualBasic
             MethodBlockSyntax AddExpressionToMethodAction(SyntaxGenerator syntaxGenerator, MethodBlockSyntax node)
             {
                 var newMethodNode = node;
-                StatementSyntax parsedExpression = SyntaxFactory.ParseExecutableStatement(expression);
+                var parsedExpression = expression.Contains("Await")
+                    ? ParseAwaitExpression(expression)
+                    : SyntaxFactory.ParseExecutableStatement(expression);
                 if (!parsedExpression.FullSpan.IsEmpty)
                 {
-                    newMethodNode = node.AddStatements(new StatementSyntax[] { parsedExpression }).NormalizeWhitespace();
+                    var body = node.Statements;
+                    int returnIndex = body.IndexOf(s => s.IsKind(SyntaxKind.ReturnStatement));
+                    if (returnIndex >= 0)
+                    {
+                        // insert new statement before return
+                        body = body.Insert(returnIndex, parsedExpression);
+                        newMethodNode = node.WithStatements(body);
+                    }
+                    else
+                    {
+                        newMethodNode = node.AddStatements(parsedExpression);
+                    }
                 }
-                return newMethodNode;
+
+                return newMethodNode.NormalizeWhitespace();
             }
+
             return AddExpressionToMethodAction;
+        }
+        
+        private StatementSyntax ParseAwaitExpression(string expression)
+        {
+            expression = expression.Replace("Await", "", StringComparison.OrdinalIgnoreCase);
+            var parsedExpression = SyntaxFactory.ParseExpression(expression);
+            var awaitExpression = SyntaxFactory.AwaitExpression(parsedExpression);
+            return SyntaxFactory.ExpressionStatement(awaitExpression);
         }
     }
 }
