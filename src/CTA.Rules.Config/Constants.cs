@@ -121,6 +121,19 @@ namespace CTA.Rules.Config
 
         public static readonly List<string> SupportedMethodModifiers = new List<string>() { "public", "internal", "protected", "private", "abstract", "extern", "override", "static", "unsafe", "virtual", "async" };
 
+        public static readonly List<string> SupportedVbMethodModifiers = new()
+        {
+            "Public",
+            "Internal",
+            "Protected",
+            "Private",
+            "Friend",
+            "Overrides",
+            "Shared",
+            "Overridable",
+            "Async"
+        };
+
         //Monolith code constants
         public const string Await = "await";
         public const string TaskActionResult = "Task<ActionResult>";

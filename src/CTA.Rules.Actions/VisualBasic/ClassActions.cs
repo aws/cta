@@ -14,9 +14,9 @@ namespace CTA.Rules.Actions.VisualBasic
     /// </summary>
     public class ClassActions
     {
-        public Func<SyntaxGenerator, ClassBlockSyntax, ClassBlockSyntax> GetRemoveBaseClassAction(string baseClass)
+        public Func<SyntaxGenerator, TypeBlockSyntax, TypeBlockSyntax> GetRemoveBaseClassAction(string baseClass)
         {
-            ClassBlockSyntax RemoveBaseClass(SyntaxGenerator syntaxGenerator, ClassBlockSyntax node)
+            TypeBlockSyntax RemoveBaseClass(SyntaxGenerator syntaxGenerator, TypeBlockSyntax node)
             {
                 var currentBaseTypes = node.Inherits.FirstOrDefault()?.Types ?? new SeparatedSyntaxList<TypeSyntax>();
                 SeparatedSyntaxList<TypeSyntax> newBaseTypes = new SeparatedSyntaxList<TypeSyntax>();
@@ -40,13 +40,13 @@ namespace CTA.Rules.Actions.VisualBasic
             return RemoveBaseClass;
         }
         
-        public Func<SyntaxGenerator, ClassBlockSyntax, ClassBlockSyntax> GetAddBaseClassAction(string baseClass)
+        public Func<SyntaxGenerator, TypeBlockSyntax, TypeBlockSyntax> GetAddBaseClassAction(string baseClass)
         {
-            ClassBlockSyntax AddBaseClass(SyntaxGenerator syntaxGenerator, ClassBlockSyntax node)
+            TypeBlockSyntax AddBaseClass(SyntaxGenerator syntaxGenerator, TypeBlockSyntax node)
             {
                 if (syntaxGenerator != null)
                 {
-                    node = (ClassBlockSyntax)syntaxGenerator.AddBaseType(node, SyntaxFactory.ParseName(baseClass));
+                    node = (TypeBlockSyntax)syntaxGenerator.AddBaseType(node, SyntaxFactory.ParseName(baseClass));
                 }
                 else
                 {
@@ -58,22 +58,22 @@ namespace CTA.Rules.Actions.VisualBasic
             return AddBaseClass;
         }
         
-        public Func<SyntaxGenerator, ClassBlockSyntax, ClassBlockSyntax> GetChangeNameAction(string className)
+        public Func<SyntaxGenerator, TypeBlockSyntax, TypeBlockSyntax> GetChangeNameAction(string className)
         {
-            ClassBlockSyntax ChangeName(SyntaxGenerator syntaxGenerator, ClassBlockSyntax node)
+            TypeBlockSyntax ChangeName(SyntaxGenerator syntaxGenerator, TypeBlockSyntax node)
             {
-                node = node.WithClassStatement(SyntaxFactory.ClassStatement(SyntaxFactory.Identifier(className)))
+                node = node.WithBlockStatement(node.BlockStatement.WithIdentifier(SyntaxFactory.Identifier(className)))
                     .NormalizeWhitespace();
                 return node;
             }
             return ChangeName;
         }
         
-        public Func<SyntaxGenerator, ClassBlockSyntax, ClassBlockSyntax> GetRemoveAttributeAction(string attributeName)
+        public Func<SyntaxGenerator, TypeBlockSyntax, TypeBlockSyntax> GetRemoveAttributeAction(string attributeName)
         {
-            ClassBlockSyntax RemoveAttribute(SyntaxGenerator syntaxGenerator, ClassBlockSyntax node)
+            TypeBlockSyntax RemoveAttribute(SyntaxGenerator syntaxGenerator, TypeBlockSyntax node)
             {
-                var attributeLists = node.ClassStatement.AttributeLists;
+                var attributeLists = node.BlockStatement.AttributeLists;
                 AttributeListSyntax attributeToRemove = null;
 
                 foreach (var attributeList in attributeLists)
@@ -93,32 +93,32 @@ namespace CTA.Rules.Actions.VisualBasic
                     attributeLists = attributeLists.Remove(attributeToRemove);
                 }
 
-                node = node.WithClassStatement(node.ClassStatement.WithAttributeLists(attributeLists))
+                node = node.WithBlockStatement(node.BlockStatement.WithAttributeLists(attributeLists))
                     .NormalizeWhitespace();
                 return node;
             }
 
             return RemoveAttribute;
         }
-        public Func<SyntaxGenerator, ClassBlockSyntax, ClassBlockSyntax> GetAddAttributeAction(string attribute)
+        public Func<SyntaxGenerator, TypeBlockSyntax, TypeBlockSyntax> GetAddAttributeAction(string attribute)
         {
-            ClassBlockSyntax AddAttribute(SyntaxGenerator syntaxGenerator, ClassBlockSyntax node)
+            TypeBlockSyntax AddAttribute(SyntaxGenerator syntaxGenerator, TypeBlockSyntax node)
             {
-                var attributeLists = node.ClassStatement.AttributeLists;
+                var attributeLists = node.BlockStatement.AttributeLists;
                 attributeLists = attributeLists.Add(
                             SyntaxFactory.AttributeList(
                                 SyntaxFactory.SingletonSeparatedList<AttributeSyntax>(
                                     SyntaxFactory.Attribute(SyntaxFactory.ParseName(attribute)))));
 
-                node = node.WithClassStatement(node.ClassStatement.WithAttributeLists(attributeLists))
+                node = node.WithBlockStatement(node.BlockStatement.WithAttributeLists(attributeLists))
                     .NormalizeWhitespace();
                 return node;
             }
             return AddAttribute;
         }
-        public Func<SyntaxGenerator, ClassBlockSyntax, ClassBlockSyntax> GetAddCommentAction(string comment, string dontUseCTAPrefix = null)
+        public Func<SyntaxGenerator, TypeBlockSyntax, TypeBlockSyntax> GetAddCommentAction(string comment, string dontUseCTAPrefix = null)
         {
-            ClassBlockSyntax AddComment(SyntaxGenerator syntaxGenerator, ClassBlockSyntax node)
+            TypeBlockSyntax AddComment(SyntaxGenerator syntaxGenerator, TypeBlockSyntax node)
             {
                 SyntaxTriviaList currentTrivia = node.GetLeadingTrivia();
                 var commentFormat = dontUseCTAPrefix != null ? Constants.VbCommentFormatBlank : Constants.VbCommentFormat;
@@ -128,30 +128,24 @@ namespace CTA.Rules.Actions.VisualBasic
             }
             return AddComment;
         }
-        public Func<SyntaxGenerator, ClassBlockSyntax, ClassBlockSyntax> GetAddMethodAction(string expression)
+        public Func<SyntaxGenerator, TypeBlockSyntax, TypeBlockSyntax> GetAddMethodAction(string expression)
         {
-            ClassBlockSyntax AddMethod(SyntaxGenerator syntaxGenerator, ClassBlockSyntax node)
+            TypeBlockSyntax AddMethod(SyntaxGenerator syntaxGenerator, TypeBlockSyntax node)
             {
-                var methodSyntax = SyntaxFactory.ParseSyntaxTree(expression).GetRoot().DescendantNodes()
-                    .OfType<MethodStatementSyntax>().FirstOrDefault();
                 var methodBlockSyntax = SyntaxFactory.ParseSyntaxTree(expression).GetRoot().DescendantNodes()
                     .OfType<MethodBlockSyntax>().FirstOrDefault();
                 if (methodBlockSyntax != null)
                 {
-                    node = node.AddMembers(methodBlockSyntax.SubOrFunctionStatement);
-                    foreach (var statement in methodBlockSyntax.Statements)
-                    {
-                        node = node.AddMembers(statement);
-                    }
+                    node = node.AddMembers(methodBlockSyntax);
                 }
                 return node.NormalizeWhitespace();
             }
             return AddMethod;
         }
-        public Func<SyntaxGenerator, ClassBlockSyntax, ClassBlockSyntax> GetRemoveMethodAction(string methodName)
+        public Func<SyntaxGenerator, TypeBlockSyntax, TypeBlockSyntax> GetRemoveMethodAction(string methodName)
         {
             //TODO  what if there is operator overloading 
-            ClassBlockSyntax RemoveMethod(SyntaxGenerator syntaxGenerator, ClassBlockSyntax node)
+            TypeBlockSyntax RemoveMethod(SyntaxGenerator syntaxGenerator, TypeBlockSyntax node)
             {
                 var allMembers = node.Members.ToList();
                 var allMethods = allMembers.OfType<MethodStatementSyntax>();
@@ -168,30 +162,41 @@ namespace CTA.Rules.Actions.VisualBasic
             }
             return RemoveMethod;
         }
-        public Func<SyntaxGenerator, ClassBlockSyntax, ClassBlockSyntax> GetRenameClassAction(string newClassName)
+        public Func<SyntaxGenerator, TypeBlockSyntax, TypeBlockSyntax> GetRenameClassAction(string newClassName)
         {
-            ClassBlockSyntax RenameClass(SyntaxGenerator syntaxGenerator, ClassBlockSyntax node)
+            TypeBlockSyntax RenameClass(SyntaxGenerator syntaxGenerator, TypeBlockSyntax node)
             {
-                node = node.WithClassStatement(node.ClassStatement.WithIdentifier(SyntaxFactory.Identifier(newClassName))).NormalizeWhitespace();
+                node = node.WithBlockStatement(node.BlockStatement.WithIdentifier(SyntaxFactory.Identifier(newClassName))).NormalizeWhitespace();
                 return node;
             }
             return RenameClass;
         }
-        public Func<SyntaxGenerator, ClassBlockSyntax, ClassBlockSyntax> GetReplaceMethodModifiersAction(string methodName, string modifiers)
+        public Func<SyntaxGenerator, TypeBlockSyntax, TypeBlockSyntax> GetReplaceMethodModifiersAction(string methodName, string modifiers)
         {
-            ClassBlockSyntax ReplaceMethodModifiers(SyntaxGenerator syntaxGenerator, ClassBlockSyntax node)
+            TypeBlockSyntax ReplaceMethodModifiers(SyntaxGenerator syntaxGenerator, TypeBlockSyntax node)
             {
-                var allMembers = node.Members.ToList();
-                var allMethods = allMembers.OfType<MethodStatementSyntax>();
+                var allMethods = node.Members.OfType<MethodStatementSyntax>();
                 if (allMethods.Any())
                 {
                     var replaceMethod = allMethods.FirstOrDefault(m => m.Identifier.ToString() == methodName);
                     if (replaceMethod != null)
                     {
-                        var allModifiersAreValid = modifiers.Split(new char[] { ' ', ',' }).All(m => Constants.SupportedMethodModifiers.Contains(m));
-                        if (allModifiersAreValid)
+                        var allModifiers = modifiers.Split(new char[] { ' ', ',' });
+                        if (allModifiers.All(m => Constants.SupportedVbMethodModifiers.Contains(m)))
                         {
-                            SyntaxTokenList tokenList = new SyntaxTokenList(SyntaxFactory.ParseTokens(modifiers));
+                            SyntaxTokenList tokenList = new SyntaxTokenList();
+                            foreach (string m in allModifiers)
+                            {
+                                if (m == "Async")
+                                {
+                                    // for some reason syntax factory can't parse that async is a keyword
+                                    tokenList = tokenList.Add(SyntaxFactory.Token(SyntaxKind.AsyncKeyword));
+                                }
+                                else
+                                {
+                                    tokenList = tokenList.Add(SyntaxFactory.ParseToken(m));
+                                }
+                            }
                             var newMethod = replaceMethod.WithModifiers(tokenList);
 
                             node = node.WithMembers(node.Members.Replace(replaceMethod, newMethod)).NormalizeWhitespace();
@@ -203,9 +208,9 @@ namespace CTA.Rules.Actions.VisualBasic
             }
             return ReplaceMethodModifiers;
         }
-        public Func<SyntaxGenerator, ClassBlockSyntax, ClassBlockSyntax> GetAddExpressionAction(string expression)
+        public Func<SyntaxGenerator, TypeBlockSyntax, TypeBlockSyntax> GetAddExpressionAction(string expression)
         {
-            ClassBlockSyntax AddExpression(SyntaxGenerator syntaxGenerator, ClassBlockSyntax node)
+            TypeBlockSyntax AddExpression(SyntaxGenerator syntaxGenerator, TypeBlockSyntax node)
             {
                 var parsedExpression = SyntaxFactory.ParseExecutableStatement(expression);
                 if (!parsedExpression.FullSpan.IsEmpty)
@@ -218,9 +223,9 @@ namespace CTA.Rules.Actions.VisualBasic
             }
             return AddExpression;
         }
-        public Func<SyntaxGenerator, ClassBlockSyntax, ClassBlockSyntax> GetRemoveConstructorInitializerAction(string initializerArgument)
+        public Func<SyntaxGenerator, TypeBlockSyntax, TypeBlockSyntax> GetRemoveConstructorInitializerAction(string initializerArgument)
         {
-            ClassBlockSyntax RemoveConstructorInitializer(SyntaxGenerator syntaxGenerator, ClassBlockSyntax node)
+            TypeBlockSyntax RemoveConstructorInitializer(SyntaxGenerator syntaxGenerator, TypeBlockSyntax node)
             {
                 var constructor = node.ChildNodes().FirstOrDefault(c => c.IsKind(SyntaxKind.ConstructorBlock));
                 if (constructor != null)
@@ -257,9 +262,9 @@ namespace CTA.Rules.Actions.VisualBasic
 
             return RemoveConstructorInitializer;
         }
-        public Func<SyntaxGenerator, ClassBlockSyntax, ClassBlockSyntax> GetAppendConstructorExpressionAction(string expression)
+        public Func<SyntaxGenerator, TypeBlockSyntax, TypeBlockSyntax> GetAppendConstructorExpressionAction(string expression)
         {
-            ClassBlockSyntax AppendConstructorExpression(SyntaxGenerator syntaxGenerator, ClassBlockSyntax node)
+            TypeBlockSyntax AppendConstructorExpression(SyntaxGenerator syntaxGenerator, TypeBlockSyntax node)
             {
                 var constructor = node.Members.FirstOrDefault(c => c.IsKind(SyntaxKind.ConstructorBlock));
                 if (constructor != null)
@@ -277,9 +282,9 @@ namespace CTA.Rules.Actions.VisualBasic
             return AppendConstructorExpression;
         }
 
-        public Func<SyntaxGenerator, ClassBlockSyntax, ClassBlockSyntax> GetCreateConstructorAction(string types, string identifiers)
+        public Func<SyntaxGenerator, TypeBlockSyntax, TypeBlockSyntax> GetCreateConstructorAction(string types, string identifiers)
         {
-            ClassBlockSyntax CreateConstructor(SyntaxGenerator syntaxGenerator, ClassBlockSyntax node)
+            TypeBlockSyntax CreateConstructor(SyntaxGenerator syntaxGenerator, TypeBlockSyntax node)
             {
                 // constructors in vb are just named new
                 var constructorStatementNode = SyntaxFactory.SubNewStatement()
@@ -313,9 +318,9 @@ namespace CTA.Rules.Actions.VisualBasic
             return CreateConstructor;
         }
 
-        public Func<SyntaxGenerator, ClassBlockSyntax, ClassBlockSyntax> GetChangeMethodNameAction(string existingMethodName, string newMethodName)
+        public Func<SyntaxGenerator, TypeBlockSyntax, TypeBlockSyntax> GetChangeMethodNameAction(string existingMethodName, string newMethodName)
         {
-            ClassBlockSyntax ChangeMethodName(SyntaxGenerator syntaxGenerator, ClassBlockSyntax node)
+            TypeBlockSyntax ChangeMethodName(SyntaxGenerator syntaxGenerator, TypeBlockSyntax node)
             {
                 // if we have more than one method with same name return without making changes
                 var methodNode = GetMethodNode(node, existingMethodName);
@@ -331,9 +336,9 @@ namespace CTA.Rules.Actions.VisualBasic
             return ChangeMethodName;
         }
 
-        public Func<SyntaxGenerator, ClassBlockSyntax, ClassBlockSyntax> GetChangeMethodToReturnTaskTypeAction(string methodName)
+        public Func<SyntaxGenerator, TypeBlockSyntax, TypeBlockSyntax> GetChangeMethodToReturnTaskTypeAction(string methodName)
         {
-            ClassBlockSyntax ChangeMethodToReturnTaskType(SyntaxGenerator syntaxGenerator, ClassBlockSyntax node)
+            TypeBlockSyntax ChangeMethodToReturnTaskType(SyntaxGenerator syntaxGenerator, TypeBlockSyntax node)
             {
                 // if we have more than one method with same name return without making changes
                 var methodNode = GetMethodNode(node, methodName);
@@ -349,9 +354,9 @@ namespace CTA.Rules.Actions.VisualBasic
             return ChangeMethodToReturnTaskType;
         }
 
-        public Func<SyntaxGenerator, ClassBlockSyntax, ClassBlockSyntax> GetRemoveMethodParametersAction(string methodName)
+        public Func<SyntaxGenerator, TypeBlockSyntax, TypeBlockSyntax> GetRemoveMethodParametersAction(string methodName)
         {
-            ClassBlockSyntax RemoveMethodParameters(SyntaxGenerator syntaxGenerator, ClassBlockSyntax node)
+            TypeBlockSyntax RemoveMethodParameters(SyntaxGenerator syntaxGenerator, TypeBlockSyntax node)
             {
                 // if we have more than one method with same name return without making changes
                 var methodNode = GetMethodNode(node, methodName);
@@ -368,9 +373,9 @@ namespace CTA.Rules.Actions.VisualBasic
             return RemoveMethodParameters;
         }
 
-        public Func<SyntaxGenerator, ClassBlockSyntax, ClassBlockSyntax> GetCommentMethodAction(string methodName, string comment = null, string dontUseCTAPrefix = null)
+        public Func<SyntaxGenerator, TypeBlockSyntax, TypeBlockSyntax> GetCommentMethodAction(string methodName, string comment = null, string dontUseCTAPrefix = null)
         {
-            ClassBlockSyntax CommentMethod(SyntaxGenerator syntaxGenerator, ClassBlockSyntax node)
+            TypeBlockSyntax CommentMethod(SyntaxGenerator syntaxGenerator, TypeBlockSyntax node)
             {
                 // if we have more than one method with same name return without making changes
                 var methodNode = GetMethodNode(node, methodName);
@@ -393,16 +398,16 @@ namespace CTA.Rules.Actions.VisualBasic
                     trivia = trivia.Add(methodEndStatementComment);
 
                     node = node.RemoveNode(methodNode, SyntaxRemoveOptions.KeepNoTrivia);
-                    node = node.WithEndClassStatement(node.EndClassStatement.WithLeadingTrivia(trivia));
+                    node = node.WithEndBlockStatement(node.EndBlockStatement.WithLeadingTrivia(trivia));
                 }
                 return node.NormalizeWhitespace();
             }
             return CommentMethod;
         }
 
-        public Func<SyntaxGenerator, ClassBlockSyntax, ClassBlockSyntax> GetAddCommentsToMethodAction(string methodName, string comment, string dontUseCTAPrefix = null)
+        public Func<SyntaxGenerator, TypeBlockSyntax, TypeBlockSyntax> GetAddCommentsToMethodAction(string methodName, string comment, string dontUseCTAPrefix = null)
         {
-            ClassBlockSyntax AddCommentsToMethod(SyntaxGenerator syntaxGenerator, ClassBlockSyntax node)
+            TypeBlockSyntax AddCommentsToMethod(SyntaxGenerator syntaxGenerator, TypeBlockSyntax node)
             {
                 // if we have more than one method with same name return without making changes
                 var methodNode = GetMethodNode(node, methodName);
@@ -421,9 +426,9 @@ namespace CTA.Rules.Actions.VisualBasic
             return AddCommentsToMethod;
         }
 
-        public Func<SyntaxGenerator, ClassBlockSyntax, ClassBlockSyntax> GetAddExpressionToMethodAction(string methodName, string expression)
+        public Func<SyntaxGenerator, TypeBlockSyntax, TypeBlockSyntax> GetAddExpressionToMethodAction(string methodName, string expression)
         {
-            ClassBlockSyntax AddExpressionToMethod(SyntaxGenerator syntaxGenerator, ClassBlockSyntax node)
+            TypeBlockSyntax AddExpressionToMethod(SyntaxGenerator syntaxGenerator, TypeBlockSyntax node)
             {
                 // if we have more than one method with same name return without making changes
                 var methodNode = GetMethodNode(node, methodName);
@@ -439,9 +444,9 @@ namespace CTA.Rules.Actions.VisualBasic
             return AddExpressionToMethod;
         }
 
-        public Func<SyntaxGenerator, ClassBlockSyntax, ClassBlockSyntax> GetAddParametersToMethodAction(string methodName, string types, string identifiers)
+        public Func<SyntaxGenerator, TypeBlockSyntax, TypeBlockSyntax> GetAddParametersToMethodAction(string methodName, string types, string identifiers)
         {
-            ClassBlockSyntax AddParametersToMethod(SyntaxGenerator syntaxGenerator, ClassBlockSyntax node)
+            TypeBlockSyntax AddParametersToMethod(SyntaxGenerator syntaxGenerator, TypeBlockSyntax node)
             {
                 // if we have more than one method with same name return without making changes
                 var methodNode = GetMethodNode(node, methodName);
@@ -457,29 +462,29 @@ namespace CTA.Rules.Actions.VisualBasic
             return AddParametersToMethod;
         }
 
-        public Func<SyntaxGenerator, ClassBlockSyntax, ClassBlockSyntax> GetReplaceMvcControllerMethodsBodyAction(string expression)
+        public Func<SyntaxGenerator, TypeBlockSyntax, TypeBlockSyntax> GetReplaceMvcControllerMethodsBodyAction(string expression)
         {
             throw new NotImplementedException();
         }
     
-        public Func<SyntaxGenerator, ClassBlockSyntax, ClassBlockSyntax> GetReplaceWebApiControllerMethodsBodyAction(string expression)
+        public Func<SyntaxGenerator, TypeBlockSyntax, TypeBlockSyntax> GetReplaceWebApiControllerMethodsBodyAction(string expression)
         {
-            ClassBlockSyntax ReplaceMethodBodyFunc(SyntaxGenerator syntaxGenerator, ClassBlockSyntax node)
+            TypeBlockSyntax ReplaceMethodBodyFunc(SyntaxGenerator syntaxGenerator, TypeBlockSyntax node)
             {
                 return AddCommentToPublicMethods(node, expression);
             }
             return ReplaceMethodBodyFunc;
         }
-        public Func<SyntaxGenerator, ClassBlockSyntax, ClassBlockSyntax> GetReplaceCoreControllerMethodsBodyAction(string expression)
+        public Func<SyntaxGenerator, TypeBlockSyntax, TypeBlockSyntax> GetReplaceCoreControllerMethodsBodyAction(string expression)
         {
-            ClassBlockSyntax ReplaceMethodModifiers(SyntaxGenerator syntaxGenerator, ClassBlockSyntax node)
+            TypeBlockSyntax ReplaceCoreControllerMethodsBody(SyntaxGenerator syntaxGenerator, TypeBlockSyntax node)
             {
                 return AddCommentToPublicMethods(node, expression);
             }
-            return ReplaceMethodModifiers;
+            return ReplaceCoreControllerMethodsBody;
         }
         
-        private ClassBlockSyntax AddCommentToPublicMethods(ClassBlockSyntax node, string expression)
+        private TypeBlockSyntax AddCommentToPublicMethods(TypeBlockSyntax node, string expression)
         {
             var comment = string.Format(Constants.VbCommentFormat, $"Replace method body with {expression}");
 
@@ -509,7 +514,7 @@ namespace CTA.Rules.Actions.VisualBasic
             return $"{method.Identifier}{method.ParameterList}";
         }
 
-        private MethodBlockSyntax GetMethodNode(ClassBlockSyntax node, string methodName)
+        private MethodBlockSyntax GetMethodNode(TypeBlockSyntax node, string methodName)
         {
             var methodNodeList = node.DescendantNodes().OfType<MethodBlockSyntax>()
                 .Where(method => method.SubOrFunctionStatement.Identifier.Text == methodName);
