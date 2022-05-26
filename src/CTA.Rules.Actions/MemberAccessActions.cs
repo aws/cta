@@ -4,9 +4,8 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Editing;
-using System.Linq;
 
-namespace CTA.Rules.Update.Csharp
+namespace CTA.Rules.Update
 {
     /// <summary>
     /// List of actions that can run on Member Accesses
@@ -18,7 +17,19 @@ namespace CTA.Rules.Update.Csharp
             SyntaxNode AddComment(SyntaxGenerator syntaxGenerator, SyntaxNode node)
             {
                 SyntaxTriviaList currentTrivia = node.GetLeadingTrivia();
-                currentTrivia = currentTrivia.Insert(0, SyntaxFactory.SyntaxTrivia(SyntaxKind.MultiLineCommentTrivia, string.Format(Constants.CommentFormat, comment)));
+                if (node is Microsoft.CodeAnalysis.VisualBasic.Syntax.MemberAccessExpressionSyntax)
+                {
+                    currentTrivia = currentTrivia.Insert(0,
+                        Microsoft.CodeAnalysis.VisualBasic.SyntaxFactory.SyntaxTrivia(
+                            Microsoft.CodeAnalysis.VisualBasic.SyntaxKind.CommentTrivia,
+                            string.Format(Constants.VbCommentFormat, comment)));
+                }
+                else
+                {
+                    currentTrivia = currentTrivia.Insert(0,
+                        SyntaxFactory.SyntaxTrivia(SyntaxKind.MultiLineCommentTrivia,
+                            string.Format(Constants.CommentFormat, comment)));
+                }
                 node = node.WithLeadingTrivia(currentTrivia).NormalizeWhitespace();
                 return node;
             }
@@ -32,6 +43,10 @@ namespace CTA.Rules.Update.Csharp
                 if(node is MemberAccessExpressionSyntax)
                 {
                     return (node as MemberAccessExpressionSyntax).Expression;
+                }
+                if (node is Microsoft.CodeAnalysis.VisualBasic.Syntax.MemberAccessExpressionSyntax)
+                {
+                    return (node as Microsoft.CodeAnalysis.VisualBasic.Syntax.MemberAccessExpressionSyntax).Expression;
                 }
                 return node;
             }
