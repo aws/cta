@@ -84,6 +84,8 @@ namespace CTA.Rules.Config
         public const string InterfaceActions = "InterfaceActions";
         public const string ProjectFileActions = "ProjectFileActions";
         public const string ProjectTypeActions = "ProjectTypeActions";
+        public const string TypeBlockActions = "TypeBlockActions";
+        public const string MethodBlockActions = "MethodBlockActions";
 
         public const string ProjectRecommendationFile = "project.all";
 
