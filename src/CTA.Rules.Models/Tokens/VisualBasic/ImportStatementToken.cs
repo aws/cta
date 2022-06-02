@@ -1,5 +1,4 @@
 ﻿using System;
-using Microsoft.Build.Logging.StructuredLogger;
 
 namespace CTA.Rules.Models.Tokens.VisualBasic;
 

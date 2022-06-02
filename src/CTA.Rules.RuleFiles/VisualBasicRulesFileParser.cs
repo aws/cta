@@ -7,7 +7,6 @@ using CTA.Rules.Config;
 using CTA.Rules.Models;
 using CTA.Rules.Models.VisualBasic;
 using CTA.Rules.Models.Tokens.VisualBasic;
-using Microsoft.Build.Logging.StructuredLogger;
 using Microsoft.CodeAnalysis.VisualBasic.Syntax;
 using Newtonsoft.Json;
 using IdentifierNameToken = CTA.Rules.Models.VisualBasic.IdentifierNameToken;
@@ -148,14 +147,12 @@ namespace CTA.Rules.RuleFiles
                 {
                     if (@class.Actions != null && @class.Actions.Count > 0)
                     {
-                        /*
-                        if (@class.KeyType == CTA.Rules.Config.Constants.BaseClass || @class.KeyType == CTA.Rules.Config.Constants.ClassName)
+                        if (@class.KeyType is Constants.BaseClass or Constants.ClassName)
                         {
-                            var token = new ClassDeclarationToken() { Key = @class.FullKey, FullKey = @class.FullKey, Namespace = @namespace.@namespace };
-                            if (!_rootNodes.Classdeclarationtokens.Contains(token)) { _rootNodes.Classdeclarationtokens.Add(token); }
+                            var token = new TypeBlockToken() { Key = @class.FullKey, FullKey = @class.FullKey, Namespace = @namespace.@namespace };
+                            if (!_visualBasicRootNodes.TypeBlockTokens.Contains(token)) { _visualBasicRootNodes.TypeBlockTokens.Add(token); }
                             ParseActions(token, @class.Actions);
                         }
-                        */
                         if (@class.KeyType == CTA.Rules.Config.Constants.Identifier)
                         {
                             var token = new IdentifierNameToken
@@ -453,9 +450,22 @@ namespace CTA.Rules.RuleFiles
                         }
                         case ActionTypes.Class:
                         {
+                            var actionFunc = _actionsLoader.GetClassAction(action.Name, action.Value);
+                            if (actionFunc != null)
+                            {
+                                visualBasicNodeToken.TypeBlockActions.Add(new TypeBlockAction()
+                                {
+                                    Key = visualBasicNodeToken.Key,
+                                    Value = GetActionValue(action.Value),
+                                    Description = action.Description,
+                                    ActionValidation = action.ActionValidation,
+                                    Name = action.Name,
+                                    Type = action.Type,
+                                    TypeBlockActionFunc = actionFunc
+                                });
+                            }
                             break;
                         }
-
                         case ActionTypes.Interface:
                         {
                             break;

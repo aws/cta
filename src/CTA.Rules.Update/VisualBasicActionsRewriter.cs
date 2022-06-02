@@ -144,16 +144,16 @@ public class VisualBasicActionsRewriter : VisualBasicSyntaxRewriter, ISyntaxRewr
     public override SyntaxNode VisitClassBlock(ClassBlockSyntax node)
     {
         var classSymbol = SemanticHelper.GetDeclaredSymbol(node, _semanticModel, _preportSemanticModel);
-        ClassDeclarationSyntax newNode = (ClassDeclarationSyntax)base.VisitClassBlock(node);
+        ClassBlockSyntax newNode = (ClassBlockSyntax)base.VisitClassBlock(node);
 
-        foreach (var action in _allActions.OfType<ClassDeclarationAction>())
+        foreach (var action in _allActions.OfType<TypeBlockAction>())
         {
             if (action.Key == node.ClassStatement.Identifier.Text.Trim())
             {
                 var actionExecution = new GenericActionExecution(action, _filePath) { TimesRun = 1 };
                 try
                 {
-                    newNode = action.ClassDeclarationActionFunc(_syntaxGenerator, newNode);
+                    newNode = (ClassBlockSyntax)action.TypeBlockActionFunc(_syntaxGenerator, newNode);
                     LogHelper.LogInformation(string.Format("{0}: {1}", node.SpanStart, action.Description));
                 }
                 catch (Exception ex)

@@ -111,7 +111,7 @@ public class VisualBasicRulesAnalysis : IRulesAnalysis
                     {
                         break;
                     }
-                    case IdConstants.UsingDirectiveIdName:
+                    case IdConstants.ImportsStatementName:
                     {
                         var overrideKey = string.Empty;
 
@@ -123,7 +123,7 @@ public class VisualBasicRulesAnalysis : IRulesAnalysis
                             containsActions = true;
                         }
 
-                        //Attempt a wildcard search, if applicable. This is using directive specific because it might want to include all sub-namespaces
+                        //Attempt a wildcard search, if applicable. This is import specific because it might want to include all sub-namespaces
                         if (token == null)
                         {
                             var wildcardMatches = _visualBasicRootNodes.ImportStatementTokens
@@ -146,7 +146,7 @@ public class VisualBasicRulesAnalysis : IRulesAnalysis
                         }
                         break;
                     }
-                    case IdConstants.NamespaceIdName:
+                    case IdConstants.NamespaceBlockIdName:
                     {
                         var compareToken = new NamespaceToken { Key = child.Identifier };
                         _visualBasicRootNodes.NamespaceTokens.TryGetValue(compareToken, out var token);
@@ -161,8 +161,60 @@ public class VisualBasicRulesAnalysis : IRulesAnalysis
                         }
                         break;
                     }
-                    case IdConstants.ClassIdName:
+                    case IdConstants.ModuleBlockName:
                     {
+                        var moduleType = (ModuleBlock)child;
+                        var name = string.Concat(
+                            moduleType.Reference != null
+                                ? string.Concat(moduleType.Reference.Namespace, ".")
+                                : string.Empty, moduleType.Identifier);
+                        var nameToken = new TypeBlockToken() { FullKey = name };
+                        if (_visualBasicRootNodes.TypeBlockTokens.TryGetValue(nameToken, out var token))
+                        {
+                            AddNamedActions(fileAction, token, moduleType.Identifier, child.TextSpan);
+                            AddActions(fileAction, token, child.TextSpan);
+                            containsActions = true;
+                        }
+                        break;
+                    }
+                    case IdConstants.ClassBlockName:
+                    {
+                        var classType = (ClassBlock)child;
+                        var baseToken = new TypeBlockToken() { FullKey = classType.BaseType };
+                        if (_visualBasicRootNodes.TypeBlockTokens.TryGetValue(baseToken, out var token))
+                        {
+                            AddNamedActions(fileAction, token, classType.Identifier, child.TextSpan);
+                            AddActions(fileAction, token, child.TextSpan);
+                            containsActions = true;
+                        }
+
+                        token = null;
+                        var name = string.Concat(
+                            classType.Reference != null
+                                ? string.Concat(classType.Reference.Namespace, ".")
+                                : string.Empty, classType.Identifier);
+                        var nameToken = new TypeBlockToken() { FullKey = name };
+                        if (_visualBasicRootNodes.TypeBlockTokens.TryGetValue(nameToken, out token))
+                        {
+                            AddNamedActions(fileAction, token, classType.Identifier, child.TextSpan);
+                            AddActions(fileAction, token, child.TextSpan);
+                            containsActions = true;
+                        }
+
+                        token = null;
+                        foreach (string interfaceName in classType.Inherits)
+                        {
+                            var baseListToken = new TypeBlockToken() { FullKey = interfaceName };
+                            if (_visualBasicRootNodes.TypeBlockTokens.TryGetValue(baseListToken, out token))
+                            {
+                                AddNamedActions(fileAction, token, classType.Identifier, child.TextSpan);
+                                AddActions(fileAction, token, child.TextSpan);
+                                containsActions = true;
+                            }
+
+                            token = null;
+                        }
+                        if (AnalyzeChildren(fileAction, child.Children, ++level, parentNamespace, classType.Identifier)) { containsActions = true; }
                         break;
                     }
                     case IdConstants.InterfaceIdName:
@@ -234,12 +286,10 @@ public class VisualBasicRulesAnalysis : IRulesAnalysis
                             AddActions(fileAction, token, child.TextSpan, overrideKey);
                             containsActions = true;
                         }
-
                         if (AnalyzeChildren(fileAction, child.Children, ++level, parentNamespace, parentClass))
                         {
                             containsActions = true;
                         }
-
                         break;
                     }
                     case IdConstants.ElementAccessIdName:
@@ -379,8 +429,8 @@ public class VisualBasicRulesAnalysis : IRulesAnalysis
     /// <param name="identifier"></param>
     private void AddNamedActions(FileActions fileAction, VisualBasicNodeToken token, string identifier, TextSpan textSpan)
     {
-        fileAction.ClassDeclarationActions.UnionWith(token.ClassDeclarationActions
-            .Select(c => new ClassDeclarationAction
+        fileAction.VbTypeBlockActions.UnionWith(token.TypeBlockActions
+            .Select(c => new TypeBlockAction()
             {
                 Key = identifier,
                 Value = c.Value,
@@ -389,35 +439,9 @@ public class VisualBasicRulesAnalysis : IRulesAnalysis
                 Type = c.Type,
                 TextSpan = textSpan,
                 ActionValidation = c.ActionValidation,
-                ClassDeclarationActionFunc = c.ClassDeclarationActionFunc
+                TypeBlockActionFunc = c.TypeBlockActionFunc
             }));
-
-        fileAction.InterfaceDeclarationActions.UnionWith(token.InterfaceDeclarationActions
-            .Select(c => new InterfaceDeclarationAction
-            {
-                Key = identifier,
-                Value = c.Value,
-                Name = c.Name,
-                Type = c.Type,
-                Description = c.Description,
-                TextSpan = textSpan,
-                ActionValidation = c.ActionValidation,
-                InterfaceDeclarationActionFunc = c.InterfaceDeclarationActionFunc
-            }));
-
-        fileAction.MethodDeclarationActions.UnionWith(token.MethodDeclarationActions
-            .Select(c => new MethodDeclarationAction
-            {
-                Key = identifier,
-                Value = c.Value,
-                Description = c.Description,
-                Name = c.Name,
-                Type = c.Type,
-                TextSpan = textSpan,
-                ActionValidation = c.ActionValidation,
-                MethodDeclarationActionFunc = c.MethodDeclarationActionFunc
-            }));
-
+        
         if (fileAction.ClassDeclarationActions.Any() || fileAction.InterfaceDeclarationActions.Any() ||
             fileAction.MethodDeclarationActions.Any() || fileAction.ObjectCreationExpressionActions.Any())
         {

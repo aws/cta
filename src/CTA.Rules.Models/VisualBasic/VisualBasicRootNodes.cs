@@ -16,6 +16,7 @@ namespace CTA.Rules.Models.VisualBasic
             NamespaceTokens = new HashSet<NamespaceToken>();
             ProjectTokens = new HashSet<NodeToken>();
             IdentifierNameTokens = new HashSet<IdentifierNameToken>();
+            TypeBlockTokens = new HashSet<TypeBlockToken>();
         }
         
         public HashSet<InvocationExpressionToken> InvocationExpressionTokens { get; set; }
@@ -23,5 +24,6 @@ namespace CTA.Rules.Models.VisualBasic
         public HashSet<NamespaceToken> NamespaceTokens { get; set; }
         public HashSet<NodeToken> ProjectTokens { get; set; }
         public HashSet<IdentifierNameToken> IdentifierNameTokens { get; set; }
+        public HashSet<TypeBlockToken> TypeBlockTokens { get; set; }
     }
 }
