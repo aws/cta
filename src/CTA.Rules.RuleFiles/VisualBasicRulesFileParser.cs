@@ -65,7 +65,7 @@ namespace CTA.Rules.RuleFiles
         /// Runs the parser to merge the rules
         /// </summary>
         /// <returns>RootNodes object that contains the tokens and their associated actions</returns>
-        public Models.VisualBasic.VisualBasicRootNodes Process()
+        public VisualBasicRootNodes Process()
         {
             //Process overrides first:
             if (_overrideObject.NameSpaces != null)
@@ -123,10 +123,8 @@ namespace CTA.Rules.RuleFiles
                     //Global Actions:
                     if (@namespace.@namespace == Constants.Project && @namespace.Assembly == Constants.Project)
                     {
-                        /*
-                        var projectToken = _rootNodes.ProjectTokens.FirstOrDefault();
-                        ParseActions(projectToken, @namespace.Actions);
-                        */
+                        var projectToken = _visualBasicRootNodes.ProjectTokens.FirstOrDefault();
+                        ParseActions((VisualBasicNodeToken)projectToken, @namespace.Actions);
                     }
                     //Namespace specific actions:
                     else
@@ -401,7 +399,7 @@ namespace CTA.Rules.RuleFiles
                                     var token = new ProjectToken() { Key = recommendation.Name, Description = recommendedActions.Description, TargetCPU = targetCPUs, Namespace = @namespace.Name, FullKey = recommendation.Value };
                                     if (!_visualBasicRootNodes.ProjectTokens.Contains(token)) { _visualBasicRootNodes.ProjectTokens.Add(token); }
                                     ParseActions(token, recommendedActions.Actions);
-                                    throw new NotImplementedException();
+                                    break;
                                 }
                             }
                         }
