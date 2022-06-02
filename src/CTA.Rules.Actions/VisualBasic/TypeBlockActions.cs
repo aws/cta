@@ -12,7 +12,7 @@ namespace CTA.Rules.Actions.VisualBasic
     /// <summary>
     /// List of actions that can run on Class Blocks
     /// </summary>
-    public class ClassActions
+    public class TypeBlockActions
     {
         public Func<SyntaxGenerator, TypeBlockSyntax, TypeBlockSyntax> GetRemoveBaseClassAction(string baseClass)
         {
