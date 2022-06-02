@@ -7,14 +7,14 @@ using Microsoft.CodeAnalysis.Editing;
 using NUnit.Framework;
 using System.Collections.Generic;
 using System.Linq;
-using AttributeSyntax = Microsoft.CodeAnalysis.CSharp.Syntax.AttributeSyntax;
+using CTA.Rules.Models.VisualBasic;
 
 namespace CTA.Rules.Test.Actions.VisualBasic
 {
     public class ClassActionsTests
     {
         private SyntaxGenerator _syntaxGenerator;
-        private ClassActions _classActions;
+        private TypeBlockActions _typeBlockActions;
         private ClassBlockSyntax _node;
         private MethodBlockSyntax _subNode;
         private MethodBlockSyntax _functionNode;
@@ -28,7 +28,7 @@ namespace CTA.Rules.Test.Actions.VisualBasic
             var workspace = new AdhocWorkspace();
             var language = LanguageNames.VisualBasic;
             _syntaxGenerator = SyntaxGenerator.GetGenerator(workspace, language);
-            _classActions = new ClassActions();
+            _typeBlockActions = new TypeBlockActions();
             SyntaxTree tree = VisualBasicSyntaxTree.ParseText(@$"Class MyClass
 End Class
 
@@ -74,7 +74,7 @@ EndModule
         public void GetAddCommentAction_Adds_Leading_Comment_To_Class_Declaration(string blockType)
         {
             const string commentToAdd = "This is a comment";
-            var addCommentFunc = _classActions.GetAddCommentAction(commentToAdd);
+            var addCommentFunc = _typeBlockActions.GetAddCommentAction(commentToAdd);
             var newNode = addCommentFunc(_syntaxGenerator, _blockNodes[blockType]);
 
             var expectedResult = @$"' Added by CTA: {commentToAdd}
@@ -88,7 +88,7 @@ EndModule
         public void GetChangeNameAction_Changes_Class_Name_To_Specified_Value(string blockType)
         {
             const string newClassName = "NewClassName";
-            var changeNameFunc = _classActions.GetChangeNameAction(newClassName);
+            var changeNameFunc = _typeBlockActions.GetChangeNameAction(newClassName);
             var newNode = changeNameFunc(_syntaxGenerator, _blockNodes[blockType]);
             Assert.AreEqual(newClassName, newNode.BlockStatement.Identifier.ToString());
         }
@@ -99,7 +99,7 @@ EndModule
         public void GetRenameClassAction_Changes_Class_Name_To_Specified_Value(string blockType)
         {
             const string newClassName = "NewClassName";
-            var changeNameFunc = _classActions.GetRenameClassAction(newClassName);
+            var changeNameFunc = _typeBlockActions.GetRenameClassAction(newClassName);
             var newNode = changeNameFunc(_syntaxGenerator, _blockNodes[blockType]);
             Assert.AreEqual(newClassName, newNode.BlockStatement.Identifier.ToString());
         }
@@ -111,13 +111,13 @@ EndModule
         {
             const string attributeToRemove = "Serializable";
             var node = _blockNodes[blockType];
-            var addAttributeFunc1 = _classActions.GetAddAttributeAction("Serializable");
-            var addAttributeFunc2 = _classActions.GetAddAttributeAction("SecurityCritical");
+            var addAttributeFunc1 = _typeBlockActions.GetAddAttributeAction("Serializable");
+            var addAttributeFunc2 = _typeBlockActions.GetAddAttributeAction("SecurityCritical");
 
             var nodeWithAttributes = addAttributeFunc1(_syntaxGenerator, node);
             nodeWithAttributes = addAttributeFunc2(_syntaxGenerator, nodeWithAttributes);
             
-            var removeAttributeFunc = _classActions.GetRemoveAttributeAction(attributeToRemove);
+            var removeAttributeFunc = _typeBlockActions.GetRemoveAttributeAction(attributeToRemove);
             var newNode = removeAttributeFunc(_syntaxGenerator, nodeWithAttributes);
             Assert.IsTrue(newNode.BlockStatement.AttributeLists.ToFullString().Contains("<SecurityCritical>"));
             Assert.IsTrue(!newNode.BlockStatement.AttributeLists.ToFullString().Contains("<Serializable"));
@@ -129,7 +129,7 @@ EndModule
         public void GetAddAttributeAction_Adds_Attribute(string blockType)
         {
             const string attributeToAdd = "Serializable";
-            var addAttributeFunc = _classActions.GetAddAttributeAction(attributeToAdd);
+            var addAttributeFunc = _typeBlockActions.GetAddAttributeAction(attributeToAdd);
             var newNode = addAttributeFunc(_syntaxGenerator, _blockNodes[blockType]);
             Assert.AreEqual("<Serializable>", newNode.BlockStatement.AttributeLists.ToString());
         }
@@ -151,7 +151,7 @@ EndModule
     End Function", "module")]
         public void GetAddMethodAction_Adds_Method(string expression, string blockType)
         {
-            var addMethodFunc = _classActions.GetAddMethodAction(expression);
+            var addMethodFunc = _typeBlockActions.GetAddMethodAction(expression);
             var newNode = addMethodFunc(_syntaxGenerator, _blockNodes[blockType]);
             Assert.AreEqual(expression, newNode.Members.OfType<MethodBlockSyntax>().FirstOrDefault()?.ToString());
         }
@@ -166,7 +166,7 @@ EndModule
                 SyntaxFactory.Token(SyntaxKind.SubKeyword), methodName);
             var nodeWithMethod = _blockNodes[blockType].AddMembers(methodNode);
 
-            var removeMethodFunc = _classActions.GetRemoveMethodAction(methodName);
+            var removeMethodFunc = _typeBlockActions.GetRemoveMethodAction(methodName);
             var newNode = removeMethodFunc(_syntaxGenerator, nodeWithMethod);
 
             var expectedResult = _blockNodes[blockType].NormalizeWhitespace().ToFullString();
@@ -179,8 +179,8 @@ EndModule
         public void RemoveLastBaseClass(string blockType)
         {
             var baseClassname = "ControllerBase";
-            var addBaseClass = _classActions.GetAddBaseClassAction(baseClassname);
-            var removeBaseClassMethod = _classActions.GetRemoveBaseClassAction(baseClassname);
+            var addBaseClass = _typeBlockActions.GetAddBaseClassAction(baseClassname);
+            var removeBaseClassMethod = _typeBlockActions.GetRemoveBaseClassAction(baseClassname);
 
             var nodeWithClass = addBaseClass(_syntaxGenerator, _blockNodes[blockType]);
             nodeWithClass = removeBaseClassMethod(_syntaxGenerator, nodeWithClass);
@@ -200,7 +200,7 @@ EndModule
             var nodeWithMethod = _blockNodes[blockType].AddMembers(methodNode);
 
             var modifier = "Private Async";
-            var replaceModifier = _classActions.GetReplaceMethodModifiersAction(methodName, modifier);
+            var replaceModifier = _typeBlockActions.GetReplaceMethodModifiersAction(methodName, modifier);
 
             var node = replaceModifier(_syntaxGenerator, nodeWithMethod);
 
@@ -214,7 +214,7 @@ EndModule
         {
             string expression = "Dim _next As RequestDelegate";
 
-            var addBaseClass = _classActions.GetAddExpressionAction(expression);
+            var addBaseClass = _typeBlockActions.GetAddExpressionAction(expression);
 
             var nodeWithExpression = addBaseClass(_syntaxGenerator, _blockNodes[blockType]);
 
@@ -236,7 +236,7 @@ EndModule
             var nodeWithMethod = _blockNodes[blockType].AddMembers(methodNode);
             string expression = "_next = [next]";
 
-            var addBaseClass = _classActions.GetAppendConstructorExpressionAction(expression);
+            var addBaseClass = _typeBlockActions.GetAppendConstructorExpressionAction(expression);
 
             var nodeWithExpression = addBaseClass(_syntaxGenerator, nodeWithMethod);
 
@@ -262,7 +262,7 @@ EndModule
             var nodeWithMethod = _blockNodes[blockType].AddMembers(methodNode);
             string expression = "next";
 
-            var addBaseClass = _classActions.GetRemoveConstructorInitializerAction(expression);
+            var addBaseClass = _typeBlockActions.GetRemoveConstructorInitializerAction(expression);
 
             var nodeWithExpression = addBaseClass(_syntaxGenerator, nodeWithMethod);
 
@@ -277,7 +277,7 @@ EndModule
             string types = "RequestDelegate, string";
             string identifiers = "[next], value";
 
-            var createConstructorFunc = _classActions.GetCreateConstructorAction(types: types, identifiers: identifiers);
+            var createConstructorFunc = _typeBlockActions.GetCreateConstructorAction(types: types, identifiers: identifiers);
             var nodeWithExpression = createConstructorFunc(_syntaxGenerator, _blockNodes[blockType]);
 
             StringAssert.Contains(types.Split(',')[0], nodeWithExpression.ToFullString());
@@ -314,7 +314,7 @@ EndModule
 
             var nodeWithMethod = _blockNodes[blockType].AddMembers(methodNode);
 
-            var changeMethodNameFunc = _classActions.GetChangeMethodNameAction(existingMethodName, newMethodName);
+            var changeMethodNameFunc = _typeBlockActions.GetChangeMethodNameAction(existingMethodName, newMethodName);
             var nodeWithExpression = changeMethodNameFunc(_syntaxGenerator, nodeWithMethod);
 
             StringAssert.Contains(newMethodName, nodeWithExpression.ToFullString());
@@ -337,7 +337,7 @@ EndModule
                 _subNode.SubOrFunctionStatement.WithParameterList(
                     SyntaxFactory.ParameterList(SyntaxFactory.SeparatedList(parameters))));
             var nodeWithMethod = _blockNodes[blockType].AddMembers(methodNode);
-            var removeMethodParametersFunc = _classActions.GetRemoveMethodParametersAction(methodName);
+            var removeMethodParametersFunc = _typeBlockActions.GetRemoveMethodParametersAction(methodName);
             var nodeWithExpression = removeMethodParametersFunc(_syntaxGenerator, nodeWithMethod);
             StringAssert.DoesNotContain("HttpContext", nodeWithExpression.ToFullString());
         }
@@ -349,7 +349,7 @@ EndModule
         {
             string methodName = "Invoke";
             var nodeWithMethod = _blockNodes[blockType].AddMembers(_subNode);
-            var changeMethodToReturnTaskTypeFunc = _classActions.GetChangeMethodToReturnTaskTypeAction(methodName);
+            var changeMethodToReturnTaskTypeFunc = _typeBlockActions.GetChangeMethodToReturnTaskTypeAction(methodName);
             var nodeWithExpression = changeMethodToReturnTaskTypeFunc(_syntaxGenerator, nodeWithMethod);
             StringAssert.Contains("Task", nodeWithExpression.ToFullString());
         }
@@ -361,7 +361,7 @@ EndModule
         {
             string methodName = "TestFunction";
             var nodeWithMethod = _blockNodes[blockType].AddMembers(_functionNode);
-            var changeMethodToReturnTaskTypeFunc = _classActions.GetChangeMethodToReturnTaskTypeAction(methodName);
+            var changeMethodToReturnTaskTypeFunc = _typeBlockActions.GetChangeMethodToReturnTaskTypeAction(methodName);
             var nodeWithExpression = changeMethodToReturnTaskTypeFunc(_syntaxGenerator, nodeWithMethod);
             StringAssert.Contains("Task(Of String)", nodeWithExpression.ToFullString());
         }
@@ -374,7 +374,7 @@ EndModule
             string methodName = "Invoke";
             var nodeWithMethod = _blockNodes[blockType].AddMembers(_subNode);
 
-            var commentMethodeFunc = _classActions.GetCommentMethodAction(methodName);
+            var commentMethodeFunc = _typeBlockActions.GetCommentMethodAction(methodName);
             var nodeWithExpression = commentMethodeFunc(_syntaxGenerator, nodeWithMethod);
 
             StringAssert.Contains("' Public Sub Invoke", nodeWithExpression.ToFullString());
@@ -389,7 +389,7 @@ EndModule
             string comment = "This method is deprecated";
             var nodeWithMethod = _blockNodes[blockType].AddMembers(_subNode);
 
-            var addCommentsToMethodFunc = _classActions.GetAddCommentsToMethodAction(methodName, comment);
+            var addCommentsToMethodFunc = _typeBlockActions.GetAddCommentsToMethodAction(methodName, comment);
             var nodeWithExpression = addCommentsToMethodFunc(_syntaxGenerator, nodeWithMethod);
 
             StringAssert.Contains("' Added by CTA: This method is deprecated", nodeWithExpression.ToFullString());
@@ -403,10 +403,10 @@ EndModule
             string methodName = "TestFunction";
             string expression = "Await _next.Invoke(context)";
             var nodeWithMethod = _blockNodes[blockType].AddMembers(_functionNode);
-            var changeMethodToReturnTaskTypeFunc = _classActions.GetChangeMethodToReturnTaskTypeAction(methodName);
+            var changeMethodToReturnTaskTypeFunc = _typeBlockActions.GetChangeMethodToReturnTaskTypeAction(methodName);
             var nodeWithExpression = changeMethodToReturnTaskTypeFunc(_syntaxGenerator, nodeWithMethod);
 
-            var addExpressionToMethodFunc = _classActions.GetAddExpressionToMethodAction(methodName, expression);
+            var addExpressionToMethodFunc = _typeBlockActions.GetAddExpressionToMethodAction(methodName, expression);
             nodeWithExpression = addExpressionToMethodFunc(_syntaxGenerator, nodeWithExpression);
 
             StringAssert.Contains("Await _next.Invoke(context)", nodeWithExpression.ToFullString());
@@ -424,7 +424,7 @@ EndModule
             var nodeWithMethod = _blockNodes[blockType].AddMembers(_subNode);
 
             var addParametersToMethodFunc =
-                _classActions.GetAddParametersToMethodAction(methodName, types, identifiers);
+                _typeBlockActions.GetAddParametersToMethodAction(methodName, types, identifiers);
             var nodeWithExpression = addParametersToMethodFunc(_syntaxGenerator, nodeWithMethod);
 
             var expectedString = @"Public Sub Invoke(context As HttpContext, value As String)";
@@ -460,8 +460,8 @@ EndModule
                 "String"));
 
             var replacePublicMethodsBodyFunc = controller == "WebApiController"
-                ? _classActions.GetReplaceWebApiControllerMethodsBodyAction(newBody)
-                : _classActions.GetReplaceCoreControllerMethodsBodyAction(newBody);
+                ? _typeBlockActions.GetReplaceWebApiControllerMethodsBodyAction(newBody)
+                : _typeBlockActions.GetReplaceCoreControllerMethodsBodyAction(newBody);
             var newNode = replacePublicMethodsBodyFunc(_syntaxGenerator, nodeWithMethods.NormalizeWhitespace());
 
             var publicMembers = newNode.Members.OfType<MethodStatementSyntax>().Where(m =>
@@ -476,13 +476,12 @@ EndModule
         [Test]
         public void ClassDeclarationEquals()
         {
-            throw new NotImplementedException();
-            // var classAction = new ClassDeclarationAction() { Key = "Test", Value = "Test2", ClassDeclarationActionFunc = _classActions.GetAddAttributeAction("Test") };
-            // var cloned = classAction.Clone<ClassDeclarationAction>();
-            // Assert.True(classAction.Equals(cloned));
-            //
-            // cloned.Value = "DifferentValue";
-            // Assert.False(classAction.Equals(cloned));
+            var classAction = new TypeBlockAction() { Key = "Test", Value = "Test2", TypeBlockActionFunc = _typeBlockActions.GetAddAttributeAction("Test") };
+            var cloned = classAction.Clone<TypeBlockAction>();
+            Assert.True(classAction.Equals(cloned));
+            
+            cloned.Value = "DifferentValue";
+            Assert.False(classAction.Equals(cloned));
         }
 
         private MethodBlockSyntax CreateMethodNode(string identifier,
