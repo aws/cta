@@ -1,16 +1,17 @@
 ﻿using System;
 
-namespace CTA.Rules.Models.Tokens.VisualBasic;
-
-public class ImportStatementToken : VisualBasicNodeToken
+namespace CTA.Rules.Models.Tokens.VisualBasic
 {
-    public override bool Equals(object obj)
+    public class ImportStatementToken : VisualBasicNodeToken
     {
-        var token = (ImportStatementToken)obj;
-        return token?.Key == this.Key;
-    }
-    public override int GetHashCode()
-    {
-        return HashCode.Combine(Key);
+        public override bool Equals(object obj)
+        {
+            var token = (ImportStatementToken)obj;
+            return token?.Key == this.Key;
+        }
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Key);
+        }
     }
 }
