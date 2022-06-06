@@ -381,7 +381,7 @@ public class VisualBasicActionsRewriter : VisualBasicSyntaxRewriter, ISyntaxRewr
         var
             skipChildren =
                 false; // This is here to skip actions on children node when the main identifier was changed. Just use new expression for the subsequent children actions.
-        foreach (var action in _allActions.OfType<ObjectCreationExpressionAction>())
+        foreach (var action in _allActions.OfType<Models.VisualBasic.ObjectCreationExpressionAction>())
         {
             if (newNode.ToString() == action.Key || symbol?.OriginalDefinition.ToDisplayString() == action.Key)
             {
