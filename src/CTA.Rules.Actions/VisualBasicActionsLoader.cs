@@ -23,7 +23,8 @@ public class VisualBasicActionsLoader : ActionLoaderBase
         _elementAccessActions,
         _expressionActions,
         _interfaceActions,
-        _methodBlockActions;
+        _methodBlockActions,
+        _objectCreationExpressionActions;
         
 
     private readonly object _compilationUnitObject,
@@ -36,7 +37,8 @@ public class VisualBasicActionsLoader : ActionLoaderBase
         _elementAccessObject,
         _expressionObject,
         _interfaceObject,
-        _methodBlockObject;
+        _methodBlockObject,
+        _objectExpressionObject;
     
     /// <summary>
     /// Initializes a new ActionLoader that loads the default actions
@@ -55,6 +57,7 @@ public class VisualBasicActionsLoader : ActionLoaderBase
         _expressionActions = new List <MethodInfo>();
         _interfaceActions = new List <MethodInfo>();
         _methodBlockActions = new List <MethodInfo>();
+        _objectCreationExpressionActions = new List<MethodInfo>();
         projectLevelActions = new List<MethodInfo>();
         projectFileActions = new List<MethodInfo>();
         projectTypeActions = new List<MethodInfo>();
@@ -69,30 +72,21 @@ public class VisualBasicActionsLoader : ActionLoaderBase
                     .Where(t => t.Name.EndsWith("Actions") &&
                                 (t.Namespace.EndsWith(ProjectLanguage.VisualBasic.ToString()) ||
                                  t.Name.StartsWith("Project"))).ToList();
-                TryCreateInstance(Constants.CompilationUnitActions, types,
-                    out _compilationUnitObject);
-                TryCreateInstance(Constants.InvocationExpressionActions, types,
-                    out _invocationExpressionObject);
-                TryCreateInstance(Constants.NamespaceActions, types,
-                    out _namespaceObject);
-                TryCreateInstance(Constants.AttributeActions, types,
-                    out _attributeObject);
-                TryCreateInstance(Constants.AttributeListActions, types,
-                    out _attributeListObject);
-                TryCreateInstance(Constants.TypeBlockActions, types,
-                    out _typeBlockObject);
-                TryCreateInstance(Constants.ElementAccessActions, types,
-                    out _elementAccessObject);
-                TryCreateInstance(Constants.ExpressionActions, types,
-                    out _expressionObject);
-                TryCreateInstance(Constants.InterfaceActions, types,
-                    out _interfaceObject);
-                TryCreateInstance(Constants.MethodBlockActions, types,
-                    out _methodBlockObject);
+                TryCreateInstance(Constants.CompilationUnitActions, types, out _compilationUnitObject);
+                TryCreateInstance(Constants.InvocationExpressionActions, types, out _invocationExpressionObject);
+                TryCreateInstance(Constants.NamespaceActions, types, out _namespaceObject);
+                TryCreateInstance(Constants.AttributeActions, types, out _attributeObject);
+                TryCreateInstance(Constants.AttributeListActions, types, out _attributeListObject);
+                TryCreateInstance(Constants.TypeBlockActions, types, out _typeBlockObject);
+                TryCreateInstance(Constants.ElementAccessActions, types, out _elementAccessObject);
+                TryCreateInstance(Constants.ExpressionActions, types, out _expressionObject);
+                TryCreateInstance(Constants.InterfaceActions, types, out _interfaceObject);
+                TryCreateInstance(Constants.MethodBlockActions, types, out _methodBlockObject);
                 TryCreateInstance(Constants.ProjectLevelActions, types, out projectLevelObject);
                 TryCreateInstance(Constants.ProjectFileActions, types, out projectFileObject);
                 TryCreateInstance(Constants.ProjectTypeActions, types, out projectTypeObject);
                 TryCreateInstance(Constants.IdentifierNameActions, types, out _identifierNameObject);
+                TryCreateInstance(Constants.ObjectCreationExpressionActions, types, out _objectExpressionObject);
                 
                 foreach (var t in types)
                 {
@@ -170,7 +164,7 @@ public class VisualBasicActionsLoader : ActionLoaderBase
                         }
                         case Constants.ObjectCreationExpressionActions:
                         {
-                            //_objectCreationExpressionActions.AddRange(GetFuncMethods(t));
+                            _objectCreationExpressionActions.AddRange(GetFuncMethods(t));
                             break;
                         }
                         default:
@@ -253,7 +247,8 @@ public class VisualBasicActionsLoader : ActionLoaderBase
     public Func<SyntaxGenerator, ObjectCreationExpressionSyntax, ExpressionSyntax> GetObjectCreationExpressionActions(
         string name, dynamic value)
     {
-        throw new NotImplementedException();
+        return GetAction<Func<SyntaxGenerator, ObjectCreationExpressionSyntax, ExpressionSyntax>>
+            (_objectCreationExpressionActions, _objectExpressionObject, name, value);
     }
 
     public Func<SyntaxGenerator, MemberAccessExpressionSyntax, MemberAccessExpressionSyntax>
