@@ -5,7 +5,6 @@ using Microsoft.CodeAnalysis.VisualBasic;
 using Microsoft.CodeAnalysis.VisualBasic.Syntax;
 using Microsoft.CodeAnalysis.Editing;
 using NUnit.Framework;
-using System;
 
 namespace CTA.Rules.Test.Actions.VisualBasic
 {
@@ -77,8 +76,12 @@ namespace CTA.Rules.Test.Actions.VisualBasic
                             SyntaxFactory.ParseExpression("new PhysicalFileSystem(@\".\\defaults\")")),
                         SyntaxFactory.Token(SyntaxKind.CommaToken)}))
             .NormalizeWhitespace();
-            var replaceObjectWithInvocationFunc = _objectCreationExpressionActions.GetReplaceOrAddObjectPropertyIdentifierAction(oldIdentifier, newIdentifier, string.Empty);
-            var newNode = replaceObjectWithInvocationFunc(_syntaxGenerator, _objectMemberNode);
+            _node = _node.WithArgumentList(SyntaxFactory.ArgumentList()).WithInitializer(_objectMemberNode)
+                .NormalizeWhitespace();
+            var replaceObjectWithInvocationFunc =
+                _objectCreationExpressionActions.GetReplaceOrAddObjectPropertyIdentifierAction(oldIdentifier,
+                    newIdentifier, string.Empty);
+            var newNode = replaceObjectWithInvocationFunc(_syntaxGenerator, _node);
             StringAssert.Contains(newIdentifier, newNode.ToFullString());
         }
 
@@ -99,9 +102,9 @@ namespace CTA.Rules.Test.Actions.VisualBasic
                             SyntaxFactory.ParseExpression("true")),
                         SyntaxFactory.Token(SyntaxKind.CommaToken)}))
             .NormalizeWhitespace();
-
+            _node = _node.WithArgumentList(SyntaxFactory.ArgumentList()).WithInitializer(_objectMemberNode);
             var replaceObjectWithInvocationFunc = _objectCreationExpressionActions.GetReplaceOrAddObjectPropertyIdentifierAction(oldIdentifier, newIdentifier, newValue);
-            var newNode = replaceObjectWithInvocationFunc(_syntaxGenerator, _objectMemberNode);
+            var newNode = replaceObjectWithInvocationFunc(_syntaxGenerator, _node);
 
             StringAssert.Contains(newIdentifier, newNode.ToFullString());
             StringAssert.Contains(newValue, newNode.ToFullString());
@@ -124,9 +127,9 @@ namespace CTA.Rules.Test.Actions.VisualBasic
                             SyntaxFactory.ParseExpression("new PhysicalFileSystem(@\".\\defaults\")")),
                         SyntaxFactory.Token(SyntaxKind.CommaToken)}))
             .NormalizeWhitespace();
-
+            _node = _node.WithArgumentList(SyntaxFactory.ArgumentList()).WithInitializer(_objectMemberNode);
             var replaceObjectWithInvocationFunc = _objectCreationExpressionActions.GetReplaceObjectPropertyValueAction(oldIdentifier, newIdentifier);
-            var newNode = replaceObjectWithInvocationFunc(_syntaxGenerator, _objectMemberNode);
+            var newNode = replaceObjectWithInvocationFunc(_syntaxGenerator, _node);
             StringAssert.Contains(newIdentifier, newNode.ToFullString());
             StringAssert.DoesNotContain(oldIdentifier, newNode.ToFullString());
         }

@@ -16,83 +16,87 @@ namespace CTA.Rules.Actions.VisualBasic
     {
         public Func<SyntaxGenerator, ObjectCreationExpressionSyntax, ExpressionSyntax> GetReplaceObjectinitializationAction(string newStatement)
         {
-            ExpressionSyntax action(SyntaxGenerator syntaxGenerator, ObjectCreationExpressionSyntax node)
+            ExpressionSyntax Action(SyntaxGenerator syntaxGenerator, ObjectCreationExpressionSyntax node)
             {
                 var newNode = SyntaxFactory.ParseExpression(newStatement).NormalizeWhitespace();
                 return newNode;
             }
-            return action;
+            return Action;
         }
 
-        public Func<SyntaxGenerator, ObjectCreationExpressionSyntax, ExpressionSyntax> GetReplaceObjectWithInvocationAction(string NewExpression, string UseParameters)
+        public Func<SyntaxGenerator, ObjectCreationExpressionSyntax, ExpressionSyntax> GetReplaceObjectWithInvocationAction(string newExpression, string useParameters)
         {
-            ExpressionSyntax action(SyntaxGenerator syntaxGenerator, ObjectCreationExpressionSyntax node)
+            ExpressionSyntax Action(SyntaxGenerator syntaxGenerator, ObjectCreationExpressionSyntax node)
             {
-                bool.TryParse(UseParameters, out var useParam);
+                bool.TryParse(useParameters, out var useParam);
 
-                var newNode = SyntaxFactory.ParseExpression(NewExpression) as InvocationExpressionSyntax;
+                var newNode = SyntaxFactory.ParseExpression(newExpression) as InvocationExpressionSyntax;
                 if (useParam)
                 {
                     newNode = newNode.WithArgumentList(node.ArgumentList);
                 }
                 return newNode.NormalizeWhitespace();
             }
-            return action;
+            return Action;
         }
 
-        public Func<SyntaxGenerator, ObjectMemberInitializerSyntax, ObjectMemberInitializerSyntax> GetReplaceOrAddObjectPropertyIdentifierAction(string oldMember, string newMember, string newValueIfAdding = null)
+        public Func<SyntaxGenerator, ObjectCreationExpressionSyntax, ExpressionSyntax> GetReplaceOrAddObjectPropertyIdentifierAction(string oldMember, string newMember, string newValueIfAdding = null)
         {
-            ObjectMemberInitializerSyntax action(SyntaxGenerator syntaxGenerator, ObjectMemberInitializerSyntax node)
+            ExpressionSyntax Action(SyntaxGenerator syntaxGenerator, ObjectCreationExpressionSyntax node)
             {
-                if (node.Initializers.Count > 0)
+                if (node.Initializer != null && node.Initializer.IsKind(SyntaxKind.ObjectMemberInitializer))
                 {
-                    var memberList = node.Initializers.Where(n => n.Kind() == SyntaxKind.NamedFieldInitializer);
-                    if (memberList.Count() > 0)
+                    var initializer = (ObjectMemberInitializerSyntax)node.Initializer;
+                    var memberList = initializer.Initializers.Where(n => n.Kind() == SyntaxKind.NamedFieldInitializer).ToList();
+                    if (memberList.Any())
                     {
                         var assignMemberList = memberList.Select(n => (NamedFieldInitializerSyntax)n);
-                        var member = assignMemberList.Where(n => n.Name.ToFullString().Contains(oldMember)).FirstOrDefault();
+                        var member = assignMemberList.FirstOrDefault(n => n.Name.ToFullString().Contains(oldMember));
+                        SeparatedSyntaxList<FieldInitializerSyntax> newInitializers;
                         if (member != null)
                         {
                             var newExpression = SyntaxFactory.NamedFieldInitializer((IdentifierNameSyntax)syntaxGenerator.IdentifierName(newMember), member.Expression);
-                            var newNode = node.Initializers.Replace(member, newExpression);
-                            node = node.WithInitializers(newNode).NormalizeWhitespace();
+                            newInitializers = initializer.Initializers.Replace(member, newExpression);
                         }
                         else
                         {
                             var newExpression = SyntaxFactory.NamedFieldInitializer((IdentifierNameSyntax)syntaxGenerator.IdentifierName(newMember), (IdentifierNameSyntax)syntaxGenerator.IdentifierName(newValueIfAdding));
-                            var newNode = node.Initializers.Add(newExpression);
-                            node = node.WithInitializers(newNode).NormalizeWhitespace();
+                            newInitializers = initializer.Initializers.Add(newExpression);
                         }
+                        var newInitializer = initializer.WithInitializers(newInitializers);
+                        node = node.WithInitializer(newInitializer).NormalizeWhitespace();
                     }
                 }
                 return node;
             }
-            return action;
+            return Action;
         }
 
-        public Func<SyntaxGenerator, ObjectMemberInitializerSyntax, ObjectMemberInitializerSyntax> GetReplaceObjectPropertyValueAction(string oldMember, string newMember)
+        public Func<SyntaxGenerator, ObjectCreationExpressionSyntax, ExpressionSyntax> GetReplaceObjectPropertyValueAction(string oldMember, string newMember)
         {
-            ObjectMemberInitializerSyntax action(SyntaxGenerator syntaxGenerator, ObjectMemberInitializerSyntax node)
+            ExpressionSyntax Action(SyntaxGenerator syntaxGenerator, ObjectCreationExpressionSyntax node)
             {
-                if (node.Initializers.Count > 0)
+                if (node.Initializer != null && node.Initializer.IsKind(SyntaxKind.ObjectMemberInitializer))
                 {
-                    var memberList = node.Initializers.Where(n => n.Kind() == SyntaxKind.NamedFieldInitializer);
-                    if (memberList.Count() > 0)
+                    var initializer = (ObjectMemberInitializerSyntax)node.Initializer;
+                    var memberList = initializer.Initializers.Where(n => n.Kind() == SyntaxKind.NamedFieldInitializer).ToList();
+                    if (memberList.Any())
                     {
                         var assignMemberList = memberList.Select(n => (NamedFieldInitializerSyntax)n);
-                        var member = assignMemberList.Where(n => n.Expression.ToFullString().Contains(oldMember)).FirstOrDefault();
+                        var member = assignMemberList.FirstOrDefault(n => n.Expression.ToFullString().Contains(oldMember));
                         if (member != null)
                         {
                             var right = SyntaxFactory.ParseExpression(member.Expression.ToFullString().Replace(oldMember, newMember));
                             var newExpression = SyntaxFactory.NamedFieldInitializer(member.Name, right);
-                            var newNode = node.Initializers.Replace(member, newExpression);
-                            node = node.WithInitializers(newNode).NormalizeWhitespace();
+                            var newInitializers = initializer.Initializers.Replace(member, newExpression);
+                            var newInitializer = initializer.WithInitializers(newInitializers);
+                            node = node.WithInitializer(newInitializer).NormalizeWhitespace();
                         }
                     }
                 }
                 return node;
             }
-            return action;
+            return Action;
         }
 
         public Func<SyntaxGenerator, ObjectCreationExpressionSyntax, ObjectCreationExpressionSyntax> GetAddCommentAction(string comment)

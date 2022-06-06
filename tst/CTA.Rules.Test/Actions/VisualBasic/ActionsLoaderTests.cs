@@ -204,7 +204,7 @@ namespace CTA.Rules.Test.Actions.VisualBasic
         public void ObjectCreationExpressionActionsTest()
         {
             var replaceObjectinitialization = _actionLoader.GetObjectCreationExpressionActions("ReplaceObjectinitialization", "newStatement");
-            var replaceObjectWithInvocation = _actionLoader.GetObjectCreationExpressionActions("ReplaceObjectWithInvocation", "{ NewExpression: \"expression\", UseParameters: \"params\" }");
+            var replaceObjectWithInvocation = _actionLoader.GetObjectCreationExpressionActions("ReplaceObjectWithInvocation", "{ newExpression: \"expression\", useParameters: \"params\" }");
             var replaceOrAddObjectPropertyIdentifier = _actionLoader.GetObjectCreationExpressionActions("ReplaceOrAddObjectPropertyIdentifier", "{ oldMember: \"old\", newMember: \"new\", newValueIfAdding: \"value\" }");
             var replaceOrAddObjectPropertyIdentifier2 = _actionLoader.GetObjectCreationExpressionActions("ReplaceOrAddObjectPropertyIdentifier", "{ oldMember: \"old\", newMember: \"new\" }");
             var replaceObjectPropertyValue = _actionLoader.GetObjectCreationExpressionActions("ReplaceObjectPropertyValue", "{ oldMember: \"old\", newMember: \"new\" }");
