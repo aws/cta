@@ -143,7 +143,7 @@ namespace CTA.Rules.RuleFiles
         }
 
 
-        private NamespaceRecommendations LoadNamespaceFile(string pathToLoad)
+        public NamespaceRecommendations LoadNamespaceFile(string pathToLoad)
         {
             NamespaceRecommendations nr = new NamespaceRecommendations();
 

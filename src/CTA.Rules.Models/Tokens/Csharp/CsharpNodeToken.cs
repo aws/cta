@@ -12,12 +12,14 @@ namespace CTA.Rules.Models.Tokens
             InvocationExpressionActions = new List<InvocationExpressionAction<InvocationExpressionSyntax>>();
             NamespaceActions = new List<NamespaceAction<NamespaceDeclarationSyntax>>();
             IdentifierNameActions = new List<IdentifierNameAction<IdentifierNameSyntax>>();
+            ObjectCreationExpressionActions = new List<ObjectCreationExpressionAction>();
         }
         
         public List<UsingAction> UsingActions { get; set; }
         public List<InvocationExpressionAction<InvocationExpressionSyntax>> InvocationExpressionActions { get; set; }
         public List<NamespaceAction<NamespaceDeclarationSyntax>> NamespaceActions { get; set; }
         public List<IdentifierNameAction<IdentifierNameSyntax>> IdentifierNameActions { get; set; }
+        public List<ObjectCreationExpressionAction> ObjectCreationExpressionActions{ get; set; }
 
         public override CsharpNodeToken Clone()
         {
@@ -26,6 +28,7 @@ namespace CTA.Rules.Models.Tokens
             cloned.IdentifierNameActions = cloned.IdentifierNameActions.Select(action => action.Clone<IdentifierNameAction<IdentifierNameSyntax>>()).ToList();
             cloned.InvocationExpressionActions = cloned.InvocationExpressionActions.Select(action => action.Clone<InvocationExpressionAction<InvocationExpressionSyntax>>()).ToList();
             cloned.NamespaceActions = cloned.NamespaceActions.Select(action => action.Clone<NamespaceAction<NamespaceDeclarationSyntax>>()).ToList();
+            cloned.ObjectCreationExpressionActions = cloned.ObjectCreationExpressionActions.Select(action => action.Clone<ObjectCreationExpressionAction>()).ToList();
 
             return cloned;
         }
@@ -39,6 +42,7 @@ namespace CTA.Rules.Models.Tokens
                 allActions.AddRange(UsingActions);
                 allActions.AddRange(NamespaceActions);
                 allActions.AddRange(IdentifierNameActions);
+                allActions.AddRange(ObjectCreationExpressionActions);
                 allActions.AddRange(base.AllActions);
                 return allActions;
             }

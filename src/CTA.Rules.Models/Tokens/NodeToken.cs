@@ -16,7 +16,6 @@ namespace CTA.Rules.Models.Tokens
             MethodDeclarationActions = new List<MethodDeclarationAction>();
             ElementAccessActions = new List<ElementAccessAction>();
             MemberAccessActions = new List<MemberAccessAction>();
-            ObjectCreationExpressionActions = new List<ObjectCreationExpressionAction>();
             PackageActions = new List<PackageAction>();
             InterfaceDeclarationActions = new List<InterfaceDeclarationAction>();
             ProjectLevelActions = new List<ProjectLevelAction>();
@@ -42,7 +41,6 @@ namespace CTA.Rules.Models.Tokens
         public List<ElementAccessAction> ElementAccessActions { get; set; }
         public List<MemberAccessAction> MemberAccessActions { get; set; }
         public List<ExpressionAction> ExpressionActions { get; set; }
-        public List<ObjectCreationExpressionAction> ObjectCreationExpressionActions { get; set; }
         public List<PackageAction> PackageActions { get; set; }
         public List<ProjectLevelAction> ProjectLevelActions { get; set; }
         public List<ProjectLevelAction> ProjectFileActions { get; set; }
@@ -61,7 +59,6 @@ namespace CTA.Rules.Models.Tokens
             cloned.ElementAccessActions = cloned.ElementAccessActions.Select(action => action.Clone<ElementAccessAction>()).ToList();
             cloned.MemberAccessActions = cloned.MemberAccessActions.Select(action => action.Clone<MemberAccessAction>()).ToList();
             cloned.ExpressionActions = cloned.ExpressionActions.Select(action => action.Clone<ExpressionAction>()).ToList();
-            cloned.ObjectCreationExpressionActions = cloned.ObjectCreationExpressionActions.Select(action => action.Clone<ObjectCreationExpressionAction>()).ToList();
             cloned.PackageActions = cloned.PackageActions.Select(action => action.Clone()).ToList();
             cloned.ProjectLevelActions = cloned.ProjectLevelActions.Select(action => action.Clone<ProjectLevelAction>()).ToList();
             cloned.ProjectFileActions = cloned.ProjectFileActions.Select(action => action.Clone<ProjectLevelAction>()).ToList();
@@ -83,7 +80,6 @@ namespace CTA.Rules.Models.Tokens
                 allActions.AddRange(MemberAccessActions);
                 allActions.AddRange(ExpressionActions);
                 allActions.AddRange(MemberAccessActions);
-                allActions.AddRange(ObjectCreationExpressionActions);
                 return allActions;
             }
         }

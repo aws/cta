@@ -1,6 +1,5 @@
 ﻿using System.Linq;
 using System.Collections.Generic;
-using System.Configuration;
 using CTA.Rules.Models.VisualBasic;
 using Microsoft.CodeAnalysis.VisualBasic.Syntax;
 using CTA.Rules.Models.Actions.VisualBasic;
@@ -20,6 +19,7 @@ namespace CTA.Rules.Models.Tokens.VisualBasic
             InterfaceBlockActions = new List<InterfaceBlockAction>();
             VbAttributeListActions = new List<AttributeListAction>();
             AccessorBlockActions = new List<AccessorBlockAction>();
+            ObjectCreationExpressionActions = new List<CTA.Rules.Models.VisualBasic.ObjectCreationExpressionAction>();
         }
 
         public List<InvocationExpressionAction<InvocationExpressionSyntax>> InvocationExpressionActions { get; set; }
@@ -31,6 +31,8 @@ namespace CTA.Rules.Models.Tokens.VisualBasic
         public List<InterfaceBlockAction> InterfaceBlockActions { get; set; }
         public List<AttributeListAction> VbAttributeListActions { get; set; }
         public List<AccessorBlockAction> AccessorBlockActions { get; set; }
+        public List<CTA.Rules.Models.VisualBasic.ObjectCreationExpressionAction> ObjectCreationExpressionActions{ get; set; }
+
 
         public override VisualBasicNodeToken Clone()
         {
@@ -53,6 +55,8 @@ namespace CTA.Rules.Models.Tokens.VisualBasic
                 .Select(action => action.Clone<AttributeListAction>()).ToList();
             cloned.AccessorBlockActions = cloned.AccessorBlockActions
                 .Select(action => action.Clone<AccessorBlockAction>()).ToList();
+            cloned.ObjectCreationExpressionActions = cloned.ObjectCreationExpressionActions
+                .Select(action => action.Clone<CTA.Rules.Models.VisualBasic.ObjectCreationExpressionAction>()).ToList();
             return cloned;
         }
 
@@ -70,6 +74,7 @@ namespace CTA.Rules.Models.Tokens.VisualBasic
                 allActions.AddRange(InterfaceBlockActions);
                 allActions.AddRange(AttributeListActions);
                 allActions.AddRange(AccessorBlockActions);
+                allActions.AddRange(ObjectCreationExpressionActions);
                 allActions.AddRange(base.AllActions);
                 return allActions;
             }

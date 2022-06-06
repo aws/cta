@@ -1,9 +1,6 @@
 ﻿using System.Collections.Generic;
-using CTA.Rules.Models.Tokens;
 using CTA.Rules.Models.Tokens.VisualBasic;
-using InvocationExpressionToken = CTA.Rules.Models.Tokens.VisualBasic.InvocationExpressionToken;
-using NamespaceToken = CTA.Rules.Models.Tokens.VisualBasic.NamespaceToken;
-using ProjectToken = CTA.Rules.Models.Tokens.VisualBasic.ProjectToken;
+using NodeToken = CTA.Rules.Models.Tokens.NodeToken;
 
 namespace CTA.Rules.Models.VisualBasic
 {
@@ -22,6 +19,7 @@ namespace CTA.Rules.Models.VisualBasic
             ProjectTokens = new HashSet<NodeToken>();
             IdentifierNameTokens = new HashSet<IdentifierNameToken>();
             TypeBlockTokens = new HashSet<TypeBlockToken>();
+            ObjectCreationExpressionTokens = new HashSet<ObjectCreationExpressionToken>();
         }
         
         public HashSet<InvocationExpressionToken> InvocationExpressionTokens { get; set; }
@@ -35,5 +33,6 @@ namespace CTA.Rules.Models.VisualBasic
         public HashSet<NodeToken> ProjectTokens { get; set; }
         public HashSet<IdentifierNameToken> IdentifierNameTokens { get; set; }
         public HashSet<TypeBlockToken> TypeBlockTokens { get; set; }
+        public HashSet<ObjectCreationExpressionToken> ObjectCreationExpressionTokens { get; set; }
     }
 }

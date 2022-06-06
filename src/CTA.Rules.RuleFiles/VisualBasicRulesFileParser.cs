@@ -8,8 +8,8 @@ using CTA.Rules.Models;
 using CTA.Rules.Models.VisualBasic;
 using CTA.Rules.Models.Tokens.VisualBasic;
 using Microsoft.CodeAnalysis.VisualBasic.Syntax;
-using Newtonsoft.Json;
 using IdentifierNameToken = CTA.Rules.Models.VisualBasic.IdentifierNameToken;
+using ObjectCreationExpressionAction = CTA.Rules.Models.VisualBasic.ObjectCreationExpressionAction;
 
 
 namespace CTA.Rules.RuleFiles
@@ -19,7 +19,7 @@ namespace CTA.Rules.RuleFiles
     /// </summary>
     public class VisualBasicRulesFileParser
     {
-        private readonly Models.VisualBasic.VisualBasicRootNodes _visualBasicRootNodes;
+        private readonly VisualBasicRootNodes _visualBasicRootNodes;
         private readonly string _assembliesDir;
         private readonly string _targetFramework;
 
@@ -39,7 +39,6 @@ namespace CTA.Rules.RuleFiles
         /// <param name="assembliesDir">Directory containing additional actions assemblies</param>
         /// <param name="namespaceRecommendations">Namespace recommendations</param>
         /// <param name="targetFramework">Framework version being targeted for porting</param>
-        /// <param name="projectLanguage">Project language, C# or VB</param>
         /// 
         public VisualBasicRulesFileParser(
             NamespaceRecommendations namespaceRecommendations,
@@ -49,8 +48,8 @@ namespace CTA.Rules.RuleFiles
             string assembliesDir,
             string targetFramework)
         {
-            _visualBasicRootNodes = new Models.VisualBasic.VisualBasicRootNodes();
-            //_visualBasicRootNodes.ProjectTokens.Add(new ProjectToken() { Key = "Project" });
+            _visualBasicRootNodes = new VisualBasicRootNodes();
+            _visualBasicRootNodes.ProjectTokens.Add(new ProjectToken() { Key = "Project" });
             _rulesObject = rulesObject;
             _overrideObject = overrideObject;
             _assembliesDir = assembliesDir;
@@ -129,16 +128,21 @@ namespace CTA.Rules.RuleFiles
                     //Namespace specific actions:
                     else
                     {
-                        /*
-                        var usingToken = new UsingDirectiveToken() { Key = @namespace.@namespace };
+                        var usingToken = new ImportStatementToken() { Key = @namespace.@namespace };
                         var namespaceToken = new NamespaceToken() { Key = @namespace.@namespace };
 
-                        if (!_rootNodes.Usingdirectivetokens.Contains(usingToken)) { _rootNodes.Usingdirectivetokens.Add(usingToken); }
-                        if (!_rootNodes.NamespaceTokens.Contains(namespaceToken)) { _rootNodes.NamespaceTokens.Add(namespaceToken); }
+                        if (!_visualBasicRootNodes.ImportStatementTokens.Contains(usingToken))
+                        {
+                            _visualBasicRootNodes.ImportStatementTokens.Add(usingToken);
+                        }
+
+                        if (!_visualBasicRootNodes.NamespaceTokens.Contains(namespaceToken))
+                        {
+                            _visualBasicRootNodes.NamespaceTokens.Add(namespaceToken);
+                        }
 
                         ParseActions(usingToken, @namespace.Actions);
                         ParseActions(namespaceToken, @namespace.Actions);
-                        */
                     }
                 }
                 foreach (var @class in @namespace.Classes)
@@ -175,16 +179,26 @@ namespace CTA.Rules.RuleFiles
                             ParseActions(token, attribute.Actions);
                         }
                     }
+                     */
                     foreach (var objectCreation in @class.ObjectCreations)
                     {
                         if (objectCreation.Actions != null && objectCreation.Actions.Count > 0)
                         {
-                            var token = new ObjectCreationExpressionToken() { Key = objectCreation.Key, Namespace = @namespace.@namespace, FullKey = objectCreation.FullKey, Type = @class.Key };
-                            if (!_rootNodes.ObjectCreationExpressionTokens.Contains(token)) { _rootNodes.ObjectCreationExpressionTokens.Add(token); }
+                            var token = new ObjectCreationExpressionToken
+                            {
+                                Key = objectCreation.Key,
+                                Namespace = @namespace.@namespace,
+                                FullKey = objectCreation.FullKey,
+                                Type = @class.Key
+                            };
+                            if (!_visualBasicRootNodes.ObjectCreationExpressionTokens.Contains(token))
+                            {
+                                _visualBasicRootNodes.ObjectCreationExpressionTokens.Add(token);
+                            }
+
                             ParseActions(token, objectCreation.Actions);
                         }
                     }
-                    */
 
                     foreach (var method in @class.Methods)
                     {
@@ -376,7 +390,21 @@ namespace CTA.Rules.RuleFiles
 
                                 case ActionTypes.ObjectCreation:
                                 {
-                                    throw new NotImplementedException();
+                                    var token = new ObjectCreationExpressionToken
+                                    {
+                                        Key = recommendation.Name,
+                                        Description = recommendedActions.Description,
+                                        TargetCPU = targetCPUs,
+                                        Namespace = @namespace.Name,
+                                        FullKey = recommendation.Value,
+                                        Type = recommendation.ContainingType
+                                    };
+                                    if (!_visualBasicRootNodes.ObjectCreationExpressionTokens.Contains(token))
+                                    {
+                                        _visualBasicRootNodes.ObjectCreationExpressionTokens.Add(token);
+                                    }
+                                    ParseActions(token, recommendedActions.Actions);
+                                    break;
                                 }
 
                                 case ActionTypes.MethodDeclaration:
@@ -537,6 +565,20 @@ namespace CTA.Rules.RuleFiles
                         }
                         case ActionTypes.ObjectCreation:
                         {
+                            var actionFunc = _actionsLoader.GetObjectCreationExpressionActions(action.Name, action.Value);
+                            if (actionFunc != null)
+                            {
+                                visualBasicNodeToken.ObjectCreationExpressionActions.Add(new ObjectCreationExpressionAction()
+                                {
+                                    Key = visualBasicNodeToken.Key,
+                                    Value = GetActionValue(action.Value),
+                                    Description = action.Description,
+                                    ActionValidation = action.ActionValidation,
+                                    Name = action.Name,
+                                    Type = action.Type,
+                                    ObjectCreationExpressionGenericActionFunc = actionFunc
+                                });
+                            }
                             break;
                         }
                         case ActionTypes.MethodDeclaration:

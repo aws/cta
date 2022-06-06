@@ -13,6 +13,7 @@ using Microsoft.CodeAnalysis.VisualBasic.Syntax;
 using IdentifierNameToken = CTA.Rules.Models.VisualBasic.IdentifierNameToken;
 using InvocationExpressionToken = CTA.Rules.Models.Tokens.VisualBasic.InvocationExpressionToken;
 using NamespaceToken = CTA.Rules.Models.Tokens.VisualBasic.NamespaceToken;
+using ObjectCreationExpressionAction = CTA.Rules.Models.VisualBasic.ObjectCreationExpressionAction;
 
 namespace CTA.Rules.Analyzer;
 
@@ -49,14 +50,11 @@ public class VisualBasicRulesAnalysis : IRulesAnalysis
                 _projectActions.FileActions.Add(fileAction);
             }
         });
-
-        //todo: project tokens
-        /*
+        
         AddPackages(
             _visualBasicRootNodes.ProjectTokens.Where(p => p.FullKey == _projectType.ToString())
                 ?.SelectMany(p => p.PackageActions)?.Distinct()?.ToList(), null);
-        */
-
+        
         return _projectActions;
     }
 
@@ -121,105 +119,105 @@ public class VisualBasicRulesAnalysis : IRulesAnalysis
                             break;
                         }
                     case IdConstants.ImportsStatementName:
+                    {
+                        var overrideKey = string.Empty;
+
+                        var compareToken = new ImportStatementToken { Key = child.Identifier };
+                        _visualBasicRootNodes.ImportStatementTokens.TryGetValue(compareToken, out var token);
+                        if (token != null)
                         {
-                            var overrideKey = string.Empty;
+                            AddActions(fileAction, token, child.TextSpan);
+                            containsActions = true;
+                        }
 
-                            var compareToken = new ImportStatementToken { Key = child.Identifier };
-                            _visualBasicRootNodes.ImportStatementTokens.TryGetValue(compareToken, out var token);
-                            if (token != null)
+                        //Attempt a wildcard search, if applicable. This is import specific because it might want to include all sub-namespaces
+                        if (token == null)
+                        {
+                            var wildcardMatches = _visualBasicRootNodes.ImportStatementTokens
+                                .Where(i => i.Key.Contains("*")).ToList();
+                            if (wildcardMatches.Any())
                             {
-                                AddActions(fileAction, token, child.TextSpan);
-                                containsActions = true;
-                            }
+                                token = wildcardMatches.FirstOrDefault(i => compareToken.Key.WildcardEquals(i.Key));
 
-                            //Attempt a wildcard search, if applicable. This is import specific because it might want to include all sub-namespaces
-                            if (token == null)
-                            {
-                                var wildcardMatches = _visualBasicRootNodes.ImportStatementTokens
-                                    .Where(i => i.Key.Contains("*")).ToList();
-                                if (wildcardMatches.Any())
+                                if (token != null)
                                 {
-                                    token = wildcardMatches.FirstOrDefault(i => compareToken.Key.WildcardEquals(i.Key));
-
-                                    if (token != null)
-                                    {
-                                        //We set the key so that we don't do another wildcard search during replacement, we just use the name as it was declared in the code
-                                        overrideKey = compareToken.Key;
-                                    }
+                                    //We set the key so that we don't do another wildcard search during replacement, we just use the name as it was declared in the code
+                                    overrideKey = compareToken.Key;
                                 }
                             }
-                            if (token != null)
-                            {
-                                AddActions(fileAction, token, child.TextSpan, overrideKey);
-                                containsActions = true;
-                            }
-                            break;
                         }
+                        if (token != null)
+                        {
+                            AddActions(fileAction, token, child.TextSpan, overrideKey);
+                            containsActions = true;
+                        }
+                        break;
+                    }
                     case IdConstants.NamespaceBlockIdName:
+                    {
+                        var compareToken = new NamespaceToken { Key = child.Identifier };
+                        _visualBasicRootNodes.NamespaceTokens.TryGetValue(compareToken, out var token);
+                        if (token != null)
                         {
-                            var compareToken = new NamespaceToken { Key = child.Identifier };
-                            _visualBasicRootNodes.NamespaceTokens.TryGetValue(compareToken, out var token);
-                            if (token != null)
-                            {
-                                AddActions(fileAction, token, child.TextSpan);
-                                containsActions = true;
-                            }
-                            if (AnalyzeChildren(fileAction, child.Children, ++level, child.Identifier))
-                            {
-                                containsActions = true;
-                            }
-                            break;
+                            AddActions(fileAction, token, child.TextSpan);
+                            containsActions = true;
                         }
+                        if (AnalyzeChildren(fileAction, child.Children, ++level, child.Identifier))
+                        {
+                            containsActions = true;
+                        }
+                        break;
+                    }
                     case IdConstants.ModuleBlockName:
+                    {
+                        var moduleType = (ModuleBlock)child;
+                        var name = string.Concat(
+                            moduleType.Reference != null
+                                ? string.Concat(moduleType.Reference.Namespace, ".")
+                                : string.Empty, moduleType.Identifier);
+                        var nameToken = new TypeBlockToken() { FullKey = name };
+                        if (_visualBasicRootNodes.TypeBlockTokens.TryGetValue(nameToken, out var token))
                         {
-                            var moduleType = (ModuleBlock)child;
-                            var name = string.Concat(
-                                moduleType.Reference != null
-                                    ? string.Concat(moduleType.Reference.Namespace, ".")
-                                    : string.Empty, moduleType.Identifier);
-                            var nameToken = new TypeBlockToken() { FullKey = name };
-                            if (_visualBasicRootNodes.TypeBlockTokens.TryGetValue(nameToken, out var token))
-                            {
-                                AddNamedActions(fileAction, token, moduleType.Identifier, child.TextSpan);
-                                AddActions(fileAction, token, child.TextSpan);
-                                containsActions = true;
-                            }
-                            break;
+                            AddNamedActions(fileAction, token, moduleType.Identifier, child.TextSpan);
+                            AddActions(fileAction, token, child.TextSpan);
+                            containsActions = true;
                         }
+                        break;
+                    }
                     case IdConstants.ClassBlockName:
+                    {
+                        var classType = (ClassBlock)child;
+                        var baseToken = new TypeBlockToken() { FullKey = classType.BaseType };
+                        if (_visualBasicRootNodes.TypeBlockTokens.TryGetValue(baseToken, out var token))
                         {
-                            var classType = (ClassBlock)child;
-                            var baseToken = new TypeBlockToken() { FullKey = classType.BaseType };
-                            if (_visualBasicRootNodes.TypeBlockTokens.TryGetValue(baseToken, out var token))
+                            AddNamedActions(fileAction, token, classType.Identifier, child.TextSpan);
+                            AddActions(fileAction, token, child.TextSpan);
+                            containsActions = true;
+                        }
+
+                        token = null;
+                        var name = string.Concat(
+                            classType.Reference != null
+                                ? string.Concat(classType.Reference.Namespace, ".")
+                                : string.Empty, classType.Identifier);
+                        var nameToken = new TypeBlockToken() { FullKey = name };
+                        if (_visualBasicRootNodes.TypeBlockTokens.TryGetValue(nameToken, out token))
+                        {
+                            AddNamedActions(fileAction, token, classType.Identifier, child.TextSpan);
+                            AddActions(fileAction, token, child.TextSpan);
+                            containsActions = true;
+                        }
+
+                        token = null;
+                        foreach (string interfaceName in classType.Inherits)
+                        {
+                            var baseListToken = new TypeBlockToken() { FullKey = interfaceName };
+                            if (_visualBasicRootNodes.TypeBlockTokens.TryGetValue(baseListToken, out token))
                             {
                                 AddNamedActions(fileAction, token, classType.Identifier, child.TextSpan);
                                 AddActions(fileAction, token, child.TextSpan);
                                 containsActions = true;
                             }
-
-                            token = null;
-                            var name = string.Concat(
-                                classType.Reference != null
-                                    ? string.Concat(classType.Reference.Namespace, ".")
-                                    : string.Empty, classType.Identifier);
-                            var nameToken = new TypeBlockToken() { FullKey = name };
-                            if (_visualBasicRootNodes.TypeBlockTokens.TryGetValue(nameToken, out token))
-                            {
-                                AddNamedActions(fileAction, token, classType.Identifier, child.TextSpan);
-                                AddActions(fileAction, token, child.TextSpan);
-                                containsActions = true;
-                            }
-
-                            token = null;
-                            foreach (string interfaceName in classType.Inherits)
-                            {
-                                var baseListToken = new TypeBlockToken() { FullKey = interfaceName };
-                                if (_visualBasicRootNodes.TypeBlockTokens.TryGetValue(baseListToken, out token))
-                                {
-                                    AddNamedActions(fileAction, token, classType.Identifier, child.TextSpan);
-                                    AddActions(fileAction, token, child.TextSpan);
-                                    containsActions = true;
-                                }
 
                                 token = null;
                             }
@@ -291,76 +289,76 @@ public class VisualBasicRulesAnalysis : IRulesAnalysis
                             break;
                         }
                     case IdConstants.InvocationIdName:
+                    {
+                        var overrideKey = string.Empty;
+
+                        InvocationExpression invocationExpression = (InvocationExpression)child;
+
+                        ////If we don't have a semantic analysis, we dont want to replace invocation expressions, otherwise we'll be replacing expressions regardless of their class/namespace
+                        if (string.IsNullOrEmpty(invocationExpression.SemanticOriginalDefinition))
                         {
-                            var overrideKey = string.Empty;
+                            break;
+                        }
 
-                            InvocationExpression invocationExpression = (InvocationExpression)child;
+                        var compareToken = new InvocationExpressionToken
+                        {
+                            Key = invocationExpression.SemanticOriginalDefinition,
+                            Namespace = invocationExpression.Reference.Namespace,
+                            Type = invocationExpression.SemanticClassType
+                        };
+                        _visualBasicRootNodes.InvocationExpressionTokens.TryGetValue(compareToken, out var token);
 
-                            ////If we don't have a semantic analysis, we dont want to replace invocation expressions, otherwise we'll be replacing expressions regardless of their class/namespace
-                            if (string.IsNullOrEmpty(invocationExpression.SemanticOriginalDefinition))
+                        //Attempt a wildcard search, if applicable. This is invocation expression specific because it has to look inside the invocation expressions only
+                        if (token == null)
+                        {
+                            var wildcardMatches =
+                                _visualBasicRootNodes.InvocationExpressionTokens.Where(i => i.Key.Contains("*"));
+                            if (wildcardMatches.Any())
                             {
-                                break;
+                                token = wildcardMatches.FirstOrDefault(i =>
+                                    compareToken.Key.WildcardEquals(i.Key) && compareToken.Namespace == i.Namespace &&
+                                    compareToken.Type == i.Type);
+
+                                if (token != null)
+                                {
+                                    //We set the key so that we don't do another wildcard search during replacement, we just use the name as it was declared in the code
+                                    overrideKey = compareToken.Key;
+                                }
                             }
 
-                            var compareToken = new InvocationExpressionToken
-                            {
-                                Key = invocationExpression.SemanticOriginalDefinition,
-                                Namespace = invocationExpression.Reference.Namespace,
-                                Type = invocationExpression.SemanticClassType
-                            };
-                            _visualBasicRootNodes.InvocationExpressionTokens.TryGetValue(compareToken, out var token);
-
-                            //Attempt a wildcard search, if applicable. This is invocation expression specific because it has to look inside the invocation expressions only
+                            //If the semanticClassType is too specific to apply to all TData types
                             if (token == null)
                             {
-                                var wildcardMatches =
-                                    _visualBasicRootNodes.InvocationExpressionTokens.Where(i => i.Key.Contains("*"));
-                                if (wildcardMatches.Any())
+                                if (invocationExpression.SemanticClassType.Contains('<'))
                                 {
-                                    token = wildcardMatches.FirstOrDefault(i =>
-                                        compareToken.Key.WildcardEquals(i.Key) && compareToken.Namespace == i.Namespace &&
-                                        compareToken.Type == i.Type);
-
-                                    if (token != null)
+                                    string semanticClassType = invocationExpression.SemanticClassType.Substring(0,
+                                        invocationExpression.SemanticClassType.IndexOf('<'));
+                                    compareToken = new InvocationExpressionToken
                                     {
-                                        //We set the key so that we don't do another wildcard search during replacement, we just use the name as it was declared in the code
-                                        overrideKey = compareToken.Key;
-                                    }
-                                }
-
-                                //If the semanticClassType is too specific to apply to all TData types
-                                if (token == null)
-                                {
-                                    if (invocationExpression.SemanticClassType.Contains('<'))
-                                    {
-                                        string semanticClassType = invocationExpression.SemanticClassType.Substring(0,
-                                            invocationExpression.SemanticClassType.IndexOf('<'));
-                                        compareToken = new InvocationExpressionToken
-                                        {
-                                            Key = invocationExpression.SemanticOriginalDefinition,
-                                            Namespace = invocationExpression.Reference.Namespace,
-                                            Type = semanticClassType
-                                        };
-                                        _visualBasicRootNodes.InvocationExpressionTokens.TryGetValue(compareToken, out token);
-                                    }
+                                        Key = invocationExpression.SemanticOriginalDefinition,
+                                        Namespace = invocationExpression.Reference.Namespace,
+                                        Type = semanticClassType
+                                    };
+                                    _visualBasicRootNodes.InvocationExpressionTokens.TryGetValue(compareToken, out token);
                                 }
                             }
-
-                            if (token != null)
-                            {
-                                AddActions(fileAction, token, child.TextSpan, overrideKey);
-                                containsActions = true;
-                            }
-                            if (AnalyzeChildren(fileAction, child.Children, ++level, parentNamespace, parentClass))
-                            {
-                                containsActions = true;
-                            }
-                            break;
                         }
-                    case IdConstants.ElementAccessIdName:
+
+                        if (token != null)
                         {
-                            break;
+                            AddActions(fileAction, token, child.TextSpan, overrideKey);
+                            containsActions = true;
                         }
+                        if (AnalyzeChildren(fileAction, child.Children, ++level, parentNamespace, parentClass))
+                        {
+                            containsActions = true;
+                        }
+                        break;
+                    }
+                    case IdConstants.ElementAccessIdName:
+                    {
+                        break;
+                    }
 
                     case IdConstants.MemberAccessIdName:
                         {
@@ -382,31 +380,77 @@ public class VisualBasicRulesAnalysis : IRulesAnalysis
                             break;
                         }
                     case IdConstants.DeclarationNodeIdName:
+                    {
+                        var declarationNode = (DeclarationNode)child;
+                        var compareToken = new IdentifierNameToken() { Key = string.Concat(declarationNode.Reference.Namespace, ".", declarationNode.Identifier), Namespace = declarationNode.Reference.Namespace };
+                        _visualBasicRootNodes.IdentifierNameTokens.TryGetValue(compareToken, out var token);
+                        if (token != null)
                         {
-                            var declarationNode = (DeclarationNode)child;
-                            var compareToken = new IdentifierNameToken() { Key = string.Concat(declarationNode.Reference.Namespace, ".", declarationNode.Identifier), Namespace = declarationNode.Reference.Namespace };
-                            _visualBasicRootNodes.IdentifierNameTokens.TryGetValue(compareToken, out var token);
+                            AddActions(fileAction, token, child.TextSpan);
+                            containsActions = true;
+                        }
+                        if (AnalyzeChildren(fileAction, child.Children, ++level, parentNamespace, parentClass)) { containsActions = true; }
+                        break;
+                    }
+                    case IdConstants.ObjectCreationIdName:
+                    {
+                        var objectCreationNode = (ObjectCreationExpression)child;
+                        //Rules based on Object Creation Parent Hierarchy
+                        var compareToken = new ObjectCreationExpressionToken
+                        {
+                            Key = objectCreationNode.Identifier,
+                            Namespace = objectCreationNode.Reference?.Namespace,
+                            Type = objectCreationNode.SemanticClassType
+                        };
+                        _visualBasicRootNodes.ObjectCreationExpressionTokens.TryGetValue(compareToken, out var token);
+                        if (token != null)
+                        {
+                            AddActions(fileAction, token, child.TextSpan);
+                            containsActions = true;
+                        }
+
+                        //Rules based on Object Creation location within code
+                        var compareTokenLocation = new ObjectCreationExpressionToken
+                        {
+                            Key = objectCreationNode.Identifier, Namespace = parentNamespace, Type = parentClass
+                        };
+                        _visualBasicRootNodes.ObjectCreationExpressionTokens.TryGetValue(compareTokenLocation,
+                            out var tokenLocation);
+                        if (tokenLocation != null)
+                        {
+                            AddActions(fileAction, tokenLocation, child.TextSpan);
+                            containsActions = true;
+                        }
+
+                        token = null;
+                        if (!string.IsNullOrEmpty(objectCreationNode.SemanticOriginalDefinition))
+                        {
+                            var nameToken = new ObjectCreationExpressionToken
+                            {
+                                Key = objectCreationNode.SemanticOriginalDefinition,
+                                Namespace = objectCreationNode.SemanticNamespace,
+                                Type = objectCreationNode.SemanticClassType
+                            };
+                            _visualBasicRootNodes.ObjectCreationExpressionTokens.TryGetValue(nameToken, out token);
                             if (token != null)
                             {
                                 AddActions(fileAction, token, child.TextSpan);
                                 containsActions = true;
                             }
-                            if (AnalyzeChildren(fileAction, child.Children, ++level, parentNamespace, parentClass)) { containsActions = true; }
-                            break;
                         }
-                    case IdConstants.ObjectCreationIdName:
-                        {
-                            break;
-                        }
-                    default:
-                        {
-                            if (AnalyzeChildren(fileAction, child.Children, ++level, parentNamespace, parentClass))
-                            {
-                                containsActions = true;
-                            }
 
-                            break;
+                        if (AnalyzeChildren(fileAction, child.Children, ++level, parentNamespace, parentClass)) { containsActions = true; }
+                        break;
+                    }
+                    default:
+                    {
+                        if (AnalyzeChildren(fileAction, child.Children, ++level, parentNamespace, parentClass))
+                        {
+                            containsActions = true;
                         }
+
+                        break;
+                    }
                 }
             }
             catch (Exception ex)
@@ -507,19 +551,35 @@ public class VisualBasicRulesAnalysis : IRulesAnalysis
             MemberAccessActionFunc = a.MemberAccessActionFunc
         }).ToList());
 
+        fileAction.VbObjectCreationExpressionActions.UnionWith(token.ObjectCreationExpressionActions.Select(a =>
+            new ObjectCreationExpressionAction
+            {
+                Key = a.Key,
+                Description = a.Description,
+                Value = a.Value,
+                Name = a.Name,
+                Type = a.Type,
+                TextSpan = textSpan,
+                ActionValidation = a.ActionValidation,
+                ObjectCreationExpressionGenericActionFunc = a.ObjectCreationExpressionGenericActionFunc
+            }).ToList());
+
         if (fileAction.InvocationExpressionActions.Any()
             || fileAction.VbImportActions.Any()
             || fileAction.VbNamespaceActions.Any()
             || fileAction.VbIdentifierNameActions.Any()
             || fileAction.VbAttributeListActions.Any()
-            || fileAction.MemberAccessActions.Any())
+            || fileAction.MemberAccessActions.Any()
+            || fileAction.NamespaceActions.Any()
+            || fileAction.IdentifierNameActions.Any()
+            || fileAction.ObjectCreationExpressionActions.Any())
         {
             var nodeToken = token.Clone();
             nodeToken.TextSpan = textSpan;
             fileAction.VbNodeTokens.Add(nodeToken);
         }
 
-        //AddPackages(token.PackageActions, textSpan);
+        AddPackages(token.PackageActions, textSpan);
     }
 
     /// <summary>

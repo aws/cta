@@ -43,23 +43,22 @@ namespace CTA.Rules.Models
             VbAttributeListActions = new HashSet<AttributeListAction>();
             VbIdentifierNameActions = new HashSet<IdentifierNameAction<Microsoft.CodeAnalysis.VisualBasic.Syntax.IdentifierNameSyntax>>();
             VbAccessorBlockActions = new HashSet<AccessorBlockAction>();
+            VbObjectCreationExpressionActions = new HashSet<CTA.Rules.Models.VisualBasic.ObjectCreationExpressionAction>();
         }
 
         public HashSet<NamespaceAction<NamespaceBlockSyntax>> VbNamespaceActions { get; set; }
         public HashSet<ImportAction> VbImportActions { get; set; }
         public HashSet<InvocationExpressionAction<Microsoft.CodeAnalysis.VisualBasic.Syntax.InvocationExpressionSyntax>>
-            VbInvocationExpressionActions
-        { get; set; }
+            VbInvocationExpressionActions { get; set; }
         public HashSet<IdentifierNameAction<Microsoft.CodeAnalysis.VisualBasic.Syntax.IdentifierNameSyntax>>
-            VbIdentifierNameActions
-        { get; set; }
-        public HashSet<TypeBlockAction>
-            VbTypeBlockActions
-        { get; set; }
+            VbIdentifierNameActions { get; set; }
+        public HashSet<TypeBlockAction> VbTypeBlockActions { get; set; }
         public HashSet<MethodBlockAction> VbMethodBlockActions { get; set; }
         public HashSet<InterfaceBlockAction> VbInterfaceBlockActions { get; set; }
         public HashSet<AttributeListAction> VbAttributeListActions { get; set; }
         public HashSet<AccessorBlockAction> VbAccessorBlockActions { get; set; }
+        public HashSet<CTA.Rules.Models.VisualBasic.ObjectCreationExpressionAction> VbObjectCreationExpressionActions
+            { get; set; }
         public List<VisualBasicNodeToken> VbNodeTokens { get; set; }
 
         public List<CsharpNodeToken> NodeTokens { get; set; }
@@ -92,7 +91,7 @@ namespace CTA.Rules.Models
                 allActions.AddRange(Usingactions);
                 allActions.AddRange(ObjectCreationExpressionActions);
                 allActions.AddRange(NamespaceActions);
-
+                
                 // visual basic actions
                 allActions.AddRange(VbImportActions);
                 allActions.AddRange(VbNamespaceActions);
@@ -103,6 +102,7 @@ namespace CTA.Rules.Models
                 allActions.AddRange(VbAttributeListActions);
                 allActions.AddRange(VbIdentifierNameActions);
                 allActions.AddRange(VbAccessorBlockActions);
+                allActions.AddRange(VbObjectCreationExpressionActions);
                 return allActions;
             }
         }
