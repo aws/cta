@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Codelyzer.Analysis.Model;
 using CTA.Rules.Config;
 using CTA.Rules.Models;
 using Microsoft.CodeAnalysis;
@@ -15,13 +16,27 @@ public class VisualBasicActionsLoader : ActionLoaderBase
     private readonly List<MethodInfo> _compilationUnitActions,
         _invocationExpressionActions,
         _namespaceActions,
-        _identifierNameActions;
+        _identifierNameActions,
+        _attributeActions,
+        _attributeListActions,
+        _typeBlockActions,
+        _elementAccessActions,
+        _expressionActions,
+        _interfaceActions,
+        _methodBlockActions;
         
 
     private readonly object _compilationUnitObject,
         _invocationExpressionObject,
         _namespaceObject,
-        _identifierNameObject;
+        _identifierNameObject,
+        _attributeObject,
+        _attributeListObject,
+        _typeBlockObject,
+        _elementAccessObject,
+        _expressionObject,
+        _interfaceObject,
+        _methodBlockObject;
     
     /// <summary>
     /// Initializes a new ActionLoader that loads the default actions
@@ -33,6 +48,13 @@ public class VisualBasicActionsLoader : ActionLoaderBase
         _invocationExpressionActions = new List<MethodInfo>();
         _namespaceActions = new List<MethodInfo>();
         _identifierNameActions = new List <MethodInfo>();
+        _attributeActions = new List <MethodInfo>();
+        _attributeListActions = new List <MethodInfo>();
+        _typeBlockActions = new List <MethodInfo>();
+        _elementAccessActions = new List <MethodInfo>();
+        _expressionActions = new List <MethodInfo>();
+        _interfaceActions = new List <MethodInfo>();
+        _methodBlockActions = new List <MethodInfo>();
         projectLevelActions = new List<MethodInfo>();
         projectFileActions = new List<MethodInfo>();
         projectTypeActions = new List<MethodInfo>();
@@ -53,6 +75,20 @@ public class VisualBasicActionsLoader : ActionLoaderBase
                     out _invocationExpressionObject);
                 TryCreateInstance(Constants.NamespaceActions, types,
                     out _namespaceObject);
+                TryCreateInstance(Constants.AttributeActions, types,
+                    out _attributeObject);
+                TryCreateInstance(Constants.AttributeListActions, types,
+                    out _attributeListObject);
+                TryCreateInstance(Constants.TypeBlockActions, types,
+                    out _typeBlockObject);
+                TryCreateInstance(Constants.ElementAccessActions, types,
+                    out _elementAccessObject);
+                TryCreateInstance(Constants.ExpressionActions, types,
+                    out _expressionObject);
+                TryCreateInstance(Constants.InterfaceActions, types,
+                    out _interfaceObject);
+                TryCreateInstance(Constants.MethodBlockActions, types,
+                    out _methodBlockObject);
                 TryCreateInstance(Constants.ProjectLevelActions, types, out projectLevelObject);
                 TryCreateInstance(Constants.ProjectFileActions, types, out projectFileObject);
                 TryCreateInstance(Constants.ProjectTypeActions, types, out projectTypeObject);
@@ -97,6 +133,46 @@ public class VisualBasicActionsLoader : ActionLoaderBase
                             _identifierNameActions.AddRange(GetFuncMethods(t));
                             break;
                         }
+                        case Constants.AttributeActions:
+                        {
+                            _attributeActions.AddRange(GetFuncMethods(t));
+                            break;
+                        }
+                        case Constants.AttributeListActions:
+                        {
+                            _attributeListActions.AddRange(GetFuncMethods(t));
+                            break;
+                        }
+                        case Constants.TypeBlockActions:
+                        {
+                            _typeBlockActions.AddRange(GetFuncMethods(t));
+                            break;
+                        }
+                        case Constants.InterfaceActions:
+                        {
+                            _interfaceActions.AddRange(GetFuncMethods(t));
+                            break;
+                        }
+                        case Constants.ExpressionActions:
+                        {
+                            _expressionActions.AddRange(GetFuncMethods(t));
+                            break;
+                        }
+                        case Constants.MethodBlockActions:
+                        {
+                            _methodBlockActions.AddRange(GetFuncMethods(t));
+                            break;
+                        }
+                        case Constants.ElementAccessActions:
+                        {
+                            _elementAccessActions.AddRange(GetFuncMethods(t));
+                            break;
+                        }
+                        case Constants.ObjectCreationExpressionActions:
+                        {
+                            //_objectCreationExpressionActions.AddRange(GetFuncMethods(t));
+                            break;
+                        }
                         default:
                         {
                             LogHelper.LogError($"Action type {t.Name} is not found");
@@ -127,27 +203,28 @@ public class VisualBasicActionsLoader : ActionLoaderBase
 
     public Func<SyntaxGenerator, AttributeSyntax, AttributeSyntax> GetAttributeAction(string name, dynamic value)
     {
-        throw new NotImplementedException();
+        return GetAction<Func<SyntaxGenerator, AttributeSyntax, AttributeSyntax>>
+            (_attributeActions, _attributeObject, name, value);
     }
 
     public Func<SyntaxGenerator, AttributeListSyntax, AttributeListSyntax> GetAttributeListAction(string name, dynamic value)
     {
-        throw new NotImplementedException();
+        return GetAction<Func<SyntaxGenerator, AttributeListSyntax, AttributeListSyntax>>
+            (_attributeListActions, _attributeListObject, name, value);
     }
-
-    /*
-    public Func<SyntaxGenerator, ClassDeclarationSyntax, ClassDeclarationSyntax> GetClassAction(string name, dynamic value)
+    
+    public Func<SyntaxGenerator, TypeBlockSyntax, TypeBlockSyntax> GetClassAction(string name, dynamic value)
     {
-        throw new NotImplementedException();
+        return GetAction<Func<SyntaxGenerator, TypeBlockSyntax, TypeBlockSyntax>>
+            (_typeBlockActions, _typeBlockObject, name, value);
     }
-    */
-    /*
-    public Func<SyntaxGenerator, InterfaceDeclarationSyntax, InterfaceDeclarationSyntax> GetInterfaceAction(string name, dynamic value)
+    
+    public Func<SyntaxGenerator, InterfaceBlockSyntax, InterfaceBlockSyntax> GetInterfaceAction(string name, dynamic value)
     {
-        throw new NotImplementedException();
+        return GetAction<Func<SyntaxGenerator, InterfaceBlockSyntax, InterfaceBlockSyntax>>
+            (_interfaceActions, _interfaceObject, name, value);
     }
-    */
-
+    
     public Func<SyntaxGenerator, IdentifierNameSyntax, IdentifierNameSyntax> GetIdentifierNameAction(string name, dynamic value)
     {
         return GetAction<Func<SyntaxGenerator, IdentifierNameSyntax, IdentifierNameSyntax>>
@@ -156,37 +233,33 @@ public class VisualBasicActionsLoader : ActionLoaderBase
 
     public Func<SyntaxGenerator, SyntaxNode, SyntaxNode> GetExpressionAction(string name, dynamic value)
     {
-        throw new NotImplementedException();
+        return GetAction<Func<SyntaxGenerator, SyntaxNode, SyntaxNode>>
+            (_expressionActions, _expressionObject, name, value);
+    }
+    
+    public Func<SyntaxGenerator, MethodBlockSyntax, MethodBlockSyntax> GetMethodDeclarationAction(string name, dynamic value)
+    {
+        return GetAction<Func<SyntaxGenerator, MethodBlockSyntax, MethodBlockSyntax>>
+            (_methodBlockActions, _methodBlockObject, name, value);
     }
 
-    /*
-    public Func<SyntaxGenerator, MethodDeclarationSyntax, MethodDeclarationSyntax> GetMethodDeclarationAction(string name, dynamic value)
-    {
-        throw new NotImplementedException();
-    }
-    */
-    
-    public Func<SyntaxGenerator, NamespaceBlockSyntax, NamespaceBlockSyntax> GetNamespaceActions(string name, dynamic value)
+    public Func<SyntaxGenerator, NamespaceBlockSyntax, NamespaceBlockSyntax> GetNamespaceActions(string name,
+        dynamic value)
     {
         return GetAction<Func<SyntaxGenerator, NamespaceBlockSyntax, NamespaceBlockSyntax>>
             (_namespaceActions, _namespaceObject, name, value);
     }
-    
 
-    public Func<SyntaxGenerator, ObjectCreationExpressionSyntax, ExpressionSyntax> GetObjectCreationExpressionActions(string name, dynamic value)
+    public Func<SyntaxGenerator, ObjectCreationExpressionSyntax, ExpressionSyntax> GetObjectCreationExpressionActions(
+        string name, dynamic value)
     {
         throw new NotImplementedException();
     }
 
-    /*
-    public Func<SyntaxGenerator, ElementAccessExpressionSyntax, ElementAccessExpressionSyntax> GetElementAccessExpressionActions(string name, dynamic value)
+    public Func<SyntaxGenerator, MemberAccessExpressionSyntax, MemberAccessExpressionSyntax>
+        GetElementAccessExpressionActions(string name, dynamic value)
     {
-        throw new NotImplementedException();
-    }
-    */
-
-    public Func<SyntaxGenerator, SyntaxNode, SyntaxNode> GetMemberAccessExpressionActions(string name, dynamic value)
-    {
-        throw new NotImplementedException();
+        return GetAction<Func<SyntaxGenerator, MemberAccessExpressionSyntax, MemberAccessExpressionSyntax>>
+            (_elementAccessActions, _elementAccessObject, name, value);
     }
 }

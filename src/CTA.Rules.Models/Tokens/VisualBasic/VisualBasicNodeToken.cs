@@ -14,12 +14,16 @@ namespace CTA.Rules.Models.Tokens.VisualBasic
             ImportActions = new List<ImportAction>();
             NamespaceActions = new List<NamespaceAction<NamespaceBlockSyntax>>();
             IdentifierNameActions = new List<IdentifierNameAction<IdentifierNameSyntax>>();
+            TypeBlockActions = new List<TypeBlockAction>();
+            
         }
         
         public List<InvocationExpressionAction<InvocationExpressionSyntax>> InvocationExpressionActions { get; set; }
         public List<ImportAction> ImportActions { get; set; }
         public List<NamespaceAction<NamespaceBlockSyntax>> NamespaceActions { get; set; }
         public List<IdentifierNameAction<IdentifierNameSyntax>> IdentifierNameActions { get; set; }
+        public List<TypeBlockAction> TypeBlockActions { get; set; }
+
 
         public override VisualBasicNodeToken Clone()
         {
@@ -32,6 +36,8 @@ namespace CTA.Rules.Models.Tokens.VisualBasic
                 .Select(action => action.Clone<NamespaceAction<NamespaceBlockSyntax>>()).ToList();
             cloned.IdentifierNameActions = cloned.IdentifierNameActions
                 .Select(action => action.Clone<IdentifierNameAction<IdentifierNameSyntax>>()).ToList();
+            cloned.TypeBlockActions = cloned.TypeBlockActions
+                .Select(action => action.Clone<TypeBlockAction>()).ToList();
             return cloned;
         }
 
@@ -44,6 +50,7 @@ namespace CTA.Rules.Models.Tokens.VisualBasic
                 allActions.AddRange(NamespaceActions);
                 allActions.AddRange(ImportActions);
                 allActions.AddRange(IdentifierNameActions);
+                allActions.AddRange(TypeBlockActions);
                 allActions.AddRange(base.AllActions);
                 return allActions;
             }

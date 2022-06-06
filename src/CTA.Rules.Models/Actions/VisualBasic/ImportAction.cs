@@ -2,7 +2,7 @@
 using Microsoft.CodeAnalysis.VisualBasic.Syntax;
 using Microsoft.CodeAnalysis.Editing;
 
-namespace CTA.Rules.Models.VisualBasic;
+namespace CTA.Rules.Models.VisualBasic { 
 
 public class ImportAction : GenericAction
 {
@@ -21,4 +21,5 @@ public class ImportAction : GenericAction
     {
         return HashCode.Combine(Value, ImportActionFunc?.Method.Name);
     }
+} 
 }

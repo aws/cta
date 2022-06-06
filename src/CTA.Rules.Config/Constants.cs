@@ -84,6 +84,8 @@ namespace CTA.Rules.Config
         public const string InterfaceActions = "InterfaceActions";
         public const string ProjectFileActions = "ProjectFileActions";
         public const string ProjectTypeActions = "ProjectTypeActions";
+        public const string TypeBlockActions = "TypeBlockActions";
+        public const string MethodBlockActions = "MethodBlockActions";
 
         public const string ProjectRecommendationFile = "project.all";
 
@@ -120,6 +122,19 @@ namespace CTA.Rules.Config
         public const string MaxAllowedContentLength = "maxAllowedContentLength";
 
         public static readonly List<string> SupportedMethodModifiers = new List<string>() { "public", "internal", "protected", "private", "abstract", "extern", "override", "static", "unsafe", "virtual", "async" };
+
+        public static readonly List<string> SupportedVbMethodModifiers = new()
+        {
+            "Public",
+            "Internal",
+            "Protected",
+            "Private",
+            "Friend",
+            "Overrides",
+            "Shared",
+            "Overridable",
+            "Async"
+        };
 
         //Monolith code constants
         public const string Await = "await";

@@ -15,8 +15,11 @@ namespace CTA.Rules.Models
             ClassDeclarationActions = new HashSet<ClassDeclarationAction>();
             MethodDeclarationActions = new HashSet<MethodDeclarationAction>();
             ElementAccessActions = new HashSet<ElementAccessAction>();
-            IdentifierNameActions = new HashSet<IdentifierNameAction<Microsoft.CodeAnalysis.CSharp.Syntax.IdentifierNameSyntax>>();
-            InvocationExpressionActions = new HashSet<InvocationExpressionAction<Microsoft.CodeAnalysis.CSharp.Syntax.InvocationExpressionSyntax>>();
+            IdentifierNameActions =
+                new HashSet<IdentifierNameAction<Microsoft.CodeAnalysis.CSharp.Syntax.IdentifierNameSyntax>>();
+            InvocationExpressionActions =
+                new HashSet<InvocationExpressionAction<
+                    Microsoft.CodeAnalysis.CSharp.Syntax.InvocationExpressionSyntax>>();
             ExpressionActions = new HashSet<ExpressionAction>();
             MemberAccessActions = new HashSet<MemberAccessAction>();
             Usingactions = new HashSet<UsingAction>();
@@ -33,6 +36,7 @@ namespace CTA.Rules.Models
             VbImportActions = new HashSet<ImportAction>();
             VbNamespaceActions =
                 new HashSet<NamespaceAction<NamespaceBlockSyntax>>();
+            VbTypeBlockActions = new HashSet<TypeBlockAction>();
         }
 
         public HashSet<NamespaceAction<NamespaceBlockSyntax>> VbNamespaceActions { get; set; }
@@ -41,6 +45,8 @@ namespace CTA.Rules.Models
             VbInvocationExpressionActions { get; set; }
         public HashSet<IdentifierNameAction<Microsoft.CodeAnalysis.VisualBasic.Syntax.IdentifierNameSyntax>>
             VbIdentifierNameAction { get; set; }
+        public HashSet<TypeBlockAction>
+            VbTypeBlockActions { get; set; }
         public List<VisualBasicNodeToken> VbNodeTokens { get; set; }
 
         public List<CsharpNodeToken> NodeTokens { get; set; }
@@ -64,11 +70,7 @@ namespace CTA.Rules.Models
             get
             {
                 var allActions = new List<GenericAction>();
-                allActions.AddRange(AttributeActions);
-                allActions.AddRange(MethodDeclarationActions);
                 allActions.AddRange(ClassDeclarationActions);
-                allActions.AddRange(InterfaceDeclarationActions);
-                allActions.AddRange(ElementAccessActions);
                 allActions.AddRange(MemberAccessActions);
                 allActions.AddRange(IdentifierNameActions);
                 allActions.AddRange(InvocationExpressionActions);
@@ -82,6 +84,7 @@ namespace CTA.Rules.Models
                 allActions.AddRange(VbImportActions);
                 allActions.AddRange(VbNamespaceActions);
                 allActions.AddRange(VbInvocationExpressionActions);
+                allActions.AddRange(VbTypeBlockActions);
                 return allActions;
             }
         }
