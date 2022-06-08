@@ -6,6 +6,8 @@ using System.Runtime.Loader;
 using CTA.Rules.Models;
 using Codelyzer.Analysis;
 using CTA.Rules.Config;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.Editing;
 using Newtonsoft.Json;
 
 namespace CTA.Rules.Actions;
@@ -14,11 +16,13 @@ public class ActionLoaderBase
 {
     protected List<MethodInfo> projectLevelActions,
         projectFileActions,
-        projectTypeActions;
+        projectTypeActions,
+        memberAccessActions;
 
     protected object projectLevelObject,
         projectFileObject,
-        projectTypeObject;
+        projectTypeObject,
+        memberAccessObject;
 
     public Func<string, ProjectType, string> GetProjectLevelActions(string name, dynamic value) =>
         GetAction<Func<string, ProjectType, string>>
@@ -29,6 +33,9 @@ public class ActionLoaderBase
     public Func<ProjectType, ProjectConfiguration, ProjectResult, AnalyzerResult, string> GetProjectTypeActions(string name, dynamic value) =>
         GetAction<Func<ProjectType, ProjectConfiguration, ProjectResult, AnalyzerResult, string>>
             (projectTypeActions, projectTypeObject, name, value);
+    public Func<SyntaxGenerator, SyntaxNode, SyntaxNode> GetMemberAccessExpressionActions(string name, dynamic value) =>
+        GetAction<Func<SyntaxGenerator, SyntaxNode, SyntaxNode>>
+            (memberAccessActions, memberAccessObject, name, value);
     
     #region helper functions
     

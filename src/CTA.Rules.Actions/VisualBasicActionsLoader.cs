@@ -58,6 +58,7 @@ public class VisualBasicActionsLoader : ActionLoaderBase
         _interfaceActions = new List <MethodInfo>();
         _methodBlockActions = new List <MethodInfo>();
         _objectCreationExpressionActions = new List<MethodInfo>();
+        memberAccessActions = new List<MethodInfo>();
         projectLevelActions = new List<MethodInfo>();
         projectFileActions = new List<MethodInfo>();
         projectTypeActions = new List<MethodInfo>();
@@ -87,7 +88,8 @@ public class VisualBasicActionsLoader : ActionLoaderBase
                 TryCreateInstance(Constants.ProjectTypeActions, types, out projectTypeObject);
                 TryCreateInstance(Constants.IdentifierNameActions, types, out _identifierNameObject);
                 TryCreateInstance(Constants.ObjectCreationExpressionActions, types, out _objectExpressionObject);
-                
+                TryCreateInstance(Constants.MemberAccessActions, types, out memberAccessObject);
+
                 foreach (var t in types)
                 {
                     switch (t.Name)
@@ -165,6 +167,11 @@ public class VisualBasicActionsLoader : ActionLoaderBase
                         case Constants.ObjectCreationExpressionActions:
                         {
                             _objectCreationExpressionActions.AddRange(GetFuncMethods(t));
+                            break;
+                        }
+                        case Constants.MemberAccessActions:
+                        {
+                            memberAccessActions.AddRange(GetFuncMethods(t));
                             break;
                         }
                         default:

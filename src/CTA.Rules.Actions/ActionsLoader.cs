@@ -27,7 +27,6 @@ namespace CTA.Rules.Actions
             methodDeclarationActions,
             elementAccessActions,
             objectCreationExpressionActions,
-            memberAccessActions,
             namespaceActions,
             interfaceActions;
 
@@ -41,7 +40,6 @@ namespace CTA.Rules.Actions
             expressionObject,
             methodDeclarationObject,
             elementAccessObject,
-            memberAccessObject,
             objectExpressionObject,
             namespaceObject;
 
@@ -95,7 +93,8 @@ namespace CTA.Rules.Actions
                     var types = assembly.GetTypes()
                         .Where(t => t.Name.EndsWith("Actions") &&
                                     (t.Namespace.EndsWith(ProjectLanguage.Csharp.ToString()) ||
-                                     t.Name.StartsWith("Project"))).ToList();
+                                     t.Name.StartsWith("Project") ||
+                                     t.Name.StartsWith("MemberAccess"))).ToList();
 
                     attributeObject = Activator.CreateInstance(types.FirstOrDefault(t => t.Name == Constants.AttributeActions));
                     attributeListObject = Activator.CreateInstance(types.FirstOrDefault(t => t.Name == Constants.AttributeListActions));
@@ -248,9 +247,6 @@ namespace CTA.Rules.Actions
         public Func<SyntaxGenerator, ElementAccessExpressionSyntax, ElementAccessExpressionSyntax> GetElementAccessExpressionActions(string name, dynamic value) =>
             GetAction<Func<SyntaxGenerator, ElementAccessExpressionSyntax, ElementAccessExpressionSyntax>>
                 (elementAccessActions, elementAccessObject, name, value);
-        public Func<SyntaxGenerator, SyntaxNode, SyntaxNode> GetMemberAccessExpressionActions(string name, dynamic value) =>
-            GetAction<Func<SyntaxGenerator, SyntaxNode, SyntaxNode>>
-                (memberAccessActions, memberAccessObject, name, value);
     }
 
 }
