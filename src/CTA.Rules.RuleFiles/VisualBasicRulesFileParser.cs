@@ -448,21 +448,26 @@ namespace CTA.Rules.RuleFiles
                 try
                 {
                     var actionType = Enum.Parse(typeof(ActionTypes), action.Type);
+
+                    dynamic value = action.VbValue ?? action.Value;
+                    ActionValidation validation = action.VbActionValidation ?? action.ActionValidation;
+                    string vbActionName = "Vb" + action.Name;
+                    
                     switch (actionType)
                     {
                         case ActionTypes.Method:
                         {
-                            var actionFunc = _actionsLoader.GetInvocationExpressionAction(action.Name, action.Value);
+                            var actionFunc = _actionsLoader.GetInvocationExpressionAction(action.Name, value);
                             if (actionFunc != null)
                             {
                                 visualBasicNodeToken.InvocationExpressionActions.Add(
                                     new InvocationExpressionAction<InvocationExpressionSyntax>
                                     {
                                         Key = visualBasicNodeToken.Key,
-                                        Value = GetActionValue(action.Value),
+                                        Value = GetActionValue(value),
                                         Description = action.Description,
-                                        ActionValidation = action.ActionValidation,
-                                        Name = action.Name,
+                                        ActionValidation = validation,
+                                        Name = vbActionName,
                                         Type = action.Type,
                                         InvocationExpressionActionFunc = actionFunc
                                     });
@@ -476,16 +481,16 @@ namespace CTA.Rules.RuleFiles
                         }
                         case ActionTypes.Class:
                         {
-                            var actionFunc = _actionsLoader.GetClassAction(action.Name, action.Value);
+                            var actionFunc = _actionsLoader.GetClassAction(action.Name, value);
                             if (actionFunc != null)
                             {
                                 visualBasicNodeToken.TypeBlockActions.Add(new TypeBlockAction()
                                 {
                                     Key = visualBasicNodeToken.Key,
-                                    Value = GetActionValue(action.Value),
+                                    Value = GetActionValue(value),
                                     Description = action.Description,
-                                    ActionValidation = action.ActionValidation,
-                                    Name = action.Name,
+                                    ActionValidation = validation,
+                                    Name = vbActionName,
                                     Type = action.Type,
                                     TypeBlockActionFunc = actionFunc
                                 });
@@ -498,20 +503,20 @@ namespace CTA.Rules.RuleFiles
                         }
                         case ActionTypes.Using:
                         {
-                            var actionFunc = _actionsLoader.GetCompilationUnitAction(action.Name, action.Value);
+                            var actionFunc = _actionsLoader.GetCompilationUnitAction(action.Name, value);
                             // Using directives can be found in both ComplilationUnit and inside Namespace.
                             // Need to make sure remove action is taken if it's inside Namespace block.
                             // Only add using directives in the CompilationUnit as our convention, so it's not added twice.
-                            var namespaceActionFunc = _actionsLoader.GetNamespaceActions(action.Name, action.Value);
+                            var namespaceActionFunc = _actionsLoader.GetNamespaceActions(action.Name, value);
                             if (actionFunc != null)
                             {
                                 visualBasicNodeToken.ImportActions.Add(new ImportAction()
                                 {
                                     Key = visualBasicNodeToken.Key,
-                                    Value = GetActionValue(action.Value),
+                                    Value = GetActionValue(value),
                                     Description = action.Description,
-                                    ActionValidation = action.ActionValidation,
-                                    Name = action.Name,
+                                    ActionValidation = validation,
+                                    Name = vbActionName,
                                     Type = action.Type,
                                     ImportActionFunc = actionFunc,
                                     ImportsClauseActionFunc = namespaceActionFunc
@@ -521,16 +526,16 @@ namespace CTA.Rules.RuleFiles
                         }
                         case ActionTypes.Namespace:
                         {
-                            var actionFunc = _actionsLoader.GetNamespaceActions(action.Name, action.Value);
+                            var actionFunc = _actionsLoader.GetNamespaceActions(action.Name, value);
                             if (actionFunc != null)
                             {
                                 visualBasicNodeToken.NamespaceActions.Add(new NamespaceAction<NamespaceBlockSyntax>()
                                 {
                                     Key = visualBasicNodeToken.Key,
-                                    Value = GetActionValue(action.Value),
+                                    Value = GetActionValue(value),
                                     Description = action.Description,
-                                    ActionValidation = action.ActionValidation,
-                                    Name = action.Name,
+                                    ActionValidation = validation,
+                                    Name = vbActionName,
                                     Type = action.Type,
                                     NamespaceActionFunc = actionFunc
                                 });
@@ -539,16 +544,16 @@ namespace CTA.Rules.RuleFiles
                         }
                         case ActionTypes.Identifier:
                         {
-                            var actionFunc = _actionsLoader.GetIdentifierNameAction(action.Name, action.Value);
+                            var actionFunc = _actionsLoader.GetIdentifierNameAction(action.Name, value);
                             if (actionFunc != null)
                             {
                                 visualBasicNodeToken.IdentifierNameActions.Add(new IdentifierNameAction<IdentifierNameSyntax>()
                                 {
                                     Key = visualBasicNodeToken.Key,
-                                    Value = GetActionValue(action.Value),
+                                    Value = GetActionValue(value),
                                     Description = action.Description,
-                                    ActionValidation = action.ActionValidation,
-                                    Name = action.Name,
+                                    ActionValidation = validation,
+                                    Name = vbActionName,
                                     Type = action.Type,
                                     IdentifierNameActionFunc = actionFunc
                                 });
@@ -565,16 +570,16 @@ namespace CTA.Rules.RuleFiles
                         }
                         case ActionTypes.ObjectCreation:
                         {
-                            var actionFunc = _actionsLoader.GetObjectCreationExpressionActions(action.Name, action.Value);
+                            var actionFunc = _actionsLoader.GetObjectCreationExpressionActions(action.Name, value);
                             if (actionFunc != null)
                             {
                                 visualBasicNodeToken.ObjectCreationExpressionActions.Add(new ObjectCreationExpressionAction()
                                 {
                                     Key = visualBasicNodeToken.Key,
-                                    Value = GetActionValue(action.Value),
+                                    Value = GetActionValue(value),
                                     Description = action.Description,
-                                    ActionValidation = action.ActionValidation,
-                                    Name = action.Name,
+                                    ActionValidation = validation,
+                                    Name = vbActionName,
                                     Type = action.Type,
                                     ObjectCreationExpressionGenericActionFunc = actionFunc
                                 });
@@ -595,16 +600,16 @@ namespace CTA.Rules.RuleFiles
                         }
                         case ActionTypes.Project:
                         {
-                            var actionFunc = _actionsLoader.GetProjectLevelActions(action.Name, action.Value);
+                            var actionFunc = _actionsLoader.GetProjectLevelActions(action.Name, value);
                             if (actionFunc != null)
                             {
                                 visualBasicNodeToken.ProjectLevelActions.Add(new ProjectLevelAction()
                                 {
                                     Key = visualBasicNodeToken.Key,
-                                    Value = GetActionValue(action.Value),
+                                    Value = GetActionValue(value),
                                     Description = action.Description,
-                                    ActionValidation = action.ActionValidation,
-                                    Name = action.Name,
+                                    ActionValidation = validation,
+                                    Name = vbActionName,
                                     Type = action.Type,
                                     ProjectLevelActionFunc = actionFunc
                                 });
@@ -613,16 +618,16 @@ namespace CTA.Rules.RuleFiles
                         }
                         case ActionTypes.ProjectFile:
                         {
-                            var actionFunc = _actionsLoader.GetProjectFileActions(action.Name, action.Value);
+                            var actionFunc = _actionsLoader.GetProjectFileActions(action.Name, value);
                             if (actionFunc != null)
                             {
                                 visualBasicNodeToken.ProjectFileActions.Add(new ProjectLevelAction()
                                 {
                                     Key = visualBasicNodeToken.Key,
-                                    Value = GetActionValue(action.Value),
+                                    Value = GetActionValue(value),
                                     Description = action.Description,
                                     ActionValidation = action.ActionValidation,
-                                    Name = action.Name,
+                                    Name = vbActionName,
                                     Type = action.Type,
                                     ProjectFileActionFunc = actionFunc
                                 });
@@ -631,16 +636,16 @@ namespace CTA.Rules.RuleFiles
                         }
                         case ActionTypes.ProjectType:
                         {
-                            var actionFunc = _actionsLoader.GetProjectTypeActions(action.Name, action.Value);
+                            var actionFunc = _actionsLoader.GetProjectTypeActions(action.Name, value);
                             if (actionFunc != null)
                             {
                                 visualBasicNodeToken.ProjectTypeActions.Add(new ProjectLevelAction()
                                 {
                                     Key = visualBasicNodeToken.Key,
-                                    Value = GetActionValue(action.Value),
+                                    Value = GetActionValue(value),
                                     Description = action.Description,
                                     ActionValidation = action.ActionValidation,
-                                    Name = action.Name,
+                                    Name = vbActionName,
                                     Type = action.Type,
                                     ProjectTypeActionFunc = actionFunc
                                 });
