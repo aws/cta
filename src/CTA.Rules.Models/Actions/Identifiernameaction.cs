@@ -21,7 +21,7 @@ namespace CTA.Rules.Models
             return HashCode.Combine(Key, Value, IdentifierNameActionFunc?.Method.Name);
         }
 
-        public IdentifierNameAction<T> Copy()
+        public override IdentifierNameAction<T> Copy()
         {
             IdentifierNameAction<T> copy = (IdentifierNameAction<T>)base.Copy();
             copy.IdentifierNameActionFunc = this.IdentifierNameActionFunc;
