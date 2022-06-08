@@ -13,6 +13,11 @@ namespace CTA.Rules.Models.VisualBasic
         {
             InvocationExpressionTokens = new HashSet<InvocationExpressionToken>();
             ImportStatementTokens = new HashSet<ImportStatementToken>();
+            InterfaceBlockTokens = new HashSet<InterfaceBlockToken>();
+            MethodBlockTokens = new HashSet<MethodBlockToken>();
+            AttributeListTokens = new HashSet<AttributeListToken>();
+            AccessorBlockTokens = new HashSet<AccessorBlockToken>();
+            VBMemberAccesstokens = new HashSet<VBMemberAccessToken>();
             NamespaceTokens = new HashSet<NamespaceToken>();
             ProjectTokens = new HashSet<NodeToken>();
             IdentifierNameTokens = new HashSet<IdentifierNameToken>();
@@ -21,6 +26,11 @@ namespace CTA.Rules.Models.VisualBasic
         
         public HashSet<InvocationExpressionToken> InvocationExpressionTokens { get; set; }
         public HashSet<ImportStatementToken> ImportStatementTokens { get; set; }
+        public HashSet<InterfaceBlockToken> InterfaceBlockTokens { get; set; }
+        public HashSet<MethodBlockToken> MethodBlockTokens { get; set; }
+        public HashSet<AttributeListToken> AttributeListTokens { get; set; }
+        public HashSet<AccessorBlockToken> AccessorBlockTokens { get; set; }
+        public HashSet<VBMemberAccessToken> VBMemberAccesstokens { get; set; }
         public HashSet<NamespaceToken> NamespaceTokens { get; set; }
         public HashSet<NodeToken> ProjectTokens { get; set; }
         public HashSet<IdentifierNameToken> IdentifierNameTokens { get; set; }
