@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using CTA.Rules.Models.Actions.VisualBasic;
 using CTA.Rules.Models.Tokens;
 using CTA.Rules.Models.Tokens.VisualBasic;
 using CTA.Rules.Models.VisualBasic;
@@ -38,11 +37,6 @@ namespace CTA.Rules.Models
             VbNamespaceActions =
                 new HashSet<NamespaceAction<NamespaceBlockSyntax>>();
             VbTypeBlockActions = new HashSet<TypeBlockAction>();
-            VbMethodBlockActions = new HashSet<MethodBlockAction>();
-            VbInterfaceBlockActions = new HashSet<InterfaceBlockAction>();
-            VbAttributeListActions = new HashSet<AttributeListAction>();
-            VbIdentifierNameActions = new HashSet<IdentifierNameAction<Microsoft.CodeAnalysis.VisualBasic.Syntax.IdentifierNameSyntax>>();
-            VbAccessorBlockActions = new HashSet<AccessorBlockAction>();
         }
 
         public HashSet<NamespaceAction<NamespaceBlockSyntax>> VbNamespaceActions { get; set; }
@@ -50,13 +44,9 @@ namespace CTA.Rules.Models
         public HashSet<InvocationExpressionAction<Microsoft.CodeAnalysis.VisualBasic.Syntax.InvocationExpressionSyntax>>
             VbInvocationExpressionActions { get; set; }
         public HashSet<IdentifierNameAction<Microsoft.CodeAnalysis.VisualBasic.Syntax.IdentifierNameSyntax>>
-            VbIdentifierNameActions { get; set; }
+            VbIdentifierNameAction { get; set; }
         public HashSet<TypeBlockAction>
             VbTypeBlockActions { get; set; }
-        public HashSet<MethodBlockAction> VbMethodBlockActions { get; set; }
-        public HashSet<InterfaceBlockAction> VbInterfaceBlockActions { get; set; }
-        public HashSet<AttributeListAction> VbAttributeListActions { get; set; }
-        public HashSet<AccessorBlockAction> VbAccessorBlockActions { get; set; }
         public List<VisualBasicNodeToken> VbNodeTokens { get; set; }
 
         public List<CsharpNodeToken> NodeTokens { get; set; }
@@ -95,11 +85,6 @@ namespace CTA.Rules.Models
                 allActions.AddRange(VbNamespaceActions);
                 allActions.AddRange(VbInvocationExpressionActions);
                 allActions.AddRange(VbTypeBlockActions);
-                allActions.AddRange(VbMethodBlockActions);
-                allActions.AddRange(VbInterfaceBlockActions);
-                allActions.AddRange(VbAttributeListActions);
-                allActions.AddRange(VbIdentifierNameActions);
-                allActions.AddRange(VbAccessorBlockActions);
                 return allActions;
             }
         }

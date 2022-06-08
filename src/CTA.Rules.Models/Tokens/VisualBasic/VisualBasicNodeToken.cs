@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Configuration;
 using CTA.Rules.Models.VisualBasic;
 using Microsoft.CodeAnalysis.VisualBasic.Syntax;
-using CTA.Rules.Models.Actions.VisualBasic;
 
 namespace CTA.Rules.Models.Tokens.VisualBasic
 {
@@ -16,10 +15,7 @@ namespace CTA.Rules.Models.Tokens.VisualBasic
             NamespaceActions = new List<NamespaceAction<NamespaceBlockSyntax>>();
             IdentifierNameActions = new List<IdentifierNameAction<IdentifierNameSyntax>>();
             TypeBlockActions = new List<TypeBlockAction>();
-            MethodBlockActions = new List<MethodBlockAction>();
-            InterfaceBlockActions = new List<InterfaceBlockAction>();
-            VbAttributeListActions = new List<AttributeListAction>();
-            AccessorBlockActions = new List<AccessorBlockAction>();
+            
         }
         
         public List<InvocationExpressionAction<InvocationExpressionSyntax>> InvocationExpressionActions { get; set; }
@@ -27,10 +23,7 @@ namespace CTA.Rules.Models.Tokens.VisualBasic
         public List<NamespaceAction<NamespaceBlockSyntax>> NamespaceActions { get; set; }
         public List<IdentifierNameAction<IdentifierNameSyntax>> IdentifierNameActions { get; set; }
         public List<TypeBlockAction> TypeBlockActions { get; set; }
-        public List<MethodBlockAction> MethodBlockActions { get; set; }
-        public List<InterfaceBlockAction> InterfaceBlockActions { get; set; }
-        public List<AttributeListAction> VbAttributeListActions { get; set; }
-        public List<AccessorBlockAction> AccessorBlockActions { get; set; }
+
 
         public override VisualBasicNodeToken Clone()
         {
@@ -45,14 +38,6 @@ namespace CTA.Rules.Models.Tokens.VisualBasic
                 .Select(action => action.Clone<IdentifierNameAction<IdentifierNameSyntax>>()).ToList();
             cloned.TypeBlockActions = cloned.TypeBlockActions
                 .Select(action => action.Clone<TypeBlockAction>()).ToList();
-            cloned.MethodBlockActions = cloned.MethodBlockActions
-                .Select(action => action.Clone<MethodBlockAction>()).ToList();
-            cloned.InterfaceBlockActions = cloned.InterfaceBlockActions
-                .Select(action => action.Clone<InterfaceBlockAction>()).ToList();
-            cloned.VbAttributeListActions = cloned.VbAttributeListActions
-                .Select(action => action.Clone<AttributeListAction>()).ToList();
-            cloned.AccessorBlockActions = cloned.AccessorBlockActions
-                .Select(action => action.Clone<AccessorBlockAction>()).ToList();
             return cloned;
         }
 
@@ -66,10 +51,6 @@ namespace CTA.Rules.Models.Tokens.VisualBasic
                 allActions.AddRange(ImportActions);
                 allActions.AddRange(IdentifierNameActions);
                 allActions.AddRange(TypeBlockActions);
-                allActions.AddRange(MethodBlockActions);
-                allActions.AddRange(InterfaceBlockActions);
-                allActions.AddRange(AttributeListActions);
-                allActions.AddRange(AccessorBlockActions);
                 allActions.AddRange(base.AllActions);
                 return allActions;
             }
