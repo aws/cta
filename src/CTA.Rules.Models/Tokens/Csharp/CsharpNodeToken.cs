@@ -13,6 +13,12 @@ namespace CTA.Rules.Models.Tokens
             NamespaceActions = new List<NamespaceAction<NamespaceDeclarationSyntax>>();
             IdentifierNameActions = new List<IdentifierNameAction<IdentifierNameSyntax>>();
             ObjectCreationExpressionActions = new List<ObjectCreationExpressionAction>();
+            ElementAccessActions = new List<ElementAccessAction>();
+            AttributeActions = new List<AttributeAction>();
+            AttributeListActions = new List<AttributeAction>();
+            ClassDeclarationActions = new List<ClassDeclarationAction>();
+            MethodDeclarationActions = new List<MethodDeclarationAction>();
+            InterfaceDeclarationActions = new List<InterfaceDeclarationAction>();
         }
         
         public List<UsingAction> UsingActions { get; set; }
@@ -20,6 +26,12 @@ namespace CTA.Rules.Models.Tokens
         public List<NamespaceAction<NamespaceDeclarationSyntax>> NamespaceActions { get; set; }
         public List<IdentifierNameAction<IdentifierNameSyntax>> IdentifierNameActions { get; set; }
         public List<ObjectCreationExpressionAction> ObjectCreationExpressionActions{ get; set; }
+        public List<ElementAccessAction> ElementAccessActions { get; set; }
+        public List<AttributeAction> AttributeActions { get; set; }
+        public List<AttributeAction> AttributeListActions { get; set; }
+        public List<ClassDeclarationAction> ClassDeclarationActions { get; set; }
+        public List<InterfaceDeclarationAction> InterfaceDeclarationActions { get; set; }
+        public List<MethodDeclarationAction> MethodDeclarationActions { get; set; }
 
         public override CsharpNodeToken Clone()
         {
@@ -29,6 +41,12 @@ namespace CTA.Rules.Models.Tokens
             cloned.InvocationExpressionActions = cloned.InvocationExpressionActions.Select(action => action.Clone<InvocationExpressionAction<InvocationExpressionSyntax>>()).ToList();
             cloned.NamespaceActions = cloned.NamespaceActions.Select(action => action.Clone<NamespaceAction<NamespaceDeclarationSyntax>>()).ToList();
             cloned.ObjectCreationExpressionActions = cloned.ObjectCreationExpressionActions.Select(action => action.Clone<ObjectCreationExpressionAction>()).ToList();
+            cloned.ElementAccessActions = cloned.ElementAccessActions.Select(action => action.Clone<ElementAccessAction>()).ToList();
+            cloned.AttributeActions = cloned.AttributeActions?.Select(action => action.Clone<AttributeAction>())?.ToList();
+            cloned.AttributeListActions = cloned.AttributeListActions?.Select(action => action.Clone<AttributeAction>())?.ToList();
+            cloned.ClassDeclarationActions = cloned.ClassDeclarationActions?.Select(action => action.Clone<ClassDeclarationAction>())?.ToList();
+            cloned.InterfaceDeclarationActions = cloned.InterfaceDeclarationActions.Select(action => action.Clone<InterfaceDeclarationAction>()).ToList();
+            cloned.MethodDeclarationActions = cloned.MethodDeclarationActions.Select(action => action.Clone<MethodDeclarationAction>()).ToList();
 
             return cloned;
         }
@@ -38,11 +56,17 @@ namespace CTA.Rules.Models.Tokens
             get
             {
                 var allActions = new List<GenericAction>();
+                allActions.AddRange(AttributeActions);
+                allActions.AddRange(AttributeListActions);
                 allActions.AddRange(InvocationExpressionActions);
                 allActions.AddRange(UsingActions);
                 allActions.AddRange(NamespaceActions);
                 allActions.AddRange(IdentifierNameActions);
                 allActions.AddRange(ObjectCreationExpressionActions);
+                allActions.AddRange(ElementAccessActions);
+                allActions.AddRange(MethodDeclarationActions);
+                allActions.AddRange(ClassDeclarationActions);
+                allActions.AddRange(InterfaceDeclarationActions);
                 allActions.AddRange(base.AllActions);
                 return allActions;
             }

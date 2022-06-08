@@ -21,6 +21,7 @@ namespace CTA.Rules.Models
             InvocationExpressionActions =
                 new HashSet<InvocationExpressionAction<
                     Microsoft.CodeAnalysis.CSharp.Syntax.InvocationExpressionSyntax>>();
+            // Member and Expression Actions do not need separate Vb models because they act on shared SyntaxNode object
             ExpressionActions = new HashSet<ExpressionAction>();
             MemberAccessActions = new HashSet<MemberAccessAction>();
             Usingactions = new HashSet<UsingAction>();
@@ -43,7 +44,9 @@ namespace CTA.Rules.Models
             VbAttributeListActions = new HashSet<AttributeListAction>();
             VbIdentifierNameActions = new HashSet<IdentifierNameAction<Microsoft.CodeAnalysis.VisualBasic.Syntax.IdentifierNameSyntax>>();
             VbAccessorBlockActions = new HashSet<AccessorBlockAction>();
+            VbElementAccessActions = new HashSet<CTA.Rules.Models.VisualBasic.ElementAccessAction>();
             VbObjectCreationExpressionActions = new HashSet<CTA.Rules.Models.VisualBasic.ObjectCreationExpressionAction>();
+            VbAttributeActions = new HashSet<Actions.VisualBasic.AttributeAction>();
         }
 
         public HashSet<NamespaceAction<NamespaceBlockSyntax>> VbNamespaceActions { get; set; }
@@ -59,6 +62,8 @@ namespace CTA.Rules.Models
         public HashSet<AccessorBlockAction> VbAccessorBlockActions { get; set; }
         public HashSet<CTA.Rules.Models.VisualBasic.ObjectCreationExpressionAction> VbObjectCreationExpressionActions
             { get; set; }
+        public HashSet<CTA.Rules.Models.VisualBasic.ElementAccessAction> VbElementAccessActions { get; set; }
+        public HashSet<CTA.Rules.Models.Actions.VisualBasic.AttributeAction> VbAttributeActions { get; set; }
         public List<VisualBasicNodeToken> VbNodeTokens { get; set; }
 
         public List<CsharpNodeToken> NodeTokens { get; set; }
@@ -103,6 +108,8 @@ namespace CTA.Rules.Models
                 allActions.AddRange(VbIdentifierNameActions);
                 allActions.AddRange(VbAccessorBlockActions);
                 allActions.AddRange(VbObjectCreationExpressionActions);
+                allActions.AddRange(VbElementAccessActions);
+                allActions.AddRange(VbAttributeActions);
                 return allActions;
             }
         }

@@ -10,7 +10,7 @@ namespace CTA.Rules.Models.Actions.VisualBasic
 
         public override bool Equals(object obj)
         {
-            var action = (AttributeAction)obj;
+            var action = (Models.AttributeAction)obj;
             return action?.Key == this.Key
                 && action?.Value == this.Value
                 && action.AttributeListActionFunc != null && this.AttributeListActionFunc != null

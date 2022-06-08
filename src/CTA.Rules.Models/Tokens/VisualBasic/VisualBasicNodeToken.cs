@@ -20,6 +20,9 @@ namespace CTA.Rules.Models.Tokens.VisualBasic
             VbAttributeListActions = new List<AttributeListAction>();
             AccessorBlockActions = new List<AccessorBlockAction>();
             ObjectCreationExpressionActions = new List<CTA.Rules.Models.VisualBasic.ObjectCreationExpressionAction>();
+            ElementAccessActions = new List<CTA.Rules.Models.VisualBasic.ElementAccessAction>();
+            AttributeActions = new List<Actions.VisualBasic.AttributeAction>();
+
         }
 
         public List<InvocationExpressionAction<InvocationExpressionSyntax>> InvocationExpressionActions { get; set; }
@@ -32,6 +35,8 @@ namespace CTA.Rules.Models.Tokens.VisualBasic
         public List<AttributeListAction> VbAttributeListActions { get; set; }
         public List<AccessorBlockAction> AccessorBlockActions { get; set; }
         public List<CTA.Rules.Models.VisualBasic.ObjectCreationExpressionAction> ObjectCreationExpressionActions{ get; set; }
+        public List<CTA.Rules.Models.VisualBasic.ElementAccessAction> ElementAccessActions { get; set; }
+        public List<CTA.Rules.Models.Actions.VisualBasic.AttributeAction> AttributeActions { get; set; }
 
 
         public override VisualBasicNodeToken Clone()
@@ -57,6 +62,10 @@ namespace CTA.Rules.Models.Tokens.VisualBasic
                 .Select(action => action.Clone<AccessorBlockAction>()).ToList();
             cloned.ObjectCreationExpressionActions = cloned.ObjectCreationExpressionActions
                 .Select(action => action.Clone<CTA.Rules.Models.VisualBasic.ObjectCreationExpressionAction>()).ToList();
+            cloned.ElementAccessActions = cloned.ElementAccessActions
+                .Select(action => action.Clone<Models.VisualBasic.ElementAccessAction>()).ToList();
+            cloned.AttributeActions = cloned.AttributeActions
+                .Select(action => action.Clone<Models.Actions.VisualBasic.AttributeAction>()).ToList();
             return cloned;
         }
 
@@ -72,9 +81,11 @@ namespace CTA.Rules.Models.Tokens.VisualBasic
                 allActions.AddRange(TypeBlockActions);
                 allActions.AddRange(MethodBlockActions);
                 allActions.AddRange(InterfaceBlockActions);
-                allActions.AddRange(AttributeListActions);
+                allActions.AddRange(VbAttributeListActions);
                 allActions.AddRange(AccessorBlockActions);
                 allActions.AddRange(ObjectCreationExpressionActions);
+                allActions.AddRange(ElementAccessActions);
+                allActions.AddRange(AttributeActions);
                 allActions.AddRange(base.AllActions);
                 return allActions;
             }

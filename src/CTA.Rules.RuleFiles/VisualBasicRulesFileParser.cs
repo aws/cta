@@ -5,10 +5,15 @@ using System.Linq;
 using CTA.Rules.Actions;
 using CTA.Rules.Config;
 using CTA.Rules.Models;
+using CTA.Rules.Models.Actions.VisualBasic;
 using CTA.Rules.Models.VisualBasic;
 using CTA.Rules.Models.Tokens.VisualBasic;
 using Microsoft.CodeAnalysis.VisualBasic.Syntax;
+using AttributeToken = CTA.Rules.Models.Tokens.VisualBasic.AttributeToken;
+using ElementAccessAction = CTA.Rules.Models.VisualBasic.ElementAccessAction;
+using ElementAccessToken = CTA.Rules.Models.Tokens.VisualBasic.ElementAccessToken;
 using IdentifierNameToken = CTA.Rules.Models.VisualBasic.IdentifierNameToken;
+using MemberAccessToken = CTA.Rules.Models.Tokens.VisualBasic.MemberAccessToken;
 using ObjectCreationExpressionAction = CTA.Rules.Models.VisualBasic.ObjectCreationExpressionAction;
 
 
@@ -169,17 +174,27 @@ namespace CTA.Rules.RuleFiles
                             ParseActions(token, @class.Actions);
                         }
                     }
-                    /*
+                    
                     foreach (var attribute in @class.Attributes)
                     {
                         if (attribute.Actions != null && attribute.Actions.Count > 0)
                         {
-                            var token = new AttributeToken() { Key = attribute.Key, Namespace = @namespace.@namespace, FullKey = attribute.FullKey, Type = @class.Key };
-                            if (!_rootNodes.Attributetokens.Contains(token)) { _rootNodes.Attributetokens.Add(token); }
+                            var token = new AttributeToken
+                            {
+                                Key = attribute.Key,
+                                Namespace = @namespace.@namespace,
+                                FullKey = attribute.FullKey,
+                                Type = @class.Key
+                            };
+                            if (!_visualBasicRootNodes.AttributeTokens.Contains(token))
+                            {
+                                _visualBasicRootNodes.AttributeTokens.Add(token);
+                            }
+
                             ParseActions(token, attribute.Actions);
                         }
                     }
-                     */
+                    
                     foreach (var objectCreation in @class.ObjectCreations)
                     {
                         if (objectCreation.Actions != null && objectCreation.Actions.Count > 0)
@@ -216,10 +231,10 @@ namespace CTA.Rules.RuleFiles
                 {
                     if (@interface.Actions != null && @interface.Actions.Count > 0)
                     {
-                        if (@interface.KeyType == CTA.Rules.Config.Constants.BaseClass || @interface.KeyType == CTA.Rules.Config.Constants.InterfaceName)
+                        if (@interface.KeyType == Constants.BaseClass || @interface.KeyType == CTA.Rules.Config.Constants.InterfaceName)
                         {
                         }
-                        else if (@interface.KeyType == CTA.Rules.Config.Constants.Identifier)
+                        else if (@interface.KeyType == Constants.Identifier)
                         {
                             var token = new IdentifierNameToken
                             {
@@ -239,6 +254,19 @@ namespace CTA.Rules.RuleFiles
                     {
                         if (attribute.Actions != null && attribute.Actions.Count > 0)
                         {
+                            var token = new AttributeToken
+                            {
+                                Key = attribute.Key,
+                                Namespace = @namespace.@namespace,
+                                FullKey = attribute.FullKey,
+                                Type = @interface.Key
+                            };
+                            if (!_visualBasicRootNodes.AttributeTokens.Contains(token))
+                            {
+                                _visualBasicRootNodes.AttributeTokens.Add(token);
+                            }
+
+                            ParseActions(token, attribute.Actions);
                         }
                     }
 
@@ -259,8 +287,8 @@ namespace CTA.Rules.RuleFiles
         /// <summary>
         /// Processes each rule object by creating tokens and associated actions
         /// </summary>
-        /// <param name="rootobject">An object containing tokens and actions to run on these tokens</param>
-        public void ProcessObject(NamespaceRecommendations namespaceRecommendations)
+        /// <param name="namespaceRecommendations">An object containing tokens and actions to run on these tokens</param>
+        private void ProcessObject(NamespaceRecommendations namespaceRecommendations)
         {
             var namespaces = namespaceRecommendations.NameSpaces;
 
@@ -381,11 +409,41 @@ namespace CTA.Rules.RuleFiles
                                 }
                                 case ActionTypes.Expression:
                                 {
-                                    throw new NotImplementedException();
+                                    var token = new ExpressionToken
+                                    {
+                                        Key = recommendation.Name,
+                                        Description = recommendedActions.Description,
+                                        TargetCPU = targetCPUs,
+                                        Namespace = @namespace.Name,
+                                        FullKey = recommendation.Value,
+                                        Type = recommendation.ContainingType
+                                    };
+                                    if (!_visualBasicRootNodes.ExpressionTokens.Contains(token))
+                                    {
+                                        _visualBasicRootNodes.ExpressionTokens.Add(token);
+                                    }
+
+                                    ParseActions(token, recommendedActions.Actions);
+                                    break;
                                 }
                                 case ActionTypes.Attribute:
                                 {
-                                    throw new NotImplementedException();
+                                    var token = new AttributeToken()
+                                    {
+                                        Key = recommendation.Name,
+                                        Description = recommendedActions.Description,
+                                        TargetCPU = targetCPUs,
+                                        Namespace = @namespace.Name,
+                                        FullKey = recommendation.Value,
+                                        Type = recommendation.ContainingType
+                                    };
+                                    if (!_visualBasicRootNodes.AttributeTokens.Contains(token))
+                                    {
+                                        _visualBasicRootNodes.AttributeTokens.Add(token);
+                                    }
+
+                                    ParseActions(token, recommendedActions.Actions);
+                                    break;
                                 }
 
                                 case ActionTypes.ObjectCreation:
@@ -409,17 +467,62 @@ namespace CTA.Rules.RuleFiles
 
                                 case ActionTypes.MethodDeclaration:
                                 {
-                                    throw new NotImplementedException();
+                                    var token = new MethodBlockToken
+                                    {
+                                        Key = recommendation.Name,
+                                        Description = recommendedActions.Description,
+                                        TargetCPU = targetCPUs,
+                                        Namespace = @namespace.Name,
+                                        FullKey = recommendation.Value,
+                                        Type = recommendation.ContainingType
+                                    };
+                                    if (!_visualBasicRootNodes.MethodBlockTokens.Contains(token))
+                                    {
+                                        _visualBasicRootNodes.MethodBlockTokens.Add(token);
+                                    }
+
+                                    ParseActions(token, recommendedActions.Actions);
+                                    break;
                                 }
 
                                 case ActionTypes.ElementAccess:
                                 {
-                                    throw new NotImplementedException();
+                                    var token = new ElementAccessToken
+                                    {
+                                        Key = recommendation.Name,
+                                        Description = recommendedActions.Description,
+                                        TargetCPU = targetCPUs,
+                                        Namespace = @namespace.Name,
+                                        FullKey = recommendation.Value,
+                                        Type = recommendation.ContainingType
+                                    };
+                                    if (!_visualBasicRootNodes.ElementAccessTokens.Contains(token))
+                                    {
+                                        _visualBasicRootNodes.ElementAccessTokens.Add(token);
+                                    }
+
+                                    ParseActions(token, recommendedActions.Actions);
+                                    break;
                                 }
 
                                 case ActionTypes.MemberAccess:
                                 {
-                                    throw new NotImplementedException();
+                                    var token = new MemberAccessToken
+                                    {
+                                        Key = recommendation.Name,
+                                        Description = recommendedActions.Description,
+                                        TargetCPU = targetCPUs,
+                                        Namespace = @namespace.Name,
+                                        FullKey = recommendation.Value,
+                                        Type = recommendation.ContainingType
+                                    };
+                                    if (!_visualBasicRootNodes.MemberAccessTokens.Contains(token))
+                                    {
+                                        _visualBasicRootNodes.MemberAccessTokens.Add(token);
+                                    }
+
+                                    ParseActions(token, recommendedActions.Actions);
+                                    break;
                                 }
 
                                 case ActionTypes.Project:
@@ -477,6 +580,20 @@ namespace CTA.Rules.RuleFiles
                         }
                         case ActionTypes.Expression:
                         {
+                            var actionFunc = _actionsLoader.GetExpressionAction(action.Name, value);
+                            if (actionFunc != null)
+                            {
+                                visualBasicNodeToken.ExpressionActions.Add(new ExpressionAction()
+                                {
+                                    Key = visualBasicNodeToken.Key,
+                                    Value = GetActionValue(value),
+                                    Description = action.Description,
+                                    ActionValidation = action.ActionValidation,
+                                    Name = vbActionName,
+                                    Type = action.Type,
+                                    ExpressionActionFunc = actionFunc
+                                });
+                            }
                             break;
                         }
                         case ActionTypes.Class:
@@ -499,6 +616,20 @@ namespace CTA.Rules.RuleFiles
                         }
                         case ActionTypes.Interface:
                         {
+                            var actionFunc = _actionsLoader.GetInterfaceAction(action.Name, value);
+                            if (actionFunc != null)
+                            {
+                                visualBasicNodeToken.InterfaceBlockActions.Add(new InterfaceBlockAction()
+                                {
+                                    Key = visualBasicNodeToken.Key,
+                                    Value = GetActionValue(value),
+                                    Description = action.Description,
+                                    ActionValidation = action.ActionValidation,
+                                    Name = vbActionName,
+                                    Type = action.Type,
+                                    InterfaceBlockActionFunc = actionFunc
+                                });
+                            }
                             break;
                         }
                         case ActionTypes.Using:
@@ -562,10 +693,38 @@ namespace CTA.Rules.RuleFiles
                         }
                         case ActionTypes.Attribute:
                         {
+                            var actionFunc = _actionsLoader.GetAttributeAction(action.Name, value);
+                            if (actionFunc != null)
+                            {
+                                visualBasicNodeToken.AttributeActions.Add(new Models.Actions.VisualBasic.AttributeAction()
+                                {
+                                    Key = visualBasicNodeToken.Key,
+                                    Value = GetActionValue(value),
+                                    Description = action.Description,
+                                    ActionValidation = action.ActionValidation,
+                                    Name = vbActionName,
+                                    Type = action.Type,
+                                    AttributeActionFunc = actionFunc
+                                });
+                            }
                             break;
                         }
                         case ActionTypes.AttributeList:
                         {
+                            var actionFunc = _actionsLoader.GetAttributeListAction(action.Name, value);
+                            if (actionFunc != null)
+                            {
+                                visualBasicNodeToken.VbAttributeListActions.Add(new Models.Actions.VisualBasic.AttributeListAction()
+                                {
+                                    Key = visualBasicNodeToken.Key,
+                                    Value = GetActionValue(value),
+                                    Description = action.Description,
+                                    ActionValidation = action.ActionValidation,
+                                    Name = vbActionName,
+                                    Type = action.Type,
+                                    AttributeListActionFunc = actionFunc
+                                });
+                            }
                             break;
                         }
                         case ActionTypes.ObjectCreation:
@@ -588,14 +747,56 @@ namespace CTA.Rules.RuleFiles
                         }
                         case ActionTypes.MethodDeclaration:
                         {
+                            var actionFunc = _actionsLoader.GetMethodDeclarationAction(action.Name, value);
+                            if (actionFunc != null)
+                            {
+                                visualBasicNodeToken.MethodBlockActions.Add(new MethodBlockAction()
+                                {
+                                    Key = visualBasicNodeToken.Key,
+                                    Value = GetActionValue(value),
+                                    Description = action.Description,
+                                    ActionValidation = action.ActionValidation,
+                                    Name = vbActionName,
+                                    Type = action.Type,
+                                    MethodBlockActionFunc = actionFunc
+                                });
+                            }
                             break;
                         }
                         case ActionTypes.ElementAccess:
                         {
+                            var actionFunc = _actionsLoader.GetElementAccessExpressionActions(action.Name, value);
+                            if (actionFunc != null)
+                            {
+                                visualBasicNodeToken.ElementAccessActions.Add(new ElementAccessAction()
+                                {
+                                    Key = visualBasicNodeToken.Key,
+                                    Value = GetActionValue(value),
+                                    Description = action.Description,
+                                    ActionValidation = action.ActionValidation,
+                                    Name = vbActionName,
+                                    Type = action.Type,
+                                    ElementAccessExpressionActionFunc = actionFunc
+                                });
+                            }
                             break;
                         }
                         case ActionTypes.MemberAccess:
                         {
+                            var actionFunc = _actionsLoader.GetMemberAccessExpressionActions(action.Name, value);
+                            if (actionFunc != null)
+                            {
+                                visualBasicNodeToken.MemberAccessActions.Add(new MemberAccessAction()
+                                {
+                                    Key = visualBasicNodeToken.Key,
+                                    Value = GetActionValue(value),
+                                    Description = action.Description,
+                                    ActionValidation = action.ActionValidation,
+                                    Name = vbActionName,
+                                    Type = action.Type,
+                                    MemberAccessActionFunc = actionFunc
+                                });
+                            }
                             break;
                         }
                         case ActionTypes.Project:

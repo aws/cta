@@ -12,10 +12,13 @@ namespace CTA.Rules.Models.VisualBasic
             ImportStatementTokens = new HashSet<ImportStatementToken>();
             InterfaceBlockTokens = new HashSet<InterfaceBlockToken>();
             MethodBlockTokens = new HashSet<MethodBlockToken>();
+            AttributeTokens = new HashSet<Tokens.VisualBasic.AttributeToken>();
             AttributeListTokens = new HashSet<AttributeListToken>();
             AccessorBlockTokens = new HashSet<AccessorBlockToken>();
-            VBMemberAccesstokens = new HashSet<VBMemberAccessToken>();
+            MemberAccessTokens = new HashSet<Tokens.VisualBasic.MemberAccessToken>();
             NamespaceTokens = new HashSet<NamespaceToken>();
+            ExpressionTokens = new HashSet<ExpressionToken>();
+            ElementAccessTokens = new HashSet<Tokens.VisualBasic.ElementAccessToken>();
             ProjectTokens = new HashSet<NodeToken>();
             IdentifierNameTokens = new HashSet<IdentifierNameToken>();
             TypeBlockTokens = new HashSet<TypeBlockToken>();
@@ -26,10 +29,13 @@ namespace CTA.Rules.Models.VisualBasic
         public HashSet<ImportStatementToken> ImportStatementTokens { get; set; }
         public HashSet<InterfaceBlockToken> InterfaceBlockTokens { get; set; }
         public HashSet<MethodBlockToken> MethodBlockTokens { get; set; }
+        public HashSet<CTA.Rules.Models.Tokens.VisualBasic.AttributeToken> AttributeTokens { get; set; }
         public HashSet<AttributeListToken> AttributeListTokens { get; set; }
         public HashSet<AccessorBlockToken> AccessorBlockTokens { get; set; }
-        public HashSet<VBMemberAccessToken> VBMemberAccesstokens { get; set; }
+        public HashSet<Tokens.VisualBasic.MemberAccessToken> MemberAccessTokens { get; set; }
         public HashSet<NamespaceToken> NamespaceTokens { get; set; }
+        public HashSet<ExpressionToken> ExpressionTokens { get; set; }
+        public HashSet<Tokens.VisualBasic.ElementAccessToken> ElementAccessTokens { get; set; }
         public HashSet<NodeToken> ProjectTokens { get; set; }
         public HashSet<IdentifierNameToken> IdentifierNameTokens { get; set; }
         public HashSet<TypeBlockToken> TypeBlockTokens { get; set; }

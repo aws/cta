@@ -10,9 +10,11 @@ using CTA.Rules.Models.Actions.VisualBasic;
 using CTA.Rules.Models.Tokens.VisualBasic;
 using CTA.Rules.Models.VisualBasic;
 using Microsoft.CodeAnalysis.VisualBasic.Syntax;
+using AttributeAction = CTA.Rules.Models.Actions.VisualBasic.AttributeAction;
+using ElementAccessAction = CTA.Rules.Models.VisualBasic.ElementAccessAction;
+using ElementAccessToken = CTA.Rules.Models.Tokens.VisualBasic.ElementAccessToken;
 using IdentifierNameToken = CTA.Rules.Models.VisualBasic.IdentifierNameToken;
-using InvocationExpressionToken = CTA.Rules.Models.Tokens.VisualBasic.InvocationExpressionToken;
-using NamespaceToken = CTA.Rules.Models.Tokens.VisualBasic.NamespaceToken;
+using MemberAccessToken = CTA.Rules.Models.Tokens.VisualBasic.MemberAccessToken;
 using ObjectCreationExpressionAction = CTA.Rules.Models.VisualBasic.ObjectCreationExpressionAction;
 
 namespace CTA.Rules.Analyzer;
@@ -25,7 +27,7 @@ public class VisualBasicRulesAnalysis : IRulesAnalysis
     private readonly ProjectType _projectType;
 
     /// <summary>
-    /// Initializes a RulesAnalysis instance for Visual Basic projects
+    ///     Initializes a RulesAnalysis instance for Visual Basic projects
     /// </summary>
     /// <param name="sourceFileResults">List of analyzed code files</param>
     /// <param name="visualBasicRootNodes">List of rules to be applied to the code files</param>
@@ -50,11 +52,11 @@ public class VisualBasicRulesAnalysis : IRulesAnalysis
                 _projectActions.FileActions.Add(fileAction);
             }
         });
-        
+
         AddPackages(
             _visualBasicRootNodes.ProjectTokens.Where(p => p.FullKey == _projectType.ToString())
                 ?.SelectMany(p => p.PackageActions)?.Distinct()?.ToList(), null);
-        
+
         return _projectActions;
     }
 
@@ -107,17 +109,23 @@ public class VisualBasicRulesAnalysis : IRulesAnalysis
                 switch (child.NodeType)
                 {
                     case IdConstants.AttributeListName:
+                    {
+                        var attributeList = (AttributeList)child;
+                        var compareToken = new AttributeListToken
                         {
-                            var attributeList = (AttributeList)child;
-                            var compareToken = new AttributeListToken() { Key = attributeList.Identifier, Namespace = attributeList.Reference.Namespace, Type = attributeList.SemanticClassType };
-                            _visualBasicRootNodes.AttributeListTokens.TryGetValue(compareToken, out var token);
-                            if (token != null)
-                            {
-                                AddActions(fileAction, token, child.TextSpan);
-                                containsActions = true;
-                            }
-                            break;
+                            Key = attributeList.Identifier,
+                            Namespace = attributeList.Reference.Namespace,
+                            Type = attributeList.SemanticClassType
+                        };
+                        _visualBasicRootNodes.AttributeListTokens.TryGetValue(compareToken, out var token);
+                        if (token != null)
+                        {
+                            AddActions(fileAction, token, child.TextSpan);
+                            containsActions = true;
                         }
+
+                        break;
+                    }
                     case IdConstants.ImportsStatementName:
                     {
                         var overrideKey = string.Empty;
@@ -146,11 +154,13 @@ public class VisualBasicRulesAnalysis : IRulesAnalysis
                                 }
                             }
                         }
+
                         if (token != null)
                         {
                             AddActions(fileAction, token, child.TextSpan, overrideKey);
                             containsActions = true;
                         }
+
                         break;
                     }
                     case IdConstants.NamespaceBlockIdName:
@@ -162,10 +172,12 @@ public class VisualBasicRulesAnalysis : IRulesAnalysis
                             AddActions(fileAction, token, child.TextSpan);
                             containsActions = true;
                         }
+
                         if (AnalyzeChildren(fileAction, child.Children, ++level, child.Identifier))
                         {
                             containsActions = true;
                         }
+
                         break;
                     }
                     case IdConstants.ModuleBlockName:
@@ -175,19 +187,20 @@ public class VisualBasicRulesAnalysis : IRulesAnalysis
                             moduleType.Reference != null
                                 ? string.Concat(moduleType.Reference.Namespace, ".")
                                 : string.Empty, moduleType.Identifier);
-                        var nameToken = new TypeBlockToken() { FullKey = name };
+                        var nameToken = new TypeBlockToken { FullKey = name };
                         if (_visualBasicRootNodes.TypeBlockTokens.TryGetValue(nameToken, out var token))
                         {
                             AddNamedActions(fileAction, token, moduleType.Identifier, child.TextSpan);
                             AddActions(fileAction, token, child.TextSpan);
                             containsActions = true;
                         }
+
                         break;
                     }
                     case IdConstants.ClassBlockName:
                     {
                         var classType = (ClassBlock)child;
-                        var baseToken = new TypeBlockToken() { FullKey = classType.BaseType };
+                        var baseToken = new TypeBlockToken { FullKey = classType.BaseType };
                         if (_visualBasicRootNodes.TypeBlockTokens.TryGetValue(baseToken, out var token))
                         {
                             AddNamedActions(fileAction, token, classType.Identifier, child.TextSpan);
@@ -200,7 +213,7 @@ public class VisualBasicRulesAnalysis : IRulesAnalysis
                             classType.Reference != null
                                 ? string.Concat(classType.Reference.Namespace, ".")
                                 : string.Empty, classType.Identifier);
-                        var nameToken = new TypeBlockToken() { FullKey = name };
+                        var nameToken = new TypeBlockToken { FullKey = name };
                         if (_visualBasicRootNodes.TypeBlockTokens.TryGetValue(nameToken, out token))
                         {
                             AddNamedActions(fileAction, token, classType.Identifier, child.TextSpan);
@@ -209,9 +222,9 @@ public class VisualBasicRulesAnalysis : IRulesAnalysis
                         }
 
                         token = null;
-                        foreach (string interfaceName in classType.Inherits)
+                        foreach (var interfaceName in classType.Inherits)
                         {
-                            var baseListToken = new TypeBlockToken() { FullKey = interfaceName };
+                            var baseListToken = new TypeBlockToken { FullKey = interfaceName };
                             if (_visualBasicRootNodes.TypeBlockTokens.TryGetValue(baseListToken, out token))
                             {
                                 AddNamedActions(fileAction, token, classType.Identifier, child.TextSpan);
@@ -219,80 +232,98 @@ public class VisualBasicRulesAnalysis : IRulesAnalysis
                                 containsActions = true;
                             }
 
-                                token = null;
-                            }
-                            if (AnalyzeChildren(fileAction, child.Children, ++level, parentNamespace, classType.Identifier)) { containsActions = true; }
-                            break;
-                        }
-                    case IdConstants.InterfaceBlockIdName:
-                        {
-                            var interfaceType = (InterfaceBlock)child;
-                            var baseToken = new InterfaceBlockToken() { FullKey = interfaceType.BaseType };
-                            InterfaceBlockToken token = null;
-
-                            if (!string.IsNullOrEmpty(interfaceType.BaseType))
-                            {
-                                _visualBasicRootNodes.InterfaceBlockTokens.TryGetValue(baseToken, out token);
-                            }
-
-                            if (token != null)
-                            {
-                                //In case of interface blocks, add actions on the interface by name, instead of property                                
-                                AddNamedActions(fileAction, token, interfaceType.Identifier, child.TextSpan);
-                                AddActions(fileAction, token, child.TextSpan);
-                                containsActions = true;
-                            }
-
                             token = null;
-                            string name = string.Concat(interfaceType.Reference != null ? string.Concat(interfaceType.Reference.Namespace, ".") : string.Empty, interfaceType.Identifier);
-                            var nameToken = new InterfaceBlockToken() { FullKey = name };
+                        }
+
+                        if (AnalyzeChildren(fileAction, child.Children, ++level, parentNamespace, classType.Identifier))
+                        {
+                            containsActions = true;
+                        }
+
+                        break;
+                    }
+                    case IdConstants.InterfaceBlockIdName:
+                    {
+                        var interfaceType = (InterfaceBlock)child;
+                        var baseToken = new InterfaceBlockToken { FullKey = interfaceType.BaseType };
+                        InterfaceBlockToken token = null;
+
+                        if (!string.IsNullOrEmpty(interfaceType.BaseType))
+                        {
                             _visualBasicRootNodes.InterfaceBlockTokens.TryGetValue(baseToken, out token);
-
-                            if (token != null)
-                            {
-                                //In case of interface blocks, add actions on the interface by name, instead of property                                   
-                                AddNamedActions(fileAction, token, interfaceType.Identifier, child.TextSpan);
-                                AddActions(fileAction, token, child.TextSpan);
-                                containsActions = true;
-                            }
-
-                            if (AnalyzeChildren(fileAction, child.Children, ++level, parentNamespace)) { containsActions = true; }
-                            break;
                         }
+
+                        if (token != null)
+                        {
+                            //In case of interface blocks, add actions on the interface by name, instead of property                                
+                            AddNamedActions(fileAction, token, interfaceType.Identifier, child.TextSpan);
+                            AddActions(fileAction, token, child.TextSpan);
+                            containsActions = true;
+                        }
+
+                        token = null;
+                        var name = string.Concat(
+                            interfaceType.Reference != null
+                                ? string.Concat(interfaceType.Reference.Namespace, ".")
+                                : string.Empty, interfaceType.Identifier);
+                        var nameToken = new InterfaceBlockToken { FullKey = name };
+                        _visualBasicRootNodes.InterfaceBlockTokens.TryGetValue(baseToken, out token);
+
+                        if (token != null)
+                        {
+                            //In case of interface blocks, add actions on the interface by name, instead of property                                   
+                            AddNamedActions(fileAction, token, interfaceType.Identifier, child.TextSpan);
+                            AddActions(fileAction, token, child.TextSpan);
+                            containsActions = true;
+                        }
+
+                        if (AnalyzeChildren(fileAction, child.Children, ++level, parentNamespace))
+                        {
+                            containsActions = true;
+                        }
+
+                        break;
+                    }
                     case IdConstants.AccessorBlockName:
+                    {
+                        var accessorType = (AccessorBlock)child;
+                        var name = string.Concat(
+                            accessorType.Reference != null
+                                ? string.Concat(accessorType.Reference.Namespace, ".")
+                                : string.Empty, accessorType.Identifier);
+                        var nameToken = new AccessorBlockToken { FullKey = name };
+                        if (_visualBasicRootNodes.AccessorBlockTokens.TryGetValue(nameToken, out var token))
                         {
-                            var accessorType = (AccessorBlock)child;
-                            var name = string.Concat(
-                                accessorType.Reference != null
-                                    ? string.Concat(accessorType.Reference.Namespace, ".")
-                                    : string.Empty, accessorType.Identifier);
-                            var nameToken = new AccessorBlockToken() { FullKey = name };
-                            if (_visualBasicRootNodes.AccessorBlockTokens.TryGetValue(nameToken, out var token))
-                            {
-                                AddNamedActions(fileAction, token, accessorType.Identifier, child.TextSpan);
-                                AddActions(fileAction, token, child.TextSpan);
-                                containsActions = true;
-                            }
-                            break;
+                            AddNamedActions(fileAction, token, accessorType.Identifier, child.TextSpan);
+                            AddActions(fileAction, token, child.TextSpan);
+                            containsActions = true;
                         }
+
+                        break;
+                    }
                     case IdConstants.SubBlockName:
+                    {
+                        var compareToken = new MethodBlockToken { FullKey = string.Concat(child.Identifier) };
+                        _visualBasicRootNodes.MethodBlockTokens.TryGetValue(compareToken, out var token);
+                        if (token != null)
                         {
-                            var compareToken = new MethodBlockToken() { FullKey = string.Concat(child.Identifier) };
-                            _visualBasicRootNodes.MethodBlockTokens.TryGetValue(compareToken, out var token);
-                            if (token != null)
-                            {
-                                AddNamedActions(fileAction, token, child.Identifier, child.TextSpan);
-                                AddActions(fileAction, token, child.TextSpan);
-                                containsActions = true;
-                            }
-                            if (AnalyzeChildren(fileAction, child.Children, ++level, parentNamespace, parentClass)) { containsActions = true; }
-                            break;
+                            AddNamedActions(fileAction, token, child.Identifier, child.TextSpan);
+                            AddActions(fileAction, token, child.TextSpan);
+                            containsActions = true;
                         }
+
+                        if (AnalyzeChildren(fileAction, child.Children, ++level, parentNamespace, parentClass))
+                        {
+                            containsActions = true;
+                        }
+
+                        break;
+                    }
                     case IdConstants.InvocationIdName:
                     {
                         var overrideKey = string.Empty;
 
-                        InvocationExpression invocationExpression = (InvocationExpression)child;
+                        var invocationExpression = (InvocationExpression)child;
 
                         ////If we don't have a semantic analysis, we dont want to replace invocation expressions, otherwise we'll be replacing expressions regardless of their class/namespace
                         if (string.IsNullOrEmpty(invocationExpression.SemanticOriginalDefinition))
@@ -331,7 +362,7 @@ public class VisualBasicRulesAnalysis : IRulesAnalysis
                             {
                                 if (invocationExpression.SemanticClassType.Contains('<'))
                                 {
-                                    string semanticClassType = invocationExpression.SemanticClassType.Substring(0,
+                                    var semanticClassType = invocationExpression.SemanticClassType.Substring(0,
                                         invocationExpression.SemanticClassType.IndexOf('<'));
                                     compareToken = new InvocationExpressionToken
                                     {
@@ -339,7 +370,8 @@ public class VisualBasicRulesAnalysis : IRulesAnalysis
                                         Namespace = invocationExpression.Reference.Namespace,
                                         Type = semanticClassType
                                     };
-                                    _visualBasicRootNodes.InvocationExpressionTokens.TryGetValue(compareToken, out token);
+                                    _visualBasicRootNodes.InvocationExpressionTokens.TryGetValue(compareToken,
+                                        out token);
                                 }
                             }
                         }
@@ -349,47 +381,80 @@ public class VisualBasicRulesAnalysis : IRulesAnalysis
                             AddActions(fileAction, token, child.TextSpan, overrideKey);
                             containsActions = true;
                         }
+
                         if (AnalyzeChildren(fileAction, child.Children, ++level, parentNamespace, parentClass))
                         {
                             containsActions = true;
                         }
+
                         break;
                     }
                     case IdConstants.ElementAccessIdName:
                     {
-                        break;
-                    }
-
-                    case IdConstants.MemberAccessIdName:
+                        ElementAccess elementAccess = (ElementAccess)child;
+                        var compareToken = new ElementAccessToken()
                         {
-                            MemberAccess memberAccess = (MemberAccess)child;
-                            var compareToken = new VBMemberAccessToken()
-                            {
-                                Key = memberAccess.Name,
-                                FullKey = GetFullKey(memberAccess.Reference?.Namespace, memberAccess.SemanticClassType, memberAccess.Name),
-                                Type = memberAccess.SemanticClassType,
-                                Namespace = memberAccess.Reference?.Namespace
-                            };
-                            _visualBasicRootNodes.VBMemberAccesstokens.TryGetValue(compareToken, out var token);
-                            if (token != null)
-                            {
-                                AddActions(fileAction, token, child.TextSpan);
-                                containsActions = true;
-                            }
-                            if (AnalyzeChildren(fileAction, child.Children, ++level, parentNamespace, parentClass)) { containsActions = true; }
-                            break;
-                        }
-                    case IdConstants.DeclarationNodeIdName:
-                    {
-                        var declarationNode = (DeclarationNode)child;
-                        var compareToken = new IdentifierNameToken() { Key = string.Concat(declarationNode.Reference.Namespace, ".", declarationNode.Identifier), Namespace = declarationNode.Reference.Namespace };
-                        _visualBasicRootNodes.IdentifierNameTokens.TryGetValue(compareToken, out var token);
+                            Key = elementAccess.Expression,
+                            FullKey = GetFullKey(elementAccess.Reference?.Namespace, elementAccess.SemanticClassType, elementAccess.Expression),
+                            Type = elementAccess.SemanticClassType,
+                            Namespace = elementAccess.Reference?.Namespace
+                        };
+                        _visualBasicRootNodes.ElementAccessTokens.TryGetValue(compareToken, out var token);
                         if (token != null)
                         {
                             AddActions(fileAction, token, child.TextSpan);
                             containsActions = true;
                         }
                         if (AnalyzeChildren(fileAction, child.Children, ++level, parentNamespace, parentClass)) { containsActions = true; }
+                        break;
+                    }
+
+                    case IdConstants.MemberAccessIdName:
+                    {
+                        var memberAccess = (MemberAccess)child;
+                        var compareToken = new MemberAccessToken
+                        {
+                            Key = memberAccess.Name,
+                            FullKey = GetFullKey(memberAccess.Reference?.Namespace, memberAccess.SemanticClassType,
+                                memberAccess.Name),
+                            Type = memberAccess.SemanticClassType,
+                            Namespace = memberAccess.Reference?.Namespace
+                        };
+                        _visualBasicRootNodes.MemberAccessTokens.TryGetValue(compareToken, out var token);
+                        if (token != null)
+                        {
+                            AddActions(fileAction, token, child.TextSpan);
+                            containsActions = true;
+                        }
+
+                        if (AnalyzeChildren(fileAction, child.Children, ++level, parentNamespace, parentClass))
+                        {
+                            containsActions = true;
+                        }
+
+                        break;
+                    }
+                    case IdConstants.DeclarationNodeIdName:
+                    {
+                        var declarationNode = (DeclarationNode)child;
+                        var compareToken = new IdentifierNameToken
+                        {
+                            Key = string.Concat(declarationNode.Reference.Namespace, ".",
+                                declarationNode.Identifier),
+                            Namespace = declarationNode.Reference.Namespace
+                        };
+                        _visualBasicRootNodes.IdentifierNameTokens.TryGetValue(compareToken, out var token);
+                        if (token != null)
+                        {
+                            AddActions(fileAction, token, child.TextSpan);
+                            containsActions = true;
+                        }
+
+                        if (AnalyzeChildren(fileAction, child.Children, ++level, parentNamespace, parentClass))
+                        {
+                            containsActions = true;
+                        }
+
                         break;
                     }
                     case IdConstants.ObjectCreationIdName:
@@ -439,7 +504,11 @@ public class VisualBasicRulesAnalysis : IRulesAnalysis
                             }
                         }
 
-                        if (AnalyzeChildren(fileAction, child.Children, ++level, parentNamespace, parentClass)) { containsActions = true; }
+                        if (AnalyzeChildren(fileAction, child.Children, ++level, parentNamespace, parentClass))
+                        {
+                            containsActions = true;
+                        }
+
                         break;
                     }
                     default:
@@ -469,14 +538,13 @@ public class VisualBasicRulesAnalysis : IRulesAnalysis
         {
             return key;
         }
-        else
+
+        if (!string.IsNullOrEmpty(containingClass))
         {
-            if (!string.IsNullOrEmpty(containingClass))
-            {
-                return $"{containingNamespace}.{containingClass}.{key}";
-            }
-            return $"{containingNamespace}.{key}";
+            return $"{containingNamespace}.{containingClass}.{key}";
         }
+
+        return $"{containingNamespace}.{key}";
     }
 
     /// <summary>
@@ -484,7 +552,8 @@ public class VisualBasicRulesAnalysis : IRulesAnalysis
     /// </summary>
     /// <param name="fileAction">The file to run actions on</param>
     /// <param name="token">The token that matched the file</param>
-    private void AddActions(FileActions fileAction, VisualBasicNodeToken token, TextSpan textSpan, string overrideKey = "")
+    private void AddActions(FileActions fileAction, VisualBasicNodeToken token, TextSpan textSpan,
+        string overrideKey = "")
     {
         fileAction.VbInvocationExpressionActions.UnionWith(token.InvocationExpressionActions.Select(a =>
             new InvocationExpressionAction<InvocationExpressionSyntax>
@@ -499,7 +568,7 @@ public class VisualBasicRulesAnalysis : IRulesAnalysis
                 InvocationExpressionActionFunc = a.InvocationExpressionActionFunc
             }).ToList());
 
-        fileAction.VbImportActions.UnionWith(token.ImportActions.Select(a => new ImportAction()
+        fileAction.VbImportActions.UnionWith(token.ImportActions.Select(a => new ImportAction
         {
             Key = a.Key,
             Description = a.Description,
@@ -527,7 +596,20 @@ public class VisualBasicRulesAnalysis : IRulesAnalysis
 
         fileAction.VbIdentifierNameActions.UnionWith(token.IdentifierNameActions.Select(a => a.Copy()).ToList());
 
-        fileAction.VbAttributeListActions.UnionWith(token.VbAttributeListActions.Select(a => new AttributeListAction()
+        fileAction.VbAttributeActions.UnionWith(token.AttributeActions.Select(a => new AttributeAction()
+        {
+            Key = a.Key,
+            Description = a.Description,
+            Value = a.Value,
+            Name = a.Name,
+            Type = a.Type,
+            TextSpan = textSpan,
+            ActionValidation = a.ActionValidation,
+            AttributeActionFunc = a.AttributeActionFunc,
+            AttributeListActionFunc = a.AttributeListActionFunc
+        }).ToList());
+        
+        fileAction.VbAttributeListActions.UnionWith(token.VbAttributeListActions.Select(a => new AttributeListAction
         {
             Key = a.Key,
             Description = a.Description,
@@ -539,9 +621,21 @@ public class VisualBasicRulesAnalysis : IRulesAnalysis
             AttributeListActionFunc = a.AttributeListActionFunc
         }).ToList());
 
-        fileAction.MemberAccessActions.UnionWith(token.MemberAccessActions.Select(a => new MemberAccessAction()
+        fileAction.VbElementAccessActions.UnionWith(token.ElementAccessActions.Select(a => new ElementAccessAction()
         {
-            Key = (token is VBMemberAccessToken) ? token.FullKey : a.Key,
+            Key = (token is ElementAccessToken) ? token.FullKey : a.Key,
+            Description = a.Description,
+            Value = a.Value,
+            Name = a.Name,
+            Type = a.Type,
+            TextSpan = textSpan,
+            ActionValidation = a.ActionValidation,
+            ElementAccessExpressionActionFunc = a.ElementAccessExpressionActionFunc
+        }).ToList());
+        
+        fileAction.MemberAccessActions.UnionWith(token.MemberAccessActions.Select(a => new MemberAccessAction
+        {
+            Key = token is MemberAccessToken ? token.FullKey : a.Key,
             Description = a.Description,
             Value = a.Value,
             Name = a.Name,
@@ -563,6 +657,18 @@ public class VisualBasicRulesAnalysis : IRulesAnalysis
                 ActionValidation = a.ActionValidation,
                 ObjectCreationExpressionGenericActionFunc = a.ObjectCreationExpressionGenericActionFunc
             }).ToList());
+        
+        fileAction.ExpressionActions.UnionWith(token.ExpressionActions.Select(a => new ExpressionAction()
+        {
+            Key = !string.IsNullOrEmpty(overrideKey) ? overrideKey : a.Key,
+            Description = a.Description,
+            Value = a.Value,
+            Name = a.Name,
+            Type = a.Type,
+            TextSpan = textSpan,
+            ActionValidation = a.ActionValidation,
+            ExpressionActionFunc = a.ExpressionActionFunc
+        }).ToList());
 
         if (fileAction.InvocationExpressionActions.Any()
             || fileAction.VbImportActions.Any()
@@ -570,9 +676,11 @@ public class VisualBasicRulesAnalysis : IRulesAnalysis
             || fileAction.VbIdentifierNameActions.Any()
             || fileAction.VbAttributeListActions.Any()
             || fileAction.MemberAccessActions.Any()
-            || fileAction.NamespaceActions.Any()
-            || fileAction.IdentifierNameActions.Any()
-            || fileAction.ObjectCreationExpressionActions.Any())
+            || fileAction.VbNamespaceActions.Any()
+            || fileAction.VbIdentifierNameActions.Any()
+            || fileAction.VbObjectCreationExpressionActions.Any()
+            || fileAction.VbElementAccessActions.Any()
+            || fileAction.ExpressionActions.Any())
         {
             var nodeToken = token.Clone();
             nodeToken.TextSpan = textSpan;
@@ -596,9 +704,7 @@ public class VisualBasicRulesAnalysis : IRulesAnalysis
                 {
                     _projectActions.PackageActions.Add(new PackageAction
                     {
-                        Name = p.Name,
-                        Version = p.Version,
-                        TextSpan = textSpan
+                        Name = p.Name, Version = p.Version, TextSpan = textSpan
                     });
                 }
             });
@@ -611,10 +717,11 @@ public class VisualBasicRulesAnalysis : IRulesAnalysis
     /// <param name="fileAction"></param>
     /// <param name="token"></param>
     /// <param name="identifier"></param>
-    private void AddNamedActions(FileActions fileAction, VisualBasicNodeToken token, string identifier, TextSpan textSpan)
+    private void AddNamedActions(FileActions fileAction, VisualBasicNodeToken token, string identifier,
+        TextSpan textSpan)
     {
         fileAction.VbTypeBlockActions.UnionWith(token.TypeBlockActions
-            .Select(c => new TypeBlockAction()
+            .Select(c => new TypeBlockAction
             {
                 Key = identifier,
                 Value = c.Value,
@@ -627,46 +734,47 @@ public class VisualBasicRulesAnalysis : IRulesAnalysis
             }));
 
         fileAction.VbMethodBlockActions.UnionWith(token.MethodBlockActions
-                .Select(c => new MethodBlockAction()
-                {
-                    Key = identifier,
-                    Value = c.Value,
-                    Description = c.Description,
-                    Name = c.Name,
-                    Type = c.Type,
-                    TextSpan = textSpan,
-                    ActionValidation = c.ActionValidation,
-                    MethodBlockActionFunc = c.MethodBlockActionFunc
-                }));
+            .Select(c => new MethodBlockAction
+            {
+                Key = identifier,
+                Value = c.Value,
+                Description = c.Description,
+                Name = c.Name,
+                Type = c.Type,
+                TextSpan = textSpan,
+                ActionValidation = c.ActionValidation,
+                MethodBlockActionFunc = c.MethodBlockActionFunc
+            }));
 
         fileAction.VbInterfaceBlockActions.UnionWith(token.InterfaceBlockActions
-                .Select(c => new InterfaceBlockAction()
-                {
-                    Key = identifier,
-                    Value = c.Value,
-                    Name = c.Name,
-                    Type = c.Type,
-                    Description = c.Description,
-                    TextSpan = textSpan,
-                    ActionValidation = c.ActionValidation,
-                    InterfaceBlockActionFunc = c.InterfaceBlockActionFunc
-                }));
+            .Select(c => new InterfaceBlockAction
+            {
+                Key = identifier,
+                Value = c.Value,
+                Name = c.Name,
+                Type = c.Type,
+                Description = c.Description,
+                TextSpan = textSpan,
+                ActionValidation = c.ActionValidation,
+                InterfaceBlockActionFunc = c.InterfaceBlockActionFunc
+            }));
 
         fileAction.VbAccessorBlockActions.UnionWith(token.AccessorBlockActions
-                .Select(c => new AccessorBlockAction()
-                {
-                    Key = identifier,
-                    Value = c.Value,
-                    Name = c.Name,
-                    Type = c.Type,
-                    Description = c.Description,
-                    TextSpan = textSpan,
-                    ActionValidation = c.ActionValidation,
-                    AccessorBlockActionFunc = c.AccessorBlockActionFunc
-                }));
+            .Select(c => new AccessorBlockAction
+            {
+                Key = identifier,
+                Value = c.Value,
+                Name = c.Name,
+                Type = c.Type,
+                Description = c.Description,
+                TextSpan = textSpan,
+                ActionValidation = c.ActionValidation,
+                AccessorBlockActionFunc = c.AccessorBlockActionFunc
+            }));
 
         if (fileAction.VbTypeBlockActions.Any() || fileAction.VbMethodBlockActions.Any()
-            || fileAction.VbInterfaceBlockActions.Any() || fileAction.VbAccessorBlockActions.Any())
+                                                || fileAction.VbInterfaceBlockActions.Any() ||
+                                                fileAction.VbAccessorBlockActions.Any())
         {
             var nodeToken = token.Clone();
             nodeToken.TextSpan = textSpan;

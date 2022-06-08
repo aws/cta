@@ -9,15 +9,9 @@ namespace CTA.Rules.Models.Tokens
     {
         public NodeToken()
         {
-            AttributeActions = new List<AttributeAction>();
-            AttributeListActions = new List<AttributeAction>();
-            ClassDeclarationActions = new List<ClassDeclarationAction>();
             ExpressionActions = new List<ExpressionAction>();
-            MethodDeclarationActions = new List<MethodDeclarationAction>();
-            ElementAccessActions = new List<ElementAccessAction>();
             MemberAccessActions = new List<MemberAccessAction>();
             PackageActions = new List<PackageAction>();
-            InterfaceDeclarationActions = new List<InterfaceDeclarationAction>();
             ProjectLevelActions = new List<ProjectLevelAction>();
             ProjectFileActions = new List<ProjectLevelAction>();
             ProjectTypeActions = new List<ProjectLevelAction>();
@@ -33,12 +27,7 @@ namespace CTA.Rules.Models.Tokens
         public string Description { get; set; }
         public IList<TextChange> TextChanges { get; set; }
         public List<string> TargetCPU { get; set; }
-        public List<AttributeAction> AttributeActions { get; set; }
-        public List<AttributeAction> AttributeListActions { get; set; }
-        public List<ClassDeclarationAction> ClassDeclarationActions { get; set; }
-        public List<InterfaceDeclarationAction> InterfaceDeclarationActions { get; set; }
-        public List<MethodDeclarationAction> MethodDeclarationActions { get; set; }
-        public List<ElementAccessAction> ElementAccessActions { get; set; }
+
         public List<MemberAccessAction> MemberAccessActions { get; set; }
         public List<ExpressionAction> ExpressionActions { get; set; }
         public List<PackageAction> PackageActions { get; set; }
@@ -50,13 +39,7 @@ namespace CTA.Rules.Models.Tokens
         {
             NodeToken cloned = (NodeToken)this.MemberwiseClone();
             cloned.TextChanges = cloned.TextChanges?.Select(textChange => textChange.Clone()).ToList();
-            cloned.TargetCPU = cloned.TargetCPU?.ToList();
-            cloned.AttributeActions = cloned.AttributeActions?.Select(action => action.Clone<AttributeAction>())?.ToList();
-            cloned.AttributeListActions = cloned.AttributeListActions?.Select(action => action.Clone<AttributeAction>())?.ToList();
-            cloned.ClassDeclarationActions = cloned.ClassDeclarationActions?.Select(action => action.Clone<ClassDeclarationAction>())?.ToList();
-            cloned.InterfaceDeclarationActions = cloned.InterfaceDeclarationActions.Select(action => action.Clone<InterfaceDeclarationAction>()).ToList();
-            cloned.MethodDeclarationActions = cloned.MethodDeclarationActions.Select(action => action.Clone<MethodDeclarationAction>()).ToList();
-            cloned.ElementAccessActions = cloned.ElementAccessActions.Select(action => action.Clone<ElementAccessAction>()).ToList();
+            cloned.TargetCPU = cloned.TargetCPU?.ToList(); 
             cloned.MemberAccessActions = cloned.MemberAccessActions.Select(action => action.Clone<MemberAccessAction>()).ToList();
             cloned.ExpressionActions = cloned.ExpressionActions.Select(action => action.Clone<ExpressionAction>()).ToList();
             cloned.PackageActions = cloned.PackageActions.Select(action => action.Clone()).ToList();
@@ -71,12 +54,6 @@ namespace CTA.Rules.Models.Tokens
             get
             {
                 var allActions = new List<GenericAction>();
-                allActions.AddRange(AttributeActions);
-                allActions.AddRange(AttributeListActions);
-                allActions.AddRange(MethodDeclarationActions);
-                allActions.AddRange(ClassDeclarationActions);
-                allActions.AddRange(InterfaceDeclarationActions);
-                allActions.AddRange(ElementAccessActions);
                 allActions.AddRange(MemberAccessActions);
                 allActions.AddRange(ExpressionActions);
                 allActions.AddRange(MemberAccessActions);
