@@ -201,7 +201,6 @@ namespace CTA.Rules.Test
         public void TestMonolithReplacementsWebAPI()
         {
             var results = runCTAFile("SampleWebApi.sln").ProjectResults.FirstOrDefault();
-
             var houseControllerText = File.ReadAllText(Path.Combine(results.ProjectDirectory, "Controllers", "HouseController.cs"));
 
             FileAssert.Exists(Path.Combine(results.ProjectDirectory, Constants.MonolithService + ".cs"));
