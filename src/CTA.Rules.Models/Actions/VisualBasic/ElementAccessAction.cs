@@ -1,8 +1,8 @@
 ﻿using System;
-using Microsoft.CodeAnalysis.VisualBasic.Syntax;
 using Microsoft.CodeAnalysis.Editing;
+using Microsoft.CodeAnalysis.VisualBasic.Syntax;
 
-namespace CTA.Rules.Models.VisualBasic
+namespace CTA.Rules.Models.Actions.VisualBasic
 {
     public class ElementAccessAction : GenericAction
     {

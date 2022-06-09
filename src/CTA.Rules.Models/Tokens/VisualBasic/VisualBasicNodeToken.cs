@@ -1,6 +1,5 @@
 ﻿using System.Linq;
 using System.Collections.Generic;
-using CTA.Rules.Models.VisualBasic;
 using Microsoft.CodeAnalysis.VisualBasic.Syntax;
 using CTA.Rules.Models.Actions.VisualBasic;
 
@@ -19,8 +18,8 @@ namespace CTA.Rules.Models.Tokens.VisualBasic
             InterfaceBlockActions = new List<InterfaceBlockAction>();
             VbAttributeListActions = new List<AttributeListAction>();
             AccessorBlockActions = new List<AccessorBlockAction>();
-            ObjectCreationExpressionActions = new List<CTA.Rules.Models.VisualBasic.ObjectCreationExpressionAction>();
-            ElementAccessActions = new List<CTA.Rules.Models.VisualBasic.ElementAccessAction>();
+            ObjectCreationExpressionActions = new List<Models.Actions.VisualBasic.ObjectCreationExpressionAction>();
+            ElementAccessActions = new List<Actions.VisualBasic.ElementAccessAction>();
             AttributeActions = new List<Actions.VisualBasic.AttributeAction>();
 
         }
@@ -34,8 +33,8 @@ namespace CTA.Rules.Models.Tokens.VisualBasic
         public List<InterfaceBlockAction> InterfaceBlockActions { get; set; }
         public List<AttributeListAction> VbAttributeListActions { get; set; }
         public List<AccessorBlockAction> AccessorBlockActions { get; set; }
-        public List<CTA.Rules.Models.VisualBasic.ObjectCreationExpressionAction> ObjectCreationExpressionActions{ get; set; }
-        public List<CTA.Rules.Models.VisualBasic.ElementAccessAction> ElementAccessActions { get; set; }
+        public List<Models.Actions.VisualBasic.ObjectCreationExpressionAction> ObjectCreationExpressionActions{ get; set; }
+        public List<Actions.VisualBasic.ElementAccessAction> ElementAccessActions { get; set; }
         public List<CTA.Rules.Models.Actions.VisualBasic.AttributeAction> AttributeActions { get; set; }
 
 
@@ -61,11 +60,11 @@ namespace CTA.Rules.Models.Tokens.VisualBasic
             cloned.AccessorBlockActions = cloned.AccessorBlockActions
                 .Select(action => action.Clone<AccessorBlockAction>()).ToList();
             cloned.ObjectCreationExpressionActions = cloned.ObjectCreationExpressionActions
-                .Select(action => action.Clone<CTA.Rules.Models.VisualBasic.ObjectCreationExpressionAction>()).ToList();
+                .Select(action => action.Clone<Models.Actions.VisualBasic.ObjectCreationExpressionAction>()).ToList();
             cloned.ElementAccessActions = cloned.ElementAccessActions
-                .Select(action => action.Clone<Models.VisualBasic.ElementAccessAction>()).ToList();
+                .Select(action => action.Clone<Actions.VisualBasic.ElementAccessAction>()).ToList();
             cloned.AttributeActions = cloned.AttributeActions
-                .Select(action => action.Clone<Models.Actions.VisualBasic.AttributeAction>()).ToList();
+                .Select(action => action.Clone<Actions.VisualBasic.AttributeAction>()).ToList();
             return cloned;
         }
 

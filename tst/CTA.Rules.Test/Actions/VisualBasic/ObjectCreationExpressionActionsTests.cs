@@ -1,5 +1,5 @@
 ﻿using CTA.Rules.Actions.VisualBasic;
-using CTA.Rules.Models.VisualBasic;
+using CTA.Rules.Models.Actions.VisualBasic;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.VisualBasic;
 using Microsoft.CodeAnalysis.VisualBasic.Syntax;
@@ -51,7 +51,7 @@ namespace CTA.Rules.Test.Actions.VisualBasic
         [Test]
         public void ObjectCreationExpressionActionEquals()
         {
-            var objectCreationExpressionAction = new ObjectCreationExpressionAction() { Key = "Test", Value = "Test2", ObjectCreationExpressionGenericActionFunc = _objectCreationExpressionActions.GetReplaceObjectinitializationAction("Test") };
+            var objectCreationExpressionAction = new ObjectCreationExpressionAction() {Key = "Test", Value = "Test2", ObjectCreationExpressionGenericActionFunc = _objectCreationExpressionActions.GetReplaceObjectinitializationAction("Test")};
             var cloned = objectCreationExpressionAction.Clone<ObjectCreationExpressionAction>();
             Assert.True(objectCreationExpressionAction.Equals(cloned));
 

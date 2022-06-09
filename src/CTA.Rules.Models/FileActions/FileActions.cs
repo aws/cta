@@ -2,7 +2,6 @@
 using CTA.Rules.Models.Actions.VisualBasic;
 using CTA.Rules.Models.Tokens;
 using CTA.Rules.Models.Tokens.VisualBasic;
-using CTA.Rules.Models.VisualBasic;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.VisualBasic.Syntax;
 
@@ -44,8 +43,8 @@ namespace CTA.Rules.Models
             VbAttributeListActions = new HashSet<AttributeListAction>();
             VbIdentifierNameActions = new HashSet<IdentifierNameAction<Microsoft.CodeAnalysis.VisualBasic.Syntax.IdentifierNameSyntax>>();
             VbAccessorBlockActions = new HashSet<AccessorBlockAction>();
-            VbElementAccessActions = new HashSet<CTA.Rules.Models.VisualBasic.ElementAccessAction>();
-            VbObjectCreationExpressionActions = new HashSet<CTA.Rules.Models.VisualBasic.ObjectCreationExpressionAction>();
+            VbElementAccessActions = new HashSet<Actions.VisualBasic.ElementAccessAction>();
+            VbObjectCreationExpressionActions = new HashSet<Actions.VisualBasic.ObjectCreationExpressionAction>();
             VbAttributeActions = new HashSet<Actions.VisualBasic.AttributeAction>();
         }
 
@@ -60,10 +59,10 @@ namespace CTA.Rules.Models
         public HashSet<InterfaceBlockAction> VbInterfaceBlockActions { get; set; }
         public HashSet<AttributeListAction> VbAttributeListActions { get; set; }
         public HashSet<AccessorBlockAction> VbAccessorBlockActions { get; set; }
-        public HashSet<CTA.Rules.Models.VisualBasic.ObjectCreationExpressionAction> VbObjectCreationExpressionActions
+        public HashSet<Actions.VisualBasic.ObjectCreationExpressionAction> VbObjectCreationExpressionActions
             { get; set; }
-        public HashSet<CTA.Rules.Models.VisualBasic.ElementAccessAction> VbElementAccessActions { get; set; }
-        public HashSet<CTA.Rules.Models.Actions.VisualBasic.AttributeAction> VbAttributeActions { get; set; }
+        public HashSet<Actions.VisualBasic.ElementAccessAction> VbElementAccessActions { get; set; }
+        public HashSet<Actions.VisualBasic.AttributeAction> VbAttributeActions { get; set; }
         public List<VisualBasicNodeToken> VbNodeTokens { get; set; }
 
         public List<CsharpNodeToken> NodeTokens { get; set; }

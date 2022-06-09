@@ -2,7 +2,7 @@
 using Microsoft.CodeAnalysis.VisualBasic.Syntax;
 using Microsoft.CodeAnalysis.Editing;
 
-namespace CTA.Rules.Models.VisualBasic
+namespace CTA.Rules.Models.Actions.VisualBasic
 {
     public class ObjectCreationExpressionAction : GenericAction
     {

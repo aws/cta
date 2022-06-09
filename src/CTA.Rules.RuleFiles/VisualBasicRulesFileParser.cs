@@ -10,11 +10,11 @@ using CTA.Rules.Models.VisualBasic;
 using CTA.Rules.Models.Tokens.VisualBasic;
 using Microsoft.CodeAnalysis.VisualBasic.Syntax;
 using AttributeToken = CTA.Rules.Models.Tokens.VisualBasic.AttributeToken;
-using ElementAccessAction = CTA.Rules.Models.VisualBasic.ElementAccessAction;
+using ElementAccessAction = CTA.Rules.Models.Actions.VisualBasic.ElementAccessAction;
 using ElementAccessToken = CTA.Rules.Models.Tokens.VisualBasic.ElementAccessToken;
 using IdentifierNameToken = CTA.Rules.Models.VisualBasic.IdentifierNameToken;
 using MemberAccessToken = CTA.Rules.Models.Tokens.VisualBasic.MemberAccessToken;
-using ObjectCreationExpressionAction = CTA.Rules.Models.VisualBasic.ObjectCreationExpressionAction;
+using ObjectCreationExpressionAction = CTA.Rules.Models.Actions.VisualBasic.ObjectCreationExpressionAction;
 
 
 namespace CTA.Rules.RuleFiles
