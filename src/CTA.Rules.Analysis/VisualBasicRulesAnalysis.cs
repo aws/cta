@@ -594,8 +594,18 @@ public class VisualBasicRulesAnalysis : IRulesAnalysis
                 NamespaceActionFunc = a.NamespaceActionFunc
             }).ToList());
 
-        fileAction.VbIdentifierNameActions.UnionWith(token.IdentifierNameActions.Select(a => a.Copy()).ToList());
-
+        fileAction.VbIdentifierNameActions.UnionWith(token.IdentifierNameActions.Select(a => new IdentifierNameAction<IdentifierNameSyntax>()
+        {
+            Key = a.Key,
+            Description = a.Description,
+            Value = a.Value,
+            Name = a.Name,
+            Type = a.Type,
+            TextSpan = textSpan,
+            ActionValidation = a.ActionValidation,
+            IdentifierNameActionFunc = a.IdentifierNameActionFunc,
+        }).ToList());
+        
         fileAction.VbAttributeActions.UnionWith(token.AttributeActions.Select(a => new AttributeAction()
         {
             Key = a.Key,
