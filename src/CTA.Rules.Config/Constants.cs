@@ -172,7 +172,9 @@ namespace CTA.Rules.Config
             new List<string> {"wcfcodebasedservice","Startup.cs"},
             new List<string> {"wcfconfigbasedservice","Program.cs"},
             new List<string> {"wcfconfigbasedservice","Startup.cs"},
-            new List<string> {"webforms","appsettings.json"}
+            new List<string> {"webforms","appsettings.json"},
+            new List<string> {"webapi", "Program.vb"},
+            new List<string> {"webapi", "Startup.vb"}
         };
 
         public const string WCFErrorTag = "WCF Porting Error: ";
