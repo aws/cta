@@ -1,29 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Codelyzer.Analysis.CSharp;
+using Codelyzer.Analysis.VisualBasic;
 using CTA.Rules.Config;
 using CTA.Rules.Models;
-using CTA.Rules.Models.VisualBasic;
+using CTA.Rules.Models.Actions.VisualBasic;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Editing;
 using Microsoft.CodeAnalysis.VisualBasic;
 using Microsoft.CodeAnalysis.VisualBasic.Syntax;
-using AttributeListSyntax = Microsoft.CodeAnalysis.VisualBasic.Syntax.AttributeListSyntax;
-using AttributeSyntax = Microsoft.CodeAnalysis.VisualBasic.Syntax.AttributeSyntax;
-using CastExpressionSyntax = Microsoft.CodeAnalysis.VisualBasic.Syntax.CastExpressionSyntax;
-using CompilationUnitSyntax = Microsoft.CodeAnalysis.VisualBasic.Syntax.CompilationUnitSyntax;
-using ExpressionStatementSyntax = Microsoft.CodeAnalysis.VisualBasic.Syntax.ExpressionStatementSyntax;
-using ExpressionSyntax = Microsoft.CodeAnalysis.VisualBasic.Syntax.ExpressionSyntax;
-using IdentifierNameSyntax = Microsoft.CodeAnalysis.VisualBasic.Syntax.IdentifierNameSyntax;
-using InvocationExpressionSyntax = Microsoft.CodeAnalysis.VisualBasic.Syntax.InvocationExpressionSyntax;
-using MemberAccessExpressionSyntax = Microsoft.CodeAnalysis.VisualBasic.Syntax.MemberAccessExpressionSyntax;
-using ObjectCreationExpressionSyntax = Microsoft.CodeAnalysis.VisualBasic.Syntax.ObjectCreationExpressionSyntax;
-using ParameterSyntax = Microsoft.CodeAnalysis.VisualBasic.Syntax.ParameterSyntax;
-using QualifiedNameSyntax = Microsoft.CodeAnalysis.VisualBasic.Syntax.QualifiedNameSyntax;
-using TypeArgumentListSyntax = Microsoft.CodeAnalysis.VisualBasic.Syntax.TypeArgumentListSyntax;
-using TypeParameterListSyntax = Microsoft.CodeAnalysis.VisualBasic.Syntax.TypeParameterListSyntax;
+using GenericAction = CTA.Rules.Models.GenericAction;
+using GenericActionExecution = CTA.Rules.Models.GenericActionExecution;
+using ActionExecutionException = CTA.Rules.Models.ActionExecutionException;
+using AttributeAction = CTA.Rules.Models.Actions.VisualBasic.AttributeAction;
 
 namespace CTA.Rules.Update;
 
@@ -40,10 +29,10 @@ public class VisualBasicActionsRewriter : VisualBasicSyntaxRewriter, ISyntaxRewr
 
     private static readonly Type[] identifierNameTypes = new Type[]
     {
-        typeof(MethodDeclarationSyntax),
-        typeof(ConstructorDeclarationSyntax),
-        typeof(ClassDeclarationSyntax),
-        typeof(VariableDeclarationSyntax),
+        typeof(MethodBlockSyntax),
+        typeof(ConstructorBlockSyntax),
+        typeof(TypeBlockSyntax),
+        typeof(VariableDeclaratorSyntax),
         typeof(TypeArgumentListSyntax),
         typeof(TypeParameterListSyntax),
         typeof(ParameterSyntax),
@@ -89,8 +78,7 @@ public class VisualBasicActionsRewriter : VisualBasicSyntaxRewriter, ISyntaxRewr
                         var actionExecution = new GenericActionExecution(action, _filePath) { TimesRun = 1 };
                         try
                         {
-                            //todo: attributeslistfunc
-                            //attributeListSyntax = action.AttributeListActionFunc(_syntaxGenerator, attributeListSyntax);
+                            attributeListSyntax = action.AttributeListActionFunc(_syntaxGenerator, attributeListSyntax);
                             LogHelper.LogInformation(string.Format("{0}: {1}", node.SpanStart, action.Description));
                         }
                         catch (Exception ex)
@@ -122,8 +110,7 @@ public class VisualBasicActionsRewriter : VisualBasicSyntaxRewriter, ISyntaxRewr
                     var actionExecution = new GenericActionExecution(action, _filePath) { TimesRun = 1 };
                     try
                     {
-                        //todo: attributesactionfunc
-                        //attributeSyntax = action.AttributeActionFunc(_syntaxGenerator, attributeSyntax);
+                        attributeSyntax = action.AttributeActionFunc(_syntaxGenerator, attributeSyntax);
                         LogHelper.LogInformation(string.Format("{0}: {1}", node.SpanStart, action.Description));
                     }
                     catch (Exception ex)
@@ -139,6 +126,35 @@ public class VisualBasicActionsRewriter : VisualBasicSyntaxRewriter, ISyntaxRewr
         }
 
         return attributeSyntax;
+    }
+
+    public override SyntaxNode VisitModuleBlock(ModuleBlockSyntax node)
+    {
+        var moduleSymbol = SemanticHelper.GetDeclaredSymbol(node, _semanticModel, _preportSemanticModel);
+        var newNode = (ModuleBlockSyntax)base.VisitModuleBlock(node);
+
+        foreach (var action in _allActions.OfType<TypeBlockAction>())
+        {
+            if (action.Key == node.ModuleStatement.Identifier.Text.Trim())
+            {
+                var actionExecution = new GenericActionExecution(action, _filePath) { TimesRun = 1 };
+                try
+                {
+                    newNode = (ModuleBlockSyntax)action.TypeBlockActionFunc(_syntaxGenerator, newNode);
+                    LogHelper.LogInformation(string.Format("{0}: {1}", node.SpanStart, action.Description));
+                }
+                catch (Exception ex)
+                {
+                    var actionExecutionException = new ActionExecutionException(action.Name, action.Key, ex);
+                    actionExecution.InvalidExecutions = 1;
+                    LogHelper.LogError(actionExecutionException);
+                }
+
+                AllExecutedActions.Add(actionExecution);
+            }
+        }
+
+        return newNode;
     }
 
     public override SyntaxNode VisitClassBlock(ClassBlockSyntax node)
@@ -169,20 +185,20 @@ public class VisualBasicActionsRewriter : VisualBasicSyntaxRewriter, ISyntaxRewr
 
         return newNode;
     }
-
+    
     public override SyntaxNode VisitInterfaceBlock(InterfaceBlockSyntax node)
     {
         var classSymbol = SemanticHelper.GetDeclaredSymbol(node, _semanticModel, _preportSemanticModel);
-        InterfaceDeclarationSyntax newNode = (InterfaceDeclarationSyntax)base.VisitInterfaceBlock(node);
+        InterfaceBlockSyntax newNode = (InterfaceBlockSyntax)base.VisitInterfaceBlock(node);
 
-        foreach (var action in _allActions.OfType<InterfaceDeclarationAction>())
+        foreach (var action in _allActions.OfType<InterfaceBlockAction>())
         {
             if (action.Key == node.InterfaceStatement.Identifier.Text.Trim())
             {
                 var actionExecution = new GenericActionExecution(action, _filePath) { TimesRun = 1 };
                 try
                 {
-                    newNode = action.InterfaceDeclarationActionFunc(_syntaxGenerator, newNode);
+                    newNode = action.InterfaceBlockActionFunc(_syntaxGenerator, newNode);
                     LogHelper.LogInformation(string.Format("{0}: {1}", node.SpanStart, action.Description));
                 }
                 catch (Exception ex)
@@ -214,8 +230,7 @@ public class VisualBasicActionsRewriter : VisualBasicSyntaxRewriter, ISyntaxRewr
                     var actionExecution = new GenericActionExecution(action, _filePath) { TimesRun = 1 };
                     try
                     {
-                        //todo: identifiernamefunc
-                        //identifierNameSyntax = action.IdentifierNameActionFunc(_syntaxGenerator, identifierNameSyntax);
+                        identifierNameSyntax = action.IdentifierNameActionFunc(_syntaxGenerator, identifierNameSyntax);
                         LogHelper.LogInformation(string.Format("{0}: {1}", node.SpanStart, action.Description));
                     }
                     catch (Exception ex)
@@ -381,7 +396,7 @@ public class VisualBasicActionsRewriter : VisualBasicSyntaxRewriter, ISyntaxRewr
         var
             skipChildren =
                 false; // This is here to skip actions on children node when the main identifier was changed. Just use new expression for the subsequent children actions.
-        foreach (var action in _allActions.OfType<Models.VisualBasic.ObjectCreationExpressionAction>())
+        foreach (var action in _allActions.OfType<Models.Actions.VisualBasic.ObjectCreationExpressionAction>())
         {
             if (newNode.ToString() == action.Key || symbol?.OriginalDefinition.ToDisplayString() == action.Key)
             {
@@ -389,9 +404,8 @@ public class VisualBasicActionsRewriter : VisualBasicSyntaxRewriter, ISyntaxRewr
                 try
                 {
                     skipChildren = true;
-                    //todo: objectcreationexpressionsyntaxfunc
-                    //newNode = action.ObjectCreationExpressionGenericActionFunc(_syntaxGenerator,
-                        //(ObjectCreationExpressionSyntax)newNode);
+                    newNode = action.ObjectCreationExpressionGenericActionFunc(_syntaxGenerator,
+                        (ObjectCreationExpressionSyntax)newNode);
                     AllExecutedActions.Add(actionExecution);
                     LogHelper.LogInformation(string.Format("{0}", action.Description));
                 }
