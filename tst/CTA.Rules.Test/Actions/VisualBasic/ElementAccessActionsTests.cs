@@ -1,5 +1,4 @@
-﻿using System;
-using CTA.Rules.Models;
+﻿using CTA.Rules.Models.Actions.VisualBasic;
 using CTA.Rules.Update.VisualBasic;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.VisualBasic;
@@ -48,20 +47,19 @@ namespace CTA.Rules.Test.Actions.VisualBasic
         [Test]
         public void ElementAccessActionComparison()
         {
-            throw new NotImplementedException();
-            // var elementAccessAction = new ElementAccessAction()
-            // {
-            //     Key = "Test",
-            //     Value = "Test2",
-            //     ElementAccessExpressionActionFunc = _elementAccessActions.GetAddCommentAction("Test")
-            //
-            // };
-            //
-            // var cloned = elementAccessAction.Clone<ElementAccessAction>();
-            //
-            // Assert.True(elementAccessAction.Equals(cloned));
-            // cloned.Value = "DifferentValue";
-            // Assert.False(elementAccessAction.Equals(cloned));
+            var elementAccessAction = new ElementAccessAction()
+            {
+                Key = "Test",
+                Value = "Test2",
+                ElementAccessExpressionActionFunc = _elementAccessActions.GetAddCommentAction("Test")
+
+            };
+
+            var cloned = elementAccessAction.Clone<ElementAccessAction>();
+
+            Assert.True(elementAccessAction.Equals(cloned));
+            cloned.Value = "DifferentValue";
+            Assert.False(elementAccessAction.Equals(cloned));
         }
     }
 }

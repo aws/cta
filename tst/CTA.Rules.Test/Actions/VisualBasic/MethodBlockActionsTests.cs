@@ -1,11 +1,11 @@
-﻿using System;
-using CTA.Rules.Actions.VisualBasic;
+﻿using CTA.Rules.Actions.VisualBasic;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.VisualBasic;
 using Microsoft.CodeAnalysis.VisualBasic.Syntax;
 using Microsoft.CodeAnalysis.Editing;
 using NUnit.Framework;
 using System.Collections.Generic;
+using CTA.Rules.Models.Actions.VisualBasic;
 
 namespace CTA.Rules.Test.Actions.VisualBasic
 {
@@ -66,21 +66,20 @@ namespace CTA.Rules.Test.Actions.VisualBasic
         }
 
         [Test]
-        public void MethodDeclarationActionComparison()
+        public void MethodBlockActionComparison()
         {
-            throw new NotImplementedException();
-            // var methodDeclarationAction = new MethodDeclarationAction()
-            // {
-            //     Key = "Test",
-            //     Value = "Test2",
-            //     MethodDeclarationActionFunc = _methodDeclarationActions.GetAddCommentAction("NewAttribute")
-            // };
-            //
-            // var cloned = methodDeclarationAction.Clone<MethodDeclarationAction>();
-            //
-            // Assert.True(methodDeclarationAction.Equals(cloned));
-            // cloned.Value = "DifferentValue";
-            // Assert.False(methodDeclarationAction.Equals(cloned));
+            var methodDeclarationAction = new MethodBlockAction()
+            {
+                Key = "Test",
+                Value = "Test2",
+                MethodBlockActionFunc = _methodBlockActions.GetAddCommentAction("NewAttribute")
+            };
+
+            var cloned = methodDeclarationAction.Clone<MethodBlockAction>();
+
+            Assert.True(methodDeclarationAction.Equals(cloned));
+            cloned.Value = "DifferentValue";
+            Assert.False(methodDeclarationAction.Equals(cloned));
         }
 
         [Test]

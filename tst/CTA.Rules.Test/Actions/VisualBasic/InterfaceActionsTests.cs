@@ -1,6 +1,5 @@
-﻿using System;
-using CTA.Rules.Actions.VisualBasic;
-using CTA.Rules.Models;
+﻿using CTA.Rules.Actions.VisualBasic;
+using CTA.Rules.Models.Actions.VisualBasic;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.VisualBasic.Syntax;
 using Microsoft.CodeAnalysis.Editing;
@@ -87,19 +86,19 @@ End Interface";
         }
         
         [Test]
-        public void InterfaceDeclarationEquals()
+        public void InterfaceBlockEquals()
         {
-            throw new NotImplementedException();
-            // var interfaceAction = new InterfaceDeclarationAction
-            // {
-            //     Key = "Test", Value = "Test2",
-            //     InterfaceDeclarationActionFunc = _interfaceActions.GetAddAttributeAction("Test")
-            // };
-            // var cloned = interfaceAction.Clone<InterfaceDeclarationAction>();
-            // Assert.True(interfaceAction.Equals(cloned));
-            //
-            // cloned.Value = "DifferentValue";
-            // Assert.False(interfaceAction.Equals(cloned));
+            var interfaceAction = new InterfaceBlockAction()
+            {
+                Key = "Test",
+                Value = "Test2",
+                InterfaceBlockActionFunc = _interfaceActions.GetAddAttributeAction("Test")
+            };
+            var cloned = interfaceAction.Clone<InterfaceBlockAction>();
+            Assert.True(interfaceAction.Equals(cloned));
+
+            cloned.Value = "DifferentValue";
+            Assert.False(interfaceAction.Equals(cloned));
         }
     }
 }

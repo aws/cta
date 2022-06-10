@@ -1,6 +1,5 @@
-﻿using System;
-using CTA.Rules.Actions.VisualBasic;
-using CTA.Rules.Models;
+﻿using CTA.Rules.Actions.VisualBasic;
+using CTA.Rules.Models.Actions.VisualBasic;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.VisualBasic;
 using Microsoft.CodeAnalysis.VisualBasic.Syntax;
@@ -40,19 +39,18 @@ namespace CTA.Rules.Test.Actions.VisualBasic
         [Test]
         public void AttributeListActionComparison()
         {
-            throw new NotImplementedException();
-            // var attributeAction = new AttributeAction()
-            // {
-            //     Key = "Test",
-            //     Value = "Test2",
-            //     AttributeListActionFunc = _attributeListActions.GetAddCommentAction("NewAttribute")
-            // };
-            //
-            // var cloned = attributeAction.Clone<AttributeAction>();
-            //
-            // Assert.True(attributeAction.Equals(cloned));
-            // cloned.Value = "DifferentValue";
-            // Assert.False(attributeAction.Equals(cloned));
+            var attributeAction = new AttributeAction()
+            {
+                Key = "Test",
+                Value = "Test2",
+                AttributeListActionFunc = _attributeListActions.GetAddCommentAction("NewAttribute")
+            };
+
+            var cloned = attributeAction.Clone<AttributeAction>();
+
+            Assert.True(attributeAction.Equals(cloned));
+            cloned.Value = "DifferentValue";
+            Assert.False(attributeAction.Equals(cloned));
         }
     }
 }
