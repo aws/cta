@@ -86,16 +86,19 @@ namespace CTA.Rules.Models
             get
             {
                 var allActions = new List<GenericAction>();
+                allActions.AddRange(AttributeActions);
+                allActions.AddRange(MethodDeclarationActions);
                 allActions.AddRange(ClassDeclarationActions);
+                allActions.AddRange(InterfaceDeclarationActions);
+                allActions.AddRange(ElementAccessActions);
                 allActions.AddRange(MemberAccessActions);
                 allActions.AddRange(IdentifierNameActions);
                 allActions.AddRange(InvocationExpressionActions);
                 allActions.AddRange(ExpressionActions);
-                allActions.AddRange(MemberAccessActions);
                 allActions.AddRange(Usingactions);
                 allActions.AddRange(ObjectCreationExpressionActions);
                 allActions.AddRange(NamespaceActions);
-                
+
                 // visual basic actions
                 allActions.AddRange(VbImportActions);
                 allActions.AddRange(VbNamespaceActions);
