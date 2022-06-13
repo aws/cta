@@ -104,7 +104,6 @@ namespace CTA.Rules.Test
         public void TestSampleWebApiSolution()
         {
             var results = runCTAFile("WebApiWithReferences.sln", "WebApiWithReferences.csproj").ProjectResults.FirstOrDefault();
-
             StringAssert.Contains("IActionResult", results.ProjectAnalysisResult);
 
             var homeControllerText = File.ReadAllText(Path.Combine(results.ProjectDirectory, "Controllers", "HouseController.cs"));
