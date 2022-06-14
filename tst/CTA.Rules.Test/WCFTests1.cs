@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 
 namespace CTA.Rules.Test
 {
-    public class WCFTests : AwsRulesBaseTest
+    public class WCFTests1 : AwsRulesBaseTest
     {
         public string tempDir = "";
         public string downloadLocation;
@@ -18,7 +18,7 @@ namespace CTA.Rules.Test
             downloadLocation = SetupTests.DownloadLocation;
         }
 
-        [TestCase(TargetFramework.Dotnet6)]
+        /*[TestCase(TargetFramework.Dotnet6)]
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.DotnetCoreApp31)]
         public void TestBasicHttpBindingAndTransportSecurity(string version)
@@ -290,9 +290,9 @@ namespace CTA.Rules.Test
                 Regex.Replace(programText, @"\r", ""));
             StringAssert.AreEqualIgnoringCase(ExpectedOutputConstants.WCFTC9ConfigText, corewcfConfigText);
             StringAssert.Contains(@"using CoreWCF", service);
-        }
+        }*/
 
-        /*[TestCase(TargetFramework.Dotnet6)]
+        [TestCase(TargetFramework.Dotnet6)]
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.DotnetCoreApp31)]
         public void TestWsHttpAndNetPipe(string version)
@@ -505,6 +505,6 @@ namespace CTA.Rules.Test
             StringAssert.Contains(@"CoreWCF.NetTcp", csProjContent);
             StringAssert.Contains(@"Microsoft.AspNetCore", csProjContent);
             StringAssert.DoesNotContain(@"CoreWCF.ConfigurationManager", csProjContent);
-        }*/
+        }
     }
 }
