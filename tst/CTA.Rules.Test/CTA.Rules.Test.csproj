@@ -30,10 +30,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="WCFTests.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Remove="TempRules\npoi.json" />
   </ItemGroup>
 	
