@@ -30,7 +30,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="OwinTests.cs" />
     <Compile Remove="WCFTests.cs" />
   </ItemGroup>
 
