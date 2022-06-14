@@ -36,7 +36,6 @@
     <Compile Remove="PortCoreTests.cs" />
     <Compile Remove="ProjectFileCreatorTests.cs" />
     <Compile Remove="RuleContributionTests.cs" />
-    <Compile Remove="SetupTests.cs" />
     <Compile Remove="UtilsTest.cs" />
     <Compile Remove="WebFormsFullTests.cs" />
     <Compile Remove="WebFormsTests.cs" />

@@ -56,7 +56,7 @@ namespace CTA.Rules.Test
             StringAssert.Contains(@"using CoreWCF", service);
         }
 
-        /*[TestCase(TargetFramework.Dotnet6)]
+        [TestCase(TargetFramework.Dotnet6)]
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.DotnetCoreApp31)]
         public void TestBasicHttpTransportMessageCredUserName(string version)
@@ -505,6 +505,6 @@ namespace CTA.Rules.Test
             StringAssert.Contains(@"CoreWCF.NetTcp", csProjContent);
             StringAssert.Contains(@"Microsoft.AspNetCore", csProjContent);
             StringAssert.DoesNotContain(@"CoreWCF.ConfigurationManager", csProjContent);
-        }*/
+        }
     }
 }
