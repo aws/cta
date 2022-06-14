@@ -31,7 +31,7 @@ namespace CTA.FeatureDetection.Tests
         private static readonly string _wcfConfigBasedProjectDir = "WCFConfigBasedProject";
         private static readonly string _wcfCodeBasedProjectDir = "WCFCodeBasedProject";
         private static readonly string _vbClassLibraryDir = "VBClassLibrary";
-        private static readonly string _vbWebApiDir = "VBWebApiLibrary";
+        private static readonly string _vbWebApiDir = "VBWebApi";
         private static readonly string _vbNetMvcDir = "VBNetMvc";
         private static readonly string _vbWebFormsDir = "VBWebForms";
         private static readonly string TestProjectDirectory = TestUtils.GetTestAssemblySourceDirectory(typeof(TestUtils));
