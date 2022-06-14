@@ -5,6 +5,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Threading;
 
+[assembly: LevelOfParallelism(10)]
 namespace CTA.Rules.Test
 {
     [SetUpFixture]
