@@ -30,11 +30,19 @@ namespace CTA.FeatureDetection.Tests
         private static readonly string _wcfDir = "WCF";
         private static readonly string _wcfConfigBasedProjectDir = "WCFConfigBasedProject";
         private static readonly string _wcfCodeBasedProjectDir = "WCFCodeBasedProject";
+        private static readonly string _vbClassLibraryDir = "VBClassLibrary";
+        private static readonly string _vbWebApiDir = "VBWebApiLibrary";
+        private static readonly string _vbNetMvcDir = "VBNetMvc";
+        private static readonly string _vbWebFormsDir = "VBWebForms";
         private static readonly string TestProjectDirectory = TestUtils.GetTestAssemblySourceDirectory(typeof(TestUtils));
         public static string ConfigFile => Path.Combine(TestProjectDirectory, "Examples", "Templates", "feature_config.json");
 
         public static string CoreMvcSolutionName => "CoreMVC.sln";
         public static string CoreWebApiSolutionName => "CoreWebApi.sln";
+        public static string VBClassLibrarySolutionName => "VBClassLibrary.sln";
+        public static string VBWebApiSolutionName => "VBWebApi.sln";
+        public static string VBWebFormsSolutionName => "VBWebForms.sln";
+        public static string VBNetMvcSolutionName => "VBNetMvc.sln";
         public static string EfSolutionName => "EF6_Test.sln";
         public static string MvcSolutionName => "ASP.NET-MVC-Framework.sln";
         public static string WebApiSolutionName => "WebApi-Framework.sln";
@@ -48,6 +56,10 @@ namespace CTA.FeatureDetection.Tests
         public static string WCFClientSolutionName => "WCFClient.sln";
         public static string CoreMvcSolutionPath => Path.Combine(_targetDir, _coreMvcDir, CoreMvcSolutionName);
         public static string CoreWebApiSolutionPath => Path.Combine(_targetDir, _coreWebApiDir, CoreWebApiSolutionName);
+        public static string VBClassLibrarySolutionPath => Path.Combine(_targetDir, _vbClassLibraryDir, VBClassLibrarySolutionName);
+        public static string VBWebApiSolutionPath => Path.Combine(_targetDir, _vbWebApiDir, VBWebApiSolutionName);
+        public static string VBWebFormsSolutionPath => Path.Combine(_targetDir, _vbWebFormsDir, VBWebFormsSolutionName);
+        public static string VBNetMvcSolutionPath => Path.Combine(_targetDir, _vbNetMvcDir, VBNetMvcSolutionName);
         public static string EfSolutionPath => Path.Combine(_targetDir, _efDir, EfSolutionName);
         public static string MvcSolutionPath => Path.Combine(_targetDir, _mvcDir, MvcSolutionName);
         public static string WebFormsSolutionPath => Path.Combine(_targetDir, _webFormsDir, WebFormsSolutionName);
@@ -71,6 +83,11 @@ namespace CTA.FeatureDetection.Tests
         public static string FederatedAuthenticationProjectPath => Path.Combine(_targetDir, _federatedAuthenticationDir, _federatedAuthenticationDir, "FederatedAuthentication.csproj");
         public static string CoreWCFServiceConfigProjectPath => Path.Combine(_targetDir, _wcfDir, _wcfConfigBasedProjectDir, "WCFConfigBasedProject.csproj");
         public static string CoreWCFServiceCodeProjectPath => Path.Combine(_targetDir, _wcfDir, _wcfCodeBasedProjectDir, "WCFCodeBasedProject.csproj");
+        public static string VBClassLibraryProjectPath => Path.Combine(_targetDir, _vbClassLibraryDir, "VBClassLibrary", "VBClassLibrary.vbproj");
+        public static string VBWebApiProjectPath => Path.Combine(_targetDir, _vbWebApiDir, "VBWebApi", "VBWebApi.vbproj");
+        public static string VBNetMvcProjectPath => Path.Combine(_targetDir, _vbNetMvcDir, "VBNetMvc", "VBNetMvc.vbproj");
+        public static string VBWebFormsProjectPath => Path.Combine(_targetDir, _vbWebFormsDir, "VBWebForms", "VBWebForms.vbproj");
+
         public static string WCFClientProjectPath => Path.Combine(_targetDir, _wcfDir, "WCFClient.csproj");
         public static string WebFormsProjectPath => Path.Combine(_targetDir, _webFormsDir, "ASP.NET-WebForms", "ASP.NET-WebForms.csproj");
         public static IEnumerable<AnalyzerResult> CoreMvcAnalyzerResults { get; private set; }
@@ -80,6 +97,10 @@ namespace CTA.FeatureDetection.Tests
         public static IEnumerable<AnalyzerResult> WebApiAnalyzerResults { get; private set; }
         public static IEnumerable<AnalyzerResult> WebClassLibraryAnalyzerResults { get; private set; }
         public static IEnumerable<AnalyzerResult> WebFormsAnalyzerResults { get; private set; }
+        public static IEnumerable<AnalyzerResult> VBClassLibraryAnalyzerResults { get; private set; }
+        public static IEnumerable<AnalyzerResult> VBWebApiAnalyzerResults { get; private set; }
+        public static IEnumerable<AnalyzerResult> VBWebFormsAnalyzerResults { get; private set; }
+        public static IEnumerable<AnalyzerResult> VBNetMvcAnalyzerResults { get; private set; }
         public static IEnumerable<AnalyzerResult> WindowsAuthenticationAnalyzerResults { get; private set; }
         public static IEnumerable<AnalyzerResult> IISConfigAnalyzerResults { get; private set; }
         public static IEnumerable<AnalyzerResult> FormsAuthenticationAnalyzerResults { get; private set; }
@@ -101,6 +122,10 @@ namespace CTA.FeatureDetection.Tests
         public static FeatureDetectionResult CoreWCFServiceConfigFeatureDetectionResult { get; private set; }
         public static FeatureDetectionResult CoreWCFServiceCodeFeatureDetectionResult { get; private set; }
         public static FeatureDetectionResult WCFClientFeatureDetectionResult { get; private set; }
+        public static FeatureDetectionResult VBClassLibraryFeatureDetectionResult { get; private set; }
+        public static FeatureDetectionResult VBWebApiFeatureDetectionResult { get; private set; }
+        public static FeatureDetectionResult VBNetMvcFeatureDetectionResult { get; private set; }
+        public static FeatureDetectionResult VBWebFormsFeatureDetectionResult { get; private set; }
 
         [OneTimeSetUp]
         public void DownloadTestProjects()
@@ -126,6 +151,10 @@ namespace CTA.FeatureDetection.Tests
             var tempFederatedAuthenticationSolutionDir = GetSolutionDir(tempDownloadDir, FederatedAuthenticationSolutionName);
             var tempCoreWCFServiceSolutionDir = GetSolutionDir(tempDownloadDir, CoreWCFServiceSolutionName);
             var tempWCFClientSolutionDir = GetSolutionDir(tempDownloadDir, WCFClientSolutionName);
+            var tempVBClassLibrarySolutionDir = GetSolutionDir(tempDownloadDir, VBClassLibrarySolutionName);
+            var tempVBWebApiSolutionDir = GetSolutionDir(tempDownloadDir, VBWebApiSolutionName);
+            var tempVBNetMvcSolutionDir = GetSolutionDir(tempDownloadDir, VBNetMvcSolutionName);
+            var tempVBWebFormsSolutionDir = GetSolutionDir(tempDownloadDir, VBWebFormsSolutionName);
 
             // Copy solutions to a directory with a shorter path
             var destDir = "dest";
@@ -143,8 +172,16 @@ namespace CTA.FeatureDetection.Tests
             TestUtils.CopyDirectory(tempFederatedAuthenticationSolutionDir, new DirectoryInfo(Path.Combine(_targetDir, _federatedAuthenticationDir)));
             TestUtils.CopyDirectory(tempCoreWCFServiceSolutionDir, new DirectoryInfo(Path.Combine(_targetDir, _wcfDir)));
             TestUtils.CopyDirectory(tempWCFClientSolutionDir, new DirectoryInfo(Path.Combine(_targetDir, _wcfDir)));
+            TestUtils.CopyDirectory(tempVBClassLibrarySolutionDir, new DirectoryInfo(Path.Combine(_targetDir, _vbClassLibraryDir)));
+            TestUtils.CopyDirectory(tempVBWebApiSolutionDir, new DirectoryInfo(Path.Combine(_targetDir, _vbWebApiDir)));
+            TestUtils.CopyDirectory(tempVBNetMvcSolutionDir, new DirectoryInfo(Path.Combine(_targetDir, _vbNetMvcDir)));
+            TestUtils.CopyDirectory(tempVBWebFormsSolutionDir, new DirectoryInfo(Path.Combine(_targetDir, _vbWebFormsDir)));
 
             // Run source code analysis
+            VBClassLibraryAnalyzerResults = AnalyzerResultsFactory.GetAnalyzerResults(VBClassLibrarySolutionPath, LanguageOptions.Vb);
+            VBWebApiAnalyzerResults = AnalyzerResultsFactory.GetAnalyzerResults(VBWebApiSolutionPath, LanguageOptions.Vb);
+            VBNetMvcAnalyzerResults = AnalyzerResultsFactory.GetAnalyzerResults(VBNetMvcProjectPath, LanguageOptions.Vb);
+            VBWebFormsAnalyzerResults = AnalyzerResultsFactory.GetAnalyzerResults(VBWebFormsSolutionPath, LanguageOptions.Vb);
             CoreMvcAnalyzerResults = AnalyzerResultsFactory.GetAnalyzerResults(CoreMvcSolutionPath);
             CoreWebApiAnalyzerResults = AnalyzerResultsFactory.GetAnalyzerResults(CoreWebApiSolutionPath);
             EfAnalyzerResults = AnalyzerResultsFactory.GetAnalyzerResults(EfSolutionPath);
@@ -161,6 +198,10 @@ namespace CTA.FeatureDetection.Tests
 
             // Detect features in each solution
             FeatureDetector = new FeatureDetector(ConfigFile);
+            VBClassLibraryFeatureDetectionResult = FeatureDetector.DetectFeaturesInProjects(VBClassLibraryAnalyzerResults)[VBClassLibraryProjectPath];
+            VBWebApiFeatureDetectionResult = FeatureDetector.DetectFeaturesInProjects(VBWebApiAnalyzerResults)[VBWebApiProjectPath];
+            VBNetMvcFeatureDetectionResult = FeatureDetector.DetectFeaturesInProjects(VBNetMvcAnalyzerResults)[VBNetMvcProjectPath];
+            VBWebFormsFeatureDetectionResult = FeatureDetector.DetectFeaturesInProjects(VBWebFormsAnalyzerResults)[VBWebFormsProjectPath];
             CoreMvcFeatureDetectionResult = FeatureDetector.DetectFeaturesInProjects(CoreMvcAnalyzerResults)[CoreMvcProjectPath];
             CoreWebApiFeatureDetectionResult = FeatureDetector.DetectFeaturesInProjects(CoreWebApiAnalyzerResults)[CoreWebApiProjectPath];
             Ef6FeatureDetectionResult = FeatureDetector.DetectFeaturesInProjects(EfAnalyzerResults)[Ef6ProjectPath];

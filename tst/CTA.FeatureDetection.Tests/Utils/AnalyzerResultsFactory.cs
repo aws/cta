@@ -7,19 +7,19 @@ namespace CTA.FeatureDetection.Tests.Utils
 {
     public class AnalyzerResultsFactory
     {
-        public static AnalyzerResult GetAnalyzerResult(string projectPath)
+        public static AnalyzerResult GetAnalyzerResult(string projectPath, string language = LanguageOptions.CSharp)
         {
-            var codeAnalyzer = GetDefaultCodeAnalyzer(projectPath);
+            var codeAnalyzer = GetDefaultCodeAnalyzer(projectPath, language);
             return codeAnalyzer.AnalyzeProject(projectPath).Result;
         }
 
-        public static IEnumerable<AnalyzerResult> GetAnalyzerResults(string solutionPath)
+        public static IEnumerable<AnalyzerResult> GetAnalyzerResults(string solutionPath, string language = LanguageOptions.CSharp)
         {
-            var codeAnalyzer = GetDefaultCodeAnalyzer(solutionPath);
+            var codeAnalyzer = GetDefaultCodeAnalyzer(solutionPath, language);
             return codeAnalyzer.AnalyzeSolution(solutionPath).Result;
         }
 
-        private static CodeAnalyzer GetDefaultCodeAnalyzer(string solutionOrProjectPath)
+        private static CodeAnalyzer GetDefaultCodeAnalyzer(string solutionOrProjectPath, string language = LanguageOptions.CSharp)
         {
             // Codelyzer input
             var analyzerOutputDir = Path.Combine("..", "..");
@@ -34,7 +34,7 @@ namespace CTA.FeatureDetection.Tests.Utils
             };
             AnalyzerCLI cli = new AnalyzerCLI();
             cli.HandleCommand(args);
-            cli.Configuration = new AnalyzerConfiguration(LanguageOptions.CSharp)
+            cli.Configuration = new AnalyzerConfiguration(language)
             {
                 ExportSettings =
                 {
