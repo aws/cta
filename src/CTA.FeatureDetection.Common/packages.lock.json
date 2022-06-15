@@ -102,8 +102,8 @@
       },
       "Codelyzer.Analysis.Model": {
         "type": "Transitive",
-        "resolved": "2.4.39-alpha-gea125ae8dd",
-        "contentHash": "HD/dWPzkMcgzwXo1Y8ahT7Rkntidg7Vg31Pp///z9o3LqyJEzXM1gfHCR/kxfhWDQn0VS2VZRc+leC+VvGB7Lw==",
+        "resolved": "2.4.56-alpha-g89b570063c",
+        "contentHash": "CJCJsGouBGuFe0MCJD3zinuaKQQXfLxT81oqpz2Z+yaTEi420fiHNLvlRzHILnaT3Uu1pBnbkCix5hxHRDWF0A==",
         "dependencies": {
           "Microsoft.CodeAnalysis": "4.1.0",
           "Microsoft.CodeAnalysis.CSharp": "4.1.0",
@@ -1712,7 +1712,7 @@
         "type": "Project",
         "dependencies": {
           "Codelyzer.Analysis": "2.4.39-alpha-gea125ae8dd",
-          "Codelyzer.Analysis.Model": "2.4.39-alpha-gea125ae8dd",
+          "Codelyzer.Analysis.Model": "2.4.56-alpha-g89b570063c",
           "Microsoft.Extensions.Logging": "6.0.0",
           "Microsoft.Extensions.Logging.Abstractions": "6.0.0",
           "Microsoft.Extensions.Logging.Console": "6.0.0",

@@ -31,7 +31,7 @@
         public const string WCFServiceCodeFeatureName = "CoreWCFServiceCodeFeature";
         public const string WCFClientFeatureName = "WCFClientFeature";
         public const string WCFServiceHostFeatureName = "WCFServiceHostFeature";
-        public const string VBLibraryFeatureName = "VBClassLibraryFeature";
+        public const string VBClassLibraryFeatureName = "VBClassLibraryFeature";
         public const string VBWebApiFeatureName = "VBWebApiFeature";
         public const string VBWebFormsFeatureName = "VBWebFormsFeature";
         public const string VBNetMvcFeatureName = "VBNetMvcFeature";

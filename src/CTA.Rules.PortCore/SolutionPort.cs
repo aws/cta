@@ -475,6 +475,22 @@ namespace CTA.Rules.PortCore
             {
                 return ProjectType.WCFClient;
             }
+            else if(projectTypeFeatureResult.IsVBNetMvcProject())
+            {
+                return ProjectType.VBNetMvc;
+            }
+            else if (projectTypeFeatureResult.IsVBWebFormsProject())
+            {
+                return ProjectType.VBWebForms;
+            }
+            else if (projectTypeFeatureResult.IsVBWebApiProject())
+            {
+                return ProjectType.VBWebApi;
+            }
+            else if (projectTypeFeatureResult.IsVBClassLibraryProject())
+            {
+                return ProjectType.VBClassLibrary;
+            }
             return ProjectType.ClassLibrary;
         }
     }

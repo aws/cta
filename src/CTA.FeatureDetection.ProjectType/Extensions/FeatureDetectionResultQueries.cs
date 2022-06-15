@@ -147,5 +147,25 @@ namespace CTA.FeatureDetection.ProjectType.Extensions
         {
             return featureDetectionResult.FeatureStatus.GetValueOrDefault(Constants.VBNetMvcFeatureName, false);
         }
+
+        /// <summary>
+        /// Queries a FeatureDetectionResult object to determine if the project is a VB class library Framework project
+        /// </summary>
+        /// <param name="featureDetectionResult">Result from feature detection</param>
+        /// <returns>Whether or not the project is a VB class library Framework project</returns>
+        public static bool IsVBClassLibraryProject(this FeatureDetectionResult featureDetectionResult)
+        {
+            return featureDetectionResult.FeatureStatus.GetValueOrDefault(Constants.VBClassLibraryFeatureName, false);
+        }
+
+        /// <summary>
+        /// Queries a FeatureDetectionResult object to determine if the project is a VB web api Framework project
+        /// </summary>
+        /// <param name="featureDetectionResult">Result from feature detection</param>
+        /// <returns>Whether or not the project is a VB web api Framework project</returns>
+        public static bool IsVBWebApiProject(this FeatureDetectionResult featureDetectionResult)
+        {
+            return featureDetectionResult.FeatureStatus.GetValueOrDefault(Constants.VBWebApiFeatureName, false);
+        }
     }
 }
