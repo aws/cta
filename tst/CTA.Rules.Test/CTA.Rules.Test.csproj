@@ -30,18 +30,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="CTATests.cs" />
-    <Compile Remove="FolderUpdateTests.cs" />
-    <Compile Remove="OwinTests.cs" />
-    <Compile Remove="PortCoreTests.cs" />
-    <Compile Remove="ProjectFileCreatorTests.cs" />
-    <Compile Remove="RuleContributionTests.cs" />
-    <Compile Remove="UtilsTest.cs" />
-    <Compile Remove="WebFormsFullTests.cs" />
-    <Compile Remove="WebFormsTests.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Remove="TempRules\npoi.json" />
   </ItemGroup>
 	
