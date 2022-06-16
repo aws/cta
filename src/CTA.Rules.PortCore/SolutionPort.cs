@@ -8,6 +8,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Codelyzer.Analysis;
+using Codelyzer.Analysis.Analyzer;
 using Codelyzer.Analysis.Build;
 using Codelyzer.Analysis.Model;
 using CTA.FeatureDetection;
@@ -86,7 +87,8 @@ namespace CTA.Rules.PortCore
                 }
             };
 
-            CodeAnalyzer analyzer = CodeAnalyzerFactory.GetAnalyzer(analyzerConfiguration, LogHelper.Logger);
+            //CodeAnalyzer analyzer = CodeAnalyzerFactory.GetAnalyzer(analyzerConfiguration, LogHelper.Logger);
+            CodeAnalyzerByLanguage analyzer = new CodeAnalyzerByLanguage(analyzerConfiguration, LogHelper.Logger);
 
             List<AnalyzerResult> analyzerResults = null;
             //We are building using references
