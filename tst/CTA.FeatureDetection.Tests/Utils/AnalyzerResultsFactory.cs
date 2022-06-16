@@ -20,7 +20,7 @@ namespace CTA.FeatureDetection.Tests.Utils
             return codeAnalyzer.AnalyzeSolution(solutionPath).Result;
         }
 
-        private static CodeAnalyzer CodeAnalyzerByLanguage(string solutionOrProjectPath, string language = LanguageOptions.CSharp)
+        private static CodeAnalyzer GetDefaultCodeAnalyzer(string solutionOrProjectPath, string language = LanguageOptions.CSharp)
         {
             // Codelyzer input
             var analyzerOutputDir = Path.Combine("..", "..");
@@ -58,8 +58,8 @@ namespace CTA.FeatureDetection.Tests.Utils
                 }
             };
 
-            //return CodeAnalyzerFactory.GetAnalyzer(cli.Configuration, logger);
-            return new CodeAnalyzerByLanguage(cli.Configuration, logger);
+            return CodeAnalyzerFactory.GetAnalyzer(cli.Configuration, logger);
+            //return new CodeAnalyzerByLanguage(cli.Configuration, logger);
 
         }
     }
