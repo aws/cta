@@ -5,8 +5,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Codelyzer.Analysis" Version="2.3.45" />
-    <PackageReference Include="Codelyzer.Analysis.Model" Version="2.4.39-alpha-gea125ae8dd" />
+    <PackageReference Include="Codelyzer.Analysis" Version="2.4.56-alpha-g89b570063c" />
+    <PackageReference Include="Codelyzer.Analysis.Model" Version="2.4.56-alpha-g89b570063c" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="6.0.0" />

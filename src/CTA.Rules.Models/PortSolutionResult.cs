@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Codelyzer.Analysis;
+using Codelyzer.Analysis.Analyzer;
 using CTA.Rules.Config;
 
 namespace CTA.Rules.Models
@@ -170,7 +171,7 @@ namespace CTA.Rules.Models
             return errorReport.ToString();
         }
 
-        private CodeAnalyzer GetCodeAnalyzer()
+        private CodeAnalyzerByLanguage GetCodeAnalyzer()
         {
             AnalyzerConfiguration analyzerConfiguration = new AnalyzerConfiguration(LanguageOptions.CSharp);
             ExportSettings exportSettings = new ExportSettings() { GenerateGremlinOutput = false, GenerateJsonOutput = false, GenerateRDFOutput = false };
@@ -187,8 +188,10 @@ namespace CTA.Rules.Models
             analyzerConfiguration.ExportSettings = exportSettings;
             analyzerConfiguration.MetaDataSettings = metaDataSettings;
 
-            CodeAnalyzer analyzer = CodeAnalyzerFactory.GetAnalyzer(analyzerConfiguration, LogHelper.Logger);
-            return analyzer;
+            //CodeAnalyzer analyzer = CodeAnalyzerFactory.GetAnalyzer(analyzerConfiguration, LogHelper.Logger);
+            CodeAnalyzerByLanguage analyzerByLanguage = new CodeAnalyzerByLanguage(analyzerConfiguration, LogHelper.Logger);
+
+            return analyzerByLanguage;
         }
     }
 }

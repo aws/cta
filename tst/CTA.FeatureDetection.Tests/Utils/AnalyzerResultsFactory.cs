@@ -1,4 +1,5 @@
 ﻿using Codelyzer.Analysis;
+using Codelyzer.Analysis.Analyzer;
 using CTA.FeatureDetection.Common;
 using System.Collections.Generic;
 using System.IO;
@@ -19,7 +20,7 @@ namespace CTA.FeatureDetection.Tests.Utils
             return codeAnalyzer.AnalyzeSolution(solutionPath).Result;
         }
 
-        private static CodeAnalyzer GetDefaultCodeAnalyzer(string solutionOrProjectPath)
+        private static CodeAnalyzerByLanguage GetDefaultCodeAnalyzer(string solutionOrProjectPath)
         {
             // Codelyzer input
             var analyzerOutputDir = Path.Combine("..", "..");
@@ -57,7 +58,9 @@ namespace CTA.FeatureDetection.Tests.Utils
                 }
             };
 
-            return CodeAnalyzerFactory.GetAnalyzer(cli.Configuration, logger);
+            //return CodeAnalyzerFactory.GetAnalyzer(cli.Configuration, logger);
+            return new CodeAnalyzerByLanguage(cli.Configuration, logger);
+
         }
     }
 }
