@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using Codelyzer.Analysis;
+using Codelyzer.Analysis.Analyzer;
 using Codelyzer.Analysis.Common;
 using CTA.FeatureDetection.Common;
 using CTA.FeatureDetection.Common.Models;
@@ -159,7 +160,7 @@ namespace CTA.FeatureDetection
             WebConfigManager.ClearCache();
         }
 
-        private CodeAnalyzer GetDefaultCodeAnalyzer()
+        private CodeAnalyzerByLanguage GetDefaultCodeAnalyzer()
         {
             var analyzerOutputDir = Path.Combine("..", "..");
             var cli = new AnalyzerCLI
@@ -192,9 +193,10 @@ namespace CTA.FeatureDetection
             Logger.LogInformation(SerializeUtils.ToJson(cli.Configuration));
 
             /* Get Analyzer instance based on language */
-            var analyzer = CodeAnalyzerFactory.GetAnalyzer(cli.Configuration, Logger);
+            //var analyzer = CodeAnalyzerFactory.GetAnalyzer(cli.Configuration, Logger);
+            CodeAnalyzerByLanguage analyzerByLanguage = new CodeAnalyzerByLanguage(cli.Configuration, Logger);
 
-            return analyzer;
+            return analyzerByLanguage;
         }
     }
 }

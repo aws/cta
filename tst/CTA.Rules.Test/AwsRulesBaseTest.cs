@@ -1,4 +1,5 @@
 ﻿using Codelyzer.Analysis;
+using Codelyzer.Analysis.Analyzer;
 using CTA.Rules.Config;
 using CTA.Rules.Models;
 using CTA.Rules.PortCore;
@@ -375,7 +376,9 @@ namespace CTA.Rules.Test
                     MemberAccess = true
                 }
             };
-            CodeAnalyzer analyzer = CodeAnalyzerFactory.GetAnalyzer(configuration, NullLogger.Instance);
+            //CodeAnalyzer analyzer = CodeAnalyzerFactory.GetAnalyzer(configuration, NullLogger.Instance);
+            CodeAnalyzerByLanguage analyzer = new CodeAnalyzerByLanguage(configuration, NullLogger.Instance);
+            
             var result = analyzer.AnalyzeSolution(solutionPath).Result;
             return result;
         }
@@ -403,7 +406,9 @@ namespace CTA.Rules.Test
                     MemberAccess = true
                 }
             };
-            CodeAnalyzer analyzer = CodeAnalyzerFactory.GetAnalyzer(configuration, NullLogger.Instance);
+            //CodeAnalyzer analyzer = CodeAnalyzerFactory.GetAnalyzer(configuration, NullLogger.Instance);
+            CodeAnalyzerByLanguage analyzer = new CodeAnalyzerByLanguage(configuration, NullLogger.Instance);
+
             var result = analyzer.AnalyzeSolution(solutionPath).Result;
             return result;
         }

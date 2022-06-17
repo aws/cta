@@ -33,7 +33,11 @@
         WCFClient,
         WCFServiceLibrary,
         MonolithService,
-        WebForms
+        WebForms,
+        VBNetMvc,
+        VBWebForms,
+        VBWebApi,
+        VBClassLibrary
     }
     public enum FileTypeCreation
     {
