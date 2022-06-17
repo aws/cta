@@ -296,7 +296,7 @@ public class VisualBasicActionsRewriter : VisualBasicSyntaxRewriter, ISyntaxRewr
 
     public override SyntaxNode VisitInvocationExpression(InvocationExpressionSyntax node)
     {
-        var symbol = SemanticHelper.GetSemanticSymbol(node, _semanticModel, _preportSemanticModel);
+        var symbol = (IMethodSymbol)SemanticHelper.GetSemanticSymbol(node, _semanticModel, _preportSemanticModel);
         var newNode = base.VisitInvocationExpression(node);
         
         if (symbol == null)
@@ -304,7 +304,8 @@ public class VisualBasicActionsRewriter : VisualBasicSyntaxRewriter, ISyntaxRewr
             return node;
         }
 
-        var nodeKey = symbol.OriginalDefinition.ToString();
+        var prefix = symbol.IsExtensionMethod ? symbol.ReceiverType?.ToString() ?? "" : symbol.ContainingType?.ToString() ?? "";
+        var nodeKey = $"{prefix}.{symbol.Name}({string.Join(", ", symbol.Parameters.Select(p => p.Type))})";
 
         foreach (var action in _allActions.OfType<InvocationExpressionAction<InvocationExpressionSyntax>>())
         {
