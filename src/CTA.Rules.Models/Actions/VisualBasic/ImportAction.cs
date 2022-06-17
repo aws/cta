@@ -11,10 +11,10 @@ namespace CTA.Rules.Models.Actions.VisualBasic {
 
         public override bool Equals(object obj)
         {
-            var action = (UsingAction)obj;
+            var action = (ImportAction)obj;
             return action?.Value == Value &&
-                   (action?.UsingActionFunc.Method.Name == ImportActionFunc.Method.Name ||
-                    action?.NamespaceUsingActionFunc.Method.Name == ImportsClauseActionFunc.Method.Name);
+                   (action?.ImportActionFunc.Method.Name == ImportActionFunc.Method.Name ||
+                    action?.ImportsClauseActionFunc.Method.Name == ImportsClauseActionFunc.Method.Name);
         }
 
         public override int GetHashCode()
