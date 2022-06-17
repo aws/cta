@@ -9,6 +9,7 @@ using CTA.Rules.Models.Actions.VisualBasic;
 using CTA.Rules.Models.VisualBasic;
 using CTA.Rules.Models.Tokens.VisualBasic;
 using Microsoft.CodeAnalysis.VisualBasic.Syntax;
+using Newtonsoft.Json;
 using AttributeToken = CTA.Rules.Models.Tokens.VisualBasic.AttributeToken;
 using ElementAccessAction = CTA.Rules.Models.Actions.VisualBasic.ElementAccessAction;
 using ElementAccessToken = CTA.Rules.Models.Tokens.VisualBasic.ElementAccessToken;
@@ -634,11 +635,8 @@ namespace CTA.Rules.RuleFiles
                         }
                         case ActionTypes.Using:
                         {
-                            var actionFunc = _actionsLoader.GetCompilationUnitAction(action.Name, value);
-                            // Using directives can be found in both ComplilationUnit and inside Namespace.
-                            // Need to make sure remove action is taken if it's inside Namespace block.
-                            // Only add using directives in the CompilationUnit as our convention, so it's not added twice.
-                            var namespaceActionFunc = _actionsLoader.GetNamespaceActions(action.Name, value);
+                            var actionName = action.Name.Replace("Directive", "Statement");
+                            var actionFunc = _actionsLoader.GetCompilationUnitAction(actionName, value);
                             if (actionFunc != null)
                             {
                                 visualBasicNodeToken.ImportActions.Add(new ImportAction()
@@ -649,8 +647,7 @@ namespace CTA.Rules.RuleFiles
                                     ActionValidation = validation,
                                     Name = vbActionName,
                                     Type = action.Type,
-                                    ImportActionFunc = actionFunc,
-                                    ImportsClauseActionFunc = namespaceActionFunc
+                                    ImportActionFunc = actionFunc
                                 });
                             }
                             break;
@@ -855,6 +852,32 @@ namespace CTA.Rules.RuleFiles
                         }
                         case ActionTypes.Package:
                         {
+                            PackageAction packageAction = new PackageAction();
+
+                            if (action.Value is string)
+                            {
+                                packageAction.Name = action.Value;
+                            }
+                            else
+                            {
+                                Dictionary<string, string> jsonParameters = JsonConvert.DeserializeObject<Dictionary<string, string>>(action.Value.ToString());
+                                if (jsonParameters.ContainsKey(CTA.Rules.Config.Constants.PackageName))
+                                {
+                                    packageAction.Name = jsonParameters[CTA.Rules.Config.Constants.PackageName];
+                                }
+                                else
+                                {
+                                    LogHelper.LogDebug(
+                                        $"Parameter {Config.Constants.PackageName} is not available for action {action.Name}");
+                                    continue;
+                                }
+                                
+                                if (jsonParameters.ContainsKey(CTA.Rules.Config.Constants.PackageVersion))
+                                {
+                                    packageAction.Version = jsonParameters[CTA.Rules.Config.Constants.PackageVersion];
+                                }
+                            }
+                            visualBasicNodeToken.PackageActions.Add(packageAction);
                             break;
                         }
                     }

@@ -38,7 +38,8 @@ public class VisualBasicActionsRewriter : VisualBasicSyntaxRewriter, ISyntaxRewr
         typeof(ParameterSyntax),
         typeof(ObjectCreationExpressionSyntax),
         typeof(QualifiedNameSyntax),
-        typeof(CastExpressionSyntax)
+        typeof(CastExpressionSyntax),
+        typeof(SimpleAsClauseSyntax)
     };
 
     public VisualBasicActionsRewriter(SemanticModel semanticModel, SemanticModel preportSemanticModel,
