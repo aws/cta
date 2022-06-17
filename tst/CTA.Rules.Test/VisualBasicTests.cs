@@ -54,7 +54,7 @@ namespace CTA.Rules.Test
             };
             CopyTestRules();
 
-            SolutionRewriter solutionRewriter = new SolutionRewriter(solutionPath, solutionConfiguration, language: LanguageOptions.Vb);
+            SolutionRewriter solutionRewriter = new SolutionRewriter(solutionPath, solutionConfiguration);
             var analysisRunResult = solutionRewriter.AnalysisRun();
             StringBuilder str = new StringBuilder();
             foreach (var projectResult in analysisRunResult.ProjectResults)
