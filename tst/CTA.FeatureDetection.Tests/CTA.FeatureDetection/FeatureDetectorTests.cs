@@ -59,7 +59,7 @@ namespace CTA.FeatureDetection.Tests.FeatureDetection
             CollectionAssert.IsNotEmpty(loadedFeatureSet.ConfiguredFeatures);
             CollectionAssert.IsNotEmpty(loadedFeatureSet.CompiledFeatures);
             Assert.True(loadedFeatureSet.ConfiguredFeatures.Count == 9);
-            Assert.True(loadedFeatureSet.CompiledFeatures.Count == 18);
+            Assert.True(loadedFeatureSet.CompiledFeatures.Count == 22);
         }
 
         [Test]

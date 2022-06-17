@@ -442,7 +442,23 @@ namespace CTA.Rules.PortCore
         
         internal ProjectType GetProjectType(FeatureDetectionResult projectTypeFeatureResult)
         {
-            if (projectTypeFeatureResult.IsMvcProject())
+            if (projectTypeFeatureResult.IsVBNetMvcProject())
+            {
+                return ProjectType.VBNetMvc;
+            }
+            else if (projectTypeFeatureResult.IsVBWebFormsProject())
+            {
+                return ProjectType.VBWebForms;
+            }
+            else if (projectTypeFeatureResult.IsVBWebApiProject())
+            {
+                return ProjectType.VBWebApi;
+            }
+            else if (projectTypeFeatureResult.IsVBClassLibraryProject())
+            {
+                return ProjectType.VBClassLibrary;
+            }
+            else if (projectTypeFeatureResult.IsMvcProject())
             {
                 return ProjectType.Mvc;
             }
@@ -477,6 +493,7 @@ namespace CTA.Rules.PortCore
             {
                 return ProjectType.WCFClient;
             }
+
             return ProjectType.ClassLibrary;
         }
     }
