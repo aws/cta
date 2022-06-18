@@ -41,6 +41,18 @@ namespace CTA.FeatureDetection.Common.Extensions
                 .Any(c => c.BaseTypeOriginalDefinition == typeOriginalDefinition);
 
         /// <summary>
+        /// Determines if a ProjectWorkspace declares a class with a specified base type for vb sln
+        /// </summary>
+        /// <param name="project">ProjectWorkspace to search</param>
+        /// <param name="typeOriginalDefinition">Original Definition of the base type being searched for</param>
+        /// <returns>Whether or not a class with the specified base type is declared in the project</returns>
+        public static bool DeclaresClassBlocksWithBaseType(this ProjectWorkspace project, string typeOriginalDefinition)
+            => project.SourceFileResults
+                .SelectMany(n => n.AllClassBlocks())
+                .Any(c => c.BaseTypeOriginalDefinition == typeOriginalDefinition);
+
+
+        /// <summary>
         /// Gets all class declaration nodes in a ProjectWorkspace
         /// </summary>
         /// <param name="project">ProjectWorkspace to search</param>

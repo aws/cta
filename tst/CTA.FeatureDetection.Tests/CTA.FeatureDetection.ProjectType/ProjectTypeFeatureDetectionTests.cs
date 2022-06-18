@@ -92,5 +92,38 @@ namespace CTA.FeatureDetection.Tests.FeatureDetection.ProjectType
             Assert.True(_webFormsFeatureDetectionResult.FeatureStatus[featureName],
                 $"Expected project type of {WebFormsProjectName} to be WebForms.");
         }
+
+        [Test]
+        public void VBClassLibraryFeature_Is_Present_In_ClassLibrary_Project()
+        {
+            var featureName = "VBClassLibraryFeature";
+            Assert.True(_VBClassLibraryFeatureDetectionResult.FeatureStatus[featureName],
+                $"Expected project type of {VBClassLibraryProjectName} to be class library.");
+        }
+
+        [Test]
+        public void VBWebApiFeature_Is_Present_In_WebApi_Project()
+        {
+            var featureName = "VBWebApiFeature";
+            Assert.True(_VBWebApiFeatureDetectionResult.FeatureStatus[featureName],
+                $"Expected project type of {VBWebApiProjectName} to be web api.");
+        }
+
+        [Test]
+        public void VBWebFormsFeature_Is_Present_In_Webforms_Project()
+        {
+            var featureName = "VBWebFormsFeature";
+            Assert.True(_VBWebFormsFeatureDetectionResult.FeatureStatus[featureName],
+                $"Expected project type of {VBWebFormsProjectName} to be web forms.");
+        }
+
+        [Test]
+        public void VBNetMvcFeature_Is_Present_In_Mvc_Project()
+        {
+            var featureName = "VBNetMvcFeature";
+            Assert.True(_VBNetMvcFeatureDetectionResult.FeatureStatus[featureName],
+                $"Expected project type of {VBNetMvcProjectName} to be mvc.");
+        }
+
     }
 }
