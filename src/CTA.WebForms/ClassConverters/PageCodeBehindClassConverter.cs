@@ -38,6 +38,10 @@ namespace CTA.WebForms.ClassConverters
             _newLifecycleLines = new Dictionary<BlazorComponentLifecycleEvent, IEnumerable<StatementSyntax>>();
             _codeBehindLinkerService = codeBehindLinkerService;
             _metricsContext = metricsContext;
+
+            // Need to register the code behind at converter creation, before migration logic in
+            // view converters need that information
+            _codeBehindLinkerService.RegisterCodeBehindFile(Path.ChangeExtension(FullPath, null));
         }
 
         public override async Task<IEnumerable<FileInformation>> MigrateClassAsync()

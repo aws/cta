@@ -50,6 +50,7 @@ namespace Test {
             Assert.True(CreateSimpleCodeBehindCompilation(inputClass, out var classDec, out var model));
 
             _service.RegisterViewFile(testPath);
+            _service.RegisterCodeBehindFile(testPath);
             _service.RegisterClassDeclaration(testPath, model, classDec);
             _service.RegisterCodeBehindHandler(testPath, testHandler);
             var result = await _service.HandleCodeBehindForAttributeAsync(testPath, "Text", null, "NewTextValue", testHandler, token);
@@ -84,6 +85,7 @@ namespace Test {
             Assert.True(CreateSimpleCodeBehindCompilation(inputClass, out var classDec, out var model));
 
             _service.RegisterViewFile(testPath);
+            _service.RegisterCodeBehindFile(testPath);
             _service.RegisterClassDeclaration(testPath, model, classDec);
             _service.RegisterCodeBehindHandler(testPath, testHandler);
             var result = await _service.HandleCodeBehindForAttributeAsync(testPath, "Text", null, null, testHandler, token);
@@ -118,6 +120,7 @@ namespace Test {
             Assert.True(CreateSimpleCodeBehindCompilation(inputClass, out var classDec, out var model));
 
             _service.RegisterViewFile(testPath);
+            _service.RegisterCodeBehindFile(testPath);
             _service.RegisterClassDeclaration(testPath, model, classDec);
             _service.RegisterCodeBehindHandler(testPath, testHandler);
             var result1 = await _service.HandleCodeBehindForAttributeAsync(testPath, "Text", null, null, testHandler, token);
@@ -150,11 +153,33 @@ namespace Test {
             Assert.True(CreateSimpleCodeBehindCompilation(inputClass, out var classDec, out var model));
 
             _service.RegisterViewFile(testPath);
+            _service.RegisterCodeBehindFile(testPath);
             _service.RegisterClassDeclaration(testPath, model, classDec);
             _service.RegisterCodeBehindHandler(testPath, testHandler);
             var result = await _service.HandleCodeBehindForAttributeAsync(testPath, "Text", null, "NewTextValue", testHandler, token);
 
             Assert.IsNull(result);
+        }
+
+        [Test]
+        public async Task HandleCodeBehindForAttribute_Returns_Null_If_No_Code_Behind_File_Registered()
+        {
+            var testPath = Path.Combine("C:", "Something", "File.aspx");
+            var testHandler = new DefaultTagCodeBehindHandler(
+                "System.Web.UI.WebControls.Button",
+                "MyButton");
+            var token = new CancellationTokenSource().Token;
+
+            _service.RegisterViewFile(testPath);
+            _service.RegisterCodeBehindHandler(testPath, testHandler);
+
+            var resultTask = _service.HandleCodeBehindForAttributeAsync(testPath, "Text", null, "NewTextValue", testHandler, token);
+
+            // Give the task time to complete
+            await Task.Delay(200);
+
+            Assert.True(resultTask.IsCompletedSuccessfully);
+            Assert.IsNull(resultTask.Result);
         }
 
         [Test]
@@ -168,9 +193,9 @@ namespace Test {
             var token = tokenSource.Token;
 
             _service.RegisterViewFile(testPath);
+            _service.RegisterCodeBehindFile(testPath);
             _service.RegisterCodeBehindHandler(testPath, testHandler);
             
-
             Assert.ThrowsAsync(typeof(TaskCanceledException), async () =>
             {
                 var task = _service.HandleCodeBehindForAttributeAsync(testPath, "Text", null, "NewTextValue", testHandler, token);
@@ -206,6 +231,7 @@ namespace Test {
             Assert.True(CreateSimpleCodeBehindCompilation(inputClass, out var classDec, out var model));
 
             _service.RegisterViewFile(testPath);
+            _service.RegisterCodeBehindFile(testPath);
             _service.RegisterClassDeclaration(testPath, model, classDec);
             _service.RegisterCodeBehindHandler(testPath, testHandler);
 
@@ -244,12 +270,21 @@ namespace Test {
         }
 
         [Test]
-        public void RegisterViewFile_Throws_Invalid_Operation_Exception_On_Double_Registration()
+        public void RegisterViewFile_Successfully_Registers_When_Called_Before_RegisterCodeBehindFile()
         {
             var testPath = Path.Combine("C:", "Something", "File.aspx");
-            _service.RegisterViewFile(testPath);
 
-            Assert.Throws(typeof(InvalidOperationException), () => _service.RegisterViewFile(testPath));
+            Assert.DoesNotThrow(() => _service.RegisterViewFile(testPath));
+            Assert.DoesNotThrow(() => _service.RegisterCodeBehindFile(testPath));
+        }
+
+        [Test]
+        public void RegisterCodeBehindFile_Successfully_Registers_When_Called_Before_RegisterViewFile()
+        {
+            var testPath = Path.Combine("C:", "Something", "File.aspx");
+
+            Assert.DoesNotThrow(() => _service.RegisterCodeBehindFile(testPath));
+            Assert.DoesNotThrow(() => _service.RegisterViewFile(testPath));
         }
 
         [Test]
@@ -279,6 +314,7 @@ namespace Test {
             Assert.True(CreateSimpleCodeBehindCompilation(inputClass, out var classDec, out var model));
 
             _service.RegisterViewFile(testPath);
+            _service.RegisterCodeBehindFile(testPath);
             _service.RegisterCodeBehindHandler(testPath, testHandler);
 
             var result = _service.HandleCodeBehindForAttributeAsync(testPath, "Text", null, "NewTextValue", testHandler, token);
@@ -320,7 +356,9 @@ namespace Test {
             Assert.True(CreateSimpleCodeBehindCompilation(inputClass, out var classDec, out var model));
 
             _service.RegisterViewFile(testPath);
+            _service.RegisterCodeBehindFile(testPath);
             _service.RegisterViewFile(otherPath);
+            _service.RegisterCodeBehindFile(otherPath);
             _service.RegisterCodeBehindHandler(testPath, testHandler);
 
             var result = _service.HandleCodeBehindForAttributeAsync(testPath, "Text", null, "NewTextValue", testHandler, token);
@@ -396,6 +434,7 @@ namespace Test {
             Assert.True(CreateSimpleCodeBehindCompilation(inputClass, out var classDec, out var _));
 
             _service.RegisterViewFile(testPath);
+            _service.RegisterCodeBehindFile(testPath);
 
             Assert.Throws(typeof(ArgumentNullException), () => _service.RegisterClassDeclaration(testPath, null, classDec));
         }
@@ -427,6 +466,7 @@ namespace Test {
             Assert.True(CreateSimpleCodeBehindCompilation(inputClass, out var _, out var model));
 
             _service.RegisterViewFile(testPath);
+            _service.RegisterCodeBehindFile(testPath);
 
             Assert.Throws(typeof(ArgumentNullException), () => _service.RegisterClassDeclaration(testPath, model, null));
         }
@@ -458,6 +498,8 @@ namespace Test {
             Assert.True(CreateSimpleCodeBehindCompilation(inputClass, out var classDec, out var model));
 
             _service.RegisterViewFile(testPath);
+            _service.RegisterCodeBehindFile(testPath);
+
             var resultTask = _service.ExecuteTagCodeBehindHandlersAsync(testPath, model, classDec, token);
             _service.RegisterCodeBehindHandler(testPath, testHandler);
             await _service.HandleCodeBehindForAttributeAsync(testPath, "Text", null, "NewTextValue", testHandler, token);
@@ -509,6 +551,7 @@ namespace Test {
             Assert.True(CreateSimpleCodeBehindCompilation(inputClass, out var classDec, out var model));
 
             _service.RegisterViewFile(testPath);
+            _service.RegisterCodeBehindFile(testPath);
             _service.RegisterCodeBehindHandler(testPath, testHandler);
             var resultTask = _service.ExecuteTagCodeBehindHandlersAsync(testPath, model, classDec, token);
             await _service.HandleCodeBehindForAttributeAsync(testPath, "Text", null, "NewTextValue", testHandler, token);
@@ -563,6 +606,7 @@ namespace Test {
             Assert.True(CreateSimpleCodeBehindCompilation(inputClass, out var classDec, out var model));
 
             _service.RegisterViewFile(testPath);
+            _service.RegisterCodeBehindFile(testPath);
 
             _service.RegisterCodeBehindHandler(testPath, buttonHandler);
             _service.RegisterCodeBehindHandler(testPath, otherButtonHandler);
@@ -614,6 +658,7 @@ namespace Test {
             Assert.True(CreateSimpleCodeBehindCompilation(inputClass, out var classDec, out var model));
 
             _service.RegisterViewFile(testPath);
+            _service.RegisterCodeBehindFile(testPath);
             _service.RegisterCodeBehindHandler(testPath, testHandler);
             var resultTask = _service.ExecuteTagCodeBehindHandlersAsync(testPath, model, classDec, token);
             await _service.HandleCodeBehindForAttributeAsync(testPath, "Text", null, "NewTextValue", testHandler, token);
@@ -682,6 +727,7 @@ namespace Test {
             Assert.True(CreateSimpleCodeBehindCompilation(inputClass, out var classDec, out var model));
 
             _service.RegisterViewFile(testPath);
+            _service.RegisterCodeBehindFile(testPath);
             _service.RegisterCodeBehindHandler(testPath, testHandler);
             var resultTask = _service.ExecuteTagCodeBehindHandlersAsync(testPath, model, classDec, token);
             await _service.HandleCodeBehindForAttributeAsync(testPath, "Text", null, "NewTextValue", testHandler, token);

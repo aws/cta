@@ -60,10 +60,18 @@ namespace CTA.WebForms.Services
                     $"argument {nameof(handler)} was null");
             }
 
-            if (!IsViewFileRegistered(viewFilePath))
+            if (!IsCodeBehindLinkCreated(viewFilePath))
             {
                 throw new InvalidOperationException($"{Rules.Config.Constants.WebFormsErrorTag}Failed to handle code behind conversions for " +
                     $"attribute {codeBehindName} of element with ID {handler.IdValue}, missing view file registration for path {viewFilePath}");
+            }
+
+            if (!IsCodeBehindLinkValid(viewFilePath))
+            {
+                // If either the view file or code behind file doesn't
+                // exist then do nothing, since no code behind conversions
+                // can take place
+                return null;
             }
 
             await WaitForClassDeclarationRegistered(viewFilePath, token);
@@ -128,31 +136,55 @@ namespace CTA.WebForms.Services
         }
 
         /// <summary>
-        /// Checks if the specified view file path has been registered with
-        /// the service.
+        /// Checks if a code behind link for files at the specified path has been
+        /// created in the service.
         /// </summary>
-        /// <param name="viewFilePath">The view file path to check for.</param>
-        /// <returns><c>true</c> if the view file path has been registered, <c>false</c> otherwise.</returns>
-        private bool IsViewFileRegistered(string viewFilePath)
+        /// <param name="viewFilePath">The path of the corresponding view file.</param>
+        /// <returns><c>true</c> if the code behind link exists, <c>false</c> otherwise.</returns>
+        private bool IsCodeBehindLinkCreated(string viewFilePath)
         {
             return _tagCodeBehindLinks.ContainsKey(viewFilePath);
+        }
+
+        /// <summary>
+        /// Checks if a code behind link for files at the specified path validly
+        /// links a code behind file and a view file.
+        /// </summary>
+        /// <param name="viewFilePath">The path of the corresponding view file.</param>
+        /// <returns><c>true</c> if the code behind link exists, and both files have been registered <c>false</c> otherwise.</returns>
+        private bool IsCodeBehindLinkValid(string viewFilePath)
+        {
+            return IsCodeBehindLinkCreated(viewFilePath)
+                && _tagCodeBehindLinks[viewFilePath].ViewFileExists
+                && _tagCodeBehindLinks[viewFilePath].CodeBehindFileExists;
         }
 
         /// <summary>
         /// Registers a view file for use by the service.
         /// </summary>
         /// <param name="viewFilePath">The full path of the view file.</param>
-        /// <exception cref="InvalidOperationException">Throws if view file with path <paramref name="viewFilePath"/>
-        /// has already been registered.</exception>
         public void RegisterViewFile(string viewFilePath)
         {
-            if (IsViewFileRegistered(viewFilePath))
+            if (!IsCodeBehindLinkCreated(viewFilePath))
             {
-                throw new InvalidOperationException($"{Rules.Config.Constants.WebFormsErrorTag}Failed to register view file, " +
-                    $"view file registration for path {viewFilePath} already completed");
+                _tagCodeBehindLinks.Add(viewFilePath, new TagCodeBehindLink());
             }
 
-            _tagCodeBehindLinks.Add(viewFilePath, new TagCodeBehindLink());
+            _tagCodeBehindLinks[viewFilePath].ViewFileExists = true;
+        }
+
+        /// <summary>
+        /// Registers a code behind file for use by the service.
+        /// </summary>
+        /// <param name="viewFilePath">The full path of the view file.</param>
+        public void RegisterCodeBehindFile(string viewFilePath)
+        {
+            if (!IsCodeBehindLinkCreated(viewFilePath))
+            {
+                _tagCodeBehindLinks.Add(viewFilePath, new TagCodeBehindLink());
+            }
+
+            _tagCodeBehindLinks[viewFilePath].CodeBehindFileExists = true;
         }
 
         /// <summary>
@@ -165,7 +197,7 @@ namespace CTA.WebForms.Services
         /// has not been registered.</exception>
         public void RegisterCodeBehindHandler(string viewFilePath, TagCodeBehindHandler handler)
         {
-            if (!IsViewFileRegistered(viewFilePath))
+            if (!IsCodeBehindLinkCreated(viewFilePath))
             {
                 throw new InvalidOperationException($"{Rules.Config.Constants.WebFormsErrorTag}Failed to register code behind handler, " +
                     $"missing view file registration for path {viewFilePath}");
@@ -197,7 +229,7 @@ namespace CTA.WebForms.Services
                     $"argument {nameof(classDeclaration)} was null");
             }
 
-            if (!IsViewFileRegistered(viewFilePath))
+            if (!IsCodeBehindLinkCreated(viewFilePath))
             {
                 throw new InvalidOperationException($"{Rules.Config.Constants.WebFormsErrorTag}Failed to register type declaration, " +
                     $"missing view file registration for path {viewFilePath}");
@@ -222,7 +254,7 @@ namespace CTA.WebForms.Services
         /// has not been registered.</exception>
         public void NotifyAllHandlerConversionsStaged(string viewFilePath)
         {
-            if (!IsViewFileRegistered(viewFilePath))
+            if (!IsCodeBehindLinkCreated(viewFilePath))
             {
                 throw new InvalidOperationException($"{Rules.Config.Constants.WebFormsErrorTag}Failed to raise handler conversions staged notification, " +
                     $"missing view file registration for path {viewFilePath}");
@@ -252,7 +284,7 @@ namespace CTA.WebForms.Services
             ClassDeclarationSyntax classDeclaration,
             CancellationToken token)
         {
-            if (IsViewFileRegistered(viewFilePath))
+            if (IsCodeBehindLinkCreated(viewFilePath))
             {
                 RegisterClassDeclaration(viewFilePath, semanticModel, classDeclaration);
                 await WaitForAllHandlerConversionsStaged(viewFilePath, token);
