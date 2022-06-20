@@ -13,6 +13,8 @@ namespace CTA.WebForms.Helpers.TagConversion
         public List<TagCodeBehindHandler> Handlers { get; }
         public SemanticModel SemanticModel { get; set; }
         public ClassDeclarationSyntax ClassDeclaration { get; set; }
+        public bool CodeBehindFileExists { get; set; }
+        public bool ViewFileExists { get; set; }
 
         public TagCodeBehindLink()
         {
