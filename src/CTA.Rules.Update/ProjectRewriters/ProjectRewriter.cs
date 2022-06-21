@@ -168,19 +168,38 @@ namespace CTA.Rules.Update
 
         public virtual List<IDEFileActions> RunIncremental(List<string> updatedFiles, RootNodes projectRules)
         {
-            var ideFileActions = new List<IDEFileActions>();
-
             var allReferences = _sourceFileResults?.SelectMany(s => s.References).Distinct();
             RulesFileLoader rulesFileLoader = new RulesFileLoader(allReferences, Constants.RulesDefaultPath, ProjectConfiguration.TargetVersions, _projectLanguage, string.Empty, ProjectConfiguration.AssemblyDir);
-            projectRules = rulesFileLoader.Load().CsharpRootNodes;
 
-            RulesAnalysis walker = new RulesAnalysis(_sourceFileResults, projectRules, ProjectConfiguration.ProjectType);
-            var projectActions = walker.Analyze();
+            var rules = rulesFileLoader.Load();
+
+            HashSet<NodeToken> projectTokens;
+            if (_projectLanguage == ProjectLanguage.VisualBasic)
+            {
+                _rulesAnalyzer = new VisualBasicRulesAnalysis(_sourceFileResults, rules.VisualBasicRootNodes,
+                    ProjectConfiguration.ProjectType);
+                projectTokens = rules.VisualBasicRootNodes.ProjectTokens;
+            }
+            else
+            {
+                _rulesAnalyzer = new RulesAnalysis(_sourceFileResults, rules.CsharpRootNodes, ProjectConfiguration.ProjectType);
+                projectTokens = rules.CsharpRootNodes.ProjectTokens;
+            }
+
+            _rulesAnalyzer = _projectLanguage == ProjectLanguage.VisualBasic
+                ? new VisualBasicRulesAnalysis(_sourceFileResults,
+                    rules.VisualBasicRootNodes,
+                    ProjectConfiguration.ProjectType)
+                : new
+                    RulesAnalysis(_sourceFileResults,
+                        rules.CsharpRootNodes,
+                        ProjectConfiguration.ProjectType);
+            var projectActions = _rulesAnalyzer.Analyze();
 
             CodeReplacer baseReplacer = new CodeReplacer(_sourceFileBuildResults, ProjectConfiguration, _metaReferences, _analyzerResult, _projectLanguage, updatedFiles, projectResult: _projectResult);
             _projectResult.ExecutedActions = baseReplacer.Run(projectActions, ProjectConfiguration.ProjectType);
 
-            ideFileActions = projectActions
+            List<IDEFileActions> ideFileActions = projectActions
                 .FileActions
                 .SelectMany(f => f.NodeTokens.Select(n => new IDEFileActions() { TextSpan = n.TextSpan,  Description = n.Description, FilePath = f.FilePath, TextChanges = n.TextChanges }))
                 .ToList();
