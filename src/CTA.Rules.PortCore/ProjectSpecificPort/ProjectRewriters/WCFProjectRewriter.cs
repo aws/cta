@@ -56,7 +56,7 @@ namespace CTA.Rules.PortCore
             return _projectResult;
         }
         
-        public override List<IDEFileActions> RunIncremental(List<string> updatedFiles, CsharpRootNodes projectRules)
+        public override List<IDEFileActions> RunIncremental(List<string> updatedFiles, RootNodes projectRules)
         {
             base.RunIncremental(updatedFiles, projectRules);
             var ideFileActions = new List<IDEFileActions>();

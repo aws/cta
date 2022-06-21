@@ -21,7 +21,8 @@ namespace CTA.Rules.Models
         public BlockingCollection<PackageAction> PackageActions { get; set; }
         public BlockingCollection<string> ProjectReferenceActions { get; set; }
         public List<ProjectLevelAction> ProjectLevelActions { get; set; }
-        public CsharpRootNodes CsharpProjectRules { get; set; }
+        public RootNodes ProjectRules { get; set; }
+        public RootNodes CsharpProjectRules { get; set; }
         public VisualBasicRootNodes VbProjectRules { get; set; }
 
         public override string ToString()

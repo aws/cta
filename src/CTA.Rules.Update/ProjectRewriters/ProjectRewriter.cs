@@ -166,7 +166,7 @@ namespace CTA.Rules.Update
             return _projectResult;
         }
 
-        public virtual List<IDEFileActions> RunIncremental(List<string> updatedFiles, CsharpRootNodes projectRules)
+        public virtual List<IDEFileActions> RunIncremental(List<string> updatedFiles, RootNodes projectRules)
         {
             var ideFileActions = new List<IDEFileActions>();
 

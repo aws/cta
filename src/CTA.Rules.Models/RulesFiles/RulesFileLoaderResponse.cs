@@ -4,7 +4,7 @@ namespace CTA.Rules.Models.RulesFiles
 {
     public class RulesFileLoaderResponse
     {
-        public CsharpRootNodes CsharpRootNodes { get; set; }
+        public RootNodes CsharpRootNodes { get; set; }
         public VisualBasicRootNodes VisualBasicRootNodes { get; set; }
     }
 }

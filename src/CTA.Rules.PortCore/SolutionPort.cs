@@ -352,7 +352,7 @@ namespace CTA.Rules.PortCore
         /// <param name="projectRules">The rules list to be used</param>
         /// <param name="updatedFiles">The files to be analyzed</param>
         /// <returns></returns>
-        public List<IDEFileActions> RunIncremental(CsharpRootNodes projectRules, List<string> updatedFiles)
+        public List<IDEFileActions> RunIncremental(RootNodes projectRules, List<string> updatedFiles)
         {
             return _solutionRewriter.RunIncremental(projectRules, updatedFiles);
         }
@@ -362,7 +362,7 @@ namespace CTA.Rules.PortCore
         /// <param name="projectRules">The rules list to be used</param>
         /// <param name="updatedFile">The file to be analyzed</param>
         /// <returns></returns>
-        public List<IDEFileActions> RunIncremental(CsharpRootNodes projectRules, string updatedFile)
+        public List<IDEFileActions> RunIncremental(RootNodes projectRules, string updatedFile)
         {
             return _solutionRewriter.RunIncremental(projectRules, new List<string> { updatedFile });
         }

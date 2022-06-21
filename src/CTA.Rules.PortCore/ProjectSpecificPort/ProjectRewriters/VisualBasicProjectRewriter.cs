@@ -62,7 +62,7 @@ namespace CTA.Rules.PortCore
         /// </summary>
         /// <param name="updatedFiles"></param>
         /// <param name="projectRules"></param>
-        public override List<IDEFileActions> RunIncremental(List<string> updatedFiles, CsharpRootNodes projectRules)
+        public override List<IDEFileActions> RunIncremental(List<string> updatedFiles, RootNodes projectRules)
         {
             List<IDEFileActions> ideFileActions = new List<IDEFileActions>();
             if(!isExludedFromPorting(_projectType))

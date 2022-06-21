@@ -14,11 +14,12 @@ namespace CTA.Rules.Models
             Invocationexpressiontokens = new HashSet<InvocationExpressionToken>();
             Expressiontokens = new HashSet<ExpressionToken>();
             MemberAccesstokens = new HashSet<MemberAccessToken>();
+            Usingdirectivetokens = new HashSet<UsingDirectiveToken>();
             MethodDeclarationTokens = new HashSet<MethodDeclarationToken>();
             ObjectCreationExpressionTokens = new HashSet<ObjectCreationExpressionToken>();
             InterfaceDeclarationTokens = new HashSet<InterfaceDeclarationToken>();
             NamespaceTokens = new HashSet<NamespaceToken>();
-            ProjectTokens = new HashSet<ProjectToken>();
+            ProjectTokens = new HashSet<NodeToken>();
         }
 
 
@@ -30,9 +31,10 @@ namespace CTA.Rules.Models
         public HashSet<InvocationExpressionToken> Invocationexpressiontokens { get; set; }
         public HashSet<ExpressionToken> Expressiontokens { get; set; }
         public HashSet<MemberAccessToken> MemberAccesstokens { get; set; }
+        public HashSet<UsingDirectiveToken> Usingdirectivetokens { get; set; }
         public HashSet<MethodDeclarationToken> MethodDeclarationTokens { get; set; }
         public HashSet<NamespaceToken> NamespaceTokens { get; set; }
         public HashSet<ObjectCreationExpressionToken> ObjectCreationExpressionTokens { get; set; }
-        public HashSet<ProjectToken> ProjectTokens { get; set; }
+        public HashSet<NodeToken> ProjectTokens { get; set; }
     }
 }
