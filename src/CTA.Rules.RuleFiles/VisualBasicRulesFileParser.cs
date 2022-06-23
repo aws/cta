@@ -555,7 +555,7 @@ namespace CTA.Rules.RuleFiles
 
                     dynamic value = action.VbValue ?? action.Value;
                     ActionValidation validation = action.VbActionValidation ?? action.ActionValidation;
-                    string vbActionName = "Vb" + action.Name;
+                    string vbActionName = action.Name;
                     
                     switch (actionType)
                     {
