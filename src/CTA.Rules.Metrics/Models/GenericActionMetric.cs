@@ -48,12 +48,12 @@ namespace CTA.Rules.Metrics
                 FilePath = string.IsNullOrEmpty(filePath) ? "N/A" : EncryptionHelper.ConvertToSHA256Hex(filePath);
             }
 
-            Language = GetLanguage(filePath);
+            Language = GetLanguage(projectPath);
         }
 
         private string GetLanguage(string filePath)
         {
-            return filePath.EndsWith(".cs") ? "csharp" : filePath.EndsWith(".vb") ? "vb" : "unknown";
+            return filePath.EndsWith(".csproj") ? "csharp" : filePath.EndsWith(".vbproj") ? "vb" : "unknown";
         }
     }
 }

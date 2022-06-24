@@ -202,7 +202,8 @@ namespace CTA.Rules.Test.Metrics
     ""actionValue"": ""GA1 Value"",
     ""solutionPath"": ""5fa9de0cb5af2d468dfb1702b1e342f47de2df9a195dabb3be2d04f9c2767482"",
     ""projectGuid"": ""1234-5678"",
-    ""filePath"": ""eb98c1d648bc61064bdeaca9523a49e51bb3312f28f59376fb385e1569c77822""
+    ""filePath"": ""eb98c1d648bc61064bdeaca9523a49e51bb3312f28f59376fb385e1569c77822"",
+    ""language"": ""csharp""
   },
   {
     ""metricsType"": ""CTA"",
@@ -212,7 +213,8 @@ namespace CTA.Rules.Test.Metrics
     ""actionValue"": ""GA2 Value"",
     ""solutionPath"": ""5fa9de0cb5af2d468dfb1702b1e342f47de2df9a195dabb3be2d04f9c2767482"",
     ""projectGuid"": ""1234-5678"",
-    ""filePath"": ""eb98c1d648bc61064bdeaca9523a49e51bb3312f28f59376fb385e1569c77822""
+    ""filePath"": ""eb98c1d648bc61064bdeaca9523a49e51bb3312f28f59376fb385e1569c77822"",
+    ""language"": ""csharp""
   },
   {
     ""metricsType"": ""CTA"",
@@ -254,7 +256,8 @@ namespace CTA.Rules.Test.Metrics
     ""actionValue"": ""GA1 Value"",
     ""solutionPath"": ""5fa9de0cb5af2d468dfb1702b1e342f47de2df9a195dabb3be2d04f9c2767482"",
     ""projectGuid"": ""1234-5678"",
-    ""filePath"": ""eb98c1d648bc61064bdeaca9523a49e51bb3312f28f59376fb385e1569c77822""
+    ""filePath"": ""eb98c1d648bc61064bdeaca9523a49e51bb3312f28f59376fb385e1569c77822"",
+    ""language"": ""csharp""
   },
   {
     ""metricsType"": ""CTA"",
@@ -264,7 +267,8 @@ namespace CTA.Rules.Test.Metrics
     ""actionValue"": ""GA2 Value"",
     ""solutionPath"": ""5fa9de0cb5af2d468dfb1702b1e342f47de2df9a195dabb3be2d04f9c2767482"",
     ""projectGuid"": ""1234-5678"",
-    ""filePath"": ""eb98c1d648bc61064bdeaca9523a49e51bb3312f28f59376fb385e1569c77822""
+    ""filePath"": ""eb98c1d648bc61064bdeaca9523a49e51bb3312f28f59376fb385e1569c77822"",
+    ""language"": ""csharp""
   },
   {
     ""metricsType"": ""CTA"",
