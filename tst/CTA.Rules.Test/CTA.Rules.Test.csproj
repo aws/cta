@@ -31,6 +31,9 @@
 
   <ItemGroup>
     <None Remove="TempRules\npoi.json" />
+    <None Update="CTAFiles\vb.rules.test.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 	
   <ItemGroup>

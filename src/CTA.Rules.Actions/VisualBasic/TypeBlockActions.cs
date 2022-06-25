@@ -464,7 +464,12 @@ namespace CTA.Rules.Actions.VisualBasic
 
         public Func<SyntaxGenerator, TypeBlockSyntax, TypeBlockSyntax> GetReplaceMvcControllerMethodsBodyAction(string expression)
         {
-            throw new NotImplementedException();
+            TypeBlockSyntax ReplaceMvcControllerMethodsBodyFunc(SyntaxGenerator syntaxGenerator, TypeBlockSyntax node)
+            {
+                return node;
+            }
+
+            return ReplaceMvcControllerMethodsBodyFunc;
         }
     
         public Func<SyntaxGenerator, TypeBlockSyntax, TypeBlockSyntax> GetReplaceWebApiControllerMethodsBodyAction(string expression)

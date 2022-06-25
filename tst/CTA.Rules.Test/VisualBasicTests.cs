@@ -15,22 +15,25 @@ namespace CTA.Rules.Test
 {
     internal class VisualBasicTests : AwsRulesBaseTest
     {
-        public string downloadLocation;
-        public List<string> ctaFiles;
-        public string version = "net5.0"; //We don't care about version for CTA-only rules:
+        private string _tempDir;
+        private string _downloadLocation;
+        private List<string> _ctaFiles;
+        private readonly string _version = "net5.0"; 
+        //We don't care about version for CTA-only rules:
 
         [SetUp]
         public void Setup()
         {
-            downloadLocation = SetupTests.DownloadLocation;
-            ctaFiles = Directory.EnumerateFiles(Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "CTAFiles")), "*.json")
+            _tempDir = SetupTests.TempDir;
+            _downloadLocation = SetupTests.DownloadLocation;
+            _ctaFiles = Directory.EnumerateFiles(Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "CTAFiles")), "*.json")
                .Select(s => Path.GetFileNameWithoutExtension(s))
                .ToList();
         }
 
         private TestSolutionAnalysis runCTAFile(string solutionName, string projectName = null)
         {
-            var solutionPath = CopySolutionFolderToTemp(solutionName, downloadLocation);
+            var solutionPath = CopySolutionFolderToTemp(solutionName, _downloadLocation);
             var solutionDir = Directory.GetParent(solutionPath).FullName;
 
             FileAssert.Exists(solutionPath);
@@ -43,9 +46,9 @@ namespace CTA.Rules.Test
             {
                 SolutionPath = solutionPath,
                 ProjectPath = projectFile,
-                TargetVersions = new List<string> { version },
+                TargetVersions = new List<string> { _version },
                 RulesDir = Constants.RulesDefaultPath,
-                AdditionalReferences = ctaFiles
+                AdditionalReferences = _ctaFiles
             };
             
             List<ProjectConfiguration> solutionConfiguration = new List<ProjectConfiguration>
@@ -111,10 +114,20 @@ namespace CTA.Rules.Test
             StringAssert.Contains("UseEndpoints", signalR);
         }
 
+        [Test]
         public void TestVbNetMvc()
         {
-            var results = runCTAFile("VBNetMvc.sln").ProjectResults.FirstOrDefault();
+            var results = AnalyzeSolution("VBNetMvc.sln",
+                    _tempDir,
+                    _downloadLocation,
+                    _version)
+                .ProjectResults.FirstOrDefault();
             // Check that nothing is ported.
+            
+            // uncomment once template in datastore is merged.
+            // StringAssert.Contains(
+            //     "<TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>",
+            //     results.CsProjectContent);
         }
     }
 }
