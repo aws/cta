@@ -110,8 +110,6 @@ namespace CTA.Rules.Update
                     projectTokens = projectRules.CsharpRootNodes.ProjectTokens;
                 }
                 
-                _rulesAnalyzer = _projectLanguage == ProjectLanguage.VisualBasic ? new VisualBasicRulesAnalysis(_sourceFileResults, projectRules.VisualBasicRootNodes, ProjectConfiguration.ProjectType) : new
-                    RulesAnalysis(_sourceFileResults, projectRules.CsharpRootNodes, ProjectConfiguration.ProjectType);
                 projectActions = _rulesAnalyzer.Analyze();
                 _projectReferences.ForEach(p =>
                 {
@@ -186,14 +184,6 @@ namespace CTA.Rules.Update
                 projectTokens = rules.CsharpRootNodes.ProjectTokens;
             }
 
-            _rulesAnalyzer = _projectLanguage == ProjectLanguage.VisualBasic
-                ? new VisualBasicRulesAnalysis(_sourceFileResults,
-                    rules.VisualBasicRootNodes,
-                    ProjectConfiguration.ProjectType)
-                : new
-                    RulesAnalysis(_sourceFileResults,
-                        rules.CsharpRootNodes,
-                        ProjectConfiguration.ProjectType);
             var projectActions = _rulesAnalyzer.Analyze();
 
             CodeReplacer baseReplacer = new CodeReplacer(_sourceFileBuildResults, ProjectConfiguration, _metaReferences, _analyzerResult, _projectLanguage, updatedFiles, projectResult: _projectResult);
