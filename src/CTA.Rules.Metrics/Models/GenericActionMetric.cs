@@ -28,9 +28,6 @@ namespace CTA.Rules.Metrics
         [JsonProperty("filePath", Order = 18)]
         public string FilePath { get; set; }
 
-        [JsonProperty("language", Order = 19)]
-        public string Language { get; set; }
-
         public GenericActionMetric(MetricsContext context, GenericAction action, string filePath, string projectPath)
         {
             ActionName = action.Name;
@@ -47,13 +44,9 @@ namespace CTA.Rules.Metrics
             {
                 FilePath = string.IsNullOrEmpty(filePath) ? "N/A" : EncryptionHelper.ConvertToSHA256Hex(filePath);
             }
-
             Language = GetLanguage(projectPath);
         }
 
-        private string GetLanguage(string filePath)
-        {
-            return filePath.EndsWith(".csproj") ? "csharp" : filePath.EndsWith(".vbproj") ? "vb" : "unknown";
-        }
+        
     }
 }

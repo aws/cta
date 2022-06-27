@@ -22,6 +22,7 @@ namespace CTA.Rules.Metrics
             FeatureName = featureName;
             SolutionPath = context.SolutionPathHash;
             ProjectGuid = context.ProjectGuidMap.GetValueOrDefault(projectPath, "N/A");
+            Language = GetLanguage(projectPath);
         }
     }
 }
