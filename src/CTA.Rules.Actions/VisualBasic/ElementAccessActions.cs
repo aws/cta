@@ -25,7 +25,6 @@ namespace CTA.Rules.Update.VisualBasic
         }
         public Func<SyntaxGenerator, MemberAccessExpressionSyntax, MemberAccessExpressionSyntax> GetReplaceElementAccessAction(string newExpression)
         {
-            // todo: for VB rules that invoke this action probably need to be converted to invocation expressions because
             MemberAccessExpressionSyntax ReplaceElement(SyntaxGenerator syntaxGenerator, MemberAccessExpressionSyntax node)
             {
                 var addCommentFunc = GetAddCommentAction($"Replace with {newExpression}");

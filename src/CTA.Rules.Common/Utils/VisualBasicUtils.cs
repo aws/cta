@@ -1,4 +1,4 @@
-﻿
+﻿using System;
 
 namespace CTA.Rules.Common.Helpers
 {
@@ -11,7 +11,7 @@ namespace CTA.Rules.Common.Helpers
         /// <returns>True if the file path contains the visual basic project extension</returns>
         public static bool IsVisualBasicProject(string projectFilePath)
         {
-            return projectFilePath.Contains("vbproj");
+            return projectFilePath.EndsWith(".vbproj", StringComparison.InvariantCultureIgnoreCase);
         }
     }
 }

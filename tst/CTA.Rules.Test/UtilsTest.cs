@@ -119,6 +119,7 @@ namespace CTA.Rules.Test
         {
             Assert.IsFalse(VisualBasicUtils.IsVisualBasicProject("test.csproj"));
             Assert.IsTrue(VisualBasicUtils.IsVisualBasicProject("C://user/john/repos/test.vbproj"));
+            Assert.IsFalse(VisualBasicUtils.IsVisualBasicProject("vbprojproject.cs"));
         }
     }
 }
