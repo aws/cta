@@ -187,6 +187,7 @@ namespace CTA.Rules.Test.Metrics
             var expectedAnalysisReport = @"[
   {
     ""metricsType"": ""CTA"",
+    ""language"": ""csharp"",
     ""metricName"": ""UpgradePackage"",
     ""packageName"": ""Newtonsoft.Json"",
     ""packageVersion"": ""12.0.0"",
@@ -196,28 +197,29 @@ namespace CTA.Rules.Test.Metrics
   },
   {
     ""metricsType"": ""CTA"",
+    ""language"": ""csharp"",
     ""metricName"": ""GenericAction"",
     ""actionName"": ""GA1 Name"",
     ""actionType"": ""GA1 Type"",
     ""actionValue"": ""GA1 Value"",
     ""solutionPath"": ""5fa9de0cb5af2d468dfb1702b1e342f47de2df9a195dabb3be2d04f9c2767482"",
     ""projectGuid"": ""1234-5678"",
-    ""filePath"": ""eb98c1d648bc61064bdeaca9523a49e51bb3312f28f59376fb385e1569c77822"",
-    ""language"": ""csharp""
+    ""filePath"": ""eb98c1d648bc61064bdeaca9523a49e51bb3312f28f59376fb385e1569c77822""
   },
   {
     ""metricsType"": ""CTA"",
+    ""language"": ""csharp"",
     ""metricName"": ""GenericAction"",
     ""actionName"": ""GA2 Name"",
     ""actionType"": ""GA2 Type"",
     ""actionValue"": ""GA2 Value"",
     ""solutionPath"": ""5fa9de0cb5af2d468dfb1702b1e342f47de2df9a195dabb3be2d04f9c2767482"",
     ""projectGuid"": ""1234-5678"",
-    ""filePath"": ""eb98c1d648bc61064bdeaca9523a49e51bb3312f28f59376fb385e1569c77822"",
-    ""language"": ""csharp""
+    ""filePath"": ""eb98c1d648bc61064bdeaca9523a49e51bb3312f28f59376fb385e1569c77822""
   },
   {
     ""metricsType"": ""CTA"",
+    ""language"": ""csharp"",
     ""metricName"": ""MissingMetaReference"",
     ""metaReference"": ""C://reference1.dll"",
     ""solutionPath"": ""5fa9de0cb5af2d468dfb1702b1e342f47de2df9a195dabb3be2d04f9c2767482"",
@@ -225,6 +227,7 @@ namespace CTA.Rules.Test.Metrics
   },
   {
     ""metricsType"": ""CTA"",
+    ""language"": ""csharp"",
     ""metricName"": ""MissingMetaReference"",
     ""metaReference"": ""C://reference2.dll"",
     ""solutionPath"": ""5fa9de0cb5af2d468dfb1702b1e342f47de2df9a195dabb3be2d04f9c2767482"",
@@ -241,6 +244,7 @@ namespace CTA.Rules.Test.Metrics
             var expectedAnalysisReport = @"[
   {
     ""metricsType"": ""CTA"",
+    ""language"": ""csharp"",
     ""metricName"": ""UpgradePackage"",
     ""packageName"": ""Newtonsoft.Json"",
     ""packageVersion"": ""12.0.0"",
@@ -250,28 +254,29 @@ namespace CTA.Rules.Test.Metrics
   },
   {
     ""metricsType"": ""CTA"",
+    ""language"": ""csharp"",
     ""metricName"": ""GenericAction"",
     ""actionName"": ""GA1 Name"",
     ""actionType"": ""GA1 Type"",
     ""actionValue"": ""GA1 Value"",
     ""solutionPath"": ""5fa9de0cb5af2d468dfb1702b1e342f47de2df9a195dabb3be2d04f9c2767482"",
     ""projectGuid"": ""1234-5678"",
-    ""filePath"": ""eb98c1d648bc61064bdeaca9523a49e51bb3312f28f59376fb385e1569c77822"",
-    ""language"": ""csharp""
+    ""filePath"": ""eb98c1d648bc61064bdeaca9523a49e51bb3312f28f59376fb385e1569c77822""
   },
   {
     ""metricsType"": ""CTA"",
+    ""language"": ""csharp"",
     ""metricName"": ""GenericAction"",
     ""actionName"": ""GA2 Name"",
     ""actionType"": ""GA2 Type"",
     ""actionValue"": ""GA2 Value"",
     ""solutionPath"": ""5fa9de0cb5af2d468dfb1702b1e342f47de2df9a195dabb3be2d04f9c2767482"",
     ""projectGuid"": ""1234-5678"",
-    ""filePath"": ""eb98c1d648bc61064bdeaca9523a49e51bb3312f28f59376fb385e1569c77822"",
-    ""language"": ""csharp""
+    ""filePath"": ""eb98c1d648bc61064bdeaca9523a49e51bb3312f28f59376fb385e1569c77822""
   },
   {
     ""metricsType"": ""CTA"",
+    ""language"": ""csharp"",
     ""metricName"": ""DetectedFeature"",
     ""featureName"": ""Feature 1"",
     ""solutionPath"": ""5fa9de0cb5af2d468dfb1702b1e342f47de2df9a195dabb3be2d04f9c2767482"",
@@ -279,6 +284,7 @@ namespace CTA.Rules.Test.Metrics
   },
   {
     ""metricsType"": ""CTA"",
+    ""language"": ""csharp"",
     ""metricName"": ""DetectedFeature"",
     ""featureName"": ""Feature 1a"",
     ""solutionPath"": ""5fa9de0cb5af2d468dfb1702b1e342f47de2df9a195dabb3be2d04f9c2767482"",
@@ -286,6 +292,7 @@ namespace CTA.Rules.Test.Metrics
   },
   {
     ""metricsType"": ""CTA"",
+    ""language"": ""csharp"",
     ""metricName"": ""MissingMetaReference"",
     ""metaReference"": ""C://reference1.dll"",
     ""solutionPath"": ""5fa9de0cb5af2d468dfb1702b1e342f47de2df9a195dabb3be2d04f9c2767482"",
@@ -293,6 +300,7 @@ namespace CTA.Rules.Test.Metrics
   },
   {
     ""metricsType"": ""CTA"",
+    ""language"": ""csharp"",
     ""metricName"": ""MissingMetaReference"",
     ""metaReference"": ""C://reference2.dll"",
     ""solutionPath"": ""5fa9de0cb5af2d468dfb1702b1e342f47de2df9a195dabb3be2d04f9c2767482"",
@@ -389,24 +397,28 @@ Count: 400";
             var expectedJsonReport = @"[
   {
     ""metricsType"": ""CTA"",
+    ""language"": null,
     ""metricName"": ""Namespace"",
     ""reference"": ""System.Web"",
     ""solutionPath"": ""5fa9de0cb5af2d468dfb1702b1e342f47de2df9a195dabb3be2d04f9c2767482""
   },
   {
     ""metricsType"": ""CTA"",
+    ""language"": null,
     ""metricName"": ""Namespace"",
     ""reference"": ""System.Web.Mvc"",
     ""solutionPath"": ""5fa9de0cb5af2d468dfb1702b1e342f47de2df9a195dabb3be2d04f9c2767482""
   },
   {
     ""metricsType"": ""CTA"",
+    ""language"": null,
     ""metricName"": ""RulesFile"",
     ""downloadedFile"": ""project.all.json"",
     ""solutionPath"": ""5fa9de0cb5af2d468dfb1702b1e342f47de2df9a195dabb3be2d04f9c2767482""
   },
   {
     ""metricsType"": ""CTA"",
+    ""language"": ""csharp"",
     ""metricName"": ""TargetVersion"",
     ""targetVersion"": ""netcoreapp3.1"",
     ""sourceVersion"": ""net48"",
@@ -415,6 +427,7 @@ Count: 400";
   },
   {
     ""metricsType"": ""CTA"",
+    ""language"": ""csharp"",
     ""metricName"": ""UpgradePackage"",
     ""packageName"": ""Newtonsoft.Json"",
     ""packageVersion"": ""12.0.0"",
@@ -424,6 +437,7 @@ Count: 400";
   },
   {
     ""metricsType"": ""CTA"",
+    ""language"": ""csharp"",
     ""metricName"": ""ActionExecution"",
     ""actionName"": ""GA1 Name"",
     ""actionType"": ""GA1 Type"",
@@ -436,6 +450,7 @@ Count: 400";
   },
   {
     ""metricsType"": ""CTA"",
+    ""language"": ""csharp"",
     ""metricName"": ""ActionExecution"",
     ""actionName"": ""GA2 Name"",
     ""actionType"": ""GA2 Type"",
@@ -448,6 +463,7 @@ Count: 400";
   },
   {
     ""metricsType"": ""CTA"",
+    ""language"": ""csharp"",
     ""metricName"": ""BuildError"",
     ""buildErrorCode"": ""CS0000"",
     ""buildError"": ""CS0000: BuildError1"",
@@ -457,6 +473,7 @@ Count: 400";
   },
   {
     ""metricsType"": ""CTA"",
+    ""language"": ""csharp"",
     ""metricName"": ""BuildError"",
     ""buildErrorCode"": ""OTHER"",
     ""buildError"": ""BuildError2"",
@@ -466,6 +483,7 @@ Count: 400";
   },
   {
     ""metricsType"": ""CTA"",
+    ""language"": ""unknown"",
     ""metricName"": ""BuildError"",
     ""buildErrorCode"": ""OTHER"",
     ""buildError"": ""BuildError3"",
@@ -475,6 +493,7 @@ Count: 400";
   },
   {
     ""metricsType"": ""CTA"",
+    ""language"": ""unknown"",
     ""metricName"": ""BuildError"",
     ""buildErrorCode"": ""OTHER"",
     ""buildError"": ""BuildError4"",
@@ -484,6 +503,7 @@ Count: 400";
   },
   {
     ""metricsType"": ""CTA"",
+    ""language"": ""csharp"",
     ""metricName"": ""MissingMetaReference"",
     ""metaReference"": ""C://reference1.dll"",
     ""solutionPath"": ""5fa9de0cb5af2d468dfb1702b1e342f47de2df9a195dabb3be2d04f9c2767482"",
@@ -491,6 +511,7 @@ Count: 400";
   },
   {
     ""metricsType"": ""CTA"",
+    ""language"": ""csharp"",
     ""metricName"": ""MissingMetaReference"",
     ""metaReference"": ""C://reference2.dll"",
     ""solutionPath"": ""5fa9de0cb5af2d468dfb1702b1e342f47de2df9a195dabb3be2d04f9c2767482"",
