@@ -1,10 +1,4 @@
 ﻿using CTA.Rules.Actions;
-using CTA.Rules.Models;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.Editing;
-using Newtonsoft.Json;
 using NUnit.Framework;
 using System.Collections.Generic;
 
@@ -12,7 +6,7 @@ namespace CTA.Rules.Test.Actions
 {
     public class ActionLoaderTests
     {
-        ActionsLoader _actionLoader;
+        private ActionsLoader _actionLoader;
 
         [SetUp]
         public void SetUp()

@@ -78,8 +78,10 @@ public class Action
     public string Name { get; set; }
     public string Type { get; set; }
     public dynamic Value { get; set; }
+    public dynamic VbValue { get; set; }
     public string Description { get; set; }
     public ActionValidation ActionValidation { get; set; }
+    public ActionValidation VbActionValidation { get; set; }
 }
 
 public class Attribute

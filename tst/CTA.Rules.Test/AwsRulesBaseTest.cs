@@ -203,7 +203,7 @@ namespace CTA.Rules.Test
             return result;
         }
 
-        private void CopyTestRules()
+        protected void CopyTestRules()
         {
             // Project configured to copy TempRules folder to output directory
             // so no extra action necessary here

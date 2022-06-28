@@ -5,6 +5,9 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Editing;
 using NUnit.Framework;
+using SimpleNameSyntax = Microsoft.CodeAnalysis.VisualBasic.Syntax.SimpleNameSyntax;
+using VbMemberAccessExpressionSyntax = Microsoft.CodeAnalysis.VisualBasic.Syntax.MemberAccessExpressionSyntax;
+using VbSyntaxFactory = Microsoft.CodeAnalysis.VisualBasic.SyntaxFactory;
 
 namespace CTA.Rules.Test.Actions
 {
@@ -14,6 +17,9 @@ namespace CTA.Rules.Test.Actions
         private SyntaxGenerator _syntaxGenerator;
         private MemberAccessExpressionSyntax _node;
 
+        private SyntaxGenerator _vbGenerator;
+        private VbMemberAccessExpressionSyntax _vbNode;
+        
         [SetUp]
         public void SetUp()
         {
@@ -21,7 +27,14 @@ namespace CTA.Rules.Test.Actions
             var language = LanguageNames.CSharp;
             _syntaxGenerator = SyntaxGenerator.GetGenerator(workspace, language);
             _memberAccessActions = new MemberAccessActions();
-            _node = SyntaxFactory.MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, SyntaxFactory.ThisExpression(), SyntaxFactory.IdentifierName("value"));
+            _node = SyntaxFactory.MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
+                SyntaxFactory.ThisExpression(), SyntaxFactory.IdentifierName("value"));
+            _vbGenerator = SyntaxGenerator.GetGenerator(workspace, LanguageNames.VisualBasic);
+            _vbNode = VbSyntaxFactory.MemberAccessExpression(
+                Microsoft.CodeAnalysis.VisualBasic.SyntaxKind.SimpleMemberAccessExpression,
+                VbSyntaxFactory.ParseExpression("Math.Abs(-1)"),
+                VbSyntaxFactory.Token(Microsoft.CodeAnalysis.VisualBasic.SyntaxKind.DotToken),
+                (SimpleNameSyntax)VbSyntaxFactory.ParseName("Value"));
         }
 
         [Test]
@@ -49,6 +62,17 @@ namespace CTA.Rules.Test.Actions
             Assert.True(memberAccessAction.Equals(cloned));
             cloned.Value = "DifferentValue";
             Assert.False(memberAccessAction.Equals(cloned));
+        }
+
+        [Test]
+        public void RemoveMemberAccess()
+        {
+            var removeMemberAccessFunc = _memberAccessActions.GetRemoveMemberAccessAction("");
+            var newCsharpNode = removeMemberAccessFunc(_syntaxGenerator, _node);
+            var newVbNode = removeMemberAccessFunc(_vbGenerator, _vbNode);
+
+            Assert.AreEqual("this", newCsharpNode.ToFullString());
+            Assert.AreEqual("Math.Abs(-1)", newVbNode.ToFullString());
         }
     }
 }

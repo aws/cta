@@ -72,4 +72,17 @@
         ClassConversion,
         FileConversion
     }
+
+    public enum ProjectLanguage
+    {
+        VisualBasic,
+        Csharp,
+    }
+
+    public static class FileExtension
+    {
+        public static readonly string VisualBasic = ".vb";
+        public static readonly string CSharp = ".cs";
+        public static readonly string Backup = ".bak";
+    }
 }

@@ -8,13 +8,14 @@ using CTA.Rules.Common.Extensions;
 using CTA.Rules.Config;
 using CTA.Rules.Models;
 using CTA.Rules.Models.Tokens;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace CTA.Rules.Analyzer
 {
     /// <summary>
     /// Object to use for creating an analysis based on a code analysis and a list of rules
     /// </summary>
-    public class RulesAnalysis
+    public class RulesAnalysis : IRulesAnalysis
     {
         private readonly RootNodes _rootNodes;
         private readonly List<RootUstNode> _sourceFileResults;
@@ -438,7 +439,7 @@ namespace CTA.Rules.Analyzer
         /// </summary>
         /// <param name="fileAction">The file to run actions on</param>
         /// <param name="token">The token that matched the file</param>
-        private void AddActions(FileActions fileAction, NodeToken token, TextSpan textSpan, string overrideKey = "")
+        private void AddActions(FileActions fileAction, CsharpNodeToken token, TextSpan textSpan, string overrideKey = "")
         {
             fileAction.AttributeActions.UnionWith(token.AttributeActions.Select(a => new AttributeAction()
             {
@@ -466,7 +467,7 @@ namespace CTA.Rules.Analyzer
                 AttributeListActionFunc = a.AttributeListActionFunc
             }).ToList());
 
-            fileAction.IdentifierNameActions.UnionWith(token.IdentifierNameActions.Select(a => new IdentifierNameAction()
+            fileAction.IdentifierNameActions.UnionWith(token.IdentifierNameActions.Select(a => new IdentifierNameAction<IdentifierNameSyntax>()
             {
                 Key = a.Key,
                 Description = a.Description,
@@ -478,7 +479,7 @@ namespace CTA.Rules.Analyzer
                 IdentifierNameActionFunc = a.IdentifierNameActionFunc,
             }).ToList());
 
-            fileAction.InvocationExpressionActions.UnionWith(token.InvocationExpressionActions.Select(a => new InvocationExpressionAction()
+            fileAction.InvocationExpressionActions.UnionWith(token.InvocationExpressionActions.Select(a => new InvocationExpressionAction<InvocationExpressionSyntax>()
             {
                 Key = !string.IsNullOrEmpty(overrideKey) ? overrideKey : a.Key,
                 Description = a.Description,
@@ -527,7 +528,7 @@ namespace CTA.Rules.Analyzer
                 NamespaceUsingActionFunc = a.NamespaceUsingActionFunc,
             }).ToList());
 
-            fileAction.NamespaceActions.UnionWith(token.NamespaceActions.Select(a => new NamespaceAction()
+            fileAction.NamespaceActions.UnionWith(token.NamespaceActions.Select(a => new NamespaceAction<NamespaceDeclarationSyntax>()
             {
                 Key = a.Key,
                 Description = a.Description,
@@ -607,7 +608,7 @@ namespace CTA.Rules.Analyzer
         /// <param name="fileAction"></param>
         /// <param name="token"></param>
         /// <param name="identifier"></param>
-        private void AddNamedActions(FileActions fileAction, NodeToken token, string identifier, TextSpan textSpan)
+        private void AddNamedActions(FileActions fileAction, CsharpNodeToken token, string identifier, TextSpan textSpan)
         {
 
             fileAction.ClassDeclarationActions.UnionWith(token.ClassDeclarationActions

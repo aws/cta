@@ -1,4 +1,4 @@
-﻿using CTA.Rules.Actions;
+﻿using CTA.Rules.Actions.Csharp;
 using CTA.Rules.Models;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -115,8 +115,8 @@ namespace CTA.Rules.Test.Actions
         [Test]
         public void InvocationExpressionEquals()
         {
-            var invocationExpressionAction = new InvocationExpressionAction() { Key = "Test", Value = "Test2", InvocationExpressionActionFunc = _invocationExpressionActions.GetAddCommentAction("Test") };
-            var cloned = invocationExpressionAction.Clone<InvocationExpressionAction>();
+            var invocationExpressionAction = new InvocationExpressionAction<InvocationExpressionSyntax>() { Key = "Test", Value = "Test2", InvocationExpressionActionFunc = _invocationExpressionActions.GetAddCommentAction("Test") };
+            var cloned = invocationExpressionAction.Clone<InvocationExpressionAction<InvocationExpressionSyntax>>();
             Assert.True(invocationExpressionAction.Equals(cloned));
 
             cloned.Value = "DifferentValue";

@@ -6,8 +6,10 @@ using Codelyzer.Analysis;
 using Codelyzer.Analysis.Build;
 using Codelyzer.Analysis.Model;
 using CTA.Rules.Analyzer;
+using CTA.Rules.Common.Helpers;
 using CTA.Rules.Config;
 using CTA.Rules.Models;
+using CTA.Rules.Models.Tokens;
 using CTA.Rules.RuleFiles;
 
 namespace CTA.Rules.Update
@@ -24,6 +26,8 @@ namespace CTA.Rules.Update
         protected readonly ProjectResult _projectResult;
         protected readonly List<string> _metaReferences;
         protected readonly AnalyzerResult _analyzerResult;
+        protected readonly ProjectLanguage _projectLanguage;
+        private IRulesAnalysis _rulesAnalyzer;
 
         /// <summary>
         /// Initializes a new instance of ProjectRewriter using an existing analysis
@@ -53,6 +57,7 @@ namespace CTA.Rules.Update
             _metaReferences = analyzerResult?.ProjectBuildResult?.Project?.MetadataReferences?.Select(m => m.Display).ToList()
                 ?? projectConfiguration.MetaReferences;
             ProjectConfiguration = projectConfiguration;
+            _projectLanguage = VisualBasicUtils.IsVisualBasicProject(ProjectConfiguration.ProjectPath) ? ProjectLanguage.VisualBasic : ProjectLanguage.Csharp;
         }
 
         public ProjectRewriter(IDEProjectResult projectResult, ProjectConfiguration projectConfiguration)
@@ -86,13 +91,26 @@ namespace CTA.Rules.Update
             {
                 var allReferences = _sourceFileResults?.SelectMany(s => s.References)
                         .Union(_sourceFileResults.SelectMany(s => s.Children.OfType<UsingDirective>())?.Select(u => new Reference() { Namespace = u.Identifier, Assembly = u.Identifier }).Distinct())
+                        .Union(_sourceFileResults.SelectMany(s => s.Children.OfType<ImportsStatement>())?.Select(u => new Reference() {Namespace = u.Identifier, Assembly = u.Identifier }).Distinct())
                         .Union(ProjectConfiguration.AdditionalReferences.Select(r => new Reference { Assembly = r, Namespace = r }));
-                RulesFileLoader rulesFileLoader = new RulesFileLoader(allReferences, ProjectConfiguration.RulesDir, ProjectConfiguration.TargetVersions, string.Empty, ProjectConfiguration.AssemblyDir);
-
+                RulesFileLoader rulesFileLoader = new RulesFileLoader(allReferences, ProjectConfiguration.RulesDir, ProjectConfiguration.TargetVersions, _projectLanguage, string.Empty, ProjectConfiguration.AssemblyDir);
+                
                 var projectRules = rulesFileLoader.Load();
 
-                RulesAnalysis walker = new RulesAnalysis(_sourceFileResults, projectRules, ProjectConfiguration.ProjectType);
-                projectActions = walker.Analyze();
+                HashSet<NodeToken> projectTokens;
+                if (_projectLanguage == ProjectLanguage.VisualBasic)
+                {
+                    _rulesAnalyzer = new VisualBasicRulesAnalysis(_sourceFileResults, projectRules.VisualBasicRootNodes,
+                        ProjectConfiguration.ProjectType);
+                    projectTokens = projectRules.VisualBasicRootNodes.ProjectTokens;
+                }
+                else
+                {
+                    _rulesAnalyzer = new RulesAnalysis(_sourceFileResults, projectRules.CsharpRootNodes, ProjectConfiguration.ProjectType);
+                    projectTokens = projectRules.CsharpRootNodes.ProjectTokens;
+                }
+                
+                projectActions = _rulesAnalyzer.Analyze();
                 _projectReferences.ForEach(p =>
                 {
                     projectActions.ProjectReferenceActions.Add(Config.Utils.GetRelativePath(ProjectConfiguration.ProjectPath, p));
@@ -107,11 +125,12 @@ namespace CTA.Rules.Update
                 }
                 MergePackages(projectActions.PackageActions);
 
-                projectActions.ProjectLevelActions = projectRules.ProjectTokens.SelectMany(p => p.ProjectTypeActions).Distinct().ToList();
-                projectActions.ProjectLevelActions.AddRange(projectRules.ProjectTokens.SelectMany(p => p.ProjectLevelActions).Distinct());
-                projectActions.ProjectLevelActions.AddRange(projectRules.ProjectTokens.SelectMany(p => p.ProjectFileActions).Distinct());
+                projectActions.ProjectLevelActions = projectTokens.SelectMany(p => p.ProjectTypeActions).Distinct().ToList();
+                projectActions.ProjectLevelActions.AddRange(projectTokens.SelectMany(p => p.ProjectLevelActions).Distinct());
+                projectActions.ProjectLevelActions.AddRange(projectTokens.SelectMany(p => p.ProjectFileActions).Distinct());
 
-                projectActions.ProjectRules = projectRules;
+                projectActions.CsharpProjectRules = projectRules.CsharpRootNodes;
+                projectActions.VbProjectRules = projectRules.VisualBasicRootNodes;
                 _projectResult.ProjectActions = projectActions;
 
                 _projectResult.FeatureType = ProjectConfiguration.ProjectType;
@@ -140,26 +159,37 @@ namespace CTA.Rules.Update
         public virtual ProjectResult Run(ProjectActions projectActions)
         {
             _projectResult.ProjectActions = projectActions;
-            CodeReplacer baseReplacer = new CodeReplacer(_sourceFileBuildResults, ProjectConfiguration, _metaReferences, _analyzerResult, projectResult: _projectResult);
+            CodeReplacer baseReplacer = new CodeReplacer(_sourceFileBuildResults, ProjectConfiguration, _metaReferences, _analyzerResult, _projectLanguage, projectResult: _projectResult);
             _projectResult.ExecutedActions = baseReplacer.Run(projectActions, ProjectConfiguration.ProjectType);
             return _projectResult;
         }
 
         public virtual List<IDEFileActions> RunIncremental(List<string> updatedFiles, RootNodes projectRules)
         {
-            var ideFileActions = new List<IDEFileActions>();
-
             var allReferences = _sourceFileResults?.SelectMany(s => s.References).Distinct();
-            RulesFileLoader rulesFileLoader = new RulesFileLoader(allReferences, Constants.RulesDefaultPath, ProjectConfiguration.TargetVersions, string.Empty, ProjectConfiguration.AssemblyDir);
-            projectRules = rulesFileLoader.Load();
+            RulesFileLoader rulesFileLoader = new RulesFileLoader(allReferences, Constants.RulesDefaultPath, ProjectConfiguration.TargetVersions, _projectLanguage, string.Empty, ProjectConfiguration.AssemblyDir);
 
-            RulesAnalysis walker = new RulesAnalysis(_sourceFileResults, projectRules, ProjectConfiguration.ProjectType);
-            var projectActions = walker.Analyze();
+            var rules = rulesFileLoader.Load();
 
-            CodeReplacer baseReplacer = new CodeReplacer(_sourceFileBuildResults, ProjectConfiguration, _metaReferences, _analyzerResult, updatedFiles, projectResult: _projectResult);
+            HashSet<NodeToken> projectTokens;
+            if (_projectLanguage == ProjectLanguage.VisualBasic)
+            {
+                _rulesAnalyzer = new VisualBasicRulesAnalysis(_sourceFileResults, rules.VisualBasicRootNodes,
+                    ProjectConfiguration.ProjectType);
+                projectTokens = rules.VisualBasicRootNodes.ProjectTokens;
+            }
+            else
+            {
+                _rulesAnalyzer = new RulesAnalysis(_sourceFileResults, rules.CsharpRootNodes, ProjectConfiguration.ProjectType);
+                projectTokens = rules.CsharpRootNodes.ProjectTokens;
+            }
+
+            var projectActions = _rulesAnalyzer.Analyze();
+
+            CodeReplacer baseReplacer = new CodeReplacer(_sourceFileBuildResults, ProjectConfiguration, _metaReferences, _analyzerResult, _projectLanguage, updatedFiles, projectResult: _projectResult);
             _projectResult.ExecutedActions = baseReplacer.Run(projectActions, ProjectConfiguration.ProjectType);
 
-            ideFileActions = projectActions
+            List<IDEFileActions> ideFileActions = projectActions
                 .FileActions
                 .SelectMany(f => f.NodeTokens.Select(n => new IDEFileActions() { TextSpan = n.TextSpan,  Description = n.Description, FilePath = f.FilePath, TextChanges = n.TextChanges }))
                 .ToList();

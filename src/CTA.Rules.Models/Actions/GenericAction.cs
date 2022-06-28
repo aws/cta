@@ -18,5 +18,18 @@ namespace CTA.Rules.Models
         public ActionValidation ActionValidation { get; set; }
 
         public T Clone<T>() => (T)this.MemberwiseClone();
+
+        public virtual GenericAction Copy()
+        {
+            GenericAction copy = new GenericAction();
+            copy.Name = this.Name;
+            copy.Type = this.Type;
+            copy.Key = this.Key;
+            copy.Value = this.Value;
+            copy.Description = this.Description;
+            copy.TextSpan = this.TextSpan;
+            copy.ActionValidation = this.ActionValidation;
+            return copy;
+        }
     }
 }

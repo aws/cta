@@ -1,0 +1,167 @@
+﻿{
+  "Name": "VbWebApi",
+  "Version": "1.0.0",
+  "Packages": [
+    {
+      "Name": "VbWebApi",
+      "Type": "Project"
+    }
+  ],
+  "Recommendations": [
+    {
+      "Type": "ElementAccess",
+      "Name": "MigrateShoppingCart",
+      "Value": "MvcMusicStore.Controllers.AccountController.MigrateShoppingCart",
+      "RecommendedActions": [
+        {
+          "Source": "Amazon",
+          "Preferred": "Yes",
+          "TargetFrameworks": [
+            {
+              "Name": "netcoreapp3.1",
+              "TargetCPU": [ "x86", "x64", "ARM64" ]
+            },
+            {
+              "Name": "net5.0",
+              "TargetCPU": [ "x86", "x64", "ARM64" ]
+            }
+          ],
+          "Description": "Add a comment",
+          "Actions": [
+            {
+              "Name": "AddComment",
+              "Type": "ElementAccess",
+              "Value": "The text of the comment",
+              "Description": "Add a comment to an element access statement"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Type": "Namespace",
+      "Name": "MvcMusicStore.ViewModels",
+      "Value": "MvcMusicStore.ViewModels",
+      "KeyType": "Name",
+      "ContainingType": "",
+      "RecommendedActions": [
+        {
+          "Source": "Amazon",
+          "Preferred": "Yes",
+          "TargetFrameworks": [
+            {
+              "Name": "netcoreapp3.1",
+              "TargetCPU": [ "x86", "x64", "ARM64" ]
+            },
+            {
+              "Name": "net5.0",
+              "TargetCPU": [ "x86", "x64", "ARM64" ]
+            }
+          ],
+          "Description": "Replace namespacee with a new namespace",
+          "Actions": [
+            {
+              "Name": "RenameNamespace",
+              "Type": "Namespace",
+              "Value": "MvcMusicStore.ChangedViewModels",
+              "Description": "Replace namespace with a new namespace",
+              "ActionValidation": {
+                "Contains": "notvalid;",
+                "NotContains": "notvalidtoo"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Type": "MethodDeclaration",
+      "Name": "MigrateShoppingCart",
+      "Value": "MvcMusicStore.Controllers.AccountController.MigrateShoppingCart",
+      "RecommendedActions": [
+        {
+          "Source": "Amazon",
+          "Preferred": "Yes",
+          "TargetFrameworks": [
+            {
+              "Name": "netcoreapp3.1",
+              "TargetCPU": [ "x86", "x64", "ARM64" ]
+            },
+            {
+              "Name": "net5.0",
+              "TargetCPU": [ "x86", "x64", "ARM64" ]
+            }
+          ],
+          "Description": "Add a comment",
+          "Actions": [
+            {
+              "Name": "AddComment",
+              "Type": "MethodDeclaration",
+              "Value": "The text of the comment",
+              "Description": "Add a comment to a method declaration"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Type": "Attribute",
+      "Name": "RoutePrefix",
+      "Value": "System.Web.Http.RoutePrefixAttribute.RoutePrefixAttribute(string)",
+      "KeyType": "Name",
+      "ContainingType": "RoutePrefixAttribute",
+      "RecommendedActions": [
+        {
+          "Source": "Amazon",
+          "Preferred": "Yes",
+          "TargetFrameworks": [
+            {
+              "Name": "netcoreapp3.1",
+              "TargetCPU": [
+                "x86",
+                "x64",
+                "ARM32",
+                "ARM64"
+              ]
+            },
+            {
+              "Name": "net5.0",
+              "TargetCPU": [
+                "x86",
+                "x64",
+                "ARM32",
+                "ARM64"
+              ]
+            },
+            {
+              "Name": "net6.0",
+              "TargetCPU": [
+                "x86",
+                "x64",
+                "ARM32",
+                "ARM64"
+              ]
+            }
+          ],
+          "Description": "Add a comment: RoutePrefix attribute is no longer supported.",
+          "Actions": [
+            {
+              "Name": "AddComment",
+              "Type": "AttributeList",
+              "Value": {
+                "comment": "RoutePrefix attribute is no longer supported",
+                "dontUseCTAPrefix": ""
+              },
+              "Description": "RoutePrefix attribute is no longer supported",
+              "ActionValidation": {
+                "Contains": "RoutePrefix attribute is no longer supported",
+                "NotContains": "",
+                "CheckComments": "True"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

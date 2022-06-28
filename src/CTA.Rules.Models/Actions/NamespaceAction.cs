@@ -5,13 +5,13 @@ using Microsoft.CodeAnalysis.Editing;
 
 namespace CTA.Rules.Models
 {
-    public class NamespaceAction : GenericAction
+    public class NamespaceAction<T> : GenericAction
     {
-        public Func<SyntaxGenerator, NamespaceDeclarationSyntax, NamespaceDeclarationSyntax> NamespaceActionFunc { get; set; }
+        public Func<SyntaxGenerator, T, T> NamespaceActionFunc { get; set; }
 
         public override bool Equals(object obj)
         {
-            var action = (NamespaceAction)obj;
+            var action = (NamespaceAction<T>)obj;
             return action?.Value == this.Value
                 && action?.NamespaceActionFunc.Method.Name == this.NamespaceActionFunc.Method.Name;
         }

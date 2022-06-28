@@ -1,5 +1,5 @@
 ﻿using CTA.Rules.Models;
-using CTA.Rules.Update;
+using CTA.Rules.Update.Csharp;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
