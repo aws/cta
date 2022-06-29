@@ -52,6 +52,7 @@ namespace CTA.Rules.Metrics
             {
                 FilePath = string.IsNullOrEmpty(action.FilePath) ? "N/A" : EncryptionHelper.ConvertToSHA256Hex(action.FilePath);
             }
+            Language = GetLanguage(projectPath);
         }
     }
 }

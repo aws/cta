@@ -1,0 +1,11 @@
+﻿!Template
+TagName: invalid:AddNugetPackageExtraProperties
+CodeBehindType: Namespace.TypeName
+CodeBehindHandler: Default
+Conditions: []
+Invocations:
+  - !AddNugetPackage
+    PackageName: Some.Other.Package
+    ExtraProperty: Value
+Templates:
+    Default: "<p>Default template</p>"

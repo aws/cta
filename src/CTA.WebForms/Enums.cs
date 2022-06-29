@@ -55,10 +55,22 @@ namespace CTA.WebForms
         Dispose
     }
 
-    public enum DirectiveMigrationResultType {
+    public enum DirectiveMigrationResultType
+    {
         UsingDirective,
         GeneralDirective,
         Comment,
         HTMLNode
+    }
+
+    public enum AttributeTargetTypes
+    {
+        String,
+        HtmlBoolean,
+        ComponentBoolean,
+        InvertedHtmlBoolean,
+        InvertedComponentBoolean,
+        EventCallback,
+        EventHandler
     }
 }

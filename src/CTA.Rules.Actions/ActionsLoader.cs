@@ -9,22 +9,39 @@ using CTA.Rules.Models;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Editing;
-using Newtonsoft.Json;
 
 namespace CTA.Rules.Actions
 {
     /// <summary>
     /// Loads actions into the current execution context
     /// </summary>
-    public class ActionsLoader
+    public class ActionsLoader : ActionLoaderBase
     {
-        private readonly List<MethodInfo> compilationUnitActions, attributeActions, attributeListActions, classActions,
-        identifierNameActions, invocationExpressionActions, expressionActions, methodDeclarationActions, elementAccessActions,
-        objectCreationExpressionActions, memberAccessActions, namespaceActions, projectLevelActions, projectFileActions, projectTypeActions, interfaceActions;
+        private readonly List<MethodInfo> compilationUnitActions,
+            attributeActions,
+            attributeListActions,
+            classActions,
+            identifierNameActions,
+            invocationExpressionActions,
+            expressionActions,
+            methodDeclarationActions,
+            elementAccessActions,
+            objectCreationExpressionActions,
+            namespaceActions,
+            interfaceActions;
 
-        private readonly object attributeObject, attributeListObject, classObject, interfaceObject, compilationUnitObject, identifierNameObject
-            , invocationExpressionObject, expressionObject, methodDeclarationObject, elementAccessObject, memberAccessObject, objectExpressionObject, namespaceObject, projectLevelObject,
-            projectFileObject, projectTypeObject;
+        private readonly object attributeObject,
+            attributeListObject,
+            classObject,
+            interfaceObject,
+            compilationUnitObject,
+            identifierNameObject,
+            invocationExpressionObject,
+            expressionObject,
+            methodDeclarationObject,
+            elementAccessObject,
+            objectExpressionObject,
+            namespaceObject;
 
         /// <summary>
         /// Initializes a new ActionLoader that loads the default actions
@@ -73,7 +90,11 @@ namespace CTA.Rules.Actions
             {
                 try
                 {
-                    var types = assembly.GetTypes().Where(t => t.Name.EndsWith("Actions"));
+                    var types = assembly.GetTypes()
+                        .Where(t => t.Name.EndsWith("Actions") &&
+                                    (t.Namespace.EndsWith(ProjectLanguage.Csharp.ToString()) ||
+                                     t.Name.StartsWith("Project") ||
+                                     t.Name.StartsWith("MemberAccess"))).ToList();
 
                     attributeObject = Activator.CreateInstance(types.FirstOrDefault(t => t.Name == Constants.AttributeActions));
                     attributeListObject = Activator.CreateInstance(types.FirstOrDefault(t => t.Name == Constants.AttributeListActions));
@@ -91,7 +112,6 @@ namespace CTA.Rules.Actions
                     interfaceObject = Activator.CreateInstance(types.FirstOrDefault(t => t.Name == Constants.InterfaceActions));
                     projectFileObject = Activator.CreateInstance(types.FirstOrDefault(t => t.Name == Constants.ProjectFileActions));
                     projectTypeObject = Activator.CreateInstance(types.FirstOrDefault(t => t.Name == Constants.ProjectTypeActions));
-
 
                     foreach (var t in types)
                     {
@@ -191,13 +211,6 @@ namespace CTA.Rules.Actions
                 }
             }
         }
-
-        private List<MethodInfo> GetFuncMethods(Type t) => t.GetMethods().Where(m => m.ReturnType.ToString().Contains("System.Func")).ToList();
-
-        private string GetActionName(string name)
-        {
-            return string.Concat("Get", name, "Action");
-        }
         public Func<SyntaxGenerator, CompilationUnitSyntax, CompilationUnitSyntax> GetCompilationUnitAction(string name, dynamic value)
             => GetAction<Func<SyntaxGenerator, CompilationUnitSyntax, CompilationUnitSyntax>>
                 (compilationUnitActions, compilationUnitObject, name, value);
@@ -231,134 +244,9 @@ namespace CTA.Rules.Actions
         public Func<SyntaxGenerator, ObjectCreationExpressionSyntax, ExpressionSyntax> GetObjectCreationExpressionActions(string name, dynamic value) =>
             GetAction<Func<SyntaxGenerator, ObjectCreationExpressionSyntax, ExpressionSyntax>>
                 (objectCreationExpressionActions, objectExpressionObject, name, value);
-        public Func<string, ProjectType, string> GetProjectLevelActions(string name, dynamic value) =>
-            GetAction<Func<string, ProjectType, string>>
-                (projectLevelActions, projectLevelObject, name, value);
-        public Func<string, ProjectType, List<string>, Dictionary<string, string>, List<string>, List<string>, string> GetProjectFileActions(string name, dynamic value) =>
-            GetAction<Func<string, ProjectType, List<string>, Dictionary<string, string>, List<string>, List<string>, string>>
-                (projectFileActions, projectFileObject, name, value);
-        public Func<ProjectType, ProjectConfiguration, ProjectResult, AnalyzerResult, string> GetProjectTypeActions(string name, dynamic value) =>
-            GetAction<Func<ProjectType, ProjectConfiguration, ProjectResult, AnalyzerResult, string>>
-                (projectTypeActions, projectTypeObject, name, value);
         public Func<SyntaxGenerator, ElementAccessExpressionSyntax, ElementAccessExpressionSyntax> GetElementAccessExpressionActions(string name, dynamic value) =>
             GetAction<Func<SyntaxGenerator, ElementAccessExpressionSyntax, ElementAccessExpressionSyntax>>
                 (elementAccessActions, elementAccessObject, name, value);
-        public Func<SyntaxGenerator, SyntaxNode, SyntaxNode> GetMemberAccessExpressionActions(string name, dynamic value) =>
-            GetAction<Func<SyntaxGenerator, SyntaxNode, SyntaxNode>>
-                (memberAccessActions, memberAccessObject, name, value);
-
-        /// <summary>
-        /// Gets the action by invoking the methods that will create it
-        /// </summary>
-        /// <typeparam name="T">The type of the object</typeparam>
-        /// <param name="actions">List of actions on the type T</param>
-        /// <param name="invokeObject">The object that will be used to retrieve the action</param>
-        /// <param name="name">Name of the action</param>
-        /// <param name="value">Parameter(s) of the action</param>
-        /// <returns></returns>
-        private T GetAction<T>(List<MethodInfo> actions, object invokeObject, string name, dynamic value)
-        {
-            T val = default;
-            try
-            {
-                string actionName = GetActionName(name);
-                var method = actions.Where(m => m.Name == actionName).FirstOrDefault();
-                if (method == null)
-                {
-                    LogHelper.LogDebug(string.Format("No such action {0}", actionName));
-                }
-                else
-                {
-                    var parameters = GetParameters(value, method);
-
-                    if (parameters != null)
-                    {
-                        val = (T)method.Invoke(invokeObject, parameters);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                LogHelper.LogError(ex, "Error while loading action {0}", name);
-            }
-            return val;
-        }
-
-        /// <summary>
-        /// Gets the parameters for the action. The parameters should match the action signature in the provided rules file
-        /// </summary>
-        /// <param name="value">The paramter(s) as a string or JSON object</param>
-        /// <param name="method">The method for these parameters</param>
-        /// <returns></returns>
-        private string[] GetParameters(dynamic value, MethodInfo method)
-        {
-            List<string> result = new List<string>();
-
-            try
-            {
-                if (value is string)
-                {
-                    var strValue = value.ToString();
-                    if (strValue.StartsWith("{"))
-                    {
-                        try
-                        {
-                            result = GetJsonParameters(value.ToString(), method);
-                        }
-                        catch (Exception)
-                        {
-                            result = new List<string>() { value };
-                        }
-                    }
-                    else
-                    {
-                        result = new List<string>() { value };
-                        var optionalParameters = method.GetParameters().Where(p => p.IsOptional);
-                        // This should only run if optional parameter was not inlcuded originally.
-                        // TODO: We do not support ONLY optional parameters > 1 at this time, this logic would need to be re-written properly, that scenario would fail at val = (T)method.Invoke(invokeObject, parameters);
-                        if (optionalParameters.Any() && method.GetParameters().Count() > 1) 
-                        {
-                            result.AddRange(optionalParameters.Select(p => p.HasDefaultValue && p.DefaultValue != null ? p.DefaultValue.ToString() : null));
-                        }
-                    }
-                }
-                else
-                {
-                    result = GetJsonParameters(value.ToString(), method);
-                }
-            }
-            catch (Exception ex)
-            {
-                LogHelper.LogError(ex, "Error while loading parameters for action {0}", method.Name);
-            }
-            return result.ToArray();
-        }
-
-        private List<string> GetJsonParameters(string value, MethodInfo method)
-        {
-            List<string> result = new List<string>();
-
-            Dictionary<string, string> jsonParameters = JsonConvert.DeserializeObject<Dictionary<string, string>>(value);
-
-            var methodParams = method.GetParameters();
-            foreach (var p in methodParams)
-            {
-                if (jsonParameters.ContainsKey(p.Name))
-                {
-                    result.Add(jsonParameters[p.Name]);
-                }
-                else if(p.IsOptional)
-                {
-                    result.Add(p.HasDefaultValue && p.DefaultValue != null ? p.DefaultValue.ToString() : null);
-                }
-                else
-                {
-                    LogHelper.LogDebug(string.Format("Parameter {0} is not available for action {1}", p.Name, method.Name));
-                    return null;
-                }
-            }
-            return result;
-        }
     }
 
 }

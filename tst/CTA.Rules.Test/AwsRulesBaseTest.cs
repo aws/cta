@@ -1,4 +1,5 @@
 ﻿using Codelyzer.Analysis;
+using Codelyzer.Analysis.Analyzer;
 using CTA.Rules.Config;
 using CTA.Rules.Models;
 using CTA.Rules.PortCore;
@@ -7,7 +8,6 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.IO.Compression;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -143,6 +143,7 @@ namespace CTA.Rules.Test
                     SolutionPort solutionPort = new SolutionPort(solutionPath, solutionPortConfiguration);
                     CopyTestRules();
                     CopyTestTemplates();
+                    CopyTestTagConfigs();
                     var analysisRunResult = solutionPort.AnalysisRun();
 
                     StringBuilder str = new StringBuilder();
@@ -202,10 +203,10 @@ namespace CTA.Rules.Test
             return result;
         }
 
-        private void CopyTestRules()
+        protected void CopyTestRules()
         {
-            // Set each file in the TempRules directory to copy to output directory using file
-            // properties menu or the test rules will not work
+            // Project configured to copy TempRules folder to output directory
+            // so no extra action necessary here
             var assemblyDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
             var tempRulesDir = Path.Combine(assemblyDir, "TempRules");
@@ -224,8 +225,8 @@ namespace CTA.Rules.Test
 
         private void CopyTestTemplates()
         {
-            // Set each file in the TempTemplates directory to copy to output directory using file
-            // properties menu or the test templates will not work
+            // Project configured to copy TempTemplates folder to output directory
+            // so no extra action necessary here
             var assemblyDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
             var tempTemplatesDir = Path.Combine(assemblyDir, "TempTemplates");
@@ -237,6 +238,29 @@ namespace CTA.Rules.Test
                 {
                     var relativePath = Path.GetRelativePath(tempTemplatesDir, file);
                     var targetFile = Path.Combine(Constants.ResourcesExtractedPath, relativePath);
+                    var targetFileDir = Path.GetDirectoryName(targetFile);
+
+                    Directory.CreateDirectory(targetFileDir);
+                    File.Copy(file, targetFile, true);
+                }
+            }
+        }
+
+        private void CopyTestTagConfigs()
+        {
+            // Project configured to copy TempTagConfigs folder to output directory
+            // so no extra action necessary here
+            var assemblyDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+
+            var tempTemplatesDir = Path.Combine(assemblyDir, "TempTagConfigs");
+            if (Directory.Exists(tempTemplatesDir))
+            {
+                var files = Directory.EnumerateFiles(tempTemplatesDir, "*", SearchOption.AllDirectories);
+
+                foreach (var file in files)
+                {
+                    var relativePath = Path.GetRelativePath(tempTemplatesDir, file);
+                    var targetFile = Path.Combine(Rules.Config.Constants.TagConfigsExtractedPath, relativePath);
                     var targetFileDir = Path.GetDirectoryName(targetFile);
 
                     Directory.CreateDirectory(targetFileDir);
@@ -352,7 +376,9 @@ namespace CTA.Rules.Test
                     MemberAccess = true
                 }
             };
-            CodeAnalyzer analyzer = CodeAnalyzerFactory.GetAnalyzer(configuration, NullLogger.Instance);
+            //CodeAnalyzer analyzer = CodeAnalyzerFactory.GetAnalyzer(configuration, NullLogger.Instance);
+            CodeAnalyzerByLanguage analyzer = new CodeAnalyzerByLanguage(configuration, NullLogger.Instance);
+            
             var result = analyzer.AnalyzeSolution(solutionPath).Result;
             return result;
         }
@@ -380,7 +406,9 @@ namespace CTA.Rules.Test
                     MemberAccess = true
                 }
             };
-            CodeAnalyzer analyzer = CodeAnalyzerFactory.GetAnalyzer(configuration, NullLogger.Instance);
+            //CodeAnalyzer analyzer = CodeAnalyzerFactory.GetAnalyzer(configuration, NullLogger.Instance);
+            CodeAnalyzerByLanguage analyzer = new CodeAnalyzerByLanguage(configuration, NullLogger.Instance);
+
             var result = analyzer.AnalyzeSolution(solutionPath).Result;
             return result;
         }

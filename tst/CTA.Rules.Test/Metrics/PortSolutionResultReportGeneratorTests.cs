@@ -79,6 +79,7 @@ namespace CTA.Rules.Test.Metrics
                 {
                     ProjectFile = projectPath1,
                     TargetVersions = new List<string>() {Constants.DefaultCoreVersion},
+                    SourceVersions = new List<string> {Constants.DefaultNetFrameworkVersion},
                     UpgradePackages = new List<PackageAction>() {new PackageAction() { Name = "Newtonsoft.Json", OriginalVersion="9.0.0", Version="12.0.0" } },
                     MissingMetaReferences = new List<string> { @"C://reference1.dll", @"C://reference2.dll" },
                     ProjectActions = new ProjectActions() {
@@ -186,6 +187,7 @@ namespace CTA.Rules.Test.Metrics
             var expectedAnalysisReport = @"[
   {
     ""metricsType"": ""CTA"",
+    ""language"": ""csharp"",
     ""metricName"": ""UpgradePackage"",
     ""packageName"": ""Newtonsoft.Json"",
     ""packageVersion"": ""12.0.0"",
@@ -195,6 +197,7 @@ namespace CTA.Rules.Test.Metrics
   },
   {
     ""metricsType"": ""CTA"",
+    ""language"": ""csharp"",
     ""metricName"": ""GenericAction"",
     ""actionName"": ""GA1 Name"",
     ""actionType"": ""GA1 Type"",
@@ -205,6 +208,7 @@ namespace CTA.Rules.Test.Metrics
   },
   {
     ""metricsType"": ""CTA"",
+    ""language"": ""csharp"",
     ""metricName"": ""GenericAction"",
     ""actionName"": ""GA2 Name"",
     ""actionType"": ""GA2 Type"",
@@ -215,6 +219,7 @@ namespace CTA.Rules.Test.Metrics
   },
   {
     ""metricsType"": ""CTA"",
+    ""language"": ""csharp"",
     ""metricName"": ""MissingMetaReference"",
     ""metaReference"": ""C://reference1.dll"",
     ""solutionPath"": ""5fa9de0cb5af2d468dfb1702b1e342f47de2df9a195dabb3be2d04f9c2767482"",
@@ -222,6 +227,7 @@ namespace CTA.Rules.Test.Metrics
   },
   {
     ""metricsType"": ""CTA"",
+    ""language"": ""csharp"",
     ""metricName"": ""MissingMetaReference"",
     ""metaReference"": ""C://reference2.dll"",
     ""solutionPath"": ""5fa9de0cb5af2d468dfb1702b1e342f47de2df9a195dabb3be2d04f9c2767482"",
@@ -238,6 +244,7 @@ namespace CTA.Rules.Test.Metrics
             var expectedAnalysisReport = @"[
   {
     ""metricsType"": ""CTA"",
+    ""language"": ""csharp"",
     ""metricName"": ""UpgradePackage"",
     ""packageName"": ""Newtonsoft.Json"",
     ""packageVersion"": ""12.0.0"",
@@ -247,6 +254,7 @@ namespace CTA.Rules.Test.Metrics
   },
   {
     ""metricsType"": ""CTA"",
+    ""language"": ""csharp"",
     ""metricName"": ""GenericAction"",
     ""actionName"": ""GA1 Name"",
     ""actionType"": ""GA1 Type"",
@@ -257,6 +265,7 @@ namespace CTA.Rules.Test.Metrics
   },
   {
     ""metricsType"": ""CTA"",
+    ""language"": ""csharp"",
     ""metricName"": ""GenericAction"",
     ""actionName"": ""GA2 Name"",
     ""actionType"": ""GA2 Type"",
@@ -267,6 +276,7 @@ namespace CTA.Rules.Test.Metrics
   },
   {
     ""metricsType"": ""CTA"",
+    ""language"": ""csharp"",
     ""metricName"": ""DetectedFeature"",
     ""featureName"": ""Feature 1"",
     ""solutionPath"": ""5fa9de0cb5af2d468dfb1702b1e342f47de2df9a195dabb3be2d04f9c2767482"",
@@ -274,6 +284,7 @@ namespace CTA.Rules.Test.Metrics
   },
   {
     ""metricsType"": ""CTA"",
+    ""language"": ""csharp"",
     ""metricName"": ""DetectedFeature"",
     ""featureName"": ""Feature 1a"",
     ""solutionPath"": ""5fa9de0cb5af2d468dfb1702b1e342f47de2df9a195dabb3be2d04f9c2767482"",
@@ -281,6 +292,7 @@ namespace CTA.Rules.Test.Metrics
   },
   {
     ""metricsType"": ""CTA"",
+    ""language"": ""csharp"",
     ""metricName"": ""MissingMetaReference"",
     ""metaReference"": ""C://reference1.dll"",
     ""solutionPath"": ""5fa9de0cb5af2d468dfb1702b1e342f47de2df9a195dabb3be2d04f9c2767482"",
@@ -288,6 +300,7 @@ namespace CTA.Rules.Test.Metrics
   },
   {
     ""metricsType"": ""CTA"",
+    ""language"": ""csharp"",
     ""metricName"": ""MissingMetaReference"",
     ""metaReference"": ""C://reference2.dll"",
     ""solutionPath"": ""5fa9de0cb5af2d468dfb1702b1e342f47de2df9a195dabb3be2d04f9c2767482"",
@@ -322,6 +335,10 @@ Showing results for: temp/project1.csproj
 Target Versions:
 ---------------------------
 netcoreapp3.1
+---------------------------
+Source Versions:
+---------------------------
+net48
 ---------------------------
 Upgrade packages:
 ---------------------------
@@ -380,31 +397,37 @@ Count: 400";
             var expectedJsonReport = @"[
   {
     ""metricsType"": ""CTA"",
+    ""language"": null,
     ""metricName"": ""Namespace"",
     ""reference"": ""System.Web"",
     ""solutionPath"": ""5fa9de0cb5af2d468dfb1702b1e342f47de2df9a195dabb3be2d04f9c2767482""
   },
   {
     ""metricsType"": ""CTA"",
+    ""language"": null,
     ""metricName"": ""Namespace"",
     ""reference"": ""System.Web.Mvc"",
     ""solutionPath"": ""5fa9de0cb5af2d468dfb1702b1e342f47de2df9a195dabb3be2d04f9c2767482""
   },
   {
     ""metricsType"": ""CTA"",
+    ""language"": null,
     ""metricName"": ""RulesFile"",
     ""downloadedFile"": ""project.all.json"",
     ""solutionPath"": ""5fa9de0cb5af2d468dfb1702b1e342f47de2df9a195dabb3be2d04f9c2767482""
   },
   {
     ""metricsType"": ""CTA"",
+    ""language"": ""csharp"",
     ""metricName"": ""TargetVersion"",
     ""targetVersion"": ""netcoreapp3.1"",
+    ""sourceVersion"": ""net48"",
     ""solutionPath"": ""5fa9de0cb5af2d468dfb1702b1e342f47de2df9a195dabb3be2d04f9c2767482"",
     ""projectGuid"": ""1234-5678""
   },
   {
     ""metricsType"": ""CTA"",
+    ""language"": ""csharp"",
     ""metricName"": ""UpgradePackage"",
     ""packageName"": ""Newtonsoft.Json"",
     ""packageVersion"": ""12.0.0"",
@@ -414,6 +437,7 @@ Count: 400";
   },
   {
     ""metricsType"": ""CTA"",
+    ""language"": ""csharp"",
     ""metricName"": ""ActionExecution"",
     ""actionName"": ""GA1 Name"",
     ""actionType"": ""GA1 Type"",
@@ -426,6 +450,7 @@ Count: 400";
   },
   {
     ""metricsType"": ""CTA"",
+    ""language"": ""csharp"",
     ""metricName"": ""ActionExecution"",
     ""actionName"": ""GA2 Name"",
     ""actionType"": ""GA2 Type"",
@@ -438,6 +463,7 @@ Count: 400";
   },
   {
     ""metricsType"": ""CTA"",
+    ""language"": ""csharp"",
     ""metricName"": ""BuildError"",
     ""buildErrorCode"": ""CS0000"",
     ""buildError"": ""CS0000: BuildError1"",
@@ -447,6 +473,7 @@ Count: 400";
   },
   {
     ""metricsType"": ""CTA"",
+    ""language"": ""csharp"",
     ""metricName"": ""BuildError"",
     ""buildErrorCode"": ""OTHER"",
     ""buildError"": ""BuildError2"",
@@ -456,6 +483,7 @@ Count: 400";
   },
   {
     ""metricsType"": ""CTA"",
+    ""language"": ""unknown"",
     ""metricName"": ""BuildError"",
     ""buildErrorCode"": ""OTHER"",
     ""buildError"": ""BuildError3"",
@@ -465,6 +493,7 @@ Count: 400";
   },
   {
     ""metricsType"": ""CTA"",
+    ""language"": ""unknown"",
     ""metricName"": ""BuildError"",
     ""buildErrorCode"": ""OTHER"",
     ""buildError"": ""BuildError4"",
@@ -474,6 +503,7 @@ Count: 400";
   },
   {
     ""metricsType"": ""CTA"",
+    ""language"": ""csharp"",
     ""metricName"": ""MissingMetaReference"",
     ""metaReference"": ""C://reference1.dll"",
     ""solutionPath"": ""5fa9de0cb5af2d468dfb1702b1e342f47de2df9a195dabb3be2d04f9c2767482"",
@@ -481,6 +511,7 @@ Count: 400";
   },
   {
     ""metricsType"": ""CTA"",
+    ""language"": ""csharp"",
     ""metricName"": ""MissingMetaReference"",
     ""metaReference"": ""C://reference2.dll"",
     ""solutionPath"": ""5fa9de0cb5af2d468dfb1702b1e342f47de2df9a195dabb3be2d04f9c2767482"",

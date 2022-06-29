@@ -21,6 +21,22 @@
   </ItemGroup>
 
   <ItemGroup>
+	<Content Include="TempRules\*">
+	  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</Content>
+	<Content Include="TempConfigs\*">
+		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="TempRules\npoi.json" />
+    <None Update="CTAFiles\vb.rules.test.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+	
+  <ItemGroup>
     <None Update="CTAFiles\action.methoddeclaration.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -57,8 +73,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="TempTemplates\" />
-    <Folder Include="TempRules\" />
+    <Folder Include="TempTagConfigs\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="TempRules\npoi.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
 </Project>

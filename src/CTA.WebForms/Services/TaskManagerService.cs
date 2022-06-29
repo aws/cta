@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -17,16 +18,21 @@ namespace CTA.WebForms.Services
         private const string UnstalledLogAction = "Exited Stall";
 
         public enum TaskState { Active, Waiting }
-        public enum TaskStallTimeout { None = 0, Short = 100, Medium = 1000, Long = 10000 }
+        // Predefined timeout periods (in milliseconds) for when the application enters a stall state
+        public enum TaskStallTimeoutMs { None = 0, Short = 100, Medium = 1000, Long = 10000 }
 
-        private IDictionary<int, ManagedTask> _managedTasks;
+        private readonly ConcurrentDictionary<int, ManagedTask> _managedTasks;
+        // When the application enters a stall state, it has to remain in that state for this many milliseconds
+        // before we cancel the oldest task
+        private readonly TaskStallTimeoutMs _stallTimeoutMs;
         private bool _stalled;
         private int _stallOccurrenceNumber;
         private int _nextAvailableTaskId;
 
-        public TaskManagerService()
+        public TaskManagerService(TaskStallTimeoutMs stallTimeout = TaskStallTimeoutMs.Short)
         {
-            _managedTasks = new Dictionary<int, ManagedTask>();
+            _managedTasks = new ConcurrentDictionary<int, ManagedTask>();
+            _stallTimeoutMs = stallTimeout;
         }
 
         public int RegisterNewTask()
@@ -34,7 +40,12 @@ namespace CTA.WebForms.Services
             var newManagedTask = new ManagedTask(_nextAvailableTaskId);
             _nextAvailableTaskId += 1;
 
-            _managedTasks.Add(newManagedTask.TaskId, newManagedTask);
+            // It should be impossible for the key to already exist in the dictionary, but
+            // if it does we choose to overwrite it to avoid having a stale managed task that
+            // may result in extra stalls
+            _managedTasks.AddOrUpdate(newManagedTask.TaskId,
+                addValueFactory: (key) => newManagedTask,
+                updateValueFactory: (key, managedTask) => newManagedTask);
             UpdateStallState();
 
             return newManagedTask.TaskId;
@@ -52,10 +63,10 @@ namespace CTA.WebForms.Services
             try
             {
                 result = await func(token);
-                managedTask.SetActive();
             }
             finally
             {
+                managedTask.SetActive();
                 UpdateStallState();
             }
 
@@ -66,7 +77,9 @@ namespace CTA.WebForms.Services
 
         public void RetireTask(int taskId)
         {
-            _managedTasks.Remove(taskId);
+            // We don't care to check the result of TryRemove because failure just means that some other
+            // thread has already removed the item, which shouldn't ever happen anyway
+            _managedTasks.TryRemove(taskId, out var _);
             LogHelper.LogInformation(string.Format(TaskStatusUpdateLogTemplate, GetType().Name, taskId, RetiredLogAction));
             UpdateStallState();
         }
@@ -93,27 +106,24 @@ namespace CTA.WebForms.Services
             // then we do nothing
         }
 
-        private void TryResolveStall()
+        private async void TryResolveStall()
         {
-            // NOTE: Commented out for use later, currently
-            // configured to immediately cancel oldest task
-            // on stall
+            var currentStallOccurrence = _stallOccurrenceNumber;
+            await Task.Delay((int)_stallTimeoutMs);
 
-            // Take the delay value as a constructor parameter?
-            // var currentStallOccurrence = _stallOccurrenceNumber;
-            // await Task.Delay((int)TaskStallTimeout.Short);
             // Ensure that stall state is still active and same occurrence
-            // if (_stalled && _stallOccurrenceNumber == currentStallOccurrence)
-            // {
-            var oldestTask = _managedTasks.Values.OrderBy(managedTask => managedTask.LastStatusChange).FirstOrDefault();
-
-            if (oldestTask != null)
+            if (_stalled && _stallOccurrenceNumber == currentStallOccurrence)
             {
-                oldestTask.CancelTask();
+                var oldestTask = _managedTasks.Values.OrderBy(managedTask => managedTask.LastStatusChange).FirstOrDefault();
+
+                if (oldestTask != null)
+                {
+                    oldestTask.CancelTask();
+                    LogHelper.LogInformation(string.Format(Constants.GenericInformationLogTemplate, GetType().Name, UnstalledLogAction));
+                }
+
                 _stalled = false;
-                LogHelper.LogInformation(string.Format(Constants.GenericInformationLogTemplate, GetType().Name, UnstalledLogAction));
             }
-            // }
         }
 
         private class ManagedTask

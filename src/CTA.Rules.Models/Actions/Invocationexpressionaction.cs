@@ -5,13 +5,13 @@ using Microsoft.CodeAnalysis.Editing;
 
 namespace CTA.Rules.Models
 {
-    public class InvocationExpressionAction : GenericAction
+    public class InvocationExpressionAction<T> : GenericAction
     {
-        public Func<SyntaxGenerator, InvocationExpressionSyntax, InvocationExpressionSyntax> InvocationExpressionActionFunc { get; set; }
+        public Func<SyntaxGenerator, T, T> InvocationExpressionActionFunc { get; set; }
 
         public override bool Equals(object obj)
         {
-            var action = (InvocationExpressionAction)obj;
+            var action = (InvocationExpressionAction<T>)obj;
             return action?.Key == this.Key
                 && action?.Value == this.Value
                 && action?.InvocationExpressionActionFunc.Method.Name == this.InvocationExpressionActionFunc.Method.Name;

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.IO;
 using CTA.Rules.Config;
 using CTA.Rules.Models;
 using Microsoft.Extensions.Logging;
@@ -58,7 +57,8 @@ namespace CTA.Rules.PortCore
                         PackageReferences = packageReferences,
                         PortCode = true,
                         PortProject = true,
-                        TargetVersions = new List<string> { cli.Version }
+                        TargetVersions = new List<string> { cli.Version },
+                        SourceVersions = new List<string> { Constants.DefaultNetFrameworkVersion }
                     };
 
                     configs.Add(projectConfiguration);

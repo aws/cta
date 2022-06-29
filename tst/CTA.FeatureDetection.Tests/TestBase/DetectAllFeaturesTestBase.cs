@@ -16,6 +16,10 @@ namespace CTA.FeatureDetection.Tests.TestBase
         protected static IEnumerable<AnalyzerResult> WebFormsAnalyzerResults => TestProjectsSetupFixture.WebFormsAnalyzerResults;
         protected static IEnumerable<AnalyzerResult> WebApiAnalyzerResults => TestProjectsSetupFixture.WebApiAnalyzerResults;
         protected static IEnumerable<AnalyzerResult> WebClassLibraryAnalyzerResults => TestProjectsSetupFixture.WebClassLibraryAnalyzerResults;
+        protected static IEnumerable<AnalyzerResult> VBClassLibraryAnalyzerResults => TestProjectsSetupFixture.VBClassLibraryAnalyzerResults;
+        protected static IEnumerable<AnalyzerResult> VBWebApiAnalyzerResults => TestProjectsSetupFixture.VBWebApiAnalyzerResults;
+        protected static IEnumerable<AnalyzerResult> VBNetMvcAnalyzerResults => TestProjectsSetupFixture.VBNetMvcAnalyzerResults;
+        protected static IEnumerable<AnalyzerResult> VBWebFormsAnalyzerResults => TestProjectsSetupFixture.VBWebFormsAnalyzerResults;
         protected static FeatureDetector FeatureDetector { get; private set; }
         protected static string TestProjectDirectory { get; private set; }
 
@@ -34,7 +38,10 @@ namespace CTA.FeatureDetection.Tests.TestBase
         protected FeatureDetectionResult _coreWCFServiceCodeFeatureDetectionResult;
         protected FeatureDetectionResult _wcfClientFeatureDetectionResult;
         protected FeatureDetectionResult _wcfServiceHostFeatureDetectionResult;
-
+        protected FeatureDetectionResult _VBClassLibraryFeatureDetectionResult;
+        protected FeatureDetectionResult _VBWebApiFeatureDetectionResult;
+        protected FeatureDetectionResult _VBNetMvcFeatureDetectionResult;
+        protected FeatureDetectionResult _VBWebFormsFeatureDetectionResult;
         protected string CoreMvcProjectName => "CoreMVC";
         protected string CoreWebApiProjectName => "CoreWebApi";
         protected string MvcProjectName => "ASP.NET-MVC-Framework";
@@ -45,6 +52,10 @@ namespace CTA.FeatureDetection.Tests.TestBase
         protected string CoreWCFServiceCodeProjectName => "WCFCodeBasedProject";
         protected string WCFClientProjectName => "WCFClientProject";
         protected string WCFServiceHostProjectName => "WCFServiceHostProject";
+        protected string VBClassLibraryProjectName => "VBClassLibrary";
+        protected string VBWebApiProjectName => "VBWebApi";
+        protected string VBNetMvcProjectName => "VBNetMvc";
+        protected string VBWebFormsProjectName => "VBWebForms";
 
         [SetUp]
         public void SetUp()
@@ -66,6 +77,10 @@ namespace CTA.FeatureDetection.Tests.TestBase
             _coreWCFServiceCodeFeatureDetectionResult = TestProjectsSetupFixture.CoreWCFServiceCodeFeatureDetectionResult;
             _wcfClientFeatureDetectionResult = TestProjectsSetupFixture.WCFClientFeatureDetectionResult;
             _wcfServiceHostFeatureDetectionResult = TestProjectsSetupFixture.CoreWCFServiceCodeFeatureDetectionResult;
+            _VBClassLibraryFeatureDetectionResult = TestProjectsSetupFixture.VBClassLibraryFeatureDetectionResult;
+            _VBWebApiFeatureDetectionResult= TestProjectsSetupFixture.VBWebApiFeatureDetectionResult;
+            _VBNetMvcFeatureDetectionResult = TestProjectsSetupFixture.VBNetMvcFeatureDetectionResult;
+            _VBWebFormsFeatureDetectionResult = TestProjectsSetupFixture.VBWebFormsFeatureDetectionResult;
         }
     }
 }

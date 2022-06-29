@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -95,6 +96,8 @@ namespace CTA.Rules.Config
         }
         public static string EscapeAllWhitespace(string src) => Regex.Replace(src, @"(\s+)|(\\n)|(\\r)|(\\t)|(\n)|(\r)|(\t)", string.Empty);
 
+        // Only used during manual testing so excluding from coverage
+        [ExcludeFromCodeCoverage]
         public static string DownloadFile(string fileUrl, string destinationFile, int retryCount = Constants.DownloadRetryCount)
         {
             int retryAttempts = 0;
@@ -191,7 +194,8 @@ namespace CTA.Rules.Config
             }
         }
 
-
+        // Used by CLI which is covered by integration tests
+        [ExcludeFromCodeCoverage]
         public static string CopySolutionToTemp(string solutionPath)
         {
             string slnDirPath = Directory.GetParent(solutionPath).FullName;
@@ -231,6 +235,8 @@ namespace CTA.Rules.Config
         /// <param name="tempDir">The folder the location resides in</param>
         /// <param name="destinationLocation">copied folder location</param>
         /// <returns></returns>
+        // Covered by CLI integration tests
+        [ExcludeFromCodeCoverage]
         public static string CopyFolderToTemp(string solutionName, string tempDir, string destinationLocation)
         {
             string solutionPath = Directory.EnumerateFiles(tempDir, solutionName, SearchOption.AllDirectories).FirstOrDefault(s => !s.Contains(string.Concat(Path.DirectorySeparatorChar, Path.DirectorySeparatorChar)));
@@ -246,6 +252,8 @@ namespace CTA.Rules.Config
         /// </summary>
         /// <param name="source">Source directory</param>
         /// <param name="target">Destination directory</param>
+        // Covered by CLI integration tests
+        [ExcludeFromCodeCoverage]
         private static void CopyDirectory(DirectoryInfo source, DirectoryInfo target)
         {
             if (!Directory.Exists(target.FullName))
@@ -272,8 +280,6 @@ namespace CTA.Rules.Config
         {
             using var httpClient = new HttpClient();
 
-            var parallelOptions = new ParallelOptions() { MaxDegreeOfParallelism = Constants.ThreadCount };
-
             Parallel.ForEach(Constants.TemplateFiles, file =>
             {
                 var localFile = Path.Combine(targetFolder, string.Join(Path.DirectorySeparatorChar, file));
@@ -297,7 +303,7 @@ namespace CTA.Rules.Config
                 }
                 catch (Exception ex)
                 {
-                    LogHelper.LogError(ex, $"Error while dowloading file {file}");
+                    LogHelper.LogError(ex, $"Error while downloading file {file}");
                 }
             });
         }

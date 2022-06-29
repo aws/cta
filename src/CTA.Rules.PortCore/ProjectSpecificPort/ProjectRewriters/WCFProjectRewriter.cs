@@ -5,10 +5,10 @@ using Codelyzer.Analysis;
 using Codelyzer.Analysis.Build;
 using CTA.Rules.Config;
 using CTA.Rules.Models;
-using CTA.Rules.PortCore;
+using CTA.Rules.Update;
 using Microsoft.CodeAnalysis.CSharp;
 
-namespace CTA.Rules.Update
+namespace CTA.Rules.PortCore
 {
     /// <summary>
     /// Runs rule updates on a Project
@@ -55,7 +55,7 @@ namespace CTA.Rules.Update
 
             return _projectResult;
         }
-
+        
         public override List<IDEFileActions> RunIncremental(List<string> updatedFiles, RootNodes projectRules)
         {
             base.RunIncremental(updatedFiles, projectRules);

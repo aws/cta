@@ -33,14 +33,19 @@
         WCFClient,
         WCFServiceLibrary,
         MonolithService,
-        WebForms
+        WebForms,
+        VBNetMvc,
+        VBWebForms,
+        VBWebApi,
+        VBClassLibrary
     }
     public enum FileTypeCreation
     {
         Startup,
         Program,
         MonolithService,
-        MonolithServiceMvc
+        MonolithServiceMvc,
+        MonolithServiceCore
     }
     public enum WebServerConfigAttributes
     {
@@ -66,5 +71,18 @@
         ControlConversion,
         ClassConversion,
         FileConversion
+    }
+
+    public enum ProjectLanguage
+    {
+        VisualBasic,
+        Csharp,
+    }
+
+    public static class FileExtension
+    {
+        public static readonly string VisualBasic = ".vb";
+        public static readonly string CSharp = ".cs";
+        public static readonly string Backup = ".bak";
     }
 }

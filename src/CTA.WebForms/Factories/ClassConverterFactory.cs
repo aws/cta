@@ -17,16 +17,19 @@ namespace CTA.WebForms.Factories
         private readonly string _sourceProjectPath;
         private LifecycleManagerService _lifecycleManager;
         private TaskManagerService _taskManager;
+        private CodeBehindReferenceLinkerService _codeBehindLinkerService;
         private WebFormMetricContext _metricsContext;
 
         public ClassConverterFactory(string sourceProjectPath,
             LifecycleManagerService lcManager,
             TaskManagerService taskManager,
+            CodeBehindReferenceLinkerService codeBehindLinkerService,
             WebFormMetricContext metricsContext)
         {
             _sourceProjectPath = sourceProjectPath;
             _lifecycleManager = lcManager;
             _taskManager = taskManager;
+            _codeBehindLinkerService = codeBehindLinkerService;
             _metricsContext = metricsContext;
 
             // TODO: Receive services required for ClassConverters
@@ -52,19 +55,19 @@ namespace CTA.WebForms.Factories
                 if (symbol.GetAllInheritedBaseTypes().Any(typeSymbol => typeSymbol.Name.Equals(Constants.ExpectedPageBaseClass))
                     && sourceFileRelativePath.EndsWith(Constants.PageCodeBehindExtension, StringComparison.InvariantCultureIgnoreCase))
                 {
-                    return new PageCodeBehindClassConverter(sourceFileRelativePath, _sourceProjectPath, model, typeDeclarationNode, symbol, _taskManager, _metricsContext);
+                    return new PageCodeBehindClassConverter(sourceFileRelativePath, _sourceProjectPath, model, typeDeclarationNode, symbol, _taskManager, _codeBehindLinkerService, _metricsContext);
                 }
 
                 if (symbol.GetAllInheritedBaseTypes().Any(typeSymbol => typeSymbol.Name.Equals(Constants.ExpectedControlBaseClass))
                     && sourceFileRelativePath.EndsWith(Constants.ControlCodeBehindExtension, StringComparison.InvariantCultureIgnoreCase))
                 {
-                    return new ControlCodeBehindClassConverter(sourceFileRelativePath, _sourceProjectPath, model, typeDeclarationNode, symbol, _taskManager, _metricsContext);
+                    return new ControlCodeBehindClassConverter(sourceFileRelativePath, _sourceProjectPath, model, typeDeclarationNode, symbol, _taskManager, _codeBehindLinkerService, _metricsContext);
                 }
 
                 if (symbol.GetAllInheritedBaseTypes().Any(typeSymbol => typeSymbol.Name.Equals(Constants.ExpectedMasterPageBaseClass))
                     && sourceFileRelativePath.EndsWith(Constants.MasterPageCodeBehindExtension, StringComparison.InvariantCultureIgnoreCase))
                 {
-                    return new MasterPageCodeBehindClassConverter(sourceFileRelativePath, _sourceProjectPath, model, typeDeclarationNode, symbol, _taskManager, _metricsContext);
+                    return new MasterPageCodeBehindClassConverter(sourceFileRelativePath, _sourceProjectPath, model, typeDeclarationNode, symbol, _taskManager, _codeBehindLinkerService, _metricsContext);
                 }
 
                 if (symbol.AllInterfaces.Any(interfaceSymbol => interfaceSymbol.Name.Equals(Constants.HttpHandlerInterface)))

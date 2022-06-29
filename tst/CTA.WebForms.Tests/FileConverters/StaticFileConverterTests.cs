@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using CTA.Rules.Metrics;
 using CTA.WebForms.FileConverters;
 using CTA.WebForms.FileInformationModel;
 using CTA.WebForms.Metrics;
@@ -11,7 +10,6 @@ using NUnit.Framework;
 
 namespace CTA.WebForms.Tests.FileConverters
 {
-    [TestFixture]
     public class StaticFileConverterTests
     {
         [Test]

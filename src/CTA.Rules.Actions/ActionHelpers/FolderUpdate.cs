@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using CTA.Rules.Common.Helpers;
 using CTA.Rules.Config;
 using CTA.Rules.Models;
 
@@ -9,12 +10,17 @@ namespace CTA.Rules.Actions
         private readonly string _projectDir;
         private readonly string _projectFile;
         private readonly ProjectType _projectType;
+        private readonly string _codeFileExtension;
 
         public FolderUpdate(string projectFile, ProjectType projectType)
         {
             _projectFile = projectFile;
             _projectDir = Directory.GetParent(_projectFile).FullName;
             _projectType = projectType;
+            _codeFileExtension =
+                VisualBasicUtils.IsVisualBasicProject(projectFile)
+                    ? FileExtension.VisualBasic
+                    : FileExtension.CSharp;
         }
 
         //TODO Is there a better way to do this?
@@ -37,25 +43,25 @@ namespace CTA.Rules.Actions
                 CreateMvcDirs(_projectDir);
                 CreateStartupFiles(_projectDir, _projectType, FileTypeCreation.Program);
                 CreateStartupFiles(_projectDir, _projectType, FileTypeCreation.Startup);
-                runResult = "Mvc project detected. Created static files, Program.cs, and Startup.cs";
+                runResult = $"Mvc project detected. Created static files, Program{_codeFileExtension} and Startup{_codeFileExtension}";
             }
             if (_projectType == ProjectType.WebApi)
             {
                 CreateStartupFiles(_projectDir, _projectType, FileTypeCreation.Program);
                 CreateStartupFiles(_projectDir, _projectType, FileTypeCreation.Startup);
-                runResult = "Web API project detected. Created Program.cs and Startup.cs";
+                runResult = $"Web API project detected. Created Program{_codeFileExtension} and Startup{_codeFileExtension}";
             }
             if (_projectType == ProjectType.WCFConfigBasedService)
             {
                 CreateStartupFiles(_projectDir, _projectType, FileTypeCreation.Program);
                 CreateStartupFiles(_projectDir, _projectType, FileTypeCreation.Startup);
-                runResult = "WCF Config Based Service Project detected. Created Program.cs and Startup.cs";
+                runResult = $"WCF Config Based Service Project detected. Created Program{_codeFileExtension} and Startup{_codeFileExtension}";
             }
             if (_projectType == ProjectType.WCFCodeBasedService)
             {
                 CreateStartupFiles(_projectDir, _projectType, FileTypeCreation.Program);
                 CreateStartupFiles(_projectDir, _projectType, FileTypeCreation.Startup);
-                runResult = "WCF Code Based Service Project detected. Created Program.cs and Startup.cs";
+                runResult = $"WCF Code Based Service Project detected. Created Program{_codeFileExtension} and Startup{_codeFileExtension}";
             }
             return runResult;
         }
@@ -69,14 +75,14 @@ namespace CTA.Rules.Actions
         {
             string projectNamespace = GetProjectNamespace();
 
-            var file = Path.Combine(projectDir, string.Concat(fileType.ToString(), ".cs"));
+            var file = Path.Combine(projectDir, string.Concat(fileType.ToString(), _codeFileExtension));
             if (File.Exists(file))
             {
-                File.Move(file, string.Concat(file, ".bak"));
+                File.Move(file, string.Concat(file, FileExtension.Backup));
             }
-            File.WriteAllText(file, GetStartupFileContent(projectNamespace, projectType, fileType));
+            File.WriteAllText(file, GetStartupFileContent(projectNamespace, projectType, fileType, _codeFileExtension));
 
-            LogChange(string.Format("Created {0}.cs file using {1} template", fileType.ToString(), projectType.ToString()));
+            LogChange(string.Format("Created {0}{2} file using {1} template", fileType.ToString(), projectType.ToString(), _codeFileExtension));
         }
 
         /// <summary>
@@ -85,10 +91,11 @@ namespace CTA.Rules.Actions
         /// <param name="projectNamespace">The project namespace</param>
         /// <param name="projectType">The project type</param>
         /// <param name="fileType">Type of the file to be retrieved</param>
+        /// <param name="fileExtension">Extension of file to be retrieved</param>
         /// <returns>The content of the startup file</returns>
-        private string GetStartupFileContent(string projectNamespace, ProjectType projectType, FileTypeCreation fileType)
+        private string GetStartupFileContent(string projectNamespace, ProjectType projectType, FileTypeCreation fileType, string fileExtension)
         {
-            return TemplateHelper.GetTemplateFileContent(projectNamespace, projectType, fileType.ToString() + ".cs");
+            return TemplateHelper.GetTemplateFileContent(projectNamespace, projectType, fileType.ToString() + fileExtension);
         }
 
         /// <summary>

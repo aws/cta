@@ -19,6 +19,7 @@ namespace CTA.WebForms.ClassConverters
     public class PageCodeBehindClassConverter : ClassConverter
     {
         private const string ActionName = "PageCodeBehindClassConverter";
+        private readonly CodeBehindReferenceLinkerService _codeBehindLinkerService;
         private WebFormMetricContext _metricsContext;
 
         private IDictionary<BlazorComponentLifecycleEvent, IEnumerable<StatementSyntax>> _newLifecycleLines;
@@ -30,14 +31,20 @@ namespace CTA.WebForms.ClassConverters
             TypeDeclarationSyntax originalDeclarationSyntax,
             INamedTypeSymbol originalClassSymbol,
             TaskManagerService taskManager,
+            CodeBehindReferenceLinkerService codeBehindLinkerService,
             WebFormMetricContext metricsContext)
             : base(relativePath, sourceProjectPath, sourceFileSemanticModel, originalDeclarationSyntax, originalClassSymbol, taskManager)
         {
             _newLifecycleLines = new Dictionary<BlazorComponentLifecycleEvent, IEnumerable<StatementSyntax>>();
+            _codeBehindLinkerService = codeBehindLinkerService;
             _metricsContext = metricsContext;
+
+            // Need to register the code behind at converter creation, before migration logic in
+            // view converters need that information
+            _codeBehindLinkerService.RegisterCodeBehindFile(Path.ChangeExtension(FullPath, null));
         }
 
-        public override Task<IEnumerable<FileInformation>> MigrateClassAsync()
+        public override async Task<IEnumerable<FileInformation>> MigrateClassAsync()
         {
             LogStart();
 
@@ -50,11 +57,14 @@ namespace CTA.WebForms.ClassConverters
             //     // This is so we can use ComponentBase base class
             //     .Append(Constants.BlazorComponentsNamespace);
 
+            var currentClassDeclaration = await DoTagCodeBehindConversionsAsync(_originalDeclarationSyntax as ClassDeclarationSyntax);
+
             var requiredNamespaceNames = _sourceFileSemanticModel.GetOriginalUsingNamespaces().Append(Constants.BlazorComponentsNamespace);
             requiredNamespaceNames = CodeSyntaxHelper.RemoveFrameworkUsings(requiredNamespaceNames);
-            var allMethods = _originalDeclarationSyntax.DescendantNodes().OfType<MethodDeclarationSyntax>();
-            var currentClassDeclaration = ((ClassDeclarationSyntax)_originalDeclarationSyntax)
-                // Need to track methods so modifications can be made one after another
+            var allMethods = currentClassDeclaration.DescendantNodes().OfType<MethodDeclarationSyntax>();
+
+            currentClassDeclaration = currentClassDeclaration
+                // Need to track method declarations for making multiple modifications at once
                 .TrackNodes(allMethods)
                 // Remove outdated base type references
                 // TODO: Scan and remove specific base types in the future
@@ -125,7 +135,39 @@ namespace CTA.WebForms.ClassConverters
 
             var result = new[] { new FileInformation(GetNewRelativePath(), Encoding.UTF8.GetBytes(fileText)) };
 
-            return Task.FromResult((IEnumerable<FileInformation>)result);
+            return result;
+        }
+
+        /// <summary>
+        /// Handles conversion of references to controls in the current code behind file.
+        /// </summary>
+        /// <param name="classDeclaration">The class declaration within which to convert references.</param>
+        /// <returns>The modified class declaration.</returns>
+        private async Task<ClassDeclarationSyntax> DoTagCodeBehindConversionsAsync(ClassDeclarationSyntax classDeclaration)
+        {
+            var viewFilePath = Path.ChangeExtension(FullPath, null);
+
+            try
+            {
+                return await _taskManager.ManagedRun(_taskId, (token) => 
+                    _codeBehindLinkerService.ExecuteTagCodeBehindHandlersAsync(viewFilePath, _sourceFileSemanticModel, classDeclaration, token));
+            }
+            catch (OperationCanceledException e)
+            {
+                LogHelper.LogError(e, string.Format(
+                    Constants.CaneledServiceCallLogTemplate,
+                    Rules.Config.Constants.WebFormsErrorTag,
+                    GetType().Name,
+                    nameof(CodeBehindReferenceLinkerService),
+                    nameof(CodeBehindReferenceLinkerService.ExecuteTagCodeBehindHandlersAsync)));
+            }
+            catch (Exception e)
+            {
+                LogHelper.LogError(e, $"{Rules.Config.Constants.WebFormsErrorTag}Failed to do tag code behind conversions " +
+                    $"for file at path {FullPath}");
+            }
+
+            return classDeclaration;
         }
 
         private string GetNewRelativePath()

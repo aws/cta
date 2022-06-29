@@ -1,0 +1,11 @@
+﻿!Template
+TagName: valid:HasParent
+CodeBehindType: Namespace.TypeName
+CodeBehindHandler: Default
+Conditions:
+  - !HasParent
+    ParentTagName: div
+    ForTemplates: [Default]
+Invocations: []
+Templates:
+    Default: "<p>Default template</p>"

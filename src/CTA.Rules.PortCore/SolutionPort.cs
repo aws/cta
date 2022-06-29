@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Codelyzer.Analysis;
+using Codelyzer.Analysis.Analyzer;
 using Codelyzer.Analysis.Build;
 using Codelyzer.Analysis.Model;
 using CTA.FeatureDetection;
@@ -85,7 +87,8 @@ namespace CTA.Rules.PortCore
                 }
             };
 
-            CodeAnalyzer analyzer = CodeAnalyzerFactory.GetAnalyzer(analyzerConfiguration, LogHelper.Logger);
+            //CodeAnalyzer analyzer = CodeAnalyzerFactory.GetAnalyzer(analyzerConfiguration, LogHelper.Logger);
+            CodeAnalyzerByLanguage analyzer = new CodeAnalyzerByLanguage(analyzerConfiguration, LogHelper.Logger);
 
             List<AnalyzerResult> analyzerResults = null;
             //We are building using references
@@ -116,7 +119,7 @@ namespace CTA.Rules.PortCore
             _context = new MetricsContext(solutionFilePath, analyzerResults);
             InitSolutionRewriter(analyzerResults, solutionConfiguration);
         }
-
+        
         public SolutionPort(string solutionFilePath, IDEProjectResult projectResult, List<PortCoreConfiguration> solutionConfiguration)
         {
             _solutionPath = solutionFilePath;
@@ -439,7 +442,23 @@ namespace CTA.Rules.PortCore
         
         internal ProjectType GetProjectType(FeatureDetectionResult projectTypeFeatureResult)
         {
-            if (projectTypeFeatureResult.IsMvcProject())
+            if (projectTypeFeatureResult.IsVBNetMvcProject())
+            {
+                return ProjectType.VBNetMvc;
+            }
+            else if (projectTypeFeatureResult.IsVBWebFormsProject())
+            {
+                return ProjectType.VBWebForms;
+            }
+            else if (projectTypeFeatureResult.IsVBWebApiProject())
+            {
+                return ProjectType.VBWebApi;
+            }
+            else if (projectTypeFeatureResult.IsVBClassLibraryProject())
+            {
+                return ProjectType.VBClassLibrary;
+            }
+            else if (projectTypeFeatureResult.IsMvcProject())
             {
                 return ProjectType.Mvc;
             }
@@ -474,6 +493,7 @@ namespace CTA.Rules.PortCore
             {
                 return ProjectType.WCFClient;
             }
+
             return ProjectType.ClassLibrary;
         }
     }

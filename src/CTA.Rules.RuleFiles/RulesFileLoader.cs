@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Codelyzer.Analysis.Model;
 using CTA.Rules.Config;
 using CTA.Rules.Models;
+using CTA.Rules.Models.RulesFiles;
 using Newtonsoft.Json;
 
 namespace CTA.Rules.RuleFiles
@@ -20,6 +21,7 @@ namespace CTA.Rules.RuleFiles
         private readonly string _overrideFile;
         private readonly string _assembliesDir;
         private readonly IEnumerable<Reference> _projectReferences;
+        private readonly ProjectLanguage _projectLanguage;
 
         /// <summary>
         /// Initializes a new RulesFileLoader
@@ -29,7 +31,8 @@ namespace CTA.Rules.RuleFiles
         /// <param name="targetFramework">Target framework to port to</param>
         /// <param name="overrideFile">Path to rules file containing override rules. The override rules will be added to the built in rules, overriding any matching existing rules</param>
         /// <param name="assembliesDir">Directory containing assemblies containing additional actions</param>
-        public RulesFileLoader(IEnumerable<Reference> projectReferences, string rulesFilesDir, List<string> targetFramework, string overrideFile = "", string assembliesDir = "")
+        /// <param name="projectLanguage">The language the project is written in, C# or VB</param>
+        public RulesFileLoader(IEnumerable<Reference> projectReferences, string rulesFilesDir, List<string> targetFramework, ProjectLanguage projectLanguage, string overrideFile = "", string assembliesDir = "")
         {
             _rulesFilesDir = rulesFilesDir;
             try
@@ -48,13 +51,14 @@ namespace CTA.Rules.RuleFiles
             _overrideFile = overrideFile;
             _assembliesDir = assembliesDir;
             _projectReferences = projectReferences;
+            _projectLanguage = projectLanguage;
         }
 
         /// <summary>
         /// Loads rules from the main rules file and override file
         /// </summary>
         /// <returns>A RootNodes object containing all the rules after being merged</returns>
-        public RootNodes Load()
+        public RulesFileLoaderResponse Load()
         {
             var mainNamespaceFileTasks = new Task<NamespaceRecommendations>(() =>
             {
@@ -110,20 +114,36 @@ namespace CTA.Rules.RuleFiles
 
             Task.WaitAll(mainNamespaceFileTasks, overrideNamespaceFileTasks, mainFileTask, overrideTask);
 
-            RulesFileParser rulesFileParser = new RulesFileParser(mainNamespaceFileTasks.Result,
-                overrideNamespaceFileTasks.Result,
-                mainFileTask.Result,
-                overrideTask.Result,
-                _assembliesDir,
-                _targetFramework
-                );
-            var rootNodes = rulesFileParser.Process();
+            var response = new RulesFileLoaderResponse();
+            
+            if (_projectLanguage == ProjectLanguage.VisualBasic)
+            {
+                var rulesFileParser = new VisualBasicRulesFileParser(mainNamespaceFileTasks.Result,
+                    overrideNamespaceFileTasks.Result,
+                    mainFileTask.Result,
+                    overrideTask.Result,
+                    _assembliesDir,
+                    _targetFramework);
+                var rootNodes = rulesFileParser.Process();
+                response.VisualBasicRootNodes = rootNodes;
+            }
+            else
+            {
+                RulesFileParser rulesFileParser = new RulesFileParser(mainNamespaceFileTasks.Result,
+                    overrideNamespaceFileTasks.Result,
+                    mainFileTask.Result,
+                    overrideTask.Result,
+                    _assembliesDir,
+                    _targetFramework);
+                var rootNodes = rulesFileParser.Process();
+                response.CsharpRootNodes = rootNodes;
+            }
 
-            return rootNodes;
+            return response;
         }
 
 
-        private NamespaceRecommendations LoadNamespaceFile(string pathToLoad)
+        public NamespaceRecommendations LoadNamespaceFile(string pathToLoad)
         {
             NamespaceRecommendations nr = new NamespaceRecommendations();
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Codelyzer.Analysis;
+using Codelyzer.Analysis.Analyzer;
 using Codelyzer.Analysis.Build;
 using CTA.Rules.Config;
 using CTA.Rules.Models;
@@ -47,7 +48,10 @@ namespace CTA.Rules.Update
             };
 
             _projectRewriters = new List<ProjectRewriter>();
-            CodeAnalyzer analyzer = CodeAnalyzerFactory.GetAnalyzer(analyzerConfiguration, LogHelper.Logger);
+            //CodeAnalyzer analyzer = CodeAnalyzerFactory.GetAnalyzer(analyzerConfiguration, LogHelper.Logger);
+
+            CodeAnalyzerByLanguage analyzer = new CodeAnalyzerByLanguage(analyzerConfiguration, LogHelper.Logger);
+
             var analyzerResults = analyzer.AnalyzeSolution(solutionFilePath).Result;
             InitializeProjectRewriters(analyzerResults, solutionConfiguration);
         }
@@ -65,7 +69,7 @@ namespace CTA.Rules.Update
             _projectRewriters = new List<ProjectRewriter>();
             InitializeProjectRewriters(analyzerResults, solutionConfiguration);
         }
-
+        
         public SolutionRewriter(IDEProjectResult projectResult, List<ProjectConfiguration> solutionConfiguration, IProjectRewriterFactory projectRewriterFactory = null)
         {
             DownloadResourceFiles();

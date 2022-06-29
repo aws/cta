@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Xml.Linq;
 using CTA.Rules.Config;
@@ -19,6 +20,8 @@ namespace CTA.Rules.Common.WebConfigManagement
         private static Dictionary<string, XDocument> _xDocumentCache = new Dictionary<string, XDocument>();
         private delegate object ConfigLoadingDelegate(string configFile);
 
+        // Currently unused
+        [ExcludeFromCodeCoverage]
         public static Configuration LoadWebConfigAsConfiguration(string projectDir)
         {
             var config = LoadWebConfig(projectDir, webConfigFile =>

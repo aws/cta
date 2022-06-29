@@ -121,11 +121,16 @@
         public const string FileMigrationLogAction = "File Migration";
         public const string ClassMigrationLogAction = "Class Migration";
         
-        //View layer constants
+        //View Layer Constants
         public const string AspControlTag = "asp:";
 
-        // Routing constants
+        // Routing Constants
         public const string DefaultHomePagePath = "Default.aspx";
         public const char RouteSeparator = '/';
+
+        // Tag Conversion Constants
+        public const string TagConverterSuffix = "TagConverter";
+        public const string TemplateConditionSuffix = "TemplateCondition";
+        public const string TemplateInvokableSuffix = "TemplateInvokable";
     }
 }

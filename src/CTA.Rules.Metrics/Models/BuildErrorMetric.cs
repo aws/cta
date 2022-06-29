@@ -37,6 +37,7 @@ namespace CTA.Rules.Metrics
             Count = count;
             SolutionPathHash = context.SolutionPathHash;
             ProjectGuid = context.ProjectGuidMap.GetValueOrDefault(projectPath, "N/A");
+            Language = GetLanguage(projectPath);
         }
 
         private string ExtractBuildErrorCode(string buildError)

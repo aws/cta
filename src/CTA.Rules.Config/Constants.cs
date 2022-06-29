@@ -26,7 +26,9 @@ namespace CTA.Rules.Config
         public static string DefaultFeaturesFilePath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Templates", "default.json"));
         public static string ResourcesFile = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "resources.zip"));
         public static string ResourcesExtractedPath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Templates"));
+        public static string TagConfigsExtractedPath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "TagConfigs"));
         public static string DefaultCoreVersion = "netcoreapp3.1";
+        public static string DefaultNetFrameworkVersion = "net48";
 
         public static string JsonFileSchema = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), Path.Combine(new string[] { "..", "..", "..", "..", ".." })
         , Path.Combine(new string[] { "src", "CTA.Rules.RuleFiles", "Schema", "schema.validator.json" })));
@@ -34,7 +36,7 @@ namespace CTA.Rules.Config
         public const string S3RootUrl = "https://s3.us-west-2.amazonaws.com/aws.portingassistant.dotnet.datastore";
         public const string S3RecommendationsBucketUrl = S3RootUrl + "/recommendationsync/recommendation";
         public const string S3TemplatesBucketUrl = S3RootUrl + "/recommendationsync/Templates";
-        
+        public const string S3TagConfigsBucketUrl = S3RootUrl + "/recommendationsync/tagconfigs";
 
         public const int ThreadCount = 10;
         public const int MaxRecursionDepth = 100000;
@@ -48,7 +50,9 @@ namespace CTA.Rules.Config
         public const string Templates = "Templates";
 
         public const string CommentFormat = @"/* Added by CTA: {0} */";
+        public const string VbCommentFormat = @"' Added by CTA: {0}";
         public const string CommentFormatBlank = @"/* {0} */";
+        public const string VbCommentFormatBlank = @"' {0}";
         public const string WebSdkName = "Microsoft.NET.Sdk.Web";
         public const string ClassLibrarySdkName = "Microsoft.NET.Sdk";
 
@@ -80,6 +84,8 @@ namespace CTA.Rules.Config
         public const string InterfaceActions = "InterfaceActions";
         public const string ProjectFileActions = "ProjectFileActions";
         public const string ProjectTypeActions = "ProjectTypeActions";
+        public const string TypeBlockActions = "TypeBlockActions";
+        public const string MethodBlockActions = "MethodBlockActions";
 
         public const string ProjectRecommendationFile = "project.all";
 
@@ -117,6 +123,19 @@ namespace CTA.Rules.Config
 
         public static readonly List<string> SupportedMethodModifiers = new List<string>() { "public", "internal", "protected", "private", "abstract", "extern", "override", "static", "unsafe", "virtual", "async" };
 
+        public static readonly List<string> SupportedVbMethodModifiers = new()
+        {
+            "Public",
+            "Internal",
+            "Protected",
+            "Private",
+            "Friend",
+            "Overrides",
+            "Shared",
+            "Overridable",
+            "Async"
+        };
+
         //Monolith code constants
         public const string Await = "await";
         public const string TaskActionResult = "Task<ActionResult>";
@@ -147,11 +166,15 @@ namespace CTA.Rules.Config
             new List<string> {"mvc","Startup.cs" },
             new List<string> {"monolithservice","MonolithService.cs" },
             new List<string> {"monolithservice","MonolithServiceMvc.cs" },
+            new List<string> {"monolithservice","MonolithServiceCore.cs" },
             new List<string> {"webclasslibrary","appsettings.json" },
-            new List<string> { "wcfcodebasedservice", "Program.cs"},
-            new List<string> { "wcfcodebasedservice", "Startup.cs"},
-            new List<string> { "wcfconfigbasedservice", "Program.cs"},
-            new List<string> { "wcfconfigbasedservice", "Startup.cs"}
+            new List<string> {"wcfcodebasedservice","Program.cs"},
+            new List<string> {"wcfcodebasedservice","Startup.cs"},
+            new List<string> {"wcfconfigbasedservice","Program.cs"},
+            new List<string> {"wcfconfigbasedservice","Startup.cs"},
+            new List<string> {"webforms","appsettings.json"},
+            new List<string> {"webapi", "Program.vb"},
+            new List<string> {"webapi", "Startup.vb"}
         };
 
         public const string WCFErrorTag = "WCF Porting Error: ";

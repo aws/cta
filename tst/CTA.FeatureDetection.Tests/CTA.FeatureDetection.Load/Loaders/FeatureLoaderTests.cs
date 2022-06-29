@@ -30,7 +30,11 @@ namespace CTA.FeatureDetection.Tests.FeatureDetection.Load.Loaders
                 nameof(CoreWCFServiceConfigFeature),
                 nameof(WCFClientFeature),
                 nameof(WCFServiceHostFeature),
-                nameof(AspNetWebFormsFeature)
+                nameof(AspNetWebFormsFeature),
+                nameof(VBClassLibraryFeature),
+                nameof(VBWebApiFeature),
+                nameof(VBNetMvcFeature),
+                nameof(VBWebFormsFeature)
             };
 
             CollectionAssert.AreEquivalent(expectedFeatureNames, loadedFeatureNames);

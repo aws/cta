@@ -5,6 +5,7 @@ using NUnit.Framework;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using CTA.Rules.Common.Helpers;
 
 namespace CTA.Rules.Test
 {
@@ -111,6 +112,14 @@ namespace CTA.Rules.Test
 
             // Confirm that text was written to file
             Assert.AreEqual(content, File.ReadAllText(filePath));
+        }
+
+        [Test]
+        public void Test_Is_VisualBasic_Project()
+        {
+            Assert.IsFalse(VisualBasicUtils.IsVisualBasicProject("test.csproj"));
+            Assert.IsTrue(VisualBasicUtils.IsVisualBasicProject("C://user/john/repos/test.vbproj"));
+            Assert.IsFalse(VisualBasicUtils.IsVisualBasicProject("vbprojproject.cs"));
         }
     }
 }

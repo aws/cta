@@ -11,6 +11,7 @@ using CTA.Rules.Config;
 using CTA.Rules.Models;
 using CTA.Rules.Update.Rewriters;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.Editing;
 using TextChange = CTA.Rules.Models.TextChange;
 
 namespace CTA.Rules.Update
@@ -22,9 +23,15 @@ namespace CTA.Rules.Update
         protected readonly List<string> _metadataReferences;
         protected readonly AnalyzerResult _analyzerResult;
         protected readonly ProjectResult _projectResult;
+        protected readonly ProjectLanguage _projectLanguage;
 
-        public CodeReplacer(List<SourceFileBuildResult> sourceFileBuildResults, ProjectConfiguration projectConfiguration, List<string> metadataReferences, AnalyzerResult analyzerResult,
-            List<string> updatedFiles = null, ProjectResult projectResult = null)
+        public CodeReplacer(List<SourceFileBuildResult> sourceFileBuildResults,
+            ProjectConfiguration projectConfiguration,
+            List<string> metadataReferences,
+            AnalyzerResult analyzerResult,
+            ProjectLanguage projectLanguage,
+            List<string> updatedFiles = null,
+            ProjectResult projectResult = null)
         {
             _sourceFileBuildResults = sourceFileBuildResults;
             if (updatedFiles != null)
@@ -35,6 +42,7 @@ namespace CTA.Rules.Update
             _projectConfiguration = projectConfiguration;
             _metadataReferences = metadataReferences;
             _projectResult = projectResult ?? new ProjectResult();
+            _projectLanguage = projectLanguage;
         }
 
         public Dictionary<string, List<GenericActionExecution>> Run(ProjectActions projectActions, ProjectType projectType)
@@ -92,8 +100,8 @@ namespace CTA.Rules.Update
 
         private void RunCodeChanges(SyntaxNode root, SourceFileBuildResult sourceFileBuildResult, FileActions currentFileActions, ConcurrentDictionary<string, List<GenericActionExecution>> actionsPerProject)
         {
-            ActionsRewriter oneRewriter = new ActionsRewriter(sourceFileBuildResult.SemanticModel, sourceFileBuildResult.PrePortSemanticModel, sourceFileBuildResult.SyntaxGenerator, currentFileActions.FilePath, currentFileActions.AllActions);
-            root = oneRewriter.Visit(root);
+            var syntaxRewriter = GetSyntaxRewriter(sourceFileBuildResult.SemanticModel, sourceFileBuildResult.PrePortSemanticModel, sourceFileBuildResult.SyntaxGenerator, currentFileActions.FilePath, currentFileActions.AllActions);
+            root = syntaxRewriter.Visit(root);
             var result = root.NormalizeWhitespace().ToFullString();
 
             if (!_projectConfiguration.IsMockRun)
@@ -101,8 +109,8 @@ namespace CTA.Rules.Update
                 File.WriteAllText(sourceFileBuildResult.SourceFileFullPath, result);
             }
 
-            var processedActions = ValidateActions(oneRewriter.allExecutedActions, root);
-            processedActions = AddActionsWithoutExecutions(currentFileActions, oneRewriter.allExecutedActions);
+            var processedActions = ValidateActions(syntaxRewriter.AllExecutedActions, root);
+            processedActions = AddActionsWithoutExecutions(currentFileActions, syntaxRewriter.AllExecutedActions);
 
             if (!actionsPerProject.TryAdd(sourceFileBuildResult.SourceFileFullPath, processedActions))
             {
@@ -125,9 +133,9 @@ namespace CTA.Rules.Update
                 currentFileActions.NodeTokens.ForEach(nodetoken =>
                 {
                     nodetoken.AllActions.ForEach(nodeAction => {
-                        ActionsRewriter oneRewriter = new ActionsRewriter(sourceFileBuildResult.SemanticModel, sourceFileBuildResult.PrePortSemanticModel, sourceFileBuildResult.SyntaxGenerator, currentFileActions.FilePath, nodeAction);
+                        var syntaxRewriter = GetSyntaxRewriter(sourceFileBuildResult.SemanticModel, sourceFileBuildResult.PrePortSemanticModel, sourceFileBuildResult.SyntaxGenerator, currentFileActions.FilePath, nodeAction);
 
-                        var newRoot = oneRewriter.Visit(root);
+                        var newRoot = syntaxRewriter.Visit(root);
                         var allChanges = newRoot.SyntaxTree.GetChanges(root.SyntaxTree);
 
                         foreach (var textChange in allChanges)
@@ -142,6 +150,24 @@ namespace CTA.Rules.Update
                     });
                 });
             }
+        }
+
+        private ISyntaxRewriter GetSyntaxRewriter(SemanticModel semanticModel, SemanticModel preportSemanticModel,
+            SyntaxGenerator syntaxGenerator, string filePath, List<GenericAction> allActions)
+        {
+            return _projectLanguage == ProjectLanguage.VisualBasic
+                ? new VisualBasicActionsRewriter(semanticModel, preportSemanticModel, syntaxGenerator, filePath,
+                    allActions)
+                : new ActionsRewriter(semanticModel, preportSemanticModel, syntaxGenerator, filePath, allActions);
+        }
+
+        private ISyntaxRewriter GetSyntaxRewriter(SemanticModel semanticModel, SemanticModel preportSemanticModel,
+            SyntaxGenerator syntaxGenerator, string filePath, GenericAction runningAction)
+        {
+            return _projectLanguage == ProjectLanguage.VisualBasic
+                ? new VisualBasicActionsRewriter(semanticModel, preportSemanticModel, syntaxGenerator, filePath,
+                    runningAction)
+                : new ActionsRewriter(semanticModel, preportSemanticModel, syntaxGenerator, filePath, runningAction);
         }
 
         protected virtual List<GenericActionExecution> ApplyProjectActions(ProjectActions projectActions, ProjectType projectType)

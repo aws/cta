@@ -19,7 +19,7 @@ namespace CTA.Rules.Models
             ObjectCreationExpressionTokens = new HashSet<ObjectCreationExpressionToken>();
             InterfaceDeclarationTokens = new HashSet<InterfaceDeclarationToken>();
             NamespaceTokens = new HashSet<NamespaceToken>();
-            ProjectTokens = new HashSet<ProjectToken>();
+            ProjectTokens = new HashSet<NodeToken>();
         }
 
 
@@ -35,6 +35,6 @@ namespace CTA.Rules.Models
         public HashSet<MethodDeclarationToken> MethodDeclarationTokens { get; set; }
         public HashSet<NamespaceToken> NamespaceTokens { get; set; }
         public HashSet<ObjectCreationExpressionToken> ObjectCreationExpressionTokens { get; set; }
-        public HashSet<ProjectToken> ProjectTokens { get; set; }
+        public HashSet<NodeToken> ProjectTokens { get; set; }
     }
 }

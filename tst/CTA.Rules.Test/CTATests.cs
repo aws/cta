@@ -104,7 +104,6 @@ namespace CTA.Rules.Test
         public void TestSampleWebApiSolution()
         {
             var results = runCTAFile("WebApiWithReferences.sln", "WebApiWithReferences.csproj").ProjectResults.FirstOrDefault();
-
             StringAssert.Contains("IActionResult", results.ProjectAnalysisResult);
 
             var homeControllerText = File.ReadAllText(Path.Combine(results.ProjectDirectory, "Controllers", "HouseController.cs"));
@@ -201,7 +200,6 @@ namespace CTA.Rules.Test
         public void TestMonolithReplacementsWebAPI()
         {
             var results = runCTAFile("SampleWebApi.sln").ProjectResults.FirstOrDefault();
-
             var houseControllerText = File.ReadAllText(Path.Combine(results.ProjectDirectory, "Controllers", "HouseController.cs"));
 
             FileAssert.Exists(Path.Combine(results.ProjectDirectory, Constants.MonolithService + ".cs"));
@@ -241,6 +239,49 @@ namespace CTA.Rules.Test
             FileAssert.Exists(Path.Combine(dir, "system.web.http.odata.json"));
             FileAssert.Exists(Path.Combine(dir, "system.web.json"));
             FileAssert.Exists(Path.Combine(dir, "system.web.mvc.json"));
+        }
+
+        [Test]
+        public void VBTestWebApiSolution()
+        {
+            var results = runCTAFile("VBWebApi.sln").ProjectResults.FirstOrDefault();
+            Assert.IsTrue(results != null);
+            StringAssert.Contains("Create service class.", results.ProjectAnalysisResult);
+
+            var homeControllerText = File.ReadAllText(Path.Combine(results.ProjectDirectory, "Controllers", "HomeController.vb"));
+            var valuesControllerText = File.ReadAllText(Path.Combine(results.ProjectDirectory, "Controllers", "ValuesController.vb"));
+
+            //Check that attribute has been added to class and inherits has been added:
+            StringAssert.Contains(@"Public Class HomeController", homeControllerText);
+            StringAssert.Contains(@"Inherits", homeControllerText);
+            StringAssert.Contains(@"End Class", homeControllerText);
+
+            //Check that function has been added to class:
+            StringAssert.Contains(@"Function", homeControllerText);
+            StringAssert.Contains(@"End Function", homeControllerText);
+
+            //Check that identifier as replaced:
+            StringAssert.Contains(@"As ActionResult", homeControllerText);
+
+            //Check that import statement has been added:
+            StringAssert.Contains(@"Imports System.Net", valuesControllerText);
+
+            //Check that attribute has been added to class and inherits has been added:
+            StringAssert.Contains(@"Public Class ValuesController", valuesControllerText);
+            StringAssert.Contains(@"ByVal id As Integer", valuesControllerText);
+            StringAssert.Contains(@"Inherits", valuesControllerText);
+            StringAssert.Contains(@"End Class", valuesControllerText);
+
+            //Check that function has been added to class:
+            StringAssert.Contains(@"Function", valuesControllerText);
+            StringAssert.Contains(@"End Function", valuesControllerText);
+
+            //Check that sub statement has been added to class:
+            StringAssert.Contains(@"Public Sub", valuesControllerText);
+            StringAssert.Contains(@"End Sub", valuesControllerText);
+
+            //Check that identifier as replaced:
+            StringAssert.Contains(@"As String", valuesControllerText);
         }
 
         [Test]

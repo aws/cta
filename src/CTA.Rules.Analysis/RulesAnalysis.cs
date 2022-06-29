@@ -8,13 +8,14 @@ using CTA.Rules.Common.Extensions;
 using CTA.Rules.Config;
 using CTA.Rules.Models;
 using CTA.Rules.Models.Tokens;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace CTA.Rules.Analyzer
 {
     /// <summary>
     /// Object to use for creating an analysis based on a code analysis and a list of rules
     /// </summary>
-    public class RulesAnalysis
+    public class RulesAnalysis : IRulesAnalysis
     {
         private readonly RootNodes _rootNodes;
         private readonly List<RootUstNode> _sourceFileResults;
@@ -129,11 +130,34 @@ namespace CTA.Rules.Analyzer
                             }
                         case IdConstants.UsingDirectiveIdName:
                             {
+                                string overrideKey = string.Empty;
+
                                 var compareToken = new UsingDirectiveToken() { Key = child.Identifier };
                                 _rootNodes.Usingdirectivetokens.TryGetValue(compareToken, out var token);
                                 if (token != null)
                                 {
                                     AddActions(fileAction, token, child.TextSpan);
+                                    containsActions = true;
+                                }
+
+                                //Attempt a wildcard search, if applicable. This is using directive specific because it might want to include all sub-namespaces
+                                if (token == null)
+                                {
+                                    var wildcardMatches = _rootNodes.Usingdirectivetokens.Where(i => i.Key.Contains("*"));
+                                    if (wildcardMatches.Any())
+                                    {
+                                        token = wildcardMatches.FirstOrDefault(i => compareToken.Key.WildcardEquals(i.Key));
+
+                                        if (token != null)
+                                        {
+                                            //We set the key so that we don't do another wildcard search during replacement, we just use the name as it was declared in the code
+                                            overrideKey = compareToken.Key;
+                                        }
+                                    }
+                                }
+                                if (token != null)
+                                {
+                                    AddActions(fileAction, token, child.TextSpan, overrideKey);
                                     containsActions = true;
                                 }
                                 break;
@@ -178,7 +202,9 @@ namespace CTA.Rules.Analyzer
                                 }
 
                                 token = null;
-                                foreach (string interfaceName in classType.BaseList)
+                                // In case base list is null, we skip the block by substituting an empty enumerab le
+                                // This case may potentially occur when a class implements no interfaces
+                                foreach (string interfaceName in classType.BaseList ?? Enumerable.Empty<string>())
                                 {
                                     var baseListToken = new ClassDeclarationToken() { FullKey = interfaceName };
                                     _rootNodes.Classdeclarationtokens.TryGetValue(baseListToken, out token);
@@ -413,7 +439,7 @@ namespace CTA.Rules.Analyzer
         /// </summary>
         /// <param name="fileAction">The file to run actions on</param>
         /// <param name="token">The token that matched the file</param>
-        private void AddActions(FileActions fileAction, NodeToken token, TextSpan textSpan, string overrideKey = "")
+        private void AddActions(FileActions fileAction, CsharpNodeToken token, TextSpan textSpan, string overrideKey = "")
         {
             fileAction.AttributeActions.UnionWith(token.AttributeActions.Select(a => new AttributeAction()
             {
@@ -441,7 +467,7 @@ namespace CTA.Rules.Analyzer
                 AttributeListActionFunc = a.AttributeListActionFunc
             }).ToList());
 
-            fileAction.IdentifierNameActions.UnionWith(token.IdentifierNameActions.Select(a => new IdentifierNameAction()
+            fileAction.IdentifierNameActions.UnionWith(token.IdentifierNameActions.Select(a => new IdentifierNameAction<IdentifierNameSyntax>()
             {
                 Key = a.Key,
                 Description = a.Description,
@@ -453,7 +479,7 @@ namespace CTA.Rules.Analyzer
                 IdentifierNameActionFunc = a.IdentifierNameActionFunc,
             }).ToList());
 
-            fileAction.InvocationExpressionActions.UnionWith(token.InvocationExpressionActions.Select(a => new InvocationExpressionAction()
+            fileAction.InvocationExpressionActions.UnionWith(token.InvocationExpressionActions.Select(a => new InvocationExpressionAction<InvocationExpressionSyntax>()
             {
                 Key = !string.IsNullOrEmpty(overrideKey) ? overrideKey : a.Key,
                 Description = a.Description,
@@ -498,10 +524,11 @@ namespace CTA.Rules.Analyzer
                 Type = a.Type,
                 TextSpan = textSpan,
                 ActionValidation = a.ActionValidation,
-                UsingActionFunc = a.UsingActionFunc
+                UsingActionFunc = a.UsingActionFunc,
+                NamespaceUsingActionFunc = a.NamespaceUsingActionFunc,
             }).ToList());
 
-            fileAction.NamespaceActions.UnionWith(token.NamespaceActions.Select(a => new NamespaceAction()
+            fileAction.NamespaceActions.UnionWith(token.NamespaceActions.Select(a => new NamespaceAction<NamespaceDeclarationSyntax>()
             {
                 Key = a.Key,
                 Description = a.Description,
@@ -581,7 +608,7 @@ namespace CTA.Rules.Analyzer
         /// <param name="fileAction"></param>
         /// <param name="token"></param>
         /// <param name="identifier"></param>
-        private void AddNamedActions(FileActions fileAction, NodeToken token, string identifier, TextSpan textSpan)
+        private void AddNamedActions(FileActions fileAction, CsharpNodeToken token, string identifier, TextSpan textSpan)
         {
 
             fileAction.ClassDeclarationActions.UnionWith(token.ClassDeclarationActions

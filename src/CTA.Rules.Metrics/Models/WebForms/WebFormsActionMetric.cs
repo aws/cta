@@ -28,6 +28,7 @@ namespace CTA.Rules.Metrics.Models.WebForms
             ChildActionName = childActionName;
             SolutionPathHash = context.SolutionPathHash;
             ProjectGuid = context.ProjectGuidMap.GetValueOrDefault(projectPath, "N/A");
+            Language = GetLanguage(projectPath);
         }
     }
 }
