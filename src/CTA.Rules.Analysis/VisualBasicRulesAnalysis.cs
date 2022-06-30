@@ -782,9 +782,10 @@ public class VisualBasicRulesAnalysis : IRulesAnalysis
                 AccessorBlockActionFunc = c.AccessorBlockActionFunc
             }));
 
-        if (fileAction.VbTypeBlockActions.Any() || fileAction.VbMethodBlockActions.Any()
-                                                || fileAction.VbInterfaceBlockActions.Any() ||
-                                                fileAction.VbAccessorBlockActions.Any())
+        if (fileAction.VbTypeBlockActions.Any() ||
+            fileAction.VbMethodBlockActions.Any() ||
+            fileAction.VbInterfaceBlockActions.Any() ||
+            fileAction.VbAccessorBlockActions.Any())
         {
             var nodeToken = token.Clone();
             nodeToken.TextSpan = textSpan;

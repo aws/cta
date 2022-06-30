@@ -97,6 +97,7 @@ namespace CTA.Rules.Test
 
             var signalR = File.ReadAllText(Path.Combine(projresults.ProjectDirectory, "SignalR.vb"));
             var startUp = File.ReadAllText(Path.Combine(projresults.ProjectDirectory, "Startup.vb"));
+            var projectFile = File.ReadAllText(projresults.CsProjectPath);
 
             //Check that namespace has been added
             StringAssert.Contains(@"Microsoft.AspNetCore.Owin", startUp);
@@ -112,6 +113,10 @@ namespace CTA.Rules.Test
 
             //Check method actions
             StringAssert.Contains("UseEndpoints", signalR);
+            
+            //Check project porting
+            StringAssert.Contains("net5.0", projectFile);
+            StringAssert.Contains("Microsoft.AspNetCore.Diagnostics", projectFile);
         }
 
         [Test]
@@ -128,6 +133,14 @@ namespace CTA.Rules.Test
             // StringAssert.Contains(
             //     "<TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>",
             //     results.CsProjectContent);
+        }
+        
+        [Test]
+        public void TestMixedClassLibrary()
+        {
+            var slnResults = runCTAFile("MixedClassLibrary.sln");
+            var projresults = slnResults.ProjectResults.FirstOrDefault();
+            Assert.IsTrue(projresults != null);
         }
     }
 }
