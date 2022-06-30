@@ -1,14 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using Codelyzer.Analysis;
-using CTA.Rules.Config;
-using CTA.Rules.Models;
-using CTA.Rules.Update;
 using NUnit.Framework;
 
 namespace CTA.Rules.Test
@@ -29,61 +22,6 @@ namespace CTA.Rules.Test
             _ctaFiles = Directory.EnumerateFiles(Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "CTAFiles")), "*.json")
                .Select(s => Path.GetFileNameWithoutExtension(s))
                .ToList();
-        }
-
-        private TestSolutionAnalysis runCTAFile(string solutionName, string projectName = null)
-        {
-            var solutionPath = CopySolutionFolderToTemp(solutionName, _downloadLocation);
-            var solutionDir = Directory.GetParent(solutionPath).FullName;
-
-            FileAssert.Exists(solutionPath);
-
-            //Sample Web API has only one project:
-            string projectFile = (projectName == null ? Utils.GetProjectPaths(Path.Combine(solutionDir, solutionName)).FirstOrDefault() : Directory.EnumerateFiles(solutionDir, projectName, SearchOption.AllDirectories).FirstOrDefault());
-            FileAssert.Exists(projectFile);
-
-            ProjectConfiguration projectConfiguration = new ProjectConfiguration()
-            {
-                SolutionPath = solutionPath,
-                ProjectPath = projectFile,
-                TargetVersions = new List<string> { _version },
-                RulesDir = Constants.RulesDefaultPath,
-                AdditionalReferences = _ctaFiles
-            };
-            
-            List<ProjectConfiguration> solutionConfiguration = new List<ProjectConfiguration>
-            {
-                projectConfiguration
-            };
-            CopyTestRules();
-
-            SolutionRewriter solutionRewriter = new SolutionRewriter(solutionPath, solutionConfiguration);
-            var analysisRunResult = solutionRewriter.AnalysisRun();
-            StringBuilder str = new StringBuilder();
-            foreach (var projectResult in analysisRunResult.ProjectResults)
-            {
-                str.AppendLine(projectResult.ProjectFile);
-                str.AppendLine(projectResult.ProjectActions.ToString());
-            }
-            var analysisResult = str.ToString();
-            solutionRewriter.Run(analysisRunResult.ProjectResults.ToDictionary(p => p.ProjectFile, p => p.ProjectActions));
-
-            TestSolutionAnalysis result = new TestSolutionAnalysis()
-            {
-                SolutionAnalysisResult = analysisResult,
-                ProjectResults = new List<ProjectResult>()
-                {
-                    new ProjectResult()
-                    {
-                        ProjectAnalysisResult = analysisResult,
-                        CsProjectPath = projectFile,
-                        ProjectDirectory = Directory.GetParent(projectFile).FullName,
-                        CsProjectContent = File.ReadAllText(projectFile)
-        }
-                }
-            };
-
-            return result;
         }
 
         [Test]
@@ -138,9 +76,15 @@ namespace CTA.Rules.Test
         [Test]
         public void TestMixedClassLibrary()
         {
-            var slnResults = runCTAFile("MixedClassLibrary.sln");
-            var projresults = slnResults.ProjectResults.FirstOrDefault();
+            var slnResults = AnalyzeSolution("MixedClassLibrary.sln",
+                _tempDir,
+                _downloadLocation,
+                _version);
+            var projresults = slnResults.ProjectResults.Select(p => p.CsProjectContent).ToList();
             Assert.IsTrue(projresults != null);
+            Assert.IsTrue(projresults.Count() == 2);
+            //check both projects ported
+            Assert.IsTrue(projresults.All(content => content.Contains("net5.0")));
         }
     }
 }
