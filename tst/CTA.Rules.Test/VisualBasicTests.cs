@@ -89,7 +89,7 @@ namespace CTA.Rules.Test
         [Test]
         public void TestOwinParadiseVb()
         {
-            var slnResults = runCTAFile("OwinParadiseVb.sln");
+            var slnResults = AnalyzeSolution("OwinParadiseVb.sln", _tempDir, _downloadLocation, _version);
             var projresults = slnResults.ProjectResults.FirstOrDefault();
             Assert.IsTrue(projresults != null);
 
