@@ -296,16 +296,32 @@ public class VisualBasicActionsRewriter : VisualBasicSyntaxRewriter, ISyntaxRewr
 
     public override SyntaxNode VisitInvocationExpression(InvocationExpressionSyntax node)
     {
-        var symbol = (IMethodSymbol)SemanticHelper.GetSemanticSymbol(node, _semanticModel, _preportSemanticModel);
-        var newNode = base.VisitInvocationExpression(node);
+        var symbol = SemanticHelper.GetSemanticSymbol(node, _semanticModel, _preportSemanticModel);
         
         if (symbol == null)
         {
             return node;
         }
 
-        var prefix = symbol.IsExtensionMethod ? symbol.ReceiverType?.ToString() ?? "" : symbol.ContainingType?.ToString() ?? "";
-        var nodeKey = $"{prefix}.{symbol.Name}({string.Join(", ", symbol.Parameters.Select(p => p.Type))})";
+        var nodeKey = "";
+        if (symbol is IMethodSymbol)
+        {
+            var methodSymbol = (IMethodSymbol)symbol;
+            var prefix = methodSymbol.IsExtensionMethod
+                ? methodSymbol.ReceiverType?.ToString() ?? ""
+                : methodSymbol.ContainingType?.ToString() ?? "";
+            nodeKey =
+                $"{prefix}.{symbol.Name}({string.Join(", ", methodSymbol.Parameters.Select(p => p.Type))})";
+        }
+        else if (symbol is IPropertySymbol)
+        {
+            var propertySymbol = (IPropertySymbol)symbol;
+            var prefix = propertySymbol.ContainingType?.ToString() ?? "";
+            nodeKey =
+                $"{prefix}.{symbol.Name}({string.Join(", ", propertySymbol.Parameters.Select(p => p.Type))})";
+        }
+
+        var newNode = base.VisitInvocationExpression(node);
 
         foreach (var action in _allActions.OfType<InvocationExpressionAction<InvocationExpressionSyntax>>())
         {
