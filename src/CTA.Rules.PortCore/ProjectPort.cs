@@ -57,7 +57,7 @@ namespace CTA.Rules.PortCore
                 }
                 projectConfiguration.RulesDir = Constants.RulesDefaultPath;
                 
-                ProjectReferences.UnionWith(PortCoreUtils.GetReferencesForProject(projectConfiguration, analyzerResult));
+                ProjectReferences.UnionWith(PortCoreUtils.GetReferencesForProject(analyzerResult));
                 ProjectReferences.Add(Constants.ProjectRecommendationFile);
             }
 

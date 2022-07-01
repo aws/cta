@@ -219,7 +219,6 @@ namespace CTA.Rules.PortCore
                     }
                     projectConfiguration.RulesDir = Constants.RulesDefaultPath;
                     allReferences.UnionWith(PortCoreUtils.GetReferencesForProject(
-                        projectConfiguration,
                         analyzerResults.FirstOrDefault(a =>
                             a.ProjectResult?.ProjectFilePath ==
                             projectConfiguration.ProjectPath)));

@@ -8,7 +8,7 @@ namespace CTA.Rules.PortCore;
 
 public class PortCoreUtils
 {
-    public static HashSet<string> GetReferencesForProject(PortCoreConfiguration projectConfiguration, AnalyzerResult analyzerResult)
+    public static HashSet<string> GetReferencesForProject(AnalyzerResult analyzerResult)
     {
         var allReferences = new HashSet<string>();
         var projectResult = analyzerResult.ProjectResult;
