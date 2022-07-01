@@ -56,23 +56,8 @@ namespace CTA.Rules.PortCore
                     _solutionPort.CopyOverrideRules(projectConfiguration.RulesDir);
                 }
                 projectConfiguration.RulesDir = Constants.RulesDefaultPath;
-                var projectResult = analyzerResult.ProjectResult;
-
-                projectResult?.SourceFileResults?.SelectMany(s => s.References)?.Select(r => r.Namespace).Distinct().ToList().ForEach(currentReference =>
-                {
-                    if (currentReference != null && !ProjectReferences.Contains(currentReference))
-                    {
-                        ProjectReferences.Add(currentReference);
-                    }
-                });
-
-                projectResult?.SourceFileResults?.SelectMany(s => s.Children.OfType<UsingDirective>())?.Select(u => u.Identifier).Distinct().ToList().ForEach(currentReference =>
-                {
-                    if (currentReference != null && !ProjectReferences.Contains(currentReference))
-                    {
-                        ProjectReferences.Add(currentReference);
-                    }
-                });
+                
+                ProjectReferences.UnionWith(PortCoreUtils.GetReferencesForProject(projectConfiguration, analyzerResult));
                 ProjectReferences.Add(Constants.ProjectRecommendationFile);
             }
 
