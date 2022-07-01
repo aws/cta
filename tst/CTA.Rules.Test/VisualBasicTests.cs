@@ -85,6 +85,9 @@ namespace CTA.Rules.Test
             Assert.IsTrue(projresults.Count() == 2);
             //check both projects ported
             Assert.IsTrue(projresults.All(content => content.Contains("net5.0")));
+            Assert.IsTrue(slnResults.ProjectResults
+                .Find(p => p.CsProjectPath.EndsWith(".vbproj"))
+                .CsProjectContent.Contains("BouncyCastle.NetCore"));
         }
     }
 }

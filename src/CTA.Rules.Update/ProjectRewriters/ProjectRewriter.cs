@@ -78,6 +78,7 @@ namespace CTA.Rules.Update
                     Version = p.Value.Item2
                 }).ToList()
             };
+            _projectLanguage = VisualBasicUtils.IsVisualBasicProject(ProjectConfiguration.ProjectPath) ? ProjectLanguage.VisualBasic : ProjectLanguage.Csharp;
         }
 
         /// <summary>
