@@ -5,7 +5,10 @@ using NUnit.Framework;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Codelyzer.Analysis;
+using Codelyzer.Analysis.Model;
 using CTA.Rules.Common.Helpers;
+using CTA.Rules.PortCore;
 
 namespace CTA.Rules.Test
 {
@@ -120,6 +123,35 @@ namespace CTA.Rules.Test
             Assert.IsFalse(VisualBasicUtils.IsVisualBasicProject("test.csproj"));
             Assert.IsTrue(VisualBasicUtils.IsVisualBasicProject("C://user/john/repos/test.vbproj"));
             Assert.IsFalse(VisualBasicUtils.IsVisualBasicProject("vbprojproject.cs"));
+        }
+
+        [Test]
+        public void TestLoadReferencesFromProject()
+        {
+            var analyzeResult = new AnalyzerResult
+            {
+                ProjectResult = new ProjectWorkspace("dummy.csproj")
+                {
+                    SourceFileResults = new UstList<RootUstNode>()
+                    {
+                        new RootUstNode()
+                        {
+                            Children = new UstList<UstNode>
+                            {
+                                new ImportsStatement { Identifier = "Newtonsoft.Json"},
+                                new UsingDirective {Identifier = "BouncyCastle.NetCore"}
+                            },
+                            References = new UstList<Reference>()
+                            {
+                                new Reference() {Namespace = "BouncyCastle.NetCore"}
+                            }
+                        }
+                    }
+                }
+            };
+
+            var references = PortCoreUtils.GetReferencesForProject(analyzeResult);
+            Assert.IsTrue(references.Count == 2);
         }
     }
 }
