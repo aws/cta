@@ -243,5 +243,15 @@ namespace CTA.Rules.Test.Actions.VisualBasic
             Assert.IsNotNull(migrateConfig);
             Assert.IsNotNull(createMonolithService);
         }
+
+        [Test]
+        public void MemberAccessExpressions()
+        {
+            var getRemoveMemberAccessAction = _actionLoader.GetMemberAccessExpressionActions("RemoveMemberAccess", "");
+            var addComment = _actionLoader.GetMemberAccessExpressionActions("AddComment", "comment");
+
+            Assert.IsNotNull(getRemoveMemberAccessAction);
+            Assert.IsNotNull(addComment);
+        }
     }
 }
