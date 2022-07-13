@@ -268,11 +268,16 @@ public class VisualBasicActionsRewriter : VisualBasicSyntaxRewriter, ISyntaxRewr
             return newNode;
         }
 
-        var nodeKey = symbol.OriginalDefinition.ToString();
+        var methodSymbol = (IMethodSymbol)symbol;
+        var prefix = methodSymbol.IsExtensionMethod
+            ? methodSymbol.ReceiverType?.ToString() ?? ""
+            : methodSymbol.ContainingType?.ToString() ?? "";
+        var nodeKey =
+            $"{prefix}.{symbol.Name}({string.Join(", ", methodSymbol.Parameters.Select(p => p.Type))})";
 
         foreach (var action in _allActions.OfType<ExpressionAction>())
         {
-            if (nodeKey == action.Key)
+            if (string.Equals(nodeKey, action.Key, StringComparison.OrdinalIgnoreCase))
             {
                 var actionExecution = new GenericActionExecution(action, _filePath) { TimesRun = 1 };
                 try
@@ -325,7 +330,7 @@ public class VisualBasicActionsRewriter : VisualBasicSyntaxRewriter, ISyntaxRewr
 
         foreach (var action in _allActions.OfType<InvocationExpressionAction<InvocationExpressionSyntax>>())
         {
-            if (nodeKey == action.Key)
+            if (string.Equals(nodeKey,action.Key, StringComparison.OrdinalIgnoreCase))
             {
                 var actionExecution = new GenericActionExecution(action, _filePath) { TimesRun = 1 };
                 try
