@@ -104,7 +104,7 @@ namespace CTA.Rules.Actions.VisualBasic
             ObjectCreationExpressionSyntax AddComment(SyntaxGenerator syntaxGenerator, ObjectCreationExpressionSyntax node)
             {
                 SyntaxTriviaList currentTrivia = node.GetLeadingTrivia();
-                currentTrivia = currentTrivia.Add(SyntaxFactory.SyntaxTrivia(SyntaxKind.CommentTrivia, string.Format(Constants.CommentFormat, comment)));
+                currentTrivia = currentTrivia.Add(SyntaxFactory.SyntaxTrivia(SyntaxKind.CommentTrivia, string.Format(Constants.VbCommentFormat, comment)));
                 node = node.WithLeadingTrivia(currentTrivia).NormalizeWhitespace();
                 return node;
             }

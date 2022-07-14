@@ -20,7 +20,7 @@ namespace CTA.Rules.Actions.VisualBasic
                 var currentTrivia = node.GetLeadingTrivia();
                 currentTrivia = currentTrivia.Insert(0,
                     SyntaxFactory.SyntaxTrivia(SyntaxKind.CommentTrivia,
-                        string.Format(Constants.CommentFormat, comment)));
+                        string.Format(Constants.VbCommentFormat, comment)));
                 node = node.WithLeadingTrivia(currentTrivia).NormalizeWhitespace();
                 return node;
             }

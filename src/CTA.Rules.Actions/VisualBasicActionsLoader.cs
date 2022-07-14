@@ -72,7 +72,8 @@ public class VisualBasicActionsLoader : ActionLoaderBase
                 var types = assembly.GetTypes()
                     .Where(t => t.Name.EndsWith("Actions") &&
                                 (t.Namespace.EndsWith(ProjectLanguage.VisualBasic.ToString()) ||
-                                 t.Name.StartsWith("Project"))).ToList();
+                                 t.Name.StartsWith("Project") ||
+                                 t.Name.StartsWith("MemberAccess"))).ToList();
                 TryCreateInstance(Constants.CompilationUnitActions, types, out _compilationUnitObject);
                 TryCreateInstance(Constants.InvocationExpressionActions, types, out _invocationExpressionObject);
                 TryCreateInstance(Constants.NamespaceActions, types, out _namespaceObject);
