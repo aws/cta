@@ -287,10 +287,7 @@ public class VisualBasicRulesAnalysis : IRulesAnalysis
                     case IdConstants.AccessorBlockName:
                     {
                         var accessorType = (AccessorBlock)child;
-                        var name = string.Concat(
-                            accessorType.Reference != null
-                                ? string.Concat(accessorType.Reference.Namespace, ".")
-                                : string.Empty, accessorType.Identifier);
+                        var name = accessorType.Identifier;
                         var nameToken = new AccessorBlockToken { FullKey = name };
                         if (_visualBasicRootNodes.AccessorBlockTokens.TryGetValue(nameToken, out var token))
                         {
