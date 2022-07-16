@@ -30,7 +30,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="TempRules\npoi.json" />
+    <None Remove="TempRules\npoi.ss.usermodel.json" />
     <None Update="CTAFiles\vb.rules.test.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -77,7 +77,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Update="TempRules\npoi.json">
+    <Content Update="TempRules\npoi.ss.usermodel.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
