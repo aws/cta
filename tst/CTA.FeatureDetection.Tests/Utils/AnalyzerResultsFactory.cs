@@ -59,8 +59,6 @@ namespace CTA.FeatureDetection.Tests.Utils
             };
 
             return CodeAnalyzerFactory.GetAnalyzer(cli.Configuration, logger);
-            //return new CodeAnalyzerByLanguage(cli.Configuration, logger);
-
         }
     }
 }

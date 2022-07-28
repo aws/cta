@@ -52,7 +52,7 @@ namespace CTA.Rules.Update
 
             CodeAnalyzerByLanguage analyzer = new CodeAnalyzerByLanguage(analyzerConfiguration, LogHelper.Logger);
 
-            var analyzerResults = analyzer.AnalyzeSolution(solutionFilePath).Result;
+            var analyzerResults = analyzer.AnalyzeSolutionGenerator(solutionFilePath).Result;
             InitializeProjectRewriters(analyzerResults, solutionConfiguration);
         }
 

@@ -379,7 +379,7 @@ namespace CTA.Rules.Test
             //CodeAnalyzer analyzer = CodeAnalyzerFactory.GetAnalyzer(configuration, NullLogger.Instance);
             CodeAnalyzerByLanguage analyzer = new CodeAnalyzerByLanguage(configuration, NullLogger.Instance);
             
-            var result = analyzer.AnalyzeSolution(solutionPath).Result;
+            var result = analyzer.AnalyzeSolutionGenerator(solutionPath).Result;
             return result;
         }
 
@@ -409,7 +409,7 @@ namespace CTA.Rules.Test
             //CodeAnalyzer analyzer = CodeAnalyzerFactory.GetAnalyzer(configuration, NullLogger.Instance);
             CodeAnalyzerByLanguage analyzer = new CodeAnalyzerByLanguage(configuration, NullLogger.Instance);
 
-            var result = analyzer.AnalyzeSolution(solutionPath).Result;
+            var result = analyzer.AnalyzeSolutionGenerator(solutionPath).Result;
             return result;
         }
     }
