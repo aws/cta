@@ -100,7 +100,7 @@ namespace CTA.Rules.PortCore
             }
             else
             {
-                analyzerResults = analyzer.AnalyzeSolution(solutionFilePath).Result;
+                analyzerResults = analyzer.AnalyzeSolutionGenerator(solutionFilePath).Result;
             }
 
             _context = new MetricsContext(solutionFilePath, analyzerResults);
