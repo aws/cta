@@ -27,7 +27,7 @@ namespace CTA.Rules.Update
         /// <param name="analyzerConfiguration">Configuration for code analyzer to be used (AnalyzerConfiguration)</param>
         /// <param name="solutionFilePath">Path to solution file</param>
         /// <param name="solutionConfiguration">Configuration for each project in solution to be built</param>
-        public SolutionRewriter(string solutionFilePath, List<ProjectConfiguration> solutionConfiguration, IProjectRewriterFactory projectRewriterFactory = null)
+        public SolutionRewriter(string solutionFilePath, List<ProjectConfiguration> solutionConfiguration, IProjectRewriterFactory projectRewriterFactory = null, bool syntaxOnly = false)
         {
             DownloadResourceFiles();
             _solutionResult = new SolutionResult();
@@ -44,6 +44,10 @@ namespace CTA.Rules.Update
                     InterfaceDeclarations = true,
                     MemberAccess = true,
                     ElementAccess = true
+                },
+                BuildSettings = new BuildSettings()
+                {
+                    SyntaxOnly = syntaxOnly
                 }
             };
 

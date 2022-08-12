@@ -44,7 +44,7 @@ namespace CTA.Rules.Update
                 }
 
                 //Solution Rewriter:
-                SolutionRewriter solutionRewriter = new SolutionRewriter(cli.FilePath, configs);
+                SolutionRewriter solutionRewriter = new SolutionRewriter(cli.FilePath, configs, syntaxOnly: cli.IsSyntaxOnlyBuild);
                 var s = solutionRewriter.AnalysisRun();
                 foreach (var k in s.ProjectResults)
                 {

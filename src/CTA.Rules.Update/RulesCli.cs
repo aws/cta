@@ -21,6 +21,9 @@ namespace CTA.Rules.Update
 
         [Option('m', "mock-run", Required = false, HelpText = "Mock run to generate output only (no changes will be made)")]
         public string IsMockRun { get; set; }
+
+        [Option('c', "syntax-only", Required = false, HelpText = "Creates an analysis without building")]
+        public string SyntaxOnlyAnalysis { get; set; }
     }
 
     public class RulesCli
@@ -30,6 +33,7 @@ namespace CTA.Rules.Update
         public string RulesDir;
         public string AssembliesDir;
         public bool IsMockRun;
+        public bool IsSyntaxOnlyBuild;
         public AnalyzerConfiguration Configuration;
 
         public void HandleCommand(String[] args)
@@ -50,6 +54,10 @@ namespace CTA.Rules.Update
                     if (!string.IsNullOrEmpty(o.IsMockRun) && o.IsMockRun.ToLower() == "true")
                     {
                         IsMockRun = true;
+                    }
+                    if (!string.IsNullOrEmpty(o.SyntaxOnlyAnalysis) && o.SyntaxOnlyAnalysis.ToLower() == "true")
+                    {
+                        IsSyntaxOnlyBuild = true;
                     }
                 });
         }
