@@ -117,6 +117,20 @@ class MyClass
         }
 
         [Test]
+        public void RemoveLastBaseClassNullException()
+        {
+            const string methodName = "MyMethod";
+            var methodNode = SyntaxFactory.MethodDeclaration(SyntaxFactory.ParseTypeName("void"), methodName);
+            var nodeWithMethod = _node.AddMembers(methodNode);
+
+            var baseClassname = "ControllerBase";
+            var removeBaseClassMethod = _classActions.GetRemoveBaseClassAction(baseClassname);
+
+            var nodeWithoutClass = removeBaseClassMethod(_syntaxGenerator, nodeWithMethod);
+            StringAssert.DoesNotContain(":", nodeWithoutClass.ToFullString());
+        }
+
+        [Test]
         public void ReplaceMethodModifiers()
         {
             const string methodName = "MyMethod";
