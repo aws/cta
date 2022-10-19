@@ -117,7 +117,7 @@ class MyClass
         }
 
         [Test]
-        public void RemoveLastBaseClassNullException()
+        public void NoBaseClass()
         {
             const string methodName = "MyMethod";
             var methodNode = SyntaxFactory.MethodDeclaration(SyntaxFactory.ParseTypeName("void"), methodName);
