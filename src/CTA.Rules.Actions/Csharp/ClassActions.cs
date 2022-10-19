@@ -22,28 +22,30 @@ namespace CTA.Rules.Actions.Csharp
         {
             ClassDeclarationSyntax RemoveBaseClass(SyntaxGenerator syntaxGenerator, ClassDeclarationSyntax node)
             {
-                SeparatedSyntaxList<BaseTypeSyntax> currentBaseTypes = node.BaseList.Types;
-                SeparatedSyntaxList<BaseTypeSyntax> newBaseTypes = new SeparatedSyntaxList<BaseTypeSyntax>();
-
-                foreach (var baseTypeSyntax in currentBaseTypes)
+                if (node.BaseList != null)
                 {
-                    if (!baseTypeSyntax.GetText().ToString().Trim().Equals(baseClass))
+                    SeparatedSyntaxList<BaseTypeSyntax> currentBaseTypes = node.BaseList.Types;
+                    SeparatedSyntaxList<BaseTypeSyntax> newBaseTypes = new SeparatedSyntaxList<BaseTypeSyntax>();
+
+                    foreach (var baseTypeSyntax in currentBaseTypes)
                     {
-                        newBaseTypes.Add(baseTypeSyntax);
+                        if (!baseTypeSyntax.GetText().ToString().Trim().Equals(baseClass))
+                        {
+                            newBaseTypes.Add(baseTypeSyntax);
+                        }
                     }
-                }
 
-                if (!newBaseTypes.Any())
-                {
-                    node = node.WithBaseList(null);
-                }
-                else
-                {
-                    node = node.WithBaseList(node.BaseList.WithTypes(newBaseTypes));
+                    if (!newBaseTypes.Any())
+                    {
+                        node = node.WithBaseList(null);
+                    }
+                    else
+                    {
+                        node = node.WithBaseList(node.BaseList.WithTypes(newBaseTypes));
+                    }
                 }
                 return node;
             }
-
             return RemoveBaseClass;
         }
         public Func<SyntaxGenerator, ClassDeclarationSyntax, ClassDeclarationSyntax> GetAddBaseClassAction(string baseClass)
