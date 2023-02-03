@@ -699,7 +699,10 @@ namespace CTA.Rules.RuleFiles
                                 }
                                 else
                                 {
-                                    Dictionary<string, string> jsonParameters = JsonConvert.DeserializeObject<Dictionary<string, string>>(action.Value.ToString());
+                                    var jsonParameters =
+                                        action.Value is Dictionary<string,string>
+                                            ? action.Value
+                                            : JsonConvert.DeserializeObject<Dictionary<string, string>>(action.Value.ToString());
                                     if (jsonParameters.ContainsKey(CTA.Rules.Config.Constants.PackageName))
                                     {
                                         packageAction.Name = jsonParameters[CTA.Rules.Config.Constants.PackageName];
