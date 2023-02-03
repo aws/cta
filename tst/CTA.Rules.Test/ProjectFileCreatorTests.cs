@@ -13,9 +13,9 @@ namespace CTA.Rules.Test
         private ProjectFileCreator _classLibraryProjectFileCreator;
         private ProjectFileCreator _webClassLibraryProjectFileCreator;
 
-        private string _mvcProjectFilePath = "mvc.csproj";
-        private string _classLibraryProjectFilePath = "classLibrary.csproj";
-        private string _webClassLibraryProjectFilePath = "webClassLibrary.csproj";
+        private readonly string _mvcProjectFilePath = "mvc.csproj";
+        private readonly string _classLibraryProjectFilePath = "classLibrary.csproj";
+        private readonly string _webClassLibraryProjectFilePath = "webClassLibrary.csproj";
 
         [SetUp]
         public void Setup()
@@ -75,10 +75,18 @@ namespace CTA.Rules.Test
         [TearDown]
         public void TearDown()
         {
-            if (File.Exists(_webClassLibraryProjectFilePath))
+            var testFiles = new[]
             {
-                File.Delete(_webClassLibraryProjectFilePath);
-            }
+                _classLibraryProjectFilePath,
+                _webClassLibraryProjectFilePath,
+                _mvcProjectFilePath,
+
+            };
+
+            foreach (var testFile in testFiles)
+                if (File.Exists(testFile))
+                    File.Delete(testFile);
+        }
         }
 
         [Test]
