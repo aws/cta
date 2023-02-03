@@ -41,12 +41,35 @@ namespace CTA.Rules.Test
                 @"C:\\RandomFile.dll"
             };
 
-            _mvcProjectFileCreator = new ProjectFileCreator(_mvcProjectFilePath, targetFramework, 
-                packages, projectReferences, ProjectType.Mvc, metaRefs, sourceFramework);
-            _classLibraryProjectFileCreator = new ProjectFileCreator(_classLibraryProjectFilePath, targetFramework, 
-                packages, projectReferences, ProjectType.ClassLibrary, metaRefs, sourceFramework);
-            _webClassLibraryProjectFileCreator = new ProjectFileCreator(_webClassLibraryProjectFilePath, targetFramework, 
-                packages, projectReferences, ProjectType.WebClassLibrary, metaRefs, sourceFramework);
+            _mvcProjectFileCreator = 
+                new ProjectFileCreator(
+                    _mvcProjectFilePath, 
+                    targetFramework, 
+                    packages,
+                    projectReferences, 
+                    ProjectType.Mvc,
+                    metaRefs, 
+                    sourceFramework);
+
+            _classLibraryProjectFileCreator = 
+                new ProjectFileCreator(
+                    _classLibraryProjectFilePath, 
+                    targetFramework, 
+                    packages, 
+                    projectReferences, 
+                    ProjectType.ClassLibrary, 
+                    metaRefs, 
+                    sourceFramework);
+
+            _webClassLibraryProjectFileCreator = 
+                new ProjectFileCreator(
+                    _webClassLibraryProjectFilePath, 
+                    targetFramework, 
+                    packages,
+                    projectReferences, 
+                    ProjectType.WebClassLibrary, 
+                    metaRefs, 
+                    sourceFramework);
         }
 
         [TearDown]

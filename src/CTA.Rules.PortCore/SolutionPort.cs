@@ -74,7 +74,7 @@ namespace CTA.Rules.PortCore
             _solutionPath = solutionFilePath;
             AnalyzerConfiguration analyzerConfiguration = new AnalyzerConfiguration(LanguageOptions.CSharp)
             {
-                MetaDataSettings = new MetaDataSettings()
+                MetaDataSettings = new MetaDataSettings
                 {
                     Annotations = true,
                     DeclarationNodes = true,

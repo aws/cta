@@ -90,11 +90,32 @@ namespace CTA.Rules.Update
             ProjectActions projectActions = new ProjectActions();
             try
             {
-                var allReferences = _sourceFileResults?.SelectMany(s => s.References)
-                        .Union(_sourceFileResults.SelectMany(s => s.Children.OfType<UsingDirective>())?.Select(u => new Reference() { Namespace = u.Identifier, Assembly = u.Identifier }).Distinct())
-                        .Union(_sourceFileResults.SelectMany(s => s.Children.OfType<ImportsStatement>())?.Select(u => new Reference() {Namespace = u.Identifier, Assembly = u.Identifier }).Distinct())
-                        .Union(ProjectConfiguration.AdditionalReferences.Select(r => new Reference { Assembly = r, Namespace = r }));
-                RulesFileLoader rulesFileLoader = new RulesFileLoader(allReferences, ProjectConfiguration.RulesDir, ProjectConfiguration.TargetVersions, _projectLanguage, string.Empty, ProjectConfiguration.AssemblyDir);
+                var allReferences = 
+                    _sourceFileResults
+                        ?.SelectMany(s => s.References)
+                        .Union(
+                            _sourceFileResults
+                                .SelectMany(s => s.Children.OfType<UsingDirective>())
+                                .Select(u => new Reference {Namespace = u.Identifier, Assembly = u.Identifier})
+                                .Distinct())
+                        .Union(
+                            _sourceFileResults
+                                .SelectMany(s => s.Children.OfType<ImportsStatement>())
+                                .Select(u => new Reference {Namespace = u.Identifier, Assembly = u.Identifier})
+                                .Distinct())
+                        .Union(
+                            ProjectConfiguration
+                                .AdditionalReferences
+                                .Select(r => new Reference {Assembly = r, Namespace = r}));
+
+                var rulesFileLoader =
+                    new RulesFileLoader(
+                        allReferences,
+                        ProjectConfiguration.RulesDir, 
+                        ProjectConfiguration.TargetVersions, 
+                        _projectLanguage, 
+                        overrideFile: string.Empty, 
+                        ProjectConfiguration.AssemblyDir);
                 
                 var projectRules = rulesFileLoader.Load();
 

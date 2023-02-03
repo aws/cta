@@ -79,8 +79,13 @@ namespace CTA.Rules.ProjectFile
         private const string ProjectReferenceTemplate = @"<ProjectReference Include=""{0}"" />";
         private const string IndentationPerLevel = "  ";
 
-        public ProjectFileCreator(string projectFile, List<string> targetVersions, Dictionary<string, string> packages,
-            List<string> projectReferences, ProjectType projectType, List<string> metaReferences)
+        public ProjectFileCreator(
+            string projectFile,
+            List<string> targetVersions, 
+            Dictionary<string, string> packages,
+            List<string> projectReferences, 
+            ProjectType projectType, 
+            List<string> metaReferences)
         {
             _projectFile = projectFile;
             _targetVersions = targetVersions;
@@ -100,8 +105,15 @@ namespace CTA.Rules.ProjectFile
             }
         }
 
-        public ProjectFileCreator(string projectFile, List<string> targetVersions, Dictionary<string, string> packages,
-            List<string> projectReferences, ProjectType projectType, List<string> metaReferences, List<string> sourceVersions) : this(projectFile, targetVersions, packages, projectReferences, projectType, metaReferences)
+        public ProjectFileCreator(
+            string projectFile, 
+            List<string> targetVersions, 
+            Dictionary<string, string> packages,
+            List<string> projectReferences, 
+            ProjectType projectType, 
+            List<string> metaReferences, 
+            List<string> sourceVersions) 
+                : this(projectFile, targetVersions, packages, projectReferences, projectType, metaReferences)
         {
             _sourceVersions = sourceVersions;
         }
