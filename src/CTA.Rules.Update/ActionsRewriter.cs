@@ -55,6 +55,36 @@ namespace CTA.Rules.Update.Rewriters
             AllExecutedActions = new List<GenericActionExecution>();
         }
 
+        public override SyntaxNode VisitMethodDeclaration(MethodDeclarationSyntax node)
+        {
+            var newNode = (MethodDeclarationSyntax)base.VisitMethodDeclaration(node);
+
+            foreach (var action in _allActions.OfType<MethodDeclarationAction>())
+            {
+                if (action.Key == node.Identifier.Text.Trim())
+                {
+                    var actionExecution = new GenericActionExecution(action, _filePath)
+                    {
+                        TimesRun = 1
+                    };
+                    try
+                    {
+                        newNode = action.MethodDeclarationActionFunc(_syntaxGenerator, newNode);
+                        LogHelper.LogInformation(string.Format("{0}: {1}", node.SpanStart, action.Description));
+                    }
+                    catch (Exception ex)
+                    {
+                        var actionExecutionException = new ActionExecutionException(action.Name, action.Key, ex);
+                        actionExecution.InvalidExecutions = 1;
+                        LogHelper.LogError(actionExecutionException);
+                    }
+                    AllExecutedActions.Add(actionExecution);
+                }
+            }
+
+            return newNode;
+        }
+
         public override SyntaxNode VisitAttributeList(AttributeListSyntax node)
         {
             AttributeListSyntax attributeListSyntax = (AttributeListSyntax)base.VisitAttributeList(node);
