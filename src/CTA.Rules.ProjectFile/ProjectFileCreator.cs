@@ -171,7 +171,7 @@ namespace CTA.Rules.ProjectFile
             catch (Exception ex)
             {
                 LogHelper.LogError(ex, "Error while creating project file for {0}", _projectFile);
-                return null;
+                throw new Exception($"Error while creating project file for [{_projectFile}]: {ex.Message}", ex);
             }
 
             return csProjContent;
@@ -304,7 +304,18 @@ namespace CTA.Rules.ProjectFile
             if (existingPackages.Count == 0)
             {
                 packages = AddItemGroup(packages);
-                _projectFileXml.Descendants().Last(d => d.Name == "ItemGroup").AddAfterSelf(XElement.Parse(packages));
+
+                var existingItemGroup = _projectFileXml.Descendants().LastOrDefault(d => d.Name == "ItemGroup");
+
+                // add after existing <ItemGroup> sections
+                if (null != existingItemGroup)
+                    existingItemGroup.AddAfterSelf(XElement.Parse(packages));
+
+                // otherwise, just stick it at the end of the document
+                if (_projectFileXml.Descendants().Any())
+                    _projectFileXml.Descendants().Last().AddAfterSelf(XElement.Parse(packages));
+                else
+                    _projectFileXml.Add(XElement.Parse(packages));
             }
             else
             {
