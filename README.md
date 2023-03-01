@@ -1,6 +1,8 @@
 # Code translation in Porting Assistant for .NET
 ![Build Test](https://github.com/aws/cta/workflows/Build%20Test/badge.svg)
 
+
+
 Porting Assistant for .NET is an analysis tool that scans .NET Framework applications and generates a .NET Core compatibility assessment, helping customers port their applications to Linux faster.
 
 Porting Assistant for .NET scans .NET Framework applications to identify incompatibilities with .NET Core, finds known replacements, generates detailed compatibility assessment reports and makes changes to the source code to fix common issues encountered while porting an application from .NET Framework to .NET Core. This reduces the manual effort involved in modernizing applications to Linux.
