@@ -31,7 +31,7 @@ namespace CTA.Rules.Test.Actions
                 _expressionActions.GetAddAwaitOperatorAction("");
             var newNode = addAwaitFunc(_syntaxGenerator, _node);
 
-            var expectedResult = "/* Super comment */\r\nawait Math.Abs(-1);";
+            var expectedResult = "/* Super comment */ await Math.Abs(-1);";
             Assert.AreEqual(expectedResult, newNode.ToFullString());
         }
 
@@ -46,7 +46,7 @@ namespace CTA.Rules.Test.Actions
             var newNode = addCommentFunc(_syntaxGenerator, expressionAction);
 
             var expectedResult = @"/* Added by CTA: Super comment */
-var t  =  1 + 5 ;";
+var t = 1+5;";
             Assert.AreEqual(expectedResult, newNode.ToFullString());
         }
 
@@ -83,8 +83,7 @@ new StringBuilder(""SomeText"")";
             var addCommentFunc = _expressionActions.GetAddCommentAction(comment);
             var newNode = addCommentFunc(_syntaxGenerator, invocationNode);
 
-            var expectedResult = @"/* Comment */
-/* Added by CTA: Super comment */
+            var expectedResult = @"/* Comment */ /* Added by CTA: Super comment */
 Math.Abs(-1)";
             Assert.AreEqual(expectedResult, newNode.ToFullString());
         }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using CTA.Rules.Actions.ActionHelpers;
 using CTA.Rules.Config;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -18,8 +19,10 @@ namespace CTA.Rules.Actions.Csharp
         {
             SyntaxNode AddAwaitOperator(SyntaxGenerator syntaxGenerator, SyntaxNode node)
             {
-                AwaitExpressionSyntax newNode = SyntaxFactory.AwaitExpression(SyntaxFactory.ParseExpression(node.WithoutTrivia().NormalizeWhitespace().ToFullString())); // SyntaxFactory.AwaitExpression().NormalizeWhitespace();
-                newNode = newNode.WithTriviaFrom(node).NormalizeWhitespace();
+                AwaitExpressionSyntax newNode = SyntaxFactory.AwaitExpression(SyntaxFactory.ParseExpression(node.WithoutTrivia().ToFullString()))
+                    .NormalizeWhitespace();
+                newNode = newNode.WithTriviaFrom(node);
+
                 return SyntaxFactory.ExpressionStatement(newNode);
             }
             return AddAwaitOperator;
@@ -29,10 +32,7 @@ namespace CTA.Rules.Actions.Csharp
         {
             SyntaxNode AddComment(SyntaxGenerator syntaxGenerator, SyntaxNode node)
             {
-                SyntaxTriviaList currentTrivia = node.GetLeadingTrivia();
-                currentTrivia = currentTrivia.Add(SyntaxFactory.SyntaxTrivia(SyntaxKind.MultiLineCommentTrivia, string.Format(Constants.CommentFormat, comment)));
-                node = node.WithLeadingTrivia(currentTrivia).NormalizeWhitespace();
-                return node;
+                return CommentHelper.AddCSharpComment(node, comment);
             }
             return AddComment;
         }

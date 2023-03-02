@@ -6,6 +6,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.VisualBasic;
 using Microsoft.CodeAnalysis.VisualBasic.Syntax;
 using Microsoft.CodeAnalysis.Editing;
+using CTA.Rules.Actions.ActionHelpers;
 
 namespace CTA.Rules.Actions.VisualBasic
 {
@@ -120,11 +121,7 @@ namespace CTA.Rules.Actions.VisualBasic
         {
             TypeBlockSyntax AddComment(SyntaxGenerator syntaxGenerator, TypeBlockSyntax node)
             {
-                SyntaxTriviaList currentTrivia = node.GetLeadingTrivia();
-                var commentFormat = dontUseCTAPrefix != null ? Constants.VbCommentFormatBlank : Constants.VbCommentFormat;
-                currentTrivia = currentTrivia.Add(SyntaxFactory.SyntaxTrivia(SyntaxKind.CommentTrivia, string.Format(commentFormat, comment)));
-                node = node.WithLeadingTrivia(currentTrivia).NormalizeWhitespace();
-                return node;
+                return (TypeBlockSyntax)CommentHelper.AddVBComment(node, comment, dontUseCTAPrefix);
             }
             return AddComment;
         }

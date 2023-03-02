@@ -5,6 +5,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.VisualBasic;
 using Microsoft.CodeAnalysis.VisualBasic.Syntax;
 using Microsoft.CodeAnalysis.Editing;
+using CTA.Rules.Actions.ActionHelpers;
 
 namespace CTA.Rules.Actions.VisualBasic
 {
@@ -19,7 +20,7 @@ namespace CTA.Rules.Actions.VisualBasic
             {
                 node = node.WithInterfaceStatement(
                     node.InterfaceStatement.WithIdentifier(SyntaxFactory.Identifier(newName)));
-                return node.NormalizeWhitespace();
+                return node;
             }
             return ChangeName;
         }
@@ -48,7 +49,7 @@ namespace CTA.Rules.Actions.VisualBasic
                 }
 
                 var newStatement = node.InterfaceStatement.WithAttributeLists(attributeLists);
-                return node.WithInterfaceStatement(newStatement).NormalizeWhitespace();
+                return node.WithInterfaceStatement(newStatement);
             }
 
             return RemoveAttribute;
@@ -61,10 +62,10 @@ namespace CTA.Rules.Actions.VisualBasic
                 attributeLists = attributeLists.Add(
                             SyntaxFactory.AttributeList(
                                 SyntaxFactory.SingletonSeparatedList<AttributeSyntax>(
-                                    SyntaxFactory.Attribute(SyntaxFactory.ParseName(attribute)))));
+                                    SyntaxFactory.Attribute(SyntaxFactory.ParseName(attribute)))).NormalizeWhitespace());
 
-                var newStatement = node.InterfaceStatement.WithAttributeLists(attributeLists).NormalizeWhitespace();
-                return node.WithInterfaceStatement(newStatement).NormalizeWhitespace();
+                var newStatement = node.InterfaceStatement.WithAttributeLists(attributeLists);
+                return node.WithInterfaceStatement(newStatement);
             }
             return AddAttribute;
         }
@@ -72,12 +73,7 @@ namespace CTA.Rules.Actions.VisualBasic
         {
             InterfaceBlockSyntax AddComment(SyntaxGenerator syntaxGenerator, InterfaceBlockSyntax node)
             {
-                var currentTrivia = node.GetLeadingTrivia();
-                //TODO see if this will lead NPE    
-                currentTrivia = currentTrivia.Add(SyntaxFactory.SyntaxTrivia(SyntaxKind.CommentTrivia,
-                    string.Format(Constants.VbCommentFormat, comment)));
-                node = node.WithLeadingTrivia(currentTrivia).NormalizeWhitespace();
-                return node;
+                return (InterfaceBlockSyntax)CommentHelper.AddVBComment(node, comment);
             }
             return AddComment;
         }
@@ -86,9 +82,9 @@ namespace CTA.Rules.Actions.VisualBasic
             InterfaceBlockSyntax AddMethod(SyntaxGenerator syntaxGenerator, InterfaceBlockSyntax node)
             {
                 var allMembers = node.Members;
-                var methodStatement = ParseMethodStatement(expression);
+                var methodStatement = ParseMethodStatement(expression).NormalizeWhitespace();
                 allMembers = allMembers.Add(methodStatement);
-                node = node.WithMembers(allMembers).NormalizeWhitespace();
+                node = node.WithMembers(allMembers);
                 return node;
             }
             return AddMethod;
@@ -103,7 +99,7 @@ namespace CTA.Rules.Actions.VisualBasic
                     allMethods.FirstOrDefault(m => m.Identifier.ToString() == methodName);
                 if (removeMethod != null)
                 {
-                    node = node.RemoveNode(removeMethod, SyntaxRemoveOptions.KeepNoTrivia).NormalizeWhitespace();
+                    node = node.RemoveNode(removeMethod, SyntaxRemoveOptions.KeepNoTrivia);
                 }
 
                 return node;

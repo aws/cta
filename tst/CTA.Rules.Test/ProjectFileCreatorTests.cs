@@ -4,26 +4,22 @@ using CTA.Rules.Config;
 using CTA.Rules.Models;
 using CTA.Rules.ProjectFile;
 using NUnit.Framework;
-using Shouldly;
 
 namespace CTA.Rules.Test
 {
     public class ProjectFileCreatorTests
     {
-        private ProjectFileCreator _vanillaProjectFileCreator;
         private ProjectFileCreator _mvcProjectFileCreator;
         private ProjectFileCreator _classLibraryProjectFileCreator;
         private ProjectFileCreator _webClassLibraryProjectFileCreator;
 
-        private readonly string _vanillaMvcProfileFilePath = "vanilla-mvc.csproj";
-        private readonly string _mvcProjectFilePath = "mvc.csproj";
-        private readonly string _classLibraryProjectFilePath = "classLibrary.csproj";
-        private readonly string _webClassLibraryProjectFilePath = "webClassLibrary.csproj";
+        private string _mvcProjectFilePath = "mvc.csproj";
+        private string _classLibraryProjectFilePath = "classLibrary.csproj";
+        private string _webClassLibraryProjectFilePath = "webClassLibrary.csproj";
 
         [SetUp]
         public void Setup()
         {
-            CreateVanillaXmlProject(_vanillaMvcProfileFilePath);
             CreateEmptyXmlDocument(_mvcProjectFilePath);
             CreateEmptyXmlDocument(_classLibraryProjectFilePath);
             CreateEmptyXmlDocument(_webClassLibraryProjectFilePath);
@@ -45,71 +41,21 @@ namespace CTA.Rules.Test
                 @"C:\\RandomFile.dll"
             };
 
-            _vanillaProjectFileCreator =
-                new ProjectFileCreator(
-                    _vanillaMvcProfileFilePath,
-                    targetFramework,
-                    packages: packages,
-                    projectReferences: new List<string>(),
-                    ProjectType.CoreMvc,
-                    metaReferences: new List<string>());
-
-            _mvcProjectFileCreator = 
-                new ProjectFileCreator(
-                    _mvcProjectFilePath, 
-                    targetFramework, 
-                    packages,
-                    projectReferences, 
-                    ProjectType.Mvc,
-                    metaRefs, 
-                    sourceFramework);
-
-            _classLibraryProjectFileCreator = 
-                new ProjectFileCreator(
-                    _classLibraryProjectFilePath, 
-                    targetFramework, 
-                    packages, 
-                    projectReferences, 
-                    ProjectType.ClassLibrary, 
-                    metaRefs, 
-                    sourceFramework);
-
-            _webClassLibraryProjectFileCreator = 
-                new ProjectFileCreator(
-                    _webClassLibraryProjectFilePath, 
-                    targetFramework, 
-                    packages,
-                    projectReferences, 
-                    ProjectType.WebClassLibrary, 
-                    metaRefs, 
-                    sourceFramework);
+            _mvcProjectFileCreator = new ProjectFileCreator(_mvcProjectFilePath, targetFramework, 
+                packages, projectReferences, ProjectType.Mvc, metaRefs, sourceFramework);
+            _classLibraryProjectFileCreator = new ProjectFileCreator(_classLibraryProjectFilePath, targetFramework, 
+                packages, projectReferences, ProjectType.ClassLibrary, metaRefs, sourceFramework);
+            _webClassLibraryProjectFileCreator = new ProjectFileCreator(_webClassLibraryProjectFilePath, targetFramework, 
+                packages, projectReferences, ProjectType.WebClassLibrary, metaRefs, sourceFramework);
         }
 
         [TearDown]
         public void TearDown()
         {
-            var testFiles = new[]
+            if (File.Exists(_webClassLibraryProjectFilePath))
             {
-                _classLibraryProjectFilePath,
-                _webClassLibraryProjectFilePath,
-                _mvcProjectFilePath,
-                _vanillaMvcProfileFilePath
-
-            };
-
-            foreach (var testFile in testFiles)
-                if (File.Exists(testFile))
-                    File.Delete(testFile);
-        }
-
-        [Test]
-        public void CanAddProjectReferencesToVanillaMvcProject()
-        {
-            bool success;
-
-            success = _vanillaProjectFileCreator.Create();
-
-            success.ShouldBeTrue();
+                File.Delete(_webClassLibraryProjectFilePath);
+            }
         }
 
         [Test]
@@ -201,19 +147,7 @@ namespace CTA.Rules.Test
 
             Assert.AreEqual(expectedProjectFileContents, projectFileContents);
         }
-
-        private void CreateVanillaXmlProject(string vanillaMvcProfileFilePath)
-        {
-            var vanillaMvcProject =
-@"<Project Sdk = ""Microsoft.NET.Sdk.Web"">
-  <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
-  </PropertyGroup>
-</Project>";
-
-            File.WriteAllText(_vanillaMvcProfileFilePath, vanillaMvcProject);
-        }
-
+        
         private void CreateEmptyXmlDocument(string filePath)
         {
             File.WriteAllText(filePath, "<root></root>");

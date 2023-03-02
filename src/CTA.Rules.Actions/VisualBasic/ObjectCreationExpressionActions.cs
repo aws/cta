@@ -8,7 +8,7 @@ using Microsoft.CodeAnalysis.VisualBasic.Syntax;
 using Microsoft.CodeAnalysis.Editing;
 using Microsoft.CodeAnalysis;
 using CTA.Rules.Config;
-
+using CTA.Rules.Actions.ActionHelpers;
 
 namespace CTA.Rules.Actions.VisualBasic
 {
@@ -103,10 +103,7 @@ namespace CTA.Rules.Actions.VisualBasic
         {
             ObjectCreationExpressionSyntax AddComment(SyntaxGenerator syntaxGenerator, ObjectCreationExpressionSyntax node)
             {
-                SyntaxTriviaList currentTrivia = node.GetLeadingTrivia();
-                currentTrivia = currentTrivia.Add(SyntaxFactory.SyntaxTrivia(SyntaxKind.CommentTrivia, string.Format(Constants.VbCommentFormat, comment)));
-                node = node.WithLeadingTrivia(currentTrivia).NormalizeWhitespace();
-                return node;
+                return (ObjectCreationExpressionSyntax)CommentHelper.AddVBComment(node, comment);
             }
             return AddComment;
         }

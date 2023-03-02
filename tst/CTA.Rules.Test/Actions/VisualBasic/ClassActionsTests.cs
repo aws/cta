@@ -77,7 +77,8 @@ EndModule
             var addCommentFunc = _typeBlockActions.GetAddCommentAction(commentToAdd);
             var newNode = addCommentFunc(_syntaxGenerator, _blockNodes[blockType]);
 
-            var expectedResult = @$"' Added by CTA: {commentToAdd}
+            var expectedResult = @$"
+' Added by CTA: {commentToAdd}
 ";
             Assert.AreEqual(expectedResult, newNode.GetLeadingTrivia().ToFullString());
         }

@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Xml.Linq;
+using CTA.Rules.Actions.ActionHelpers;
 using CTA.Rules.Config;
 using CTA.Rules.Models;
 using Microsoft.CodeAnalysis;
@@ -300,7 +301,7 @@ namespace CTA.Rules.Actions
                     var usingDirective = SyntaxFactory.UsingDirective(SyntaxFactory.ParseName(directive)).NormalizeWhitespace();
                     allUsings = allUsings.Add(usingDirective);
                 }
-                node = node.WithUsings(allUsings).NormalizeWhitespace();
+                node = node.WithUsings(allUsings);
             }
             _startupRoot = node;
         }
@@ -362,9 +363,7 @@ namespace CTA.Rules.Actions
             sb.Append(".");
             sb.Append(string.Join(".", ServerConfigTemplates.AdditonalComments));
 
-            SyntaxTriviaList currentTrivia = _startupRoot.GetLeadingTrivia();    
-            currentTrivia = currentTrivia.Add(SyntaxFactory.SyntaxTrivia(SyntaxKind.MultiLineCommentTrivia, string.Format(Constants.CommentFormat, sb.ToString())));
-            _startupRoot = _startupRoot.WithLeadingTrivia(currentTrivia).NormalizeWhitespace();
+            _startupRoot = CommentHelper.AddCSharpComment(_startupRoot, sb.ToString());
         }
 
         private string GetAttributeValue(XElement element, string attributeName, string splitChar = null)

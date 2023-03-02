@@ -79,13 +79,8 @@ namespace CTA.Rules.ProjectFile
         private const string ProjectReferenceTemplate = @"<ProjectReference Include=""{0}"" />";
         private const string IndentationPerLevel = "  ";
 
-        public ProjectFileCreator(
-            string projectFile,
-            List<string> targetVersions, 
-            Dictionary<string, string> packages,
-            List<string> projectReferences, 
-            ProjectType projectType, 
-            List<string> metaReferences)
+        public ProjectFileCreator(string projectFile, List<string> targetVersions, Dictionary<string, string> packages,
+            List<string> projectReferences, ProjectType projectType, List<string> metaReferences)
         {
             _projectFile = projectFile;
             _targetVersions = targetVersions;
@@ -105,15 +100,8 @@ namespace CTA.Rules.ProjectFile
             }
         }
 
-        public ProjectFileCreator(
-            string projectFile, 
-            List<string> targetVersions, 
-            Dictionary<string, string> packages,
-            List<string> projectReferences, 
-            ProjectType projectType, 
-            List<string> metaReferences, 
-            List<string> sourceVersions) 
-                : this(projectFile, targetVersions, packages, projectReferences, projectType, metaReferences)
+        public ProjectFileCreator(string projectFile, List<string> targetVersions, Dictionary<string, string> packages,
+            List<string> projectReferences, ProjectType projectType, List<string> metaReferences, List<string> sourceVersions) : this(projectFile, targetVersions, packages, projectReferences, projectType, metaReferences)
         {
             _sourceVersions = sourceVersions;
         }
@@ -171,7 +159,7 @@ namespace CTA.Rules.ProjectFile
             catch (Exception ex)
             {
                 LogHelper.LogError(ex, "Error while creating project file for {0}", _projectFile);
-                throw new Exception($"Error while creating project file for [{_projectFile}]: {ex.Message}", ex);
+                return null;
             }
 
             return csProjContent;
@@ -304,18 +292,7 @@ namespace CTA.Rules.ProjectFile
             if (existingPackages.Count == 0)
             {
                 packages = AddItemGroup(packages);
-
-                var existingItemGroup = _projectFileXml.Descendants().LastOrDefault(d => d.Name == "ItemGroup");
-
-                // add after existing <ItemGroup> sections
-                if (null != existingItemGroup)
-                    existingItemGroup.AddAfterSelf(XElement.Parse(packages));
-
-                // otherwise, just stick it at the end of the document
-                if (_projectFileXml.Descendants().Any())
-                    _projectFileXml.Descendants().Last().AddAfterSelf(XElement.Parse(packages));
-                else
-                    _projectFileXml.Add(XElement.Parse(packages));
+                _projectFileXml.Descendants().Last(d => d.Name == "ItemGroup").AddAfterSelf(XElement.Parse(packages));
             }
             else
             {

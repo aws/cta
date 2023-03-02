@@ -24,7 +24,7 @@ namespace CTA.Rules.Test.Actions
             _syntaxGenerator = SyntaxGenerator.GetGenerator(workspace, language);
             _compilationUnitActions = new CompilationUnitActions();
 
-            SyntaxTree tree = CSharpSyntaxTree.ParseText(@$"using System.Web; 
+            SyntaxTree tree = CSharpSyntaxTree.ParseText(@$"using System.Web;
 class MyClass
 {{
 }}");
@@ -69,7 +69,6 @@ class MyClass
 
             var expectedResult = @$"/* Added by CTA: {commentToAdd} */
 using System.Web;
-
 class MyClass
 {{
 }}";

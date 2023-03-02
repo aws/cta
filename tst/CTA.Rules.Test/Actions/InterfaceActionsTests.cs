@@ -63,5 +63,21 @@ interface ISomeInterface
             cloned.Value = "DifferentValue";
             Assert.False(interfaceAction.Equals(cloned));
         }
+
+        [Test]
+        public void TestGetAddMethodAction()
+        {
+            var interfaceAction = new InterfaceDeclarationAction();
+
+            const string methodToAdd = "string HelloWorld(string input);";
+            var addMethodAction = _interfaceActions.GetAddMethodAction(methodToAdd);
+            var newNode = addMethodAction(_syntaxGenerator, _node);
+
+            var expectedResult = @$"interface ISomeInterface
+{{
+string HelloWorld(string input);}}";
+            Assert.AreEqual(expectedResult, newNode.ToFullString());
+
+        }
     }
 }

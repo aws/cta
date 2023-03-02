@@ -54,12 +54,12 @@
       },
       "Codelyzer.Analysis": {
         "type": "Transitive",
-        "resolved": "2.6.2",
-        "contentHash": "e5v8q0aGLvGkOklcbtWhxJ0BZczTNILUqxoTaD0TxJIy/t1YxoAaKWlPbele2n+DwUQNOf0PqKWU2Hurwwr/lw==",
+        "resolved": "2.5.15",
+        "contentHash": "HvYYZkeT5ekhCZSK8lQrZ11Ho7Ohy3pBhqUnhIQldV0TpvLz7xTF+jV12I5HwSXmnJwRW0If0kX5wTNbNwnclA==",
         "dependencies": {
-          "Codelyzer.Analysis.Build": "2.6.2",
-          "Codelyzer.Analysis.CSharp": "2.6.2",
-          "Codelyzer.Analysis.VisualBasic": "2.6.2",
+          "Codelyzer.Analysis.Build": "2.5.15",
+          "Codelyzer.Analysis.CSharp": "2.5.15",
+          "Codelyzer.Analysis.VisualBasic": "2.5.15",
           "CommandLineParser": "2.8.0",
           "Microsoft.Build.Utilities.Core": "17.1.0",
           "Microsoft.Extensions.Logging.Console": "6.0.0",
@@ -69,23 +69,23 @@
       },
       "Codelyzer.Analysis.Build": {
         "type": "Transitive",
-        "resolved": "2.6.2",
-        "contentHash": "35reTFVRwBd0w/MyQkpUaoF4aejj1zPJcmTEbotmA+51+Zzkqvqwdn5Bkq+Ed8vqWNzzFCtWE6uClCp40TD0Kg==",
+        "resolved": "2.5.15",
+        "contentHash": "dmH1gcuubhOqJqzq1s61eyxzF9y1V8VaV0vfwVsiiqV+cNNkSTObp5KZ3/Oewmv31Mo8uiJ5a0EAGW8sUiy2Rg==",
         "dependencies": {
           "Buildalyzer": "4.1.4",
           "Buildalyzer.Logger": "4.1.4",
           "Buildalyzer.Workspaces": "4.1.4",
-          "Codelyzer.Analysis.Common": "2.6.2",
+          "Codelyzer.Analysis.Common": "2.5.15",
           "Microsoft.Extensions.Logging": "6.0.0",
           "NuGet.Packaging": "6.0.0"
         }
       },
       "Codelyzer.Analysis.Common": {
         "type": "Transitive",
-        "resolved": "2.6.2",
-        "contentHash": "U1JL8Bs4zjF4mSIeVNYmXG/kNCg3iK5HcQmFec6Nw9WV6J+HaZLHHVI5i9QEb5i3y5rJHr6BRXvamSLDMwhNzg==",
+        "resolved": "2.5.15",
+        "contentHash": "nasdN7LehYSdsAhgV4gziYXtMyjVugqVpRlMCVlDBKYCczX4Fl1q332Sa8jBENCeKfOYewZA48ZF7Fq7oza9JQ==",
         "dependencies": {
-          "Codelyzer.Analysis.Model": "2.6.2",
+          "Codelyzer.Analysis.Model": "2.5.15",
           "Microsoft.Build": "17.0.0",
           "Microsoft.VisualStudio.Setup.Configuration.Interop": "3.1.2196",
           "Newtonsoft.Json": "13.0.1"
@@ -93,17 +93,17 @@
       },
       "Codelyzer.Analysis.CSharp": {
         "type": "Transitive",
-        "resolved": "2.6.2",
-        "contentHash": "5woKfZm0dmCBCHIv1sYHsKbeJ/TaFAdwjAAOf77jO+45HgBVnAmaoek94DMkE6ntxory13978pYhMI8VvBGbaQ==",
+        "resolved": "2.5.15",
+        "contentHash": "ehf02NijvzJD+DFT7NcA5W3A54Zo97Sa//kl7Qb3Qc/bHvwO+XuU+1Ioaf7lUf7pR8JpBW6lbKOsEMTiQFuGiw==",
         "dependencies": {
-          "Codelyzer.Analysis.Common": "2.6.2",
-          "Codelyzer.Analysis.Model": "2.6.2"
+          "Codelyzer.Analysis.Common": "2.5.15",
+          "Codelyzer.Analysis.Model": "2.5.15"
         }
       },
       "Codelyzer.Analysis.Model": {
         "type": "Transitive",
-        "resolved": "2.6.2",
-        "contentHash": "xEnO+h0TDVJ4ylc7Ta09EgcadAwKaV7JTNF3MirJ5JxIFJgXI9Wfob2zb1tUcbz8Hf4T9LHxwb1i8Dz2PZug3Q==",
+        "resolved": "2.5.15",
+        "contentHash": "0G0F0TqEpPERCWiVEkrMtQMaDF85BrL9I9bAmky8DLCwTsETHwmLKRPQJN80GDcSaXYea0YTPIyET9gYn6BfIQ==",
         "dependencies": {
           "Microsoft.CodeAnalysis": "4.1.0",
           "Microsoft.CodeAnalysis.CSharp": "4.1.0",
@@ -114,11 +114,11 @@
       },
       "Codelyzer.Analysis.VisualBasic": {
         "type": "Transitive",
-        "resolved": "2.6.2",
-        "contentHash": "LMgD0aumyHnEgxLeGEzF6FhyvbQSVZezeti3u0QTaMLb5/WDMVF973WGEEbnriYngJADeWOd8gOTOQNkAjz9gg==",
+        "resolved": "2.5.15",
+        "contentHash": "UiOrMNx3NXu+SXy0kz/EAHNMUb+j06dCY8VfLHr1prwFJPEth5CQpRuQZR3Wb0AYGdrFSl9M3gDHZQZXcc93Xg==",
         "dependencies": {
-          "Codelyzer.Analysis.Common": "2.6.2",
-          "Codelyzer.Analysis.Model": "2.6.2"
+          "Codelyzer.Analysis.Common": "2.5.15",
+          "Codelyzer.Analysis.Model": "2.5.15"
         }
       },
       "CommandLineParser": {
@@ -1711,8 +1711,8 @@
       "cta.rules.config": {
         "type": "Project",
         "dependencies": {
-          "Codelyzer.Analysis": "[2.6.2, )",
-          "Codelyzer.Analysis.Model": "[2.6.2, )",
+          "Codelyzer.Analysis": "[2.5.15, )",
+          "Codelyzer.Analysis.Model": "[2.5.15, )",
           "Microsoft.Extensions.Logging": "[6.0.0, )",
           "Microsoft.Extensions.Logging.Abstractions": "[6.0.0, )",
           "Microsoft.Extensions.Logging.Console": "[6.0.0, )",

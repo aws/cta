@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using CTA.Rules.Actions.ActionHelpers;
 using CTA.Rules.Config;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -17,11 +18,7 @@ namespace CTA.Rules.Actions.Csharp
         {
             MethodDeclarationSyntax AddComment(SyntaxGenerator syntaxGenerator, MethodDeclarationSyntax node)
             {
-                SyntaxTriviaList currentTrivia = node.GetLeadingTrivia();
-                var commentFormat = !string.IsNullOrEmpty(dontUseCTAPrefix) ? Constants.CommentFormatBlank : Constants.CommentFormat;
-                currentTrivia = currentTrivia.Insert(0, SyntaxFactory.SyntaxTrivia(SyntaxKind.MultiLineCommentTrivia, string.Format(commentFormat, comment)));
-                node = node.WithLeadingTrivia(currentTrivia).NormalizeWhitespace();
-                return node;
+                return (MethodDeclarationSyntax)CommentHelper.AddCSharpComment(node, comment, dontUseCTAPrefix);
             }
             return AddComment;
         }
@@ -31,12 +28,12 @@ namespace CTA.Rules.Actions.Csharp
             // TODO: This will add an expression at the bottom of a method body, in the future we should add granularity for where to add the expression within a method body
             Func<SyntaxGenerator, MethodDeclarationSyntax, MethodDeclarationSyntax> AppendExpression = (SyntaxGenerator syntaxGenerator, MethodDeclarationSyntax node) =>
             {
-                StatementSyntax statementExpression = SyntaxFactory.ParseStatement(expression);
+                StatementSyntax statementExpression = SyntaxFactory.ParseStatement(expression).NormalizeWhitespace();
                 if(!statementExpression.FullSpan.IsEmpty)
                 {
                     BlockSyntax nodeBody = node.Body;
                     nodeBody = nodeBody.AddStatements(statementExpression);
-                    node = node.WithBody(nodeBody).NormalizeWhitespace();
+                    node = node.WithBody(nodeBody);
                 }
                 return node;
             };
@@ -48,7 +45,7 @@ namespace CTA.Rules.Actions.Csharp
             MethodDeclarationSyntax ChangeMethodName(SyntaxGenerator syntaxGenerator, MethodDeclarationSyntax node)
             {
                var newMethodNode = node;
-               newMethodNode = newMethodNode.WithIdentifier(SyntaxFactory.Identifier(newMethodName)).NormalizeWhitespace();
+               newMethodNode = newMethodNode.WithIdentifier(SyntaxFactory.Identifier(newMethodName));
                return newMethodNode;
             }
             return ChangeMethodName;
@@ -81,7 +78,7 @@ namespace CTA.Rules.Actions.Csharp
             MethodDeclarationSyntax RemoveMethodParametersAction(SyntaxGenerator syntaxGenerator, MethodDeclarationSyntax node)
             {
                 List<ParameterSyntax> parameters = new List<ParameterSyntax>();
-                var newMethodNode = node.WithParameterList(SyntaxFactory.ParameterList(SyntaxFactory.SeparatedList(parameters))).NormalizeWhitespace();
+                var newMethodNode = node.WithParameterList(SyntaxFactory.ParameterList(SyntaxFactory.SeparatedList(parameters)).NormalizeWhitespace());
                 return newMethodNode;
             }
             return RemoveMethodParametersAction;
@@ -137,10 +134,10 @@ namespace CTA.Rules.Actions.Csharp
             MethodDeclarationSyntax AddExpressionToMethodAction(SyntaxGenerator syntaxGenerator, MethodDeclarationSyntax node)
             {
                 var newMethodNode = node;
-                StatementSyntax parsedExpression = SyntaxFactory.ParseStatement(expression);
+                StatementSyntax parsedExpression = SyntaxFactory.ParseStatement(expression).NormalizeWhitespace();
                 if (!parsedExpression.FullSpan.IsEmpty)
                 {
-                    newMethodNode = node.AddBodyStatements(new StatementSyntax[] { parsedExpression }).NormalizeWhitespace();
+                    newMethodNode = node.AddBodyStatements(new StatementSyntax[] { parsedExpression });
                 }
                 return newMethodNode;
             }

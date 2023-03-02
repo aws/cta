@@ -1,4 +1,5 @@
 ﻿using System;
+using CTA.Rules.Actions.ActionHelpers;
 using CTA.Rules.Config;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -16,11 +17,7 @@ namespace CTA.Rules.Actions.Csharp
         {
             AttributeListSyntax AddComment(SyntaxGenerator syntaxGenerator, AttributeListSyntax node)
             {
-                //TODO IS there possibility of NPE , if there are no Trivia or it always returns a node...
-                SyntaxTriviaList currentTrivia = node.GetLeadingTrivia();
-                currentTrivia = currentTrivia.Insert(0, SyntaxFactory.SyntaxTrivia(SyntaxKind.MultiLineCommentTrivia, string.Format(Constants.CommentFormat, comment)));
-                node = node.WithLeadingTrivia(currentTrivia).NormalizeWhitespace();
-                return node;
+                return (AttributeListSyntax)CommentHelper.AddCSharpComment(node, comment);
             }
             return AddComment;
         }

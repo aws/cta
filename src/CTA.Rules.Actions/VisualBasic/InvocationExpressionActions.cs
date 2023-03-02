@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using CTA.Rules.Actions.ActionHelpers;
 using CTA.Rules.Config;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Editing;
@@ -159,10 +160,7 @@ namespace CTA.Rules.Actions.VisualBasic
         {
             InvocationExpressionSyntax AddComment(SyntaxGenerator syntaxGenerator, InvocationExpressionSyntax node)
             {
-                SyntaxTriviaList currentTrivia = node.GetLeadingTrivia();
-                currentTrivia = currentTrivia.Add(SyntaxFactory.SyntaxTrivia(SyntaxKind.CommentTrivia, string.Format(Constants.VbCommentFormat, comment)));
-                node = node.WithLeadingTrivia(currentTrivia).NormalizeWhitespace();
-                return node;
+                return (InvocationExpressionSyntax)CommentHelper.AddVBComment(node, comment);
             }
             return AddComment;
         }

@@ -1,7 +1,5 @@
 ﻿using System;
-using CTA.Rules.Config;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.VisualBasic;
+using CTA.Rules.Actions.ActionHelpers;
 using Microsoft.CodeAnalysis.VisualBasic.Syntax;
 using Microsoft.CodeAnalysis.Editing;
 
@@ -16,13 +14,11 @@ namespace CTA.Rules.Update.VisualBasic
         {
             MemberAccessExpressionSyntax AddComment(SyntaxGenerator syntaxGenerator, MemberAccessExpressionSyntax node)
             {
-                SyntaxTriviaList currentTrivia = node.GetLeadingTrivia();
-                currentTrivia = currentTrivia.Insert(0, SyntaxFactory.SyntaxTrivia(SyntaxKind.CommentTrivia, string.Format(Constants.VbCommentFormat, comment)));
-                node = node.WithLeadingTrivia(currentTrivia).NormalizeWhitespace();
-                return node;
+                return (MemberAccessExpressionSyntax)CommentHelper.AddVBComment(node, comment);
             }
             return AddComment;
         }
+
         public Func<SyntaxGenerator, MemberAccessExpressionSyntax, MemberAccessExpressionSyntax> GetReplaceElementAccessAction(string newExpression)
         {
             MemberAccessExpressionSyntax ReplaceElement(SyntaxGenerator syntaxGenerator, MemberAccessExpressionSyntax node)

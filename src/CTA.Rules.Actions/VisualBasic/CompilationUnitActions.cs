@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using CTA.Rules.Actions.ActionHelpers;
 using CTA.Rules.Config;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Editing;
@@ -22,11 +23,12 @@ namespace CTA.Rules.Actions.VisualBasic
                         SyntaxFactory.SeparatedList<ImportsClauseSyntax>()
                             .Add(SyntaxFactory.SimpleImportsClause(
                                 SyntaxFactory.ParseName(@namespace)))
-                    )
-                    .NormalizeWhitespace();
+                    ).NormalizeWhitespace()
+                    .WithTrailingTrivia(SyntaxFactory.EndOfLine(Environment.NewLine + Environment.NewLine));
+
                 allImports = allImports.Add(importStatement);
 
-                node = node.WithImports(allImports).NormalizeWhitespace();
+                node = node.WithImports(allImports);
                 return node;
             }
             return AddStatement;
@@ -58,7 +60,7 @@ namespace CTA.Rules.Actions.VisualBasic
                         allImports = allImports.Add(newImportStatement);
                     }
                 }
-                node = node.WithImports(allImports).NormalizeWhitespace();
+                node = node.WithImports(allImports);
                 return RemoveStatement(syntaxGenerator, node);
             }
 
@@ -69,11 +71,7 @@ namespace CTA.Rules.Actions.VisualBasic
         {
             CompilationUnitSyntax AddComment(SyntaxGenerator syntaxGenerator, CompilationUnitSyntax node)
             {
-                SyntaxTriviaList currentTrivia = node.GetLeadingTrivia();
-                //TODO see if this will lead NPE    
-                currentTrivia = currentTrivia.Add(SyntaxFactory.SyntaxTrivia(SyntaxKind.CommentTrivia, string.Format(Constants.VbCommentFormat, comment)));
-                node = node.WithLeadingTrivia(currentTrivia).NormalizeWhitespace();
-                return node;
+                return (CompilationUnitSyntax)CommentHelper.AddVBComment(node, comment);
             }
             return AddComment;
         }

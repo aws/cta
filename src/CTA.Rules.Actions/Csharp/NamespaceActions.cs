@@ -39,7 +39,7 @@ namespace CTA.Rules.Actions.Csharp
 
                 allUsings = allUsings.Remove(removeItem);
 
-                node = node.WithUsings(allUsings).NormalizeWhitespace();
+                node = node.WithUsings(allUsings);
                 return RemoveDirective(syntaxGenerator, node);
             }
             return RemoveDirective;

@@ -5,6 +5,7 @@ using Microsoft.CodeAnalysis.VisualBasic;
 using Microsoft.CodeAnalysis.VisualBasic.Syntax;
 using Microsoft.CodeAnalysis.Editing;
 using NUnit.Framework;
+using System;
 
 namespace CTA.Rules.Test.Actions.VisualBasic
 {
@@ -22,7 +23,7 @@ namespace CTA.Rules.Test.Actions.VisualBasic
             _syntaxGenerator = SyntaxGenerator.GetGenerator(workspace, language);
             _expressionActions = new ExpressionActions();
             _node = SyntaxFactory.ExpressionStatement(SyntaxFactory.ParseExpression("Math.Abs(-1)")
-                .WithLeadingTrivia(SyntaxFactory.CommentTrivia("' Super Comment")));
+                .WithLeadingTrivia(SyntaxFactory.CommentTrivia($"' Existing Comment{Environment.NewLine}")));
         }
 
         [Test]
@@ -32,7 +33,7 @@ namespace CTA.Rules.Test.Actions.VisualBasic
                 _expressionActions.GetAddAwaitOperatorAction("");
             var newNode = addAwaitFunc(_syntaxGenerator, _node);
 
-            var expectedResult = "' Super Comment\r\nAwait Math.Abs(-1)";
+            var expectedResult = "' Existing Comment\r\nAwait Math.Abs(-1)";
             Assert.AreEqual(expectedResult, newNode.ToFullString());
         }
 
@@ -47,7 +48,7 @@ namespace CTA.Rules.Test.Actions.VisualBasic
             var newNode = addCommentFunc(_syntaxGenerator, expressionAction);
 
             var expectedResult = @"' Added by CTA: Super comment
-var t = 1 + 5";
+var t = 1+5";
             Assert.AreEqual(expectedResult, newNode.ToFullString());
         }
 
@@ -74,14 +75,11 @@ New StringBuilder(""SomeText"")";
         public void InvocationExpressionAddComment()
         {
             var comment = "Super comment";
-            var invocationNode =
-                SyntaxFactory.ParseExpression("Math.Abs(-1)")
-                    .WithLeadingTrivia(SyntaxFactory.CommentTrivia("' Comment")) as InvocationExpressionSyntax;
 
             var addCommentFunc = _expressionActions.GetAddCommentAction(comment);
-            var newNode = addCommentFunc(_syntaxGenerator, invocationNode);
+            var newNode = addCommentFunc(_syntaxGenerator, _node);
 
-            var expectedResult = @"' Comment
+            var expectedResult = @"' Existing Comment
 ' Added by CTA: Super comment
 Math.Abs(-1)";
             Assert.AreEqual(expectedResult, newNode.ToFullString());

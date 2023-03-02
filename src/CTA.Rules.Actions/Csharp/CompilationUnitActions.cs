@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using CTA.Rules.Actions.ActionHelpers;
 using CTA.Rules.Config;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -19,10 +20,12 @@ namespace CTA.Rules.Actions.Csharp
             {
                 var allUsings = node.Usings;
 
-                var usingDirective = SyntaxFactory.UsingDirective(SyntaxFactory.ParseName(@namespace)).NormalizeWhitespace();
+                var usingDirective = SyntaxFactory.UsingDirective(SyntaxFactory.ParseName(@namespace))
+                    .NormalizeWhitespace().WithTrailingTrivia(SyntaxFactory.EndOfLine(Environment.NewLine + Environment.NewLine));
+
                 allUsings = allUsings.Add(usingDirective);
 
-                node = node.WithUsings(allUsings).NormalizeWhitespace();
+                node = node.WithUsings(allUsings);
                 return node;
             }
             return AddDirective;
@@ -42,7 +45,7 @@ namespace CTA.Rules.Actions.Csharp
 
                 allUsings = allUsings.Remove(removeItem);
                 
-                node = node.WithUsings(allUsings).NormalizeWhitespace();
+                node = node.WithUsings(allUsings);
                 return RemoveDirective(syntaxGenerator,node);
             }
             return RemoveDirective;
@@ -52,11 +55,7 @@ namespace CTA.Rules.Actions.Csharp
         {
             CompilationUnitSyntax AddComment(SyntaxGenerator syntaxGenerator, CompilationUnitSyntax node)
             {
-                SyntaxTriviaList currentTrivia = node.GetLeadingTrivia();
-                //TODO see if this will lead NPE    
-                currentTrivia = currentTrivia.Add(SyntaxFactory.SyntaxTrivia(SyntaxKind.MultiLineCommentTrivia, string.Format(Constants.CommentFormat, comment)));
-                node = node.WithLeadingTrivia(currentTrivia).NormalizeWhitespace();
-                return node;
+                return (CompilationUnitSyntax)CommentHelper.AddCSharpComment(node, comment);
             }
             return AddComment;
         }

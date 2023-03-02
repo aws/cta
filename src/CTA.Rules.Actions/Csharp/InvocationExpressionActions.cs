@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using CTA.Rules.Actions.ActionHelpers;
 using CTA.Rules.Config;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -27,9 +28,8 @@ namespace CTA.Rules.Actions.Csharp
             {
                 node = SyntaxFactory.InvocationExpression(
                         SyntaxFactory.IdentifierName(newMethod),
-                        SyntaxFactory.ParseArgumentList(newParameters))
-                    .WithLeadingTrivia(node.GetLeadingTrivia())
-                    .NormalizeWhitespace();
+                        SyntaxFactory.ParseArgumentList(newParameters).NormalizeWhitespace())
+                    .WithLeadingTrivia(node.GetLeadingTrivia());
                 return node;
             }
             return ReplaceMethod;
@@ -46,9 +46,8 @@ namespace CTA.Rules.Actions.Csharp
             //TODO what's the outcome if newMethod doesn't have a valid signature.. are there any options we could provide to parseexpression ?
             InvocationExpressionSyntax ReplaceMethod(SyntaxGenerator syntaxGenerator, InvocationExpressionSyntax node)
             {
-                node = node.WithExpression(SyntaxFactory.ParseExpression(newMethod))
-                    .WithLeadingTrivia(node.GetLeadingTrivia())
-                    .NormalizeWhitespace(); 
+                node = node.WithExpression(SyntaxFactory.ParseExpression(newMethod).NormalizeWhitespace())
+                    .WithLeadingTrivia(node.GetLeadingTrivia()); 
                 return node;
             }
             return ReplaceMethod;
@@ -72,7 +71,7 @@ namespace CTA.Rules.Actions.Csharp
                     node = node.WithArgumentList(argumentList).WithLeadingTrivia(node.GetLeadingTrivia());
                 }
 
-                node = node.WithExpression(SyntaxFactory.ParseExpression(newMethod)).WithLeadingTrivia(node.GetLeadingTrivia()).NormalizeWhitespace();
+                node = node.WithExpression(SyntaxFactory.ParseExpression(newMethod).NormalizeWhitespace()).WithLeadingTrivia(node.GetLeadingTrivia());
                 return node;
             }
             return ReplaceMethod;
@@ -91,10 +90,11 @@ namespace CTA.Rules.Actions.Csharp
             //TODO what's the outcome if newMethod doesn't have a valid signature.. are there any options we could provide to parseexpression ?
             InvocationExpressionSyntax ReplaceOnlyMethod(SyntaxGenerator syntaxGenerator, InvocationExpressionSyntax node)
             {
-                node = node.WithExpression(SyntaxFactory.ParseExpression(node.Expression.ToString().Replace(oldMethod, newMethod)))
-                    .WithArgumentList(SyntaxFactory.ParseArgumentList(newParameters))
-                    .WithLeadingTrivia(node.GetLeadingTrivia())
-                    .NormalizeWhitespace();
+                node = node.WithExpression(SyntaxFactory.ParseExpression(node.Expression.ToString().Replace(oldMethod, newMethod))
+                    .NormalizeWhitespace())
+                    .WithArgumentList(SyntaxFactory.ParseArgumentList(newParameters)
+                    .NormalizeWhitespace())
+                    .WithLeadingTrivia(node.GetLeadingTrivia());
                 return node;
             }
             return ReplaceOnlyMethod;
@@ -111,9 +111,8 @@ namespace CTA.Rules.Actions.Csharp
             //TODO what's the outcome if newMethod doesn't have a valid signature.. are there any options we could provide to parseexpression ?
             InvocationExpressionSyntax ReplaceOnlyMethod(SyntaxGenerator syntaxGenerator, InvocationExpressionSyntax node)
             {
-                node = node.WithExpression(SyntaxFactory.ParseExpression(node.Expression.ToString().Replace(oldMethod, newMethod)))
-                    .WithLeadingTrivia(node.GetLeadingTrivia())
-                    .NormalizeWhitespace();
+                node = node.WithExpression(SyntaxFactory.ParseExpression(node.Expression.ToString().Replace(oldMethod, newMethod)).NormalizeWhitespace())
+                    .WithLeadingTrivia(node.GetLeadingTrivia());
                 return node;
             }
             return ReplaceOnlyMethod;
@@ -129,7 +128,7 @@ namespace CTA.Rules.Actions.Csharp
             //TODO what's the outcome if newMethod doesn't have a valid signature.. are there any options we could provide to parseexpression ?
             InvocationExpressionSyntax ReplaceOnlyMethod(SyntaxGenerator syntaxGenerator, InvocationExpressionSyntax node)
             {
-                node = node.WithArgumentList(SyntaxFactory.ParseArgumentList(newParameters)).NormalizeWhitespace();
+                node = node.WithArgumentList(SyntaxFactory.ParseArgumentList(newParameters).NormalizeWhitespace());
                 return node;
             }
             return ReplaceOnlyMethod;
@@ -144,7 +143,7 @@ namespace CTA.Rules.Actions.Csharp
                     SyntaxKind.SimpleMemberAccessExpression,
                     node,
                     SyntaxFactory.IdentifierName(SyntaxFactory.ParseName(appendMethod).ToString())),
-                SyntaxFactory.ArgumentList()).NormalizeWhitespace();
+                SyntaxFactory.ArgumentList());
                 return node;
             }
             return ReplaceMethod;
@@ -154,10 +153,7 @@ namespace CTA.Rules.Actions.Csharp
         {
             InvocationExpressionSyntax AddComment(SyntaxGenerator syntaxGenerator, InvocationExpressionSyntax node)
             {
-                SyntaxTriviaList currentTrivia = node.GetLeadingTrivia();
-                currentTrivia = currentTrivia.Add(SyntaxFactory.SyntaxTrivia(SyntaxKind.MultiLineCommentTrivia, string.Format(Constants.CommentFormat, comment)));
-                node = node.WithLeadingTrivia(currentTrivia).NormalizeWhitespace();
-                return node;
+                return (InvocationExpressionSyntax)CommentHelper.AddCSharpComment(node, comment);
             }
             return AddComment;
         }

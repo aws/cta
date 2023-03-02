@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using CTA.Rules.Actions.ActionHelpers;
 using CTA.Rules.Config;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -49,15 +50,15 @@ namespace CTA.Rules.Actions.Csharp
                         var member = assignMemberList.Where(n => n.Left.ToFullString().Contains(oldMember)).FirstOrDefault();
                         if (member != null)
                         {
-                            var newExpression = SyntaxFactory.ParseExpression(newMember + "=" + member.Right);
+                            var newExpression = SyntaxFactory.ParseExpression(newMember + "=" + member.Right).NormalizeWhitespace();
                             var newNode = node.Initializer.Expressions.Replace(member, newExpression);
-                            node = node.WithInitializer(node.Initializer.WithExpressions(newNode)).NormalizeWhitespace();
+                            node = node.WithInitializer(node.Initializer.WithExpressions(newNode));
                         }
                         else
                         {
-                            var newExpression = SyntaxFactory.ParseExpression(newMember + "=" + newValueIfAdding);
+                            var newExpression = SyntaxFactory.ParseExpression(newMember + "=" + newValueIfAdding).NormalizeWhitespace();
                             var newNode = node.Initializer.Expressions.Add(newExpression);
-                            node = node.WithInitializer(node.Initializer.WithExpressions(newNode)).NormalizeWhitespace();
+                            node = node.WithInitializer(node.Initializer.WithExpressions(newNode));
                         }
                     }
                 }
@@ -79,9 +80,9 @@ namespace CTA.Rules.Actions.Csharp
                         var member = assignMemberList.Where(n => n.Right.ToFullString().Contains(oldMember)).FirstOrDefault();
                         if (member != null)
                         {
-                            var newExpression = SyntaxFactory.ParseExpression(member.Left + "=" + member.Right.ToString().Replace(oldMember,newMember));
+                            var newExpression = SyntaxFactory.ParseExpression(member.Left + "=" + member.Right.ToString().Replace(oldMember,newMember)).NormalizeWhitespace();
                             var newNode = node.Initializer.Expressions.Replace(member, newExpression);
-                            node = node.WithInitializer(node.Initializer.WithExpressions(newNode)).NormalizeWhitespace();
+                            node = node.WithInitializer(node.Initializer.WithExpressions(newNode));
                         }
                     }
                 }
@@ -94,10 +95,7 @@ namespace CTA.Rules.Actions.Csharp
         {
             ObjectCreationExpressionSyntax AddComment(SyntaxGenerator syntaxGenerator, ObjectCreationExpressionSyntax node)
             {
-                SyntaxTriviaList currentTrivia = node.GetLeadingTrivia();
-                currentTrivia = currentTrivia.Add(SyntaxFactory.SyntaxTrivia(SyntaxKind.MultiLineCommentTrivia, string.Format(Constants.CommentFormat, comment)));
-                node = node.WithLeadingTrivia(currentTrivia).NormalizeWhitespace();
-                return node;
+                return (ObjectCreationExpressionSyntax)CommentHelper.AddCSharpComment(node, comment);
             }
             return AddComment;
         }

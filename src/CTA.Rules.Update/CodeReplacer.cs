@@ -122,14 +122,6 @@ namespace CTA.Rules.Update
         {
             if (currentFileActions != null)
             {
-                var normalizedRoot = root.NormalizeWhitespace().ToFullString();
-                //If true, and we are doing a full analysis, line endings and spaces need to be normalized:
-                //TODO change the condition to be a config value in ProjectConfiguration instead of file count
-                if (normalizedRoot != root.ToFullString() && fileActionsCount > 1)
-                {
-                    File.WriteAllText(sourceFileBuildResult.SourceFileFullPath, normalizedRoot);
-                }
-
                 currentFileActions.NodeTokens.ForEach(nodetoken =>
                 {
                     nodetoken.AllActions.ForEach(nodeAction => {

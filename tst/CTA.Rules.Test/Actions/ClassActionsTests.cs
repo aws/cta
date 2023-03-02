@@ -25,7 +25,10 @@ namespace CTA.Rules.Test.Actions
             var language = LanguageNames.CSharp;
             _syntaxGenerator = SyntaxGenerator.GetGenerator(workspace, language);
             _classActions = new ClassActions();
+
             _node = _syntaxGenerator.ClassDeclaration("MyClass") as ClassDeclarationSyntax;
+            // We normalize whitespace here because this is simulating the incoming code from the project we're performing actions on, which would have whitespace in it.
+            _node = _node.NormalizeWhitespace(); 
         }
 
         [Test]
@@ -75,7 +78,8 @@ class MyClass
             var nodeWithAttributes = (ClassDeclarationSyntax)_syntaxGenerator.AddAttributes(_node,
                 _syntaxGenerator.Attribute("Serializable"),
                 _syntaxGenerator.Attribute("SecurityCritical"));
-
+            // We normalize whitespace here because this is simulating the incoming code from the project we're performing actions on, which would have whitespace in it.
+            nodeWithAttributes = nodeWithAttributes.NormalizeWhitespace();
             var removeAttributeFunc = _classActions.GetRemoveAttributeAction(attributeToRemove);
             var newNode = removeAttributeFunc(_syntaxGenerator, nodeWithAttributes);
 
@@ -330,7 +334,9 @@ class MyClass
             var AddParametersToMethodFunc = _classActions.GetAddParametersToMethodAction(methodName, types, identifiers);
             var nodeWithExpression = AddParametersToMethodFunc(_syntaxGenerator, nodeWithMethod);
 
-            var expectedString = @"classMyClass{void Invoke(HttpContext context, string value){}}";
+            var expectedString = @"class MyClass
+{
+void Invoke(HttpContext context, string value){}}";
             StringAssert.Contains(expectedString, nodeWithExpression.ToFullString());
         }
 
@@ -345,16 +351,24 @@ class MyClass
             nodeWithMethods = nodeWithMethods.AddMembers(SyntaxFactory.ParseMemberDeclaration(methodString2));
             nodeWithMethods = nodeWithMethods.AddMembers(SyntaxFactory.ParseMemberDeclaration(methodString3));
 
+            // We normalize whitespace here because this is simulating the incoming code from the project we're performing actions on, which would have whitespace in it.
+            nodeWithMethods = nodeWithMethods.NormalizeWhitespace();
+
             var ReplacePublicMethodsBodyFunc = _classActions.GetReplaceMvcControllerMethodsBodyAction(newBody);
             var newNode = ReplacePublicMethodsBodyFunc(_syntaxGenerator, nodeWithMethods);
 
-            var expectedString = @"classMyClass{public async Task<ActionResult> SuperStringAsyncMethod()
+            var expectedString = @"class MyClass
+{
+    public async Task<ActionResult> SuperStringAsyncMethod()
 {
     return Content(await MonolithService.CreateRequestAsync());
-}public ActionResult SuperStringMethod()
+}    public ActionResult SuperStringMethod()
 {
     return Content(MonolithService.CreateRequest());
-}private string SuperDontTouchMethod(){ var hello = ""Not hello world!""}}";
+}    private string SuperDontTouchMethod()
+    {
+        var hello = ""Not hello world!"" }
+}";
             StringAssert.Contains(expectedString, newNode.ToFullString());
         }
 
@@ -369,16 +383,24 @@ class MyClass
             nodeWithMethods = nodeWithMethods.AddMembers(SyntaxFactory.ParseMemberDeclaration(methodString2));
             nodeWithMethods = nodeWithMethods.AddMembers(SyntaxFactory.ParseMemberDeclaration(methodString3));
 
+            // We normalize whitespace here because this is simulating the incoming code from the project we're performing actions on, which would have whitespace in it.
+            nodeWithMethods = nodeWithMethods.NormalizeWhitespace();
+
             var ReplacePublicMethodsBodyFunc = _classActions.GetReplaceWebApiControllerMethodsBodyAction(newBody);
             var newNode = ReplacePublicMethodsBodyFunc(_syntaxGenerator, nodeWithMethods);
 
-            var expectedString = @"classMyClass{public async Task<IHttpActionResult> SuperStringAsyncMethod()
+            var expectedString = @"class MyClass
+{
+    public async Task<IHttpActionResult> SuperStringAsyncMethod()
 {
     return Content(await MonolithService.CreateRequestAsync());
-}public IHttpActionResult SuperStringMethod()
+}    public IHttpActionResult SuperStringMethod()
 {
     return Content(MonolithService.CreateRequest());
-}private string SuperDontTouchMethod(){ var hello = ""Not hello world!""}}";
+}    private string SuperDontTouchMethod()
+    {
+        var hello = ""Not hello world!"" }
+}";
             StringAssert.Contains(expectedString, newNode.ToFullString());
         }
 

@@ -4,6 +4,7 @@ using CTA.Rules.Config;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.VisualBasic;
 using Microsoft.CodeAnalysis.Editing;
+using CTA.Rules.Actions.ActionHelpers;
 
 namespace CTA.Rules.Actions.VisualBasic
 {
@@ -18,8 +19,9 @@ namespace CTA.Rules.Actions.VisualBasic
             SyntaxNode AddAwaitOperator(SyntaxGenerator syntaxGenerator, SyntaxNode node)
             {
                 var newNode = SyntaxFactory.AwaitExpression(
-                    SyntaxFactory.ParseExpression(node.WithoutTrivia().NormalizeWhitespace().ToFullString()));
-                newNode = newNode.WithTriviaFrom(node).NormalizeWhitespace();
+                    SyntaxFactory.ParseExpression(node.WithoutTrivia().ToFullString()))
+                    .NormalizeWhitespace();
+                newNode = newNode.WithTriviaFrom(node);
                 return SyntaxFactory.ExpressionStatement(newNode);
             }
             return AddAwaitOperator;
@@ -29,11 +31,7 @@ namespace CTA.Rules.Actions.VisualBasic
         {
             SyntaxNode AddComment(SyntaxGenerator syntaxGenerator, SyntaxNode node)
             {
-                var currentTrivia = node.GetLeadingTrivia();
-                currentTrivia = currentTrivia.Add(SyntaxFactory.SyntaxTrivia(SyntaxKind.CommentTrivia,
-                    string.Format(Constants.VbCommentFormat, comment)));
-                node = node.WithLeadingTrivia(currentTrivia).NormalizeWhitespace();
-                return node;
+                return CommentHelper.AddVBComment(node, comment);
             }
             return AddComment;
         }

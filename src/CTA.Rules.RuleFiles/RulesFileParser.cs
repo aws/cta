@@ -236,11 +236,8 @@ namespace CTA.Rules.RuleFiles
             {
                 foreach (var recommendation in @namespace.Recommendations)
                 {
-                    RecommendedActions recommendedActions = 
-                        recommendation.RecommendedActions
-                            .FirstOrDefault(ra => 
-                                ra.Preferred == "Yes" && 
-                                ra.TargetFrameworks.Any(t => t.Name.Equals(_targetFramework)));
+                    RecommendedActions recommendedActions = recommendation.RecommendedActions
+                        .Where(ra => ra.Preferred == "Yes" && ra.TargetFrameworks.Any(t => t.Name.Equals(_targetFramework))).FirstOrDefault();
 
                     //There are recommendations, but none of them are preferred
                     if (recommendedActions == null && recommendation.RecommendedActions.Count > 0)
@@ -699,10 +696,7 @@ namespace CTA.Rules.RuleFiles
                                 }
                                 else
                                 {
-                                    var jsonParameters =
-                                        action.Value is Dictionary<string,string>
-                                            ? action.Value
-                                            : JsonConvert.DeserializeObject<Dictionary<string, string>>(action.Value.ToString());
+                                    Dictionary<string, string> jsonParameters = JsonConvert.DeserializeObject<Dictionary<string, string>>(action.Value.ToString());
                                     if (jsonParameters.ContainsKey(CTA.Rules.Config.Constants.PackageName))
                                     {
                                         packageAction.Name = jsonParameters[CTA.Rules.Config.Constants.PackageName];

@@ -40,8 +40,7 @@ End Class");
 Imports {directive}
 
 Class MyClass
-End Class
-";
+End Class";
             Assert.AreEqual(expectedResult, newNode.ToFullString());
         }
 
@@ -53,8 +52,7 @@ End Class
             var newNode = removeStatementAction(_syntaxGenerator, _node);
 
             var expectedResult = @$"Class MyClass
-End Class
-";
+End Class";
             Assert.AreEqual(expectedResult, newNode.ToFullString());
         }
 
@@ -67,10 +65,8 @@ End Class
 
             var expectedResult = @$"' Added by CTA: {commentToAdd}
 Imports System.Web
-
 Class MyClass
-End Class
-";
+End Class";
             Assert.AreEqual(expectedResult, newNode.ToFullString());
         }
     }

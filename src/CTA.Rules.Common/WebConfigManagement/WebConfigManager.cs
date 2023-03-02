@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Diagnostics.CodeAnalysis;
@@ -17,8 +16,8 @@ namespace CTA.Rules.Common.WebConfigManagement
     /// </summary>
     public class WebConfigManager
     {
-        private static ConcurrentDictionary<string, Configuration> _configurationCache = new ConcurrentDictionary<string, Configuration>();
-        private static ConcurrentDictionary<string, XDocument> _xDocumentCache = new ConcurrentDictionary<string, XDocument>();
+        private static Dictionary<string, Configuration> _configurationCache = new Dictionary<string, Configuration>();
+        private static Dictionary<string, XDocument> _xDocumentCache = new Dictionary<string, XDocument>();
         private delegate object ConfigLoadingDelegate(string configFile);
 
         // Currently unused
@@ -80,8 +79,8 @@ namespace CTA.Rules.Common.WebConfigManagement
 
         public static void ClearCache()
         {
-            _configurationCache = new ConcurrentDictionary<string, Configuration>();
-            _xDocumentCache = new ConcurrentDictionary<string, XDocument>();
+            _configurationCache = new Dictionary<string, Configuration>();
+            _xDocumentCache = new Dictionary<string, XDocument>();
         }
 
         private static object LoadWebConfig(string projectDir, ConfigLoadingDelegate configLoadingDelegate)

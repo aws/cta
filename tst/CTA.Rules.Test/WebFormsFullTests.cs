@@ -50,7 +50,7 @@ namespace CTA.Rules.Test
             StringAssert.Contains($"<TargetFramework>{version}</TargetFramework>", webFormsFullResult.CsProjectContent);
             StringAssert.Contains(@"<PackageReference Include=""Microsoft.EntityFrameworkCore"" Version=""5.0.12"" />", webFormsFullResult.CsProjectContent);
             StringAssert.Contains(@"<PackageReference Include=""Newtonsoft.Json"" Version=""*"" />", webFormsFullResult.CsProjectContent);
-            StringAssert.Contains(@"<PackageReference Include=""Microsoft.Data.SqlClient"" Version=""5.0.1"" />", webFormsFullResult.CsProjectContent);
+            StringAssert.Contains(@"<PackageReference Include=""Microsoft.Data.SqlClient"" Version=""*"" />", webFormsFullResult.CsProjectContent);
         }
 
         [TestCase(TargetFramework.DotnetCoreApp31)]

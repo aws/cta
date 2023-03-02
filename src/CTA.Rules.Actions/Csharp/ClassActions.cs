@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using CTA.Rules.Actions.ActionHelpers;
 using CTA.Rules.Config;
 using CTA.Rules.Models;
 using Microsoft.CodeAnalysis;
@@ -67,12 +68,8 @@ namespace CTA.Rules.Actions.Csharp
         }
         public Func<SyntaxGenerator, ClassDeclarationSyntax, ClassDeclarationSyntax> GetChangeNameAction(string className)
         {
-            ClassDeclarationSyntax ChangeName(SyntaxGenerator syntaxGenerator, ClassDeclarationSyntax node)
-            {
-                node = node.WithIdentifier(SyntaxFactory.Identifier(className)).NormalizeWhitespace();
-                return node;
-            }
-            return ChangeName;
+            // Even though this method is a duplicate of GetRenameClassAction, keep it for backwards compatibility
+            return GetRenameClassAction(className);
         }
         public Func<SyntaxGenerator, ClassDeclarationSyntax, ClassDeclarationSyntax> GetRemoveAttributeAction(string attributeName)
         {
@@ -92,13 +89,12 @@ namespace CTA.Rules.Actions.Csharp
                         }
                     }
                 }
-
                 if (attributeToRemove != null)
                 {
                     attributeLists = attributeLists.Remove(attributeToRemove);
                 }
 
-                node = node.WithAttributeLists(attributeLists).NormalizeWhitespace();
+                node = node.WithAttributeLists(attributeLists);
                 return node;
             }
 
@@ -114,7 +110,7 @@ namespace CTA.Rules.Actions.Csharp
                                 SyntaxFactory.SingletonSeparatedList<AttributeSyntax>(
                                     SyntaxFactory.Attribute(SyntaxFactory.ParseName(attribute)))));
 
-                node = node.WithAttributeLists(attributeLists).NormalizeWhitespace();
+                node = node.WithAttributeLists(attributeLists);
                 return node;
             }
             return AddAttribute;
@@ -123,12 +119,7 @@ namespace CTA.Rules.Actions.Csharp
         {
             ClassDeclarationSyntax AddComment(SyntaxGenerator syntaxGenerator, ClassDeclarationSyntax node)
             {
-                SyntaxTriviaList currentTrivia = node.GetLeadingTrivia();
-                //TODO see if this will lead NPE    
-                var commentFormat = dontUseCTAPrefix != null ? Constants.CommentFormatBlank : Constants.CommentFormat;
-                currentTrivia = currentTrivia.Add(SyntaxFactory.SyntaxTrivia(SyntaxKind.MultiLineCommentTrivia, string.Format(commentFormat, comment)));
-                node = node.WithLeadingTrivia(currentTrivia).NormalizeWhitespace();
-                return node;
+                return (ClassDeclarationSyntax)CommentHelper.AddCSharpComment(node, comment, dontUseCTAPrefix);
             }
             return AddComment;
         }
@@ -138,7 +129,7 @@ namespace CTA.Rules.Actions.Csharp
             {
                 var allMembers = node.Members;
                 allMembers = allMembers.Add(SyntaxFactory.ParseMemberDeclaration(expression));
-                node = node.WithMembers(allMembers).NormalizeWhitespace();
+                node = node.WithMembers(allMembers);
                 return node;
             }
             return AddMethod;
@@ -155,7 +146,7 @@ namespace CTA.Rules.Actions.Csharp
                     var removeMethod = allMethods.FirstOrDefault(m => m.Identifier.ToString() == methodName);
                     if (removeMethod != null)
                     {
-                        node = node.RemoveNode(removeMethod, SyntaxRemoveOptions.KeepNoTrivia).NormalizeWhitespace();
+                        node = node.RemoveNode(removeMethod, SyntaxRemoveOptions.KeepNoTrivia);
                     }
                 }
 
@@ -167,7 +158,9 @@ namespace CTA.Rules.Actions.Csharp
         {
             ClassDeclarationSyntax RenameClass(SyntaxGenerator syntaxGenerator, ClassDeclarationSyntax node)
             {
-                node = node.WithIdentifier(SyntaxFactory.Identifier(newClassName)).NormalizeWhitespace();
+                var leadingTrivia = node.GetLeadingTrivia();
+                var trailingTrivia = node.GetTrailingTrivia();
+                node = node.WithIdentifier(SyntaxFactory.Identifier(node.Identifier.LeadingTrivia, newClassName, node.Identifier.TrailingTrivia));
                 return node;
             }
             return RenameClass;
@@ -189,7 +182,7 @@ namespace CTA.Rules.Actions.Csharp
                             SyntaxTokenList tokenList = new SyntaxTokenList(SyntaxFactory.ParseTokens(modifiers));
                             var newMethod = replaceMethod.WithModifiers(tokenList);
 
-                            node = node.WithMembers(node.Members.Replace(replaceMethod, newMethod)).NormalizeWhitespace();
+                            node = node.WithMembers(node.Members.Replace(replaceMethod, newMethod));
                         }
                     }
                 }
@@ -207,7 +200,7 @@ namespace CTA.Rules.Actions.Csharp
                 {
                     var nodeDeclarations = node.Members;
                     nodeDeclarations = nodeDeclarations.Insert(0, parsedExpression);
-                    node = node.WithMembers(nodeDeclarations).NormalizeWhitespace();
+                    node = node.WithMembers(nodeDeclarations);
                 }
                 return node;
             }
@@ -241,7 +234,7 @@ namespace CTA.Rules.Actions.Csharp
                     {
                         constructorNode = constructorNode.WithInitializer(SyntaxFactory.ConstructorInitializer(SyntaxKind.BaseConstructorInitializer).AddArgumentListArguments(newArguments.ToArray()));
                     }
-                    node = node.ReplaceNode(constructor, constructorNode).NormalizeWhitespace();
+                    node = node.ReplaceNode(constructor, constructorNode);
                 }
                 return node;
             }
@@ -260,7 +253,7 @@ namespace CTA.Rules.Actions.Csharp
                     if (!statementExpression.FullSpan.IsEmpty)
                     {
                         constructorNode = constructorNode.AddBodyStatements(statementExpression);
-                        node = node.ReplaceNode(constructor, constructorNode).NormalizeWhitespace();
+                        node = node.ReplaceNode(constructor, constructorNode);
                     }
                 }
                 return node;
@@ -295,7 +288,7 @@ namespace CTA.Rules.Actions.Csharp
                         }
 
                     };
-                    node = node.AddMembers(constructorNode).NormalizeWhitespace();
+                    node = node.AddMembers(constructorNode);
                 }
                 return node;
             }
@@ -466,9 +459,8 @@ namespace CTA.Rules.Actions.Csharp
                     {
                         currentMethod = currentMethod.WithReturnType(SyntaxFactory.ParseTypeName(returnType)).WithLeadingTrivia(currentMethod.GetLeadingTrivia());
                     }
-                    currentMethod = currentMethod.NormalizeWhitespace();
 
-                    node = node.ReplaceNode(originalMethod, currentMethod.WithLeadingTrivia(currentMethod.GetLeadingTrivia()));
+                    node = node.ReplaceNode(originalMethod, currentMethod.NormalizeWhitespace().WithLeadingTrivia(currentMethod.GetLeadingTrivia()));
                 }
 
                 return node;
@@ -501,9 +493,8 @@ namespace CTA.Rules.Actions.Csharp
                     currentMethod = currentMethod.WithBody(null).WithLeadingTrivia(currentMethod.GetLeadingTrivia());
                     currentMethod = currentMethod.WithBody(SyntaxFactory.Block(SyntaxFactory.ParseStatement(newExpression))).WithLeadingTrivia(currentMethod.GetLeadingTrivia());
                     currentMethod = currentMethod.WithReturnType(SyntaxFactory.ParseTypeName(returnType)).WithLeadingTrivia(currentMethod.GetLeadingTrivia());
-                    currentMethod = currentMethod.NormalizeWhitespace();
 
-                    node = node.ReplaceNode(originalMethod, currentMethod.WithLeadingTrivia(currentMethod.GetLeadingTrivia()));
+                    node = node.ReplaceNode(originalMethod, currentMethod.NormalizeWhitespace().WithLeadingTrivia(currentMethod.GetLeadingTrivia()));
                 }
 
                 return node;
@@ -544,7 +535,6 @@ namespace CTA.Rules.Actions.Csharp
                     {
                         currentMethod = currentMethod.WithReturnType(SyntaxFactory.ParseTypeName(returnType)).WithLeadingTrivia(currentMethod.GetLeadingTrivia());
                     }
-                    currentMethod = currentMethod.NormalizeWhitespace();
 
                     node = node.ReplaceNode(originalMethod, currentMethod.WithLeadingTrivia(currentMethod.GetLeadingTrivia()));
                 }

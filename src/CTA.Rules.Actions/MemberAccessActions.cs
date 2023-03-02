@@ -1,7 +1,6 @@
 ﻿using System;
-using CTA.Rules.Config;
+using CTA.Rules.Actions.ActionHelpers;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Editing;
 
@@ -16,22 +15,14 @@ namespace CTA.Rules.Update
         {
             SyntaxNode AddComment(SyntaxGenerator syntaxGenerator, SyntaxNode node)
             {
-                SyntaxTriviaList currentTrivia = node.GetLeadingTrivia();
                 if (node is Microsoft.CodeAnalysis.VisualBasic.Syntax.MemberAccessExpressionSyntax)
                 {
-                    currentTrivia = currentTrivia.Insert(0,
-                        Microsoft.CodeAnalysis.VisualBasic.SyntaxFactory.SyntaxTrivia(
-                            Microsoft.CodeAnalysis.VisualBasic.SyntaxKind.CommentTrivia,
-                            string.Format(Constants.VbCommentFormat, comment)));
+                    return CommentHelper.AddVBComment(node, comment);
                 }
                 else
                 {
-                    currentTrivia = currentTrivia.Insert(0,
-                        SyntaxFactory.SyntaxTrivia(SyntaxKind.MultiLineCommentTrivia,
-                            string.Format(Constants.CommentFormat, comment)));
+                    return CommentHelper.AddCSharpComment(node, comment);
                 }
-                node = node.WithLeadingTrivia(currentTrivia).NormalizeWhitespace();
-                return node;
             }
             return AddComment;
         }

@@ -18,14 +18,8 @@ namespace CTA.Rules.Actions
                 bool result = false;
                 try
                 {
-                    var projectFileCreator = 
-                        new ProjectFileCreator(
-                            projectDir, 
-                            targetVersion,
-                            packageReferences, 
-                            projectReferences.ToList(), 
-                            projectType, 
-                            metaReferences);
+                    ProjectFileCreator projectFileCreator = new ProjectFileCreator(projectDir, targetVersion,
+                    packageReferences, projectReferences.ToList(), projectType, metaReferences);
 
                     result = projectFileCreator.Create();
                 }
