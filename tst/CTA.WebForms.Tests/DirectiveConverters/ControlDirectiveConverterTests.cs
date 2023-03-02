@@ -29,8 +29,14 @@ namespace CTA.WebForms.Tests.DirectiveConverters
         [Test]
         public void RegisterDirective_Properly_Executes_Standard_Conversion()
         {
-            Assert.AreEqual(ExpectedStandardControlDirective, _directiveConverter.ConvertDirective(
-                TestDirectiveName, TestStandardControlDirective, TestPath, TestProjectName, new ViewImportService()));
+            Assert.AreEqual(
+                ExpectedStandardControlDirective, 
+                _directiveConverter.ConvertDirective(
+                    TestDirectiveName, 
+                    TestStandardControlDirective, 
+                    TestPath, 
+                    TestProjectName, 
+                    new ViewImportService()));
         }
     }
 }

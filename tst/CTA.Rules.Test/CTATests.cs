@@ -222,6 +222,20 @@ namespace CTA.Rules.Test
         }
 
         [Test]
+        public void AnalysisDoesNotModifyWhitespace()
+        {
+            var routeConfigFileContentBefore = File.ReadAllText(Directory.EnumerateFiles(tempDir, "RouteConfig.cs", SearchOption.AllDirectories)
+                .Where(x=> x.Contains("BuildableWebApi")).FirstOrDefault());
+
+            var results = AnalyzeSolution("BuildableWebApi.sln", tempDir, downloadLocation, version, portCode: false, portProject: false);
+
+            var resultSolutionPath = new FileInfo(results.SolutionRunResult.SolutionPath).Directory.FullName;
+            var routeConfigFileContentAfter = File.ReadAllText(Directory.EnumerateFiles(resultSolutionPath, "RouteConfig.cs", SearchOption.AllDirectories).FirstOrDefault());
+
+            Assert.AreEqual(routeConfigFileContentBefore, routeConfigFileContentAfter);
+        }
+
+        [Test]
         public void ConvertHierarchicalToNamespaceFile()
         {
             var dir = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "CTAFiles");
