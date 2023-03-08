@@ -18,6 +18,7 @@ namespace CTA.Rules.Test
             downloadLocation = SetupTests.DownloadLocation;
         }
 
+        [TestCase(TargetFramework.Dotnet7)]
         [TestCase(TargetFramework.Dotnet6)]
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.DotnetCoreApp31)]
@@ -56,6 +57,7 @@ namespace CTA.Rules.Test
             StringAssert.Contains(@"using CoreWCF", service);
         }
 
+        [TestCase(TargetFramework.Dotnet7)]
         [TestCase(TargetFramework.Dotnet6)]
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.DotnetCoreApp31)]
@@ -94,6 +96,7 @@ namespace CTA.Rules.Test
             StringAssert.Contains(@"using CoreWCF", service);
         }
 
+        [TestCase(TargetFramework.Dotnet7)]
         [TestCase(TargetFramework.Dotnet6)]
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.DotnetCoreApp31)]
@@ -132,6 +135,7 @@ namespace CTA.Rules.Test
             StringAssert.Contains(@"using CoreWCF", service);
         }
 
+        [TestCase(TargetFramework.Dotnet7)]
         [TestCase(TargetFramework.Dotnet6)]
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.DotnetCoreApp31)]
@@ -170,6 +174,7 @@ namespace CTA.Rules.Test
             StringAssert.Contains(@"using CoreWCF", service);
         }
 
+        [TestCase(TargetFramework.Dotnet7)]
         [TestCase(TargetFramework.Dotnet6)]
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.DotnetCoreApp31)]
@@ -193,6 +198,7 @@ namespace CTA.Rules.Test
             FileAssert.DoesNotExist(Path.Combine(projectDir, "Program.cs"));
         }
 
+        [TestCase(TargetFramework.Dotnet7)]
         [TestCase(TargetFramework.Dotnet6)]
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.DotnetCoreApp31)]
@@ -231,6 +237,7 @@ namespace CTA.Rules.Test
             StringAssert.Contains(@"using CoreWCF", service);
         }
 
+        [TestCase(TargetFramework.Dotnet7)]
         [TestCase(TargetFramework.Dotnet6)]
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.DotnetCoreApp31)]
@@ -254,6 +261,7 @@ namespace CTA.Rules.Test
             FileAssert.DoesNotExist(Path.Combine(projectDir, "Program.cs"));
         }
 
+        [TestCase(TargetFramework.Dotnet7)]
         [TestCase(TargetFramework.Dotnet6)]
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.DotnetCoreApp31)]
@@ -292,6 +300,7 @@ namespace CTA.Rules.Test
             StringAssert.Contains(@"using CoreWCF", service);
         }
 
+        [TestCase(TargetFramework.Dotnet7)]
         [TestCase(TargetFramework.Dotnet6)]
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.DotnetCoreApp31)]
@@ -330,6 +339,7 @@ namespace CTA.Rules.Test
             StringAssert.Contains(@"using CoreWCF", service);
         }
 
+        [TestCase(TargetFramework.Dotnet7)]
         [TestCase(TargetFramework.Dotnet6)]
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.DotnetCoreApp31)]
@@ -363,6 +373,7 @@ namespace CTA.Rules.Test
             StringAssert.Contains(@"using CoreWCF", service);
         }
 
+        [TestCase(TargetFramework.Dotnet7)]
         [TestCase(TargetFramework.Dotnet6)]
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.DotnetCoreApp31)]
@@ -396,6 +407,7 @@ namespace CTA.Rules.Test
             StringAssert.Contains(@"using CoreWCF", service);
         }
 
+        [TestCase(TargetFramework.Dotnet7)]
         [TestCase(TargetFramework.Dotnet6)]
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.DotnetCoreApp31)]
@@ -429,6 +441,7 @@ namespace CTA.Rules.Test
             StringAssert.Contains(@"using CoreWCF", service);
         }
 
+        [TestCase(TargetFramework.Dotnet7)]
         [TestCase(TargetFramework.Dotnet6)]
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.DotnetCoreApp31)]
@@ -462,6 +475,7 @@ namespace CTA.Rules.Test
             StringAssert.Contains(@"using CoreWCF", service);
         }
 
+        [TestCase(TargetFramework.Dotnet7)]
         [TestCase(TargetFramework.Dotnet6)]
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.DotnetCoreApp31)]
@@ -480,6 +494,7 @@ namespace CTA.Rules.Test
             StringAssert.Contains(@"System.ServiceModel.NetTcp", csProjContent);
         }
 
+        [TestCase(TargetFramework.Dotnet7)]
         [TestCase(TargetFramework.Dotnet6)]
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.DotnetCoreApp31)]

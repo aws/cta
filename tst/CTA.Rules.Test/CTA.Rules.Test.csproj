@@ -29,8 +29,7 @@
 	</Content>
   </ItemGroup>
 
-  <ItemGroup>
-    <None Remove="TempRules\npoi.ss.usermodel.json" />
+	<ItemGroup>
     <None Update="CTAFiles\vb.rules.test.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -74,12 +73,6 @@
 
   <ItemGroup>
     <Folder Include="TempTagConfigs\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Update="TempRules\npoi.ss.usermodel.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
 
 </Project>

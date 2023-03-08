@@ -18,6 +18,7 @@ namespace CTA.Rules.Test
             downloadLocation = SetupTests.DownloadLocation;
         }
 
+        [TestCase(TargetFramework.Dotnet7)]
         [TestCase(TargetFramework.Dotnet6)]
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.DotnetCoreApp31)]
@@ -43,6 +44,7 @@ namespace CTA.Rules.Test
         [TestCase(TargetFramework.DotnetCoreApp31)]
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.Dotnet6)]
+        [TestCase(TargetFramework.Dotnet7)]
         public void TestSolutionWithMvcAndDualWebForms(string version)
         {
             var solutionName = "MvcAndDualWebForms.sln";
