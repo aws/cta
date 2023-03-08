@@ -18,6 +18,7 @@ namespace CTA.Rules.Test
             downloadLocation = SetupTests.DownloadLocation;
         }
 
+        [TestCase(TargetFramework.Dotnet7)]
         [TestCase(TargetFramework.Dotnet6)]
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.DotnetCoreApp31)]

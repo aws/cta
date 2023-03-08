@@ -29,12 +29,14 @@ namespace CTA.Rules.Test
             var net31Results = AnalyzeSolution(solutionPath, TargetFramework.DotnetCoreApp31);
             var net50Results = AnalyzeSolution(solutionPath, TargetFramework.Dotnet5);
             var net60Results = AnalyzeSolution(solutionPath, TargetFramework.Dotnet6);
+            var net70Results = AnalyzeSolution(solutionPath, TargetFramework.Dotnet7);
 
             _resultsDict = new Dictionary<string, TestSolutionAnalysis>
             {
                 {TargetFramework.DotnetCoreApp31, net31Results},
                 {TargetFramework.Dotnet5, net50Results},
-                {TargetFramework.Dotnet6, net60Results}
+                {TargetFramework.Dotnet6, net60Results},
+                {TargetFramework.Dotnet7, net70Results}
             };
         }
 
@@ -53,9 +55,23 @@ namespace CTA.Rules.Test
             StringAssert.Contains(@"<PackageReference Include=""Microsoft.Data.SqlClient"" Version=""5.0.1"" />", webFormsFullResult.CsProjectContent);
         }
 
+        [TestCase(TargetFramework.Dotnet7)]
+        public void TestProjectFilePortingResults_Dotnet7AndAbove(string version)
+        {
+            var results = _resultsDict[version];
+            var webFormsFullResult = results.ProjectResults.First(proj => proj.CsProjectPath.EndsWith("WebFormsFull.csproj"));
+
+            // Verify expected packages are in .csproj
+            StringAssert.Contains($"<TargetFramework>{version}</TargetFramework>", webFormsFullResult.CsProjectContent);
+            StringAssert.Contains(@"<PackageReference Include=""Microsoft.EntityFrameworkCore"" Version=""*"" />", webFormsFullResult.CsProjectContent);
+            StringAssert.Contains(@"<PackageReference Include=""Newtonsoft.Json"" Version=""*"" />", webFormsFullResult.CsProjectContent);
+            StringAssert.Contains(@"<PackageReference Include=""Microsoft.Data.SqlClient"" Version=""5.0.1"" />", webFormsFullResult.CsProjectContent);
+        }
+
         [TestCase(TargetFramework.DotnetCoreApp31)]
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.Dotnet6)]
+        [TestCase(TargetFramework.Dotnet7)]
         public void TestUserControlsPortingResults(string version)
         {
             var results = _resultsDict[version];
@@ -75,6 +91,7 @@ namespace CTA.Rules.Test
         [TestCase(TargetFramework.DotnetCoreApp31)]
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.Dotnet6)]
+        [TestCase(TargetFramework.Dotnet7)]
         public void TestStaticFilesMovedToWwwroot(string version)
         {
             var results = _resultsDict[version];
@@ -99,6 +116,7 @@ namespace CTA.Rules.Test
         [TestCase(TargetFramework.DotnetCoreApp31)]
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.Dotnet6)]
+        [TestCase(TargetFramework.Dotnet7)]
         public void TestProperHttpModulePortsCorrectly(string version)
         {
             var results = _resultsDict[version];
@@ -113,6 +131,7 @@ namespace CTA.Rules.Test
         [TestCase(TargetFramework.DotnetCoreApp31)]
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.Dotnet6)]
+        [TestCase(TargetFramework.Dotnet7)]
         public void TestProperHttpModuleAlternatePortsCorrectly(string version)
         {
             var results = _resultsDict[version];
@@ -131,6 +150,7 @@ namespace CTA.Rules.Test
         [TestCase(TargetFramework.DotnetCoreApp31)]
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.Dotnet6)]
+        [TestCase(TargetFramework.Dotnet7)]
         public void TestImproperHttpModulePortsCorrectly(string version)
         {
             var results = _resultsDict[version];
@@ -145,6 +165,7 @@ namespace CTA.Rules.Test
         [TestCase(TargetFramework.DotnetCoreApp31)]
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.Dotnet6)]
+        [TestCase(TargetFramework.Dotnet7)]
         public void TestHttpHandlersMovedToMiddleware(string version)
         {
             var results = _resultsDict[version];
@@ -159,6 +180,7 @@ namespace CTA.Rules.Test
         [TestCase(TargetFramework.DotnetCoreApp31)]
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.Dotnet6)]
+        [TestCase(TargetFramework.Dotnet7)]
         public void TestDefaultAspxMigrations(string version)
         {
             var results = _resultsDict[version];
@@ -194,6 +216,7 @@ namespace CTA.Rules.Test
         [TestCase(TargetFramework.DotnetCoreApp31)]
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.Dotnet6)]
+        [TestCase(TargetFramework.Dotnet7)]
         public void TestOtherPageAspxMigration(string version)
         {
             var results = _resultsDict[version];
@@ -234,6 +257,7 @@ namespace CTA.Rules.Test
         [TestCase(TargetFramework.DotnetCoreApp31)]
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.Dotnet6)]
+        [TestCase(TargetFramework.Dotnet7)]
         public void TestDefaultAspxCsMigrations(string version)
         {
             var results = _resultsDict[version];
@@ -248,6 +272,7 @@ namespace CTA.Rules.Test
         [TestCase(TargetFramework.DotnetCoreApp31)]
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.Dotnet6)]
+        [TestCase(TargetFramework.Dotnet7)]
         public void TestOtherPageAspxCsMigrations(string version)
         {
             var results = _resultsDict[version];
@@ -262,6 +287,7 @@ namespace CTA.Rules.Test
         [TestCase(TargetFramework.DotnetCoreApp31)]
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.Dotnet6)]
+        [TestCase(TargetFramework.Dotnet7)]
         public void TestHostFileCreation(string version)
         {
             var results = _resultsDict[version];
@@ -277,6 +303,7 @@ namespace CTA.Rules.Test
         [TestCase(TargetFramework.DotnetCoreApp31)]
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.Dotnet6)]
+        [TestCase(TargetFramework.Dotnet7)]
         public void TestImportsFileCreation(string version)
         {
             var results = _resultsDict[version];
@@ -292,6 +319,7 @@ namespace CTA.Rules.Test
         [TestCase(TargetFramework.DotnetCoreApp31)]
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.Dotnet6)]
+        [TestCase(TargetFramework.Dotnet7)]
         public void TestActivityIdHelperFileCreation(string version)
         {
             var results = _resultsDict[version];
@@ -307,6 +335,7 @@ namespace CTA.Rules.Test
         [TestCase(TargetFramework.DotnetCoreApp31)]
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.Dotnet6)]
+        [TestCase(TargetFramework.Dotnet7)]
         public void TestAppFileCreation(string version)
         {
             var results = _resultsDict[version];
@@ -322,6 +351,7 @@ namespace CTA.Rules.Test
         [TestCase(TargetFramework.DotnetCoreApp31)]
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.Dotnet6)]
+        [TestCase(TargetFramework.Dotnet7)]
         public void TestAppSettingsFileCreation(string version)
         {
             var results = _resultsDict[version];
@@ -337,6 +367,7 @@ namespace CTA.Rules.Test
         [TestCase(TargetFramework.DotnetCoreApp31)]
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.Dotnet6)]
+        [TestCase(TargetFramework.Dotnet7)]
         public void TestProgramFileCreation(string version)
         {
             var results = _resultsDict[version];
@@ -352,6 +383,7 @@ namespace CTA.Rules.Test
         [TestCase(TargetFramework.DotnetCoreApp31)]
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.Dotnet6)]
+        [TestCase(TargetFramework.Dotnet7)]
         public void TestStartupFileCreation(string version)
         {
             var results = _resultsDict[version];
@@ -367,6 +399,7 @@ namespace CTA.Rules.Test
         [TestCase(TargetFramework.DotnetCoreApp31)]
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.Dotnet6)]
+        [TestCase(TargetFramework.Dotnet7)]
         public void TestWebRequestInfoFileCreation(string version)
         {
             var results = _resultsDict[version];
