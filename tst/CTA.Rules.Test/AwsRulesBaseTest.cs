@@ -27,6 +27,7 @@ namespace CTA.Rules.Test
             public const string DotnetCoreApp31 = "netcoreapp3.1";
             public const string Dotnet5 = "net5.0";
             public const string Dotnet6 = "net6.0";
+            public const string Dotnet7 = "net7.0";
         }
 
         protected void Setup(System.Type type)

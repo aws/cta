@@ -243,7 +243,7 @@ namespace WebFormsFull
         private void ConfigureContainer()
         {
             var builder = new ContainerBuilder();
-            var mockData = bool.Parse(ConfigurationManager.AppSettings[""UseMockData""]);
+            var mockData = bool.Parse(ConfigurationManager.Configuration.GetSection(""appSettings"")[""UseMockData""]);
             builder.RegisterModule(new ApplicationModule(mockData));
             container = builder.Build();
             _containerProvider = new ContainerProvider(container);
@@ -251,7 +251,7 @@ namespace WebFormsFull
 
         private void ConfigDataBase()
         {
-            var mockData = bool.Parse(ConfigurationManager.AppSettings[""UseMockData""]);
+            var mockData = bool.Parse(ConfigurationManager.Configuration.GetSection(""appSettings"")[""UseMockData""]);
             if (!mockData)
             {
                 Database.SetInitializer<CatalogDBContext>(container.Resolve<CatalogDBInitializer>());
@@ -262,7 +262,7 @@ namespace WebFormsFull
         // /// <summary>
         /// Track the machine name and the start time for the session inside the current session
         /// </summary>
-        protected void Session_Start(Object sender, EventArgs e)// {
+        protected void Session_Start(Object sender, EventArgs e) // {
     //     HttpContext.Current.Session[""MachineName""] = Environment.MachineName;
     //     HttpContext.Current.Session[""SessionStartTime""] = DateTime.Now;
     // }

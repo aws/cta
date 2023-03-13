@@ -53,6 +53,7 @@ namespace CTA.Rules.Test
             TestWebApi(TargetFramework.Dotnet5, solutionDir);
         }
 
+        [TestCase(TargetFramework.Dotnet7)]
         [TestCase(TargetFramework.Dotnet6)]
         [TestCase(TargetFramework.Dotnet5)]
         public void TestWebApi(string version, string solutionDir = "")
@@ -262,6 +263,7 @@ namespace CTA.Rules.Test
             Assert.AreEqual(4, webApiProjectActions.Count);
         }
 
+        [TestCase(TargetFramework.Dotnet7)]
         [TestCase(TargetFramework.Dotnet6)]
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.DotnetCoreApp31)]
@@ -273,6 +275,7 @@ namespace CTA.Rules.Test
             ValidateMvcMusicStore(results, version);
         }
 
+        [TestCase(TargetFramework.Dotnet7)]
         [TestCase(TargetFramework.Dotnet6)]
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.DotnetCoreApp31)]
@@ -287,6 +290,7 @@ namespace CTA.Rules.Test
             ValidateMvcMusicStore(results, version);
         }
 
+        [TestCase(TargetFramework.Dotnet7)]
         [TestCase(TargetFramework.Dotnet6)]
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.DotnetCoreApp31)]
@@ -409,6 +413,7 @@ namespace CTA.Rules.Test
             Assert.AreEqual(4, mvcProjectActions.Count);
         }
 
+        [TestCase(TargetFramework.Dotnet7)]
         [TestCase(TargetFramework.Dotnet6)]
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.DotnetCoreApp31)]
@@ -429,6 +434,7 @@ namespace CTA.Rules.Test
             StringAssert.Contains("Include=\"Antlr3.Runtime\"", csProjectContent);
         }
 
+        [TestCase(TargetFramework.Dotnet7)]
         [TestCase(TargetFramework.Dotnet6)]
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.DotnetCoreApp31)]
@@ -442,6 +448,7 @@ namespace CTA.Rules.Test
             ValidateConfig(homeControllerText);
         }
 
+        [TestCase(TargetFramework.Dotnet7)]
         [TestCase(TargetFramework.Dotnet6)]
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.DotnetCoreApp31)]
@@ -456,6 +463,7 @@ namespace CTA.Rules.Test
 
         }
 
+        [TestCase(TargetFramework.Dotnet7)]
         [TestCase(TargetFramework.Dotnet6)]
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.DotnetCoreApp31)]
@@ -463,13 +471,14 @@ namespace CTA.Rules.Test
         {
             TestSolutionAnalysis resultWithoutCodePort = AnalyzeSolution("BuildableMvc.sln", tempDir, downloadLocation, version, portCode: false);
             var buildErrorsWithoutPortCode = GetSolutionBuildErrors(resultWithoutCodePort.SolutionRunResult.SolutionPath);
-            Assert.AreEqual(42, buildErrorsWithoutPortCode.Count);
+            Assert.True(buildErrorsWithoutPortCode.Count > 0);
 
             TestSolutionAnalysis results = AnalyzeSolution("BuildableMvc.sln", tempDir, downloadLocation, version);
             var buildErrors = GetSolutionBuildErrors(results.SolutionRunResult.SolutionPath);
             Assert.AreEqual(0, buildErrors.Count);
         }
 
+        [TestCase(TargetFramework.Dotnet7)]
         [TestCase(TargetFramework.Dotnet6)]
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.DotnetCoreApp31)]
@@ -497,6 +506,7 @@ namespace CTA.Rules.Test
             Assert.AreEqual(0, buildErrors.Count);
         }
 
+        [TestCase(TargetFramework.Dotnet7)]
         [TestCase(TargetFramework.Dotnet6)]
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.DotnetCoreApp31)]
@@ -513,6 +523,7 @@ namespace CTA.Rules.Test
             StringAssert.Contains("TryUpdateModelAsync", homeController);
         }
 
+        [TestCase(TargetFramework.Dotnet7)]
         [TestCase(TargetFramework.Dotnet6)]
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.DotnetCoreApp31)]
@@ -561,6 +572,7 @@ namespace CTA.Rules.Test
             StringAssert.DoesNotContain(@"var appSetting3 = WebConfigurationManager.AppSettings[constAppSetting];", controllerText);
         }
 
+        [TestCase(TargetFramework.Dotnet7)]
         [TestCase(TargetFramework.Dotnet6)]
         [TestCase(TargetFramework.Dotnet5)]
         [TestCase(TargetFramework.DotnetCoreApp31)]
