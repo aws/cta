@@ -48,7 +48,7 @@ namespace CTA.Rules.Test.Actions.VisualBasic
             var newNode = addCommentFunc(_syntaxGenerator, expressionAction);
 
             var expectedResult = @"' Added by CTA: Super comment
-var t = 1+5";
+var t = 1 + 5";
             Assert.AreEqual(expectedResult, newNode.ToFullString());
         }
 
@@ -80,6 +80,7 @@ New StringBuilder(""SomeText"")";
             var newNode = addCommentFunc(_syntaxGenerator, _node);
 
             var expectedResult = @"' Existing Comment
+
 ' Added by CTA: Super comment
 Math.Abs(-1)";
             Assert.AreEqual(expectedResult, newNode.ToFullString());

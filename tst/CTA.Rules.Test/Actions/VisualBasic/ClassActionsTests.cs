@@ -29,7 +29,8 @@ namespace CTA.Rules.Test.Actions.VisualBasic
             var language = LanguageNames.VisualBasic;
             _syntaxGenerator = SyntaxGenerator.GetGenerator(workspace, language);
             _typeBlockActions = new TypeBlockActions();
-            SyntaxTree tree = VisualBasicSyntaxTree.ParseText(@$"Class MyClass
+            SyntaxTree tree = VisualBasicSyntaxTree.ParseText(@$"
+Class MyClass
 End Class
 
 Module MyModule
@@ -78,8 +79,7 @@ EndModule
             var newNode = addCommentFunc(_syntaxGenerator, _blockNodes[blockType]);
 
             var expectedResult = @$"
-' Added by CTA: {commentToAdd}
-";
+' Added by CTA: {commentToAdd}";
             Assert.AreEqual(expectedResult, newNode.GetLeadingTrivia().ToFullString());
         }
 

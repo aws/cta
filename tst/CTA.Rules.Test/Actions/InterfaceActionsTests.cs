@@ -45,8 +45,7 @@ namespace CTA.Rules.Test.Actions
             var addCommentFunc = _interfaceActions.GetAddCommentAction(commentToAdd);
             var newNode = addCommentFunc(_syntaxGenerator, _node);
 
-            var expectedResult = @$"/* Added by CTA: {commentToAdd} */
-interface ISomeInterface
+            var expectedResult = @$"/* Added by CTA: {commentToAdd} */interface ISomeInterface
 {{
 }}";
             Assert.AreEqual(expectedResult, newNode.ToFullString());

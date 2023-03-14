@@ -2,7 +2,6 @@
 using Microsoft.CodeAnalysis;
 using VB = Microsoft.CodeAnalysis.VisualBasic;
 using CSharp = Microsoft.CodeAnalysis.CSharp;
-using System;
 
 namespace CTA.Rules.Actions.ActionHelpers
 {
@@ -18,7 +17,7 @@ namespace CTA.Rules.Actions.ActionHelpers
             SyntaxTriviaList leadingTrivia = node.GetLeadingTrivia();
 
             var commentFormat = dontUseCTAPrefix != null ? Constants.CommentFormatBlank : Constants.CommentFormat;
-            leadingTrivia = leadingTrivia.Add(CSharp.SyntaxFactory.SyntaxTrivia(CSharp.SyntaxKind.MultiLineCommentTrivia, string.Format(commentFormat, comment) + Environment.NewLine));
+            leadingTrivia = leadingTrivia.Add(CSharp.SyntaxFactory.SyntaxTrivia(CSharp.SyntaxKind.MultiLineCommentTrivia, string.Format(commentFormat, comment)));
             node = node.WithLeadingTrivia(leadingTrivia);
             return node;
         }
@@ -33,7 +32,7 @@ namespace CTA.Rules.Actions.ActionHelpers
             SyntaxTriviaList leadingTrivia = node.GetLeadingTrivia();
 
             var commentFormat = !string.IsNullOrEmpty(dontUseCTAPrefix) ? Constants.VbCommentFormatBlank : Constants.VbCommentFormat;
-            leadingTrivia = leadingTrivia.Add(VB.SyntaxFactory.SyntaxTrivia(VB.SyntaxKind.CommentTrivia, string.Format(commentFormat, comment) + Environment.NewLine));
+            leadingTrivia = leadingTrivia.Add(VB.SyntaxFactory.SyntaxTrivia(VB.SyntaxKind.CommentTrivia, string.Format(commentFormat, comment)));
             node = node.WithLeadingTrivia(leadingTrivia);
             return node;            
         }

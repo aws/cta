@@ -63,8 +63,7 @@ End Class";
             var addCommentFunc = _compilationUnitActions.GetAddCommentAction(commentToAdd);
             var newNode = addCommentFunc(_syntaxGenerator, _node);
 
-            var expectedResult = @$"' Added by CTA: {commentToAdd}
-Imports System.Web
+            var expectedResult = @$"' Added by CTA: {commentToAdd}Imports System.Web
 Class MyClass
 End Class";
             Assert.AreEqual(expectedResult, newNode.ToFullString());

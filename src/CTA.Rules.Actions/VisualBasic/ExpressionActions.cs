@@ -31,7 +31,7 @@ namespace CTA.Rules.Actions.VisualBasic
         {
             SyntaxNode AddComment(SyntaxGenerator syntaxGenerator, SyntaxNode node)
             {
-                return CommentHelper.AddVBComment(node, comment);
+                return CommentHelper.AddVBComment(node, comment).NormalizeWhitespace();
             }
             return AddComment;
         }
