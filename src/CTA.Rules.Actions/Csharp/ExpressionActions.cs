@@ -32,7 +32,7 @@ namespace CTA.Rules.Actions.Csharp
         {
             SyntaxNode AddComment(SyntaxGenerator syntaxGenerator, SyntaxNode node)
             {
-                return CommentHelper.AddCSharpComment(node, comment).NormalizeWhitespace();
+                return CommentHelper.AddCSharpComment(node, comment);
             }
             return AddComment;
         }

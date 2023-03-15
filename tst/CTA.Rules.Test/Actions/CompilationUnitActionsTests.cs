@@ -67,7 +67,8 @@ class MyClass
             var addCommentFunc = _compilationUnitActions.GetAddCommentAction(commentToAdd);
             var newNode = addCommentFunc(_syntaxGenerator, _node);
 
-            var expectedResult = @$"/* Added by CTA: {commentToAdd} */using System.Web;
+            var expectedResult = @$"/* Added by CTA: {commentToAdd} */
+using System.Web;
 class MyClass
 {{
 }}";

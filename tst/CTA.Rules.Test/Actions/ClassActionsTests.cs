@@ -38,7 +38,8 @@ namespace CTA.Rules.Test.Actions
             var addCommentFunc = _classActions.GetAddCommentAction(commentToAdd);
             var newNode = addCommentFunc(_syntaxGenerator, _node);
 
-            var expectedResult = @$"/* Added by CTA: {commentToAdd} */class MyClass
+            var expectedResult = @$"/* Added by CTA: {commentToAdd} */
+class MyClass
 {{
 }}";
             Assert.AreEqual(expectedResult, newNode.ToFullString());

@@ -2,6 +2,7 @@
 using Microsoft.CodeAnalysis;
 using VB = Microsoft.CodeAnalysis.VisualBasic;
 using CSharp = Microsoft.CodeAnalysis.CSharp;
+using System;
 
 namespace CTA.Rules.Actions.ActionHelpers
 {
@@ -18,6 +19,7 @@ namespace CTA.Rules.Actions.ActionHelpers
 
             var commentFormat = dontUseCTAPrefix != null ? Constants.CommentFormatBlank : Constants.CommentFormat;
             leadingTrivia = leadingTrivia.Add(CSharp.SyntaxFactory.SyntaxTrivia(CSharp.SyntaxKind.MultiLineCommentTrivia, string.Format(commentFormat, comment)));
+            leadingTrivia = leadingTrivia.Add(CSharp.SyntaxFactory.SyntaxTrivia(CSharp.SyntaxKind.EndOfLineTrivia, Environment.NewLine));
             node = node.WithLeadingTrivia(leadingTrivia);
             return node;
         }
@@ -33,6 +35,7 @@ namespace CTA.Rules.Actions.ActionHelpers
 
             var commentFormat = !string.IsNullOrEmpty(dontUseCTAPrefix) ? Constants.VbCommentFormatBlank : Constants.VbCommentFormat;
             leadingTrivia = leadingTrivia.Add(VB.SyntaxFactory.SyntaxTrivia(VB.SyntaxKind.CommentTrivia, string.Format(commentFormat, comment)));
+            leadingTrivia = leadingTrivia.Add(CSharp.SyntaxFactory.SyntaxTrivia(CSharp.SyntaxKind.EndOfLineTrivia, Environment.NewLine));
             node = node.WithLeadingTrivia(leadingTrivia);
             return node;            
         }
