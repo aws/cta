@@ -10,19 +10,19 @@ namespace CTA.Rules.Test
     [SetUpFixture]
     public class SetupTests : AwsRulesBaseTest
     {
-        public static string TempDir;
+        public static string CtaTestProjectsDir;
         public static string DownloadLocation;
 
         [OneTimeSetUp]
         public void Setup()
         {
             Setup(this.GetType());
-            TempDir = GetTstPath(Path.Combine(new string[] { "Projects", "Temp", "CTA" }));
+            CtaTestProjectsDir = GetTstPath(Path.Combine(new string[] { "Projects", "Temp", "CTA" }));
             DownloadTestProjects();
         }
         private void DownloadTestProjects()
         {
-            var tempDirectory = Directory.CreateDirectory(TempDir);
+            var tempDirectory = Directory.CreateDirectory(CtaTestProjectsDir);
             DownloadLocation = Path.Combine(tempDirectory.FullName, "d");
 
             var fileName = Path.Combine(tempDirectory.Parent.FullName, @"TestProjects.zip");
@@ -42,7 +42,7 @@ namespace CTA.Rules.Test
             {
                 try
                 {
-                    Directory.Delete(TempDir, true);
+                    Directory.Delete(CtaTestProjectsDir, true);
                 }
                 catch (Exception)
                 {

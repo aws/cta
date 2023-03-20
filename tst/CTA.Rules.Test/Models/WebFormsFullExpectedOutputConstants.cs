@@ -46,10 +46,10 @@ using WebFormsFull.Modules;
 using log4net;
 using System;
 using System.Configuration;
+using System.Data.Entity;
 using System.Diagnostics;
 using System.Web;
 using Microsoft.AspNetCore.Components;
-using Microsoft.EntityFrameworkCore;
 
 namespace WebFormsFull
 {
@@ -140,6 +140,7 @@ using WebFormsFull.Modules;
 using log4net;
 using System;
 using System.Configuration;
+using System.Data.Entity;
 using System.Diagnostics;
 using System.Web;
 using eShopLegacyWebForms.HttpHandlers;
@@ -149,7 +150,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.EntityFrameworkCore;
 
 namespace WebFormsFull
 {
@@ -190,6 +190,7 @@ namespace WebFormsFull
                 app.UseDeveloperExceptionPage();
             }
 
+            
             // Code that runs on application startup
             // The following lines were extracted from Application_Start
             RouteConfig.RegisterRoutes(RouteTable.Routes);
@@ -232,9 +233,9 @@ namespace WebFormsFull
         {
             services.AddRazorPages();
             services.AddServerSideBlazor();
-        // Did not attempt to migrate service layer
-        // and configure dependency injection in ConfigureServices(),
-        // this must be done manually
+             // Did not attempt to migrate service layer
+            // and configure dependency injection in ConfigureServices(),
+            // this must be done manually
         }
 
         /// <summary>
@@ -243,7 +244,7 @@ namespace WebFormsFull
         private void ConfigureContainer()
         {
             var builder = new ContainerBuilder();
-            var mockData = bool.Parse(ConfigurationManager.Configuration.GetSection(""appSettings"")[""UseMockData""]);
+            var mockData = bool.Parse(ConfigurationManager.AppSettings[""UseMockData""]);
             builder.RegisterModule(new ApplicationModule(mockData));
             container = builder.Build();
             _containerProvider = new ContainerProvider(container);
@@ -251,21 +252,21 @@ namespace WebFormsFull
 
         private void ConfigDataBase()
         {
-            var mockData = bool.Parse(ConfigurationManager.Configuration.GetSection(""appSettings"")[""UseMockData""]);
+            var mockData = bool.Parse(ConfigurationManager.AppSettings[""UseMockData""]);
             if (!mockData)
             {
                 Database.SetInitializer<CatalogDBContext>(container.Resolve<CatalogDBInitializer>());
             }
         }
-
         // Unable to migrate the following code, as a result it was removed
         // /// <summary>
-        /// Track the machine name and the start time for the session inside the current session
-        /// </summary>
-        protected void Session_Start(Object sender, EventArgs e) // {
-    //     HttpContext.Current.Session[""MachineName""] = Environment.MachineName;
-    //     HttpContext.Current.Session[""SessionStartTime""] = DateTime.Now;
-    // }
+/// Track the machine name and the start time for the session inside the current session
+/// </summary>
+protected void Session_Start(Object sender, EventArgs e)
+        // {
+        //     HttpContext.Current.Session[""MachineName""] = Environment.MachineName;
+        //     HttpContext.Current.Session[""SessionStartTime""] = DateTime.Now;
+        // }
     }
 }";
 
@@ -277,10 +278,10 @@ using WebFormsFull.Modules;
 using log4net;
 using System;
 using System.Configuration;
+using System.Data.Entity;
 using System.Diagnostics;
 using System.Web;
 using Microsoft.AspNetCore.Components;
-using Microsoft.EntityFrameworkCore;
 
 namespace WebFormsFull
 {

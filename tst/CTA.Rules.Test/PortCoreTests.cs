@@ -20,7 +20,7 @@ namespace CTA.Rules.Test
         [SetUp]
         public void Setup()
         {
-            tempDir = SetupTests.TempDir;
+            tempDir = SetupTests.CtaTestProjectsDir;
             downloadLocation = SetupTests.DownloadLocation;
         }
 
@@ -132,7 +132,7 @@ namespace CTA.Rules.Test
         [TestCase(TargetFramework.DotnetCoreApp31)]
         public void TestWebApiWithReferences(string version)
         {
-            var solutionPath = CopySolutionFolderToTemp("WebApiWithReferences.sln", tempDir);
+            var solutionPath = CopySolutionDirToUniqueTempDir("WebApiWithReferences.sln", tempDir);
             TestSolutionAnalysis results = AnalyzeSolution(solutionPath, version);
 
             ValidateWebApiWithReferences(results);
@@ -141,7 +141,7 @@ namespace CTA.Rules.Test
         [TestCase(TargetFramework.DotnetCoreApp31)]
         public async Task TestWebApiWithReferencesUsingGenerator(string version)
         {
-            var solutionPath = CopySolutionFolderToTemp("WebApiWithReferences.sln", tempDir);
+            var solutionPath = CopySolutionDirToUniqueTempDir("WebApiWithReferences.sln", tempDir);
 
             AnalyzerConfiguration configuration = new AnalyzerConfiguration(LanguageOptions.CSharp)
             {
@@ -269,7 +269,7 @@ namespace CTA.Rules.Test
         [TestCase(TargetFramework.DotnetCoreApp31)]
         public void TestMvcMusicStore(string version)
         {
-            var solutionPath = CopySolutionFolderToTemp("MvcMusicStore.sln", tempDir);
+            var solutionPath = CopySolutionDirToUniqueTempDir("MvcMusicStore.sln", tempDir);
             TestSolutionAnalysis results = AnalyzeSolution(solutionPath, version);
 
             ValidateMvcMusicStore(results, version);
@@ -281,7 +281,7 @@ namespace CTA.Rules.Test
         [TestCase(TargetFramework.DotnetCoreApp31)]
         public void TestMvcMusicStoreWithReferences(string version)
         {
-            var solutionPath = CopySolutionFolderToTemp("MvcMusicStore.sln", tempDir);
+            var solutionPath = CopySolutionDirToUniqueTempDir("MvcMusicStore.sln", tempDir);
             var analyzerResults = GenerateSolutionAnalysis(solutionPath);
 
             var metaReferences = analyzerResults.ToDictionary(a => a.ProjectResult.ProjectFilePath, a => a.ProjectBuildResult.Project.MetadataReferences.Select(m => m.Display).ToList());
@@ -296,11 +296,11 @@ namespace CTA.Rules.Test
         [TestCase(TargetFramework.DotnetCoreApp31)]
         public void TestMvcMusicStoreWithoutProjectPort(string version)
         {
-            var solutionPath = CopySolutionFolderToTemp("MvcMusicStore.sln", tempDir);
+            var solutionPath = CopySolutionDirToUniqueTempDir("MvcMusicStore.sln", tempDir);
             var analyzerResults = GenerateSolutionAnalysis(solutionPath);
 
             var metaReferences = analyzerResults.ToDictionary(a => a.ProjectResult.ProjectFilePath, a => a.ProjectBuildResult.Project.MetadataReferences.Select(m => m.Display).ToList());
-            TestSolutionAnalysis results = AnalyzeSolution(solutionPath, version, metaReferences, true, false, false);
+            TestSolutionAnalysis results = AnalyzeSolution(solutionPath, version, metaReferences, /*true,*/ false, false);
 
             ValidateMvcMusicStoreSolutionRunResultNodeTokenDeepClone(results);
         }

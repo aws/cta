@@ -1,21 +1,51 @@
 ﻿using CTA.Rules.Test.Models;
 using NUnit.Framework;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace CTA.Rules.Test
 {
+    [TestFixture]
     public class WCFTests : AwsRulesBaseTest
     {
-        public string tempDir = "";
+        public string ctaTestProjectsDir = "";
         public string downloadLocation;
+        private Dictionary<string, TestSolutionAnalysis> _paCoreWCFSupportResultsDict;
+        private Dictionary<string, TestSolutionAnalysis> _wcfTCPSelfHostResultsDict;
 
-        [SetUp]
+        [OneTimeSetUp]
         public void Setup()
         {
-            tempDir = SetupTests.TempDir;
+            ctaTestProjectsDir = SetupTests.CtaTestProjectsDir;
             downloadLocation = SetupTests.DownloadLocation;
+
+            var solutionName = "PACoreWCFSupport.sln";
+            var net31Results = CopySolutionToUniqueTempDirAndAnalyze(solutionName, ctaTestProjectsDir, TargetFramework.DotnetCoreApp31);
+            var net50Results = CopySolutionToUniqueTempDirAndAnalyze(solutionName, ctaTestProjectsDir, TargetFramework.Dotnet5);
+            var net60Results = CopySolutionToUniqueTempDirAndAnalyze(solutionName, ctaTestProjectsDir, TargetFramework.Dotnet6);
+            var net70Results = CopySolutionToUniqueTempDirAndAnalyze(solutionName, ctaTestProjectsDir, TargetFramework.Dotnet7);
+            _paCoreWCFSupportResultsDict = new Dictionary<string, TestSolutionAnalysis>
+            {
+                {TargetFramework.DotnetCoreApp31, net31Results},
+                {TargetFramework.Dotnet5, net50Results},
+                {TargetFramework.Dotnet6, net60Results},
+                {TargetFramework.Dotnet7, net70Results}
+            };
+            
+            solutionName = "WCFTCPSelfHost.sln";
+            net31Results = CopySolutionToUniqueTempDirAndAnalyze(solutionName, ctaTestProjectsDir, TargetFramework.DotnetCoreApp31);
+            net50Results = CopySolutionToUniqueTempDirAndAnalyze(solutionName, ctaTestProjectsDir, TargetFramework.Dotnet5);
+            net60Results = CopySolutionToUniqueTempDirAndAnalyze(solutionName, ctaTestProjectsDir, TargetFramework.Dotnet6);
+            net70Results = CopySolutionToUniqueTempDirAndAnalyze(solutionName, ctaTestProjectsDir, TargetFramework.Dotnet7);
+            _wcfTCPSelfHostResultsDict = new Dictionary<string, TestSolutionAnalysis>
+            {
+                {TargetFramework.DotnetCoreApp31, net31Results},
+                {TargetFramework.Dotnet5, net50Results},
+                {TargetFramework.Dotnet6, net60Results},
+                {TargetFramework.Dotnet7, net70Results}
+            };
         }
 
         [TestCase(TargetFramework.Dotnet7)]
@@ -24,8 +54,7 @@ namespace CTA.Rules.Test
         [TestCase(TargetFramework.DotnetCoreApp31)]
         public void TestBasicHttpBindingAndTransportSecurity(string version)
         {
-            var solutionPath = CopySolutionFolderToTemp("PACoreWCFSupport.sln", tempDir);
-            TestSolutionAnalysis results = AnalyzeSolution(solutionPath, version);
+            var results = _paCoreWCFSupportResultsDict[version];
 
             var testCaseName = "TC2BasicHttpTransportSecurity";
             var project = results.ProjectResults.Where(prop => prop.CsProjectPath.EndsWith(testCaseName + ".csproj")).FirstOrDefault();
@@ -63,8 +92,7 @@ namespace CTA.Rules.Test
         [TestCase(TargetFramework.DotnetCoreApp31)]
         public void TestBasicHttpTransportMessageCredUserName(string version)
         {
-            var solutionPath = CopySolutionFolderToTemp("PACoreWCFSupport.sln", tempDir);
-            TestSolutionAnalysis results = AnalyzeSolution(solutionPath, version);
+            var results = _paCoreWCFSupportResultsDict[version];
 
             var testCaseName = "TC3BasicHttpTransportMessageCredUserName";
             var project = results.ProjectResults.Where(prop => prop.CsProjectPath.EndsWith(testCaseName + ".csproj")).FirstOrDefault();
@@ -102,8 +130,7 @@ namespace CTA.Rules.Test
         [TestCase(TargetFramework.DotnetCoreApp31)]
         public void TestBasicHttpTransportMessageCredCertificate(string version)
         {
-            var solutionPath = CopySolutionFolderToTemp("PACoreWCFSupport.sln", tempDir);
-            TestSolutionAnalysis results = AnalyzeSolution(solutionPath, version);
+            var results = _paCoreWCFSupportResultsDict[version];
 
             var testCaseName = "TC4BasicHttpTransportMessageCredCertificate";
             var project = results.ProjectResults.Where(prop => prop.CsProjectPath.EndsWith(testCaseName + ".csproj")).FirstOrDefault();
@@ -141,8 +168,7 @@ namespace CTA.Rules.Test
         [TestCase(TargetFramework.DotnetCoreApp31)]
         public void TestWSHttpBindingWithWindowsAuth(string version)
         {
-            var solutionPath = CopySolutionFolderToTemp("PACoreWCFSupport.sln", tempDir);
-            TestSolutionAnalysis results = AnalyzeSolution(solutionPath, version);
+            var results = _paCoreWCFSupportResultsDict[version];
 
             var testCaseName = "TC5WSHttpBindingWithWindowsAuth";
             var project = results.ProjectResults.Where(prop => prop.CsProjectPath.EndsWith(testCaseName + ".csproj")).FirstOrDefault();
@@ -180,8 +206,7 @@ namespace CTA.Rules.Test
         [TestCase(TargetFramework.DotnetCoreApp31)]
         public void TestBasicHttpMessageSecurity(string version)
         {
-            var solutionPath = CopySolutionFolderToTemp("PACoreWCFSupport.sln", tempDir);
-            TestSolutionAnalysis results = AnalyzeSolution(solutionPath, version);
+            var results = _paCoreWCFSupportResultsDict[version];
 
             var project = results.ProjectResults.Where(prop => prop.CsProjectPath.EndsWith("TC6BasicHttpMessageSecurity.csproj")).FirstOrDefault();
             var projectDir = Directory.GetParent(project.CsProjectPath).FullName;
@@ -204,8 +229,7 @@ namespace CTA.Rules.Test
         [TestCase(TargetFramework.DotnetCoreApp31)]
         public void TestNetTCPBindingDefaultSecurity(string version)
         {
-            var solutionPath = CopySolutionFolderToTemp("PACoreWCFSupport.sln", tempDir);
-            TestSolutionAnalysis results = AnalyzeSolution(solutionPath, version);
+            var results = _paCoreWCFSupportResultsDict[version];
 
             var testCaseName = "TC7NetTCPBindingDefaultSecurity";
             var project = results.ProjectResults.Where(prop => prop.CsProjectPath.EndsWith(testCaseName + ".csproj")).FirstOrDefault();
@@ -243,8 +267,7 @@ namespace CTA.Rules.Test
         [TestCase(TargetFramework.DotnetCoreApp31)]
         public void TestNetPipeBindingDefault(string version)
         {
-            var solutionPath = CopySolutionFolderToTemp("PACoreWCFSupport.sln", tempDir);
-            TestSolutionAnalysis results = AnalyzeSolution(solutionPath, version);
+            var results = _paCoreWCFSupportResultsDict[version];
 
             var project = results.ProjectResults.Where(prop => prop.CsProjectPath.EndsWith("TC8NetPipeBindingDefault.csproj")).FirstOrDefault();
             var projectDir = Directory.GetParent(project.CsProjectPath).FullName;
@@ -267,8 +290,7 @@ namespace CTA.Rules.Test
         [TestCase(TargetFramework.DotnetCoreApp31)]
         public void TestBasicHttpAndNetTCPSupported(string version)
         {
-            var solutionPath = CopySolutionFolderToTemp("PACoreWCFSupport.sln", tempDir);
-            TestSolutionAnalysis results = AnalyzeSolution(solutionPath, version);
+            var results = _paCoreWCFSupportResultsDict[version];
 
             var testCaseName = "TC9BasicHttpAndNetTCPSupported";
             var project = results.ProjectResults.Where(prop => prop.CsProjectPath.EndsWith(testCaseName + ".csproj")).FirstOrDefault();
@@ -306,8 +328,7 @@ namespace CTA.Rules.Test
         [TestCase(TargetFramework.DotnetCoreApp31)]
         public void TestWsHttpAndNetPipe(string version)
         {
-            var solutionPath = CopySolutionFolderToTemp("PACoreWCFSupport.sln", tempDir);
-            TestSolutionAnalysis results = AnalyzeSolution(solutionPath, version);
+            var results = _paCoreWCFSupportResultsDict[version];
 
             var testCaseName = "TC10WsHttpAndNetPipe";
             var project = results.ProjectResults.Where(prop => prop.CsProjectPath.EndsWith(testCaseName + ".csproj")).FirstOrDefault();
@@ -345,8 +366,7 @@ namespace CTA.Rules.Test
         [TestCase(TargetFramework.DotnetCoreApp31)]
         public void TestCodeBasedBasicHttpDefaultSecurity(string version)
         {
-            var solutionPath = CopySolutionFolderToTemp("PACoreWCFSupport.sln", tempDir);
-            TestSolutionAnalysis results = AnalyzeSolution(solutionPath, version);
+            var results = _paCoreWCFSupportResultsDict[version];
 
             var testCaseName = "TC1CodeBasicHttpDefaultSecurity";
             var project = results.ProjectResults.Where(prop => prop.CsProjectPath.EndsWith(testCaseName + ".csproj")).FirstOrDefault();
@@ -379,8 +399,7 @@ namespace CTA.Rules.Test
         [TestCase(TargetFramework.DotnetCoreApp31)]
         public void TestCodeBasicHttpTransportSecurity(string version)
         {
-            var solutionPath = CopySolutionFolderToTemp("PACoreWCFSupport.sln", tempDir);
-            TestSolutionAnalysis results = AnalyzeSolution(solutionPath, version);
+            var results = _paCoreWCFSupportResultsDict[version];
 
             var testCaseName = "TC2CodeBasicHttpTransportSecurity";
             var project = results.ProjectResults.Where(prop => prop.CsProjectPath.EndsWith(testCaseName + ".csproj")).FirstOrDefault();
@@ -413,8 +432,7 @@ namespace CTA.Rules.Test
         [TestCase(TargetFramework.DotnetCoreApp31)]
         public void TestCodeBasicHttpTransportMessageCredUserName(string version)
         {
-            var solutionPath = CopySolutionFolderToTemp("PACoreWCFSupport.sln", tempDir);
-            TestSolutionAnalysis results = AnalyzeSolution(solutionPath, version);
+            var results = _paCoreWCFSupportResultsDict[version];
 
             var testCaseName = "TC3CodeBasicHttpTransportMessageCredUserName";
             var project = results.ProjectResults.Where(prop => prop.CsProjectPath.EndsWith(testCaseName + ".csproj")).FirstOrDefault();
@@ -447,8 +465,7 @@ namespace CTA.Rules.Test
         [TestCase(TargetFramework.DotnetCoreApp31)]
         public void TestCodeBasicHttpNetTCPSupported(string version)
         {
-            var solutionPath = CopySolutionFolderToTemp("PACoreWCFSupport.sln", tempDir);
-            TestSolutionAnalysis results = AnalyzeSolution(solutionPath, version);
+            var results = _paCoreWCFSupportResultsDict[version];
 
             var testCaseName = "TC9CodeBasicHttpNetTCPSupported";
             var project = results.ProjectResults.Where(prop => prop.CsProjectPath.EndsWith(testCaseName + ".csproj")).FirstOrDefault();
@@ -481,8 +498,7 @@ namespace CTA.Rules.Test
         [TestCase(TargetFramework.DotnetCoreApp31)]
         public void TestWCFClient(string version)
         {
-            var solutionPath = CopySolutionFolderToTemp("WCFTCPSelfHost.sln", tempDir);
-            TestSolutionAnalysis results = AnalyzeSolution(solutionPath, version);
+            var results = _wcfTCPSelfHostResultsDict[version];
 
             var testCaseName = "WcfTcpClient";
             var project = results.ProjectResults.Where(prop => prop.CsProjectPath.EndsWith(testCaseName + ".csproj")).FirstOrDefault();
@@ -500,8 +516,7 @@ namespace CTA.Rules.Test
         [TestCase(TargetFramework.DotnetCoreApp31)]
         public void TestWCFServiceLibrary(string version)
         {
-            var solutionPath = CopySolutionFolderToTemp("WCFTCPSelfHost.sln", tempDir);
-            TestSolutionAnalysis results = AnalyzeSolution(solutionPath, version);
+            var results = _wcfTCPSelfHostResultsDict[version];
 
             var testCaseName = "WcfServiceLibrary1";
             var project = results.ProjectResults.Where(prop => prop.CsProjectPath.EndsWith(testCaseName + ".csproj")).FirstOrDefault();

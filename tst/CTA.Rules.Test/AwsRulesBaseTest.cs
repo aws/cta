@@ -65,6 +65,23 @@ namespace CTA.Rules.Test
             return Path.Combine(srcPath, path);
         }
 
+        /// <summary>
+        /// Finds a solution within the designated directory and copies it to a unique,
+        /// temporary directory where it can be ported in isolation.
+        /// </summary>
+        /// <param name="solutionName"></param>
+        /// <param name="searchDir"></param>
+        /// <param name="targetFrameworkVersion"></param>
+        /// <returns>Results of the CTA analysis/port</returns>
+        public TestSolutionAnalysis CopySolutionToUniqueTempDirAndAnalyze(
+            string solutionName, 
+            string searchDir, 
+            string targetFrameworkVersion)
+        {
+            var solutionPath = CopySolutionDirToUniqueTempDir(solutionName, searchDir);
+            return AnalyzeSolution(solutionPath, targetFrameworkVersion);
+        }
+
         public TestSolutionAnalysis AnalyzeSolution(
             string solutionName,
             string tempDir,
@@ -79,17 +96,17 @@ namespace CTA.Rules.Test
 
             if (!skipCopy)
             {
-                solutionPath = CopySolutionFolderToTemp(solutionName, downloadLocation);
+                solutionPath = CopySolutionDirToUniqueTempDir(solutionName, downloadLocation);
             }
 
-            return AnalyzeSolution(solutionPath, version, metaReferences, true, portCode, portProject);
+            return AnalyzeSolution(solutionPath, version, metaReferences, portCode, portProject);
         }
 
         public TestSolutionAnalysis AnalyzeSolution(
             string solutionPath,
             string version,
             Dictionary<string, List<string>> metaReferences = null,
-            bool skipCopy = false,
+            //bool skipCopy = false,
             bool portCode = true,
             bool portProject = true)
         {
@@ -100,7 +117,7 @@ namespace CTA.Rules.Test
                 List<PortCoreConfiguration> solutionPortConfiguration = new List<PortCoreConfiguration>();
                 IEnumerable<string> projectFiles = Utils.GetProjectPaths(solutionPath);
 
-                if (projectFiles != null && projectFiles.Count() > 0)
+                if (projectFiles != null && projectFiles.Any())
                 {
                     foreach (string projectFile in projectFiles)
                     {
@@ -291,7 +308,7 @@ namespace CTA.Rules.Test
             }
         }
 
-        protected string CopySolutionFolderToTemp(string solutionName, string searchDir)
+        protected string CopySolutionDirToUniqueTempDir(string solutionName, string searchDir)
         {
             var solutionPath = Directory.EnumerateFiles(searchDir, solutionName, SearchOption.AllDirectories).FirstOrDefault(s => !s.Contains(string.Concat(Path.DirectorySeparatorChar, CopyFolder, Path.DirectorySeparatorChar)));
             var solutionDir = Directory.GetParent(solutionPath).FullName;

@@ -24,7 +24,7 @@ namespace CTA.Rules.Test
         [SetUp]
         public void Setup()
         {
-            _tempDir = SetupTests.TempDir;
+            _tempDir = SetupTests.CtaTestProjectsDir;
             _downloadLocation = SetupTests.DownloadLocation;
             _ctaFiles = Directory.EnumerateFiles(Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "CTAFiles")), "*.json")
                .Select(s => Path.GetFileNameWithoutExtension(s))
@@ -99,7 +99,7 @@ namespace CTA.Rules.Test
         [Test]
         public async Task RunMixedUsingGenerator()
         {
-            var solutionPath = CopySolutionFolderToTemp("MixedClassLibrary.sln", _tempDir);
+            var solutionPath = CopySolutionDirToUniqueTempDir("MixedClassLibrary.sln", _tempDir);
 
             AnalyzerConfiguration configuration = new AnalyzerConfiguration(LanguageOptions.CSharp)
             {

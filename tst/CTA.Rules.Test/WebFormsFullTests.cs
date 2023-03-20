@@ -14,22 +14,21 @@ namespace CTA.Rules.Test
     [TestFixture]
     class WebFormsFullTests : AwsRulesBaseTest
     {
-        public string tempDir = "";
+        public string ctaTestProjectsDir = "";
         public string downloadLocation;
         private Dictionary<string, TestSolutionAnalysis> _resultsDict;
 
         [OneTimeSetUp]
         public void Setup()
         {
-            tempDir = SetupTests.TempDir;
+            ctaTestProjectsDir = SetupTests.CtaTestProjectsDir;
             downloadLocation = SetupTests.DownloadLocation;
 
             var solutionName = "WebFormsFull.sln";
-            var solutionPath = CopySolutionFolderToTemp(solutionName, tempDir);
-            var net31Results = AnalyzeSolution(solutionPath, TargetFramework.DotnetCoreApp31);
-            var net50Results = AnalyzeSolution(solutionPath, TargetFramework.Dotnet5);
-            var net60Results = AnalyzeSolution(solutionPath, TargetFramework.Dotnet6);
-            var net70Results = AnalyzeSolution(solutionPath, TargetFramework.Dotnet7);
+            var net31Results = CopySolutionToUniqueTempDirAndAnalyze(solutionName, ctaTestProjectsDir, TargetFramework.DotnetCoreApp31);
+            var net50Results = CopySolutionToUniqueTempDirAndAnalyze(solutionName, ctaTestProjectsDir, TargetFramework.Dotnet5);
+            var net60Results = CopySolutionToUniqueTempDirAndAnalyze(solutionName, ctaTestProjectsDir, TargetFramework.Dotnet6);
+            var net70Results = CopySolutionToUniqueTempDirAndAnalyze(solutionName, ctaTestProjectsDir, TargetFramework.Dotnet7);
 
             _resultsDict = new Dictionary<string, TestSolutionAnalysis>
             {

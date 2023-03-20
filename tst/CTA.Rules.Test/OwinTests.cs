@@ -6,15 +6,16 @@ using System.Text.RegularExpressions;
 
 namespace CTA.Rules.Test
 {
+    [TestFixture]
     public class OwinTests : AwsRulesBaseTest
     {
         public string tempDir = "";
         public string downloadLocation;
 
-        [SetUp]
+        [OneTimeSetUp]
         public void Setup()
         {
-            tempDir = SetupTests.TempDir;
+            tempDir = SetupTests.CtaTestProjectsDir;
             downloadLocation = SetupTests.DownloadLocation;
         }
 

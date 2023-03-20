@@ -15,7 +15,7 @@ namespace CTA.Rules.Test
 {
     public class CTATests : AwsRulesBaseTest
     {
-        public string tempDir = "";
+        public string ctaTestProjectsDir = "";
         public string downloadLocation;
         public List<string> ctaFiles;
         public string version = "net5.0"; //We don't care about version for CTA-only rules:
@@ -23,7 +23,7 @@ namespace CTA.Rules.Test
         [SetUp]
         public void Setup()
         {
-            tempDir = SetupTests.TempDir;
+            ctaTestProjectsDir = SetupTests.CtaTestProjectsDir;
             downloadLocation = SetupTests.DownloadLocation;
             ctaFiles = Directory.EnumerateFiles(Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "CTAFiles")), "*.json")
                .Select(s => Path.GetFileNameWithoutExtension(s))
@@ -33,9 +33,9 @@ namespace CTA.Rules.Test
         [Test]
         public void TestCli()
         {
-            string mvcMusicStorePath = Directory.EnumerateFiles(tempDir, "MvcMusicStore.sln", SearchOption.AllDirectories).FirstOrDefault();
-            string mvcMusicStoreProjectPath = Directory.EnumerateFiles(tempDir, "MvcMusicStore.csproj", SearchOption.AllDirectories).FirstOrDefault();
-            string[] args = { "-p", mvcMusicStoreProjectPath, "-s", mvcMusicStorePath, "-r", Path.Combine(tempDir, "Input"), "-a", "", "-m", "true" };
+            string mvcMusicStorePath = Directory.EnumerateFiles(ctaTestProjectsDir, "MvcMusicStore.sln", SearchOption.AllDirectories).FirstOrDefault();
+            string mvcMusicStoreProjectPath = Directory.EnumerateFiles(ctaTestProjectsDir, "MvcMusicStore.csproj", SearchOption.AllDirectories).FirstOrDefault();
+            string[] args = { "-p", mvcMusicStoreProjectPath, "-s", mvcMusicStorePath, "-r", Path.Combine(ctaTestProjectsDir, "Input"), "-a", "", "-m", "true" };
             var cli = new RulesCli();
             cli.HandleCommand(args);
             Assert.NotNull(cli);
@@ -48,7 +48,7 @@ namespace CTA.Rules.Test
 
         private TestSolutionAnalysis runCTAFile(string solutionName, string projectName = null) 
         {
-            var solutionPath = CopySolutionFolderToTemp(solutionName, downloadLocation);
+            var solutionPath = CopySolutionDirToUniqueTempDir(solutionName, downloadLocation);
             var solutionDir = Directory.GetParent(solutionPath).FullName;
 
             FileAssert.Exists(solutionPath);
@@ -209,7 +209,7 @@ namespace CTA.Rules.Test
         [Test]
         public void TestProjectsOutsideSolutionPath_Are_Ported()
         {
-            var results = AnalyzeSolution("Application_Proj_diff_folder.sln", tempDir, downloadLocation, version);
+            var results = AnalyzeSolution("Application_Proj_diff_folder.sln", ctaTestProjectsDir, downloadLocation, version);
 
             FileAssert.Exists(results.ProjectResults[0].CsProjectPath);
             FileAssert.Exists(results.ProjectResults[1].CsProjectPath);
@@ -224,10 +224,10 @@ namespace CTA.Rules.Test
         [Test]
         public void AnalysisDoesNotModifyWhitespace()
         {
-            var routeConfigFileContentBefore = File.ReadAllText(Directory.EnumerateFiles(tempDir, "RouteConfig.cs", SearchOption.AllDirectories)
+            var routeConfigFileContentBefore = File.ReadAllText(Directory.EnumerateFiles(ctaTestProjectsDir, "RouteConfig.cs", SearchOption.AllDirectories)
                 .Where(x=> x.Contains("BuildableWebApi")).FirstOrDefault());
 
-            var results = AnalyzeSolution("BuildableWebApi.sln", tempDir, downloadLocation, version, portCode: false, portProject: false);
+            var results = AnalyzeSolution("BuildableWebApi.sln", ctaTestProjectsDir, downloadLocation, version, portCode: false, portProject: false);
 
             var resultSolutionPath = new FileInfo(results.SolutionRunResult.SolutionPath).Directory.FullName;
             var routeConfigFileContentAfter = File.ReadAllText(Directory.EnumerateFiles(resultSolutionPath, "RouteConfig.cs", SearchOption.AllDirectories).FirstOrDefault());

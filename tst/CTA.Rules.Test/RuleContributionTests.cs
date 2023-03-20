@@ -16,19 +16,17 @@ namespace CTA.Rules.Test
     {
         private const string RuleContributionsSolutionFileName = "RuleContributions.sln";
         private const string RuleContributionsProjectFileName = "RuleContributions.csproj";
-        private string _tempDir = "";
+        private string _ctaTestProjectsDir = "";
         private Dictionary<string, TestSolutionAnalysis> _resultsDict;
 
         [OneTimeSetUp]
         public void Setup()
         {
-            _tempDir = SetupTests.TempDir;
-
-            var solutionPath = CopySolutionFolderToTemp(RuleContributionsSolutionFileName, _tempDir);
-            var net31Results = AnalyzeSolution(solutionPath, TargetFramework.DotnetCoreApp31);
-            var net50Results = AnalyzeSolution(solutionPath, TargetFramework.Dotnet5);
-            var net60Results = AnalyzeSolution(solutionPath, TargetFramework.Dotnet6);
-            var net70Results = AnalyzeSolution(solutionPath, TargetFramework.Dotnet7);
+            _ctaTestProjectsDir = SetupTests.CtaTestProjectsDir;
+            var net31Results = CopySolutionToUniqueTempDirAndAnalyze(RuleContributionsSolutionFileName, _ctaTestProjectsDir, TargetFramework.DotnetCoreApp31);
+            var net50Results = CopySolutionToUniqueTempDirAndAnalyze(RuleContributionsSolutionFileName, _ctaTestProjectsDir, TargetFramework.Dotnet5);
+            var net60Results = CopySolutionToUniqueTempDirAndAnalyze(RuleContributionsSolutionFileName, _ctaTestProjectsDir, TargetFramework.Dotnet6);
+            var net70Results = CopySolutionToUniqueTempDirAndAnalyze(RuleContributionsSolutionFileName, _ctaTestProjectsDir, TargetFramework.Dotnet7);
 
             _resultsDict = new Dictionary<string, TestSolutionAnalysis>
             {
