@@ -75,7 +75,7 @@ namespace CTA.Rules.Update.Rewriters
                     catch (Exception ex)
                     {
                         var actionExecutionException = new ActionExecutionException(action.Name, action.Key, ex);
-                        actionExecution.InvalidExecutions = 1;
+                        actionExecution.ExecutionsWithError = 1;
                         LogHelper.LogError(actionExecutionException);
                     }
                     AllExecutedActions.Add(actionExecution);
@@ -109,7 +109,7 @@ namespace CTA.Rules.Update.Rewriters
                             catch (Exception ex)
                             {
                                 var actionExecutionException = new ActionExecutionException(action.Name, action.Key, ex);
-                                actionExecution.InvalidExecutions = 1;
+                                actionExecution.ExecutionsWithError = 1;
                                 LogHelper.LogError(actionExecutionException);
                             }
                             AllExecutedActions.Add(actionExecution);
@@ -142,7 +142,7 @@ namespace CTA.Rules.Update.Rewriters
                         catch (Exception ex)
                         {
                             var actionExecutionException = new ActionExecutionException(action.Name, action.Key, ex);
-                            actionExecution.InvalidExecutions = 1;
+                            actionExecution.ExecutionsWithError = 1;
                             LogHelper.LogError(actionExecutionException);
                         }
                         AllExecutedActions.Add(actionExecution);
@@ -173,7 +173,7 @@ namespace CTA.Rules.Update.Rewriters
                     catch (Exception ex)
                     {
                         var actionExecutionException = new ActionExecutionException(action.Name, action.Key, ex);
-                        actionExecution.InvalidExecutions = 1;
+                        actionExecution.ExecutionsWithError = 1;
                         LogHelper.LogError(actionExecutionException);
                     }
                     AllExecutedActions.Add(actionExecution);
@@ -202,7 +202,7 @@ namespace CTA.Rules.Update.Rewriters
                     catch (Exception ex)
                     {
                         var actionExecutionException = new ActionExecutionException(action.Name, action.Key, ex);
-                        actionExecution.InvalidExecutions = 1;
+                        actionExecution.ExecutionsWithError = 1;
                         LogHelper.LogError(actionExecutionException);
                     }
                     AllExecutedActions.Add(actionExecution);
@@ -234,7 +234,7 @@ namespace CTA.Rules.Update.Rewriters
                         catch (Exception ex)
                         {
                             var actionExecutionException = new ActionExecutionException(action.Name, action.Key, ex);
-                            actionExecution.InvalidExecutions = 1;
+                            actionExecution.ExecutionsWithError = 1;
                             LogHelper.LogError(actionExecutionException);
                         }
                         AllExecutedActions.Add(actionExecution);
@@ -279,7 +279,7 @@ namespace CTA.Rules.Update.Rewriters
                     catch (Exception ex)
                     {
                         var actionExecutionException = new ActionExecutionException(action.Name, action.Key, ex);
-                        actionExecution.InvalidExecutions = 1;
+                        actionExecution.ExecutionsWithError = 1;
                         LogHelper.LogError(actionExecutionException);
                     }
                     AllExecutedActions.Add(actionExecution);
@@ -317,7 +317,7 @@ namespace CTA.Rules.Update.Rewriters
                     catch (Exception ex)
                     {
                         var actionExecutionException = new ActionExecutionException(action.Name, action.Key, ex);
-                        actionExecution.InvalidExecutions = 1;
+                        actionExecution.ExecutionsWithError = 1;
                         LogHelper.LogError(actionExecutionException);
                     }
                     AllExecutedActions.Add(actionExecution);
@@ -352,7 +352,7 @@ namespace CTA.Rules.Update.Rewriters
                         catch (Exception ex)
                         {
                             var actionExecutionException = new ActionExecutionException(action.Name, action.Key, ex);
-                            actionExecution.InvalidExecutions = 1;
+                            actionExecution.ExecutionsWithError = 1;
                             LogHelper.LogError(actionExecutionException);
                         }
                         AllExecutedActions.Add(actionExecution);
@@ -387,7 +387,7 @@ namespace CTA.Rules.Update.Rewriters
                         catch (Exception ex)
                         {
                             var actionExecutionException = new ActionExecutionException(action.Name, action.Key, ex);
-                            actionExecution.InvalidExecutions = 1;
+                            actionExecution.ExecutionsWithError = 1;
                             LogHelper.LogError(actionExecutionException);
                         }
                         AllExecutedActions.Add(actionExecution);
@@ -415,7 +415,7 @@ namespace CTA.Rules.Update.Rewriters
                 catch (Exception ex)
                 {
                     var actionExecutionException = new ActionExecutionException(action.Name, action.Key, ex);
-                    actionExecution.InvalidExecutions = 1;
+                    actionExecution.ExecutionsWithError = 1;
                     LogHelper.LogError(actionExecutionException);
                 }
                 AllExecutedActions.Add(actionExecution);
@@ -446,7 +446,7 @@ namespace CTA.Rules.Update.Rewriters
                     catch (Exception ex)
                     {
                         var actionExecutionException = new ActionExecutionException(action.Name, action.Key, ex);
-                        actionExecution.InvalidExecutions = 1;
+                        actionExecution.ExecutionsWithError = 1;
                         LogHelper.LogError(actionExecutionException);
                     }
                 }
@@ -477,7 +477,7 @@ namespace CTA.Rules.Update.Rewriters
                     catch (Exception ex)
                     {
                         var actionExecutionException = new ActionExecutionException(action.Name, action.Key, ex);
-                        actionExecution.InvalidExecutions = 1;
+                        actionExecution.ExecutionsWithError = 1;
                         LogHelper.LogError(actionExecutionException);
                     }
                     AllExecutedActions.Add(actionExecution);
@@ -503,7 +503,7 @@ namespace CTA.Rules.Update.Rewriters
                 catch (Exception ex)
                 {
                     var actionExecutionException = new ActionExecutionException(action.Name, action.Key, ex);
-                    actionExecution.InvalidExecutions = 1;
+                    actionExecution.ExecutionsWithError = 1;
                     LogHelper.LogError(actionExecutionException);
                 }
                 AllExecutedActions.Add(actionExecution);

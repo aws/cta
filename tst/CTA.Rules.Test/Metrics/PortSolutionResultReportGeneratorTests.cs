@@ -118,6 +118,7 @@ namespace CTA.Rules.Test.Metrics
                                     Name = "GA1 Name",
                                     Value = "GA1 Value",
                                     TimesRun = 2,
+                                    ExecutionsWithError = 2,
                                     InvalidExecutions = 1
                                 },
                                 new GenericActionExecution
@@ -126,6 +127,7 @@ namespace CTA.Rules.Test.Metrics
                                     Name = "GA2 Name",
                                     Value = "GA2 Value",
                                     TimesRun = 3,
+                                    ExecutionsWithError = 1,
                                     InvalidExecutions = 0
                                 }
                             }
@@ -354,12 +356,14 @@ Action Type: GA1 Type
 Action Name: GA1 Name
 Action Value: GA1Value
 Times Run: 2
+Executions With Error: 2
 Invalid Executions: 1
 
 Action Type: GA2 Type
 Action Name: GA2 Name
 Action Value: GA2Value
 Times Run: 3
+Executions With Error: 1
 Invalid Executions: 0
 
 
@@ -443,6 +447,7 @@ Count: 400";
     ""actionType"": ""GA1 Type"",
     ""actionValue"": ""GA1 Value"",
     ""timesRun"": 2,
+    ""executionsWithError"": 2,
     ""invalidExecutions"": 1,
     ""solutionPath"": ""5fa9de0cb5af2d468dfb1702b1e342f47de2df9a195dabb3be2d04f9c2767482"",
     ""projectGuid"": ""1234-5678"",
@@ -456,6 +461,7 @@ Count: 400";
     ""actionType"": ""GA2 Type"",
     ""actionValue"": ""GA2 Value"",
     ""timesRun"": 3,
+    ""executionsWithError"": 1,
     ""invalidExecutions"": 0,
     ""solutionPath"": ""5fa9de0cb5af2d468dfb1702b1e342f47de2df9a195dabb3be2d04f9c2767482"",
     ""projectGuid"": ""1234-5678"",

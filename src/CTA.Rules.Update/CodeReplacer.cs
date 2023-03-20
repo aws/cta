@@ -184,7 +184,7 @@ namespace CTA.Rules.Update
                         catch (Exception ex)
                         {
                             var actionExecutionException = new ActionExecutionException(projectLevelAction.Name, projectLevelAction.Key, ex);
-                            projectActionExecution.InvalidExecutions = 1;
+                            projectActionExecution.ExecutionsWithError = 1;
                             LogHelper.LogError(actionExecutionException);
                         }
                     }
@@ -202,7 +202,7 @@ namespace CTA.Rules.Update
                         catch (Exception ex)
                         {
                             var actionExecutionException = new ActionExecutionException(projectLevelAction.Name, projectLevelAction.Key, ex);
-                            projectActionExecution.InvalidExecutions = 1;
+                            projectActionExecution.ExecutionsWithError = 1;
                             LogHelper.LogError(actionExecutionException);
                         }
                     }
@@ -215,7 +215,7 @@ namespace CTA.Rules.Update
                         catch (Exception ex)
                         {
                             var actionExecutionException = new ActionExecutionException(projectLevelAction.Name, projectLevelAction.Key, ex);
-                            projectActionExecution.InvalidExecutions = 1;
+                            projectActionExecution.ExecutionsWithError = 1;
                             LogHelper.LogError(actionExecutionException);
                         }
                     }
@@ -257,6 +257,7 @@ namespace CTA.Rules.Update
                     Value = g.First().Value,
                     FilePath = filePath,
                     TimesRun = g.Sum(gt => gt.TimesRun),
+                    ExecutionsWithError = g.Sum(gi => gi.ExecutionsWithError),
                     InvalidExecutions = g.Sum(gi => gi.InvalidExecutions)
                 })
                 .ToList();
@@ -270,7 +271,7 @@ namespace CTA.Rules.Update
             //string regComments = @"\/\*(?:(?!\*\/)(?:.|[\r\n]+))*\*\/|\/\/(.*?)\r?\n|""((\\[^\n]|[^""\n])*)""|@(""[^""""]*"")+";
 
             //We should only validate actions that did not throw an exception during execution.
-            var validActions = actions.Where(a => a.InvalidExecutions == 0).ToList();
+            var validActions = actions.Where(a => a.ExecutionsWithError == 0).ToList();
 
             foreach (var action in validActions)
             {

@@ -75,6 +75,7 @@ namespace CTA.Rules.Models
                     stringBuilder.AppendLine($"Action Name: {genericAction.Name}");
                     stringBuilder.AppendLine($"Action Value: {Utils.EscapeAllWhitespace(genericAction.Value)}");
                     stringBuilder.AppendLine($"Times Run: {genericAction.TimesRun}");
+                    stringBuilder.AppendLine($"Executions With Error: {genericAction.ExecutionsWithError}");
                     stringBuilder.AppendLine($"Invalid Executions: {genericAction.InvalidExecutions}");
                 }
                 stringBuilder.AppendLine();

@@ -25,6 +25,7 @@
 
         public string FilePath { get; set; }
         public int TimesRun { get; set; }
+        public int ExecutionsWithError { get; set; }
         public int InvalidExecutions { get; set; }
     }
 }

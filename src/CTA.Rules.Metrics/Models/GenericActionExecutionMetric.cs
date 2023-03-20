@@ -22,16 +22,19 @@ namespace CTA.Rules.Metrics
         [JsonProperty("timesRun", Order = 14)]
         public int TimesRun { get; set; }
 
-        [JsonProperty("invalidExecutions", Order = 15)]
+        [JsonProperty("executionsWithError", Order = 20)]
+        public int ExecutionsWithError { get; set; }
+
+        [JsonProperty("invalidExecutions", Order = 25)]
         public int InvalidExecutions { get; set; }
 
-        [JsonProperty("solutionPath", Order = 16)]
+        [JsonProperty("solutionPath", Order = 30)]
         public string SolutionPath { get; set; }
 
-        [JsonProperty("projectGuid", Order = 17)]
+        [JsonProperty("projectGuid", Order = 35)]
         public string ProjectGuid { get; set; }
 
-        [JsonProperty("filePath", Order = 18)]
+        [JsonProperty("filePath", Order = 40)]
         public string FilePath { get; set; }
 
         public GenericActionExecutionMetric(MetricsContext context, GenericActionExecution action, string projectPath)
@@ -40,6 +43,7 @@ namespace CTA.Rules.Metrics
             ActionType = action.Type;
             ActionValue = action.Value;
             TimesRun = action.TimesRun;
+            ExecutionsWithError = action.ExecutionsWithError;
             InvalidExecutions = action.InvalidExecutions;
             SolutionPath = context.SolutionPathHash;
             ProjectGuid = context.ProjectGuidMap.GetValueOrDefault(projectPath, "N/A");

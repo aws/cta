@@ -85,7 +85,7 @@ public class VisualBasicActionsRewriter : VisualBasicSyntaxRewriter, ISyntaxRewr
                         catch (Exception ex)
                         {
                             var actionExecutionException = new ActionExecutionException(action.Name, action.Key, ex);
-                            actionExecution.InvalidExecutions = 1;
+                            actionExecution.ExecutionsWithError = 1;
                             LogHelper.LogError(actionExecutionException);
                         }
 
@@ -117,7 +117,7 @@ public class VisualBasicActionsRewriter : VisualBasicSyntaxRewriter, ISyntaxRewr
                     catch (Exception ex)
                     {
                         var actionExecutionException = new ActionExecutionException(action.Name, action.Key, ex);
-                        actionExecution.InvalidExecutions = 1;
+                        actionExecution.ExecutionsWithError = 1;
                         LogHelper.LogError(actionExecutionException);
                     }
 
@@ -147,7 +147,7 @@ public class VisualBasicActionsRewriter : VisualBasicSyntaxRewriter, ISyntaxRewr
                 catch (Exception ex)
                 {
                     var actionExecutionException = new ActionExecutionException(action.Name, action.Key, ex);
-                    actionExecution.InvalidExecutions = 1;
+                    actionExecution.ExecutionsWithError = 1;
                     LogHelper.LogError(actionExecutionException);
                 }
 
@@ -176,7 +176,7 @@ public class VisualBasicActionsRewriter : VisualBasicSyntaxRewriter, ISyntaxRewr
                 catch (Exception ex)
                 {
                     var actionExecutionException = new ActionExecutionException(action.Name, action.Key, ex);
-                    actionExecution.InvalidExecutions = 1;
+                    actionExecution.ExecutionsWithError = 1;
                     LogHelper.LogError(actionExecutionException);
                 }
 
@@ -205,7 +205,7 @@ public class VisualBasicActionsRewriter : VisualBasicSyntaxRewriter, ISyntaxRewr
                 catch (Exception ex)
                 {
                     var actionExecutionException = new ActionExecutionException(action.Name, action.Key, ex);
-                    actionExecution.InvalidExecutions = 1;
+                    actionExecution.ExecutionsWithError = 1;
                     LogHelper.LogError(actionExecutionException);
                 }
 
@@ -237,7 +237,7 @@ public class VisualBasicActionsRewriter : VisualBasicSyntaxRewriter, ISyntaxRewr
                     catch (Exception ex)
                     {
                         var actionExecutionException = new ActionExecutionException(action.Name, action.Key, ex);
-                        actionExecution.InvalidExecutions = 1;
+                        actionExecution.ExecutionsWithError = 1;
                         LogHelper.LogError(actionExecutionException);
                     }
 
@@ -288,7 +288,7 @@ public class VisualBasicActionsRewriter : VisualBasicSyntaxRewriter, ISyntaxRewr
                 catch (Exception ex)
                 {
                     var actionExecutionException = new ActionExecutionException(action.Name, action.Key, ex);
-                    actionExecution.InvalidExecutions = 1;
+                    actionExecution.ExecutionsWithError = 1;
                     LogHelper.LogError(actionExecutionException);
                 }
 
@@ -342,7 +342,7 @@ public class VisualBasicActionsRewriter : VisualBasicSyntaxRewriter, ISyntaxRewr
                 catch (Exception ex)
                 {
                     var actionExecutionException = new ActionExecutionException(action.Name, action.Key, ex);
-                    actionExecution.InvalidExecutions = 1;
+                    actionExecution.ExecutionsWithError = 1;
                     LogHelper.LogError(actionExecutionException);
                 }
 
@@ -375,7 +375,7 @@ public class VisualBasicActionsRewriter : VisualBasicSyntaxRewriter, ISyntaxRewr
                     catch (Exception ex)
                     {
                         var actionExecutionException = new ActionExecutionException(action.Name, action.Key, ex);
-                        actionExecution.InvalidExecutions = 1;
+                        actionExecution.ExecutionsWithError = 1;
                         LogHelper.LogError(actionExecutionException);
                     }
 
@@ -402,7 +402,7 @@ public class VisualBasicActionsRewriter : VisualBasicSyntaxRewriter, ISyntaxRewr
             catch (Exception ex)
             {
                 var actionExecutionException = new ActionExecutionException(action.Name, action.Key, ex);
-                actionExecution.InvalidExecutions = 1;
+                actionExecution.ExecutionsWithError = 1;
                 LogHelper.LogError(actionExecutionException);
             }
 
@@ -435,7 +435,7 @@ public class VisualBasicActionsRewriter : VisualBasicSyntaxRewriter, ISyntaxRewr
                 catch (Exception ex)
                 {
                     var actionExecutionException = new ActionExecutionException(action.Name, action.Key, ex);
-                    actionExecution.InvalidExecutions = 1;
+                    actionExecution.ExecutionsWithError = 1;
                     LogHelper.LogError(actionExecutionException);
                 }
             }
@@ -466,7 +466,7 @@ public class VisualBasicActionsRewriter : VisualBasicSyntaxRewriter, ISyntaxRewr
                 catch (Exception ex)
                 {
                     var actionExecutionException = new ActionExecutionException(action.Name, action.Key, ex);
-                    actionExecution.InvalidExecutions = 1;
+                    actionExecution.ExecutionsWithError = 1;
                     LogHelper.LogError(actionExecutionException);
                 }
 
