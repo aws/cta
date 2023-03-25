@@ -35,6 +35,90 @@ namespace CTA.Rules.Test.Actions.ActionHelpers
             _portServerConfigMethod = TestUtils.GetPrivateMethod(_configMigrateType, "PortServerConfig");
         }
 
+        [Test]
+        public void MigrateServerConfig_WhitespaceIsCorrect()
+        {
+            var webConfig = @"
+                    <configuration>
+                            <system.webServer>
+                                 <modules>
+			                        <add name=""AppShutDownModule"" type=""TestMvcApplication.AppShutDownModule"" />
+		                        </modules>
+		                        <handlers>  
+			                        <add name=""AppShutDownHandler"" verb=""*"" path=""*.cshtml"" type=""TestMvcApplication.AppShutDownHandler"" />  
+		                        </handlers>
+                           </system.webServer>	
+                </configuration>";
+            InvokeTestMethod(webConfig);
+
+            var expectedResult =
+@"/* Added by CTA: Please add the correponding references..If certs are not provided for deployment communication will be on http, please remove the https section of the kestrel config in appsettings.json and also remove middleware component app.UseHttpsRedirection(); */
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+
+namespace
+#NAMESPACEPLACEHOLDER#
+{
+    public class Startup
+    {
+        public Startup(IConfiguration configuration)
+        {
+            Configuration = configuration;
+            ConfigurationManager.Configuration = configuration;
+        }
+
+        public IConfiguration Configuration { get; }
+
+        public void ConfigureServices(IServiceCollection services)
+        {
+            services.AddControllersWithViews();
+        }
+
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        {
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
+            else
+            {
+                app.UseExceptionHandler(""/Home/Error"");
+            }
+
+            app.UseHttpsRedirection();
+            app.UseStaticFiles();
+            app.MapWhen(context => context.Request.Path.ToString().EndsWith("".cshtml""), appBranch =>
+            {
+                appBranch.UseMiddleware<TestMvcApplication.AppShutDownHandler>();
+            });
+            app.UseMiddleware<TestMvcApplication.AppShutDownModule>();
+            app.UseRouting();
+            app.UseAuthorization();
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllerRoute(name: ""default"", pattern: ""{controller=Home}/{action=Index}/{id?}"");
+            });
+        }
+    }
+
+    public class ConfigurationManager
+    {
+        public static IConfiguration Configuration { get; set; }
+    }
+}";
+            var startupcsContent = File.ReadAllText(Path.Combine(_projectDir, "Startup.cs"));
+            Assert.AreEqual(expectedResult, startupcsContent);
+        }
 
         [Test]
         public void MigrateServerConfig_HttpModulesandHandlers()
