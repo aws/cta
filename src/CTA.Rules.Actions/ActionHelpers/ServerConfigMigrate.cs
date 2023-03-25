@@ -301,7 +301,7 @@ namespace CTA.Rules.Actions
                     var usingDirective = SyntaxFactory.UsingDirective(SyntaxFactory.ParseName(directive)).NormalizeWhitespace();
                     allUsings = allUsings.Add(usingDirective);
                 }
-                node = node.WithUsings(allUsings);
+                node = node.WithUsings(allUsings).NormalizeWhitespace();
             }
             _startupRoot = node;
         }
