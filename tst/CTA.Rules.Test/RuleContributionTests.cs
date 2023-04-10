@@ -94,5 +94,18 @@ namespace CTA.Rules.Test
             // Verify expected package is in .csproj
             StringAssert.Contains(@"PackageReference Include=""NPOI""", ruleContributionsResult.CsProjectContent);
         }
+
+        [TestCase(TargetFramework.DotnetCoreApp31)]
+        [TestCase(TargetFramework.Dotnet5)]
+        [TestCase(TargetFramework.Dotnet6)]
+        [TestCase(TargetFramework.Dotnet7)]
+        public void OracleManagedDataAccess_Package_Is_Added(string version)
+        {
+            var solutionPortingResult = _resultsDict[version];
+            var ruleContributionsResult = solutionPortingResult.ProjectResults.First(proj => proj.CsProjectPath.EndsWith(RuleContributionsProjectFileName));
+
+            // Verify expected package is in .csproj
+            StringAssert.Contains(@"PackageReference Include=""Oracle.ManagedDataAccess.Core""", ruleContributionsResult.CsProjectContent);
+        }
     }
 }
