@@ -3,6 +3,7 @@ using CTA.Rules.Test.Models;
 using NUnit.Framework;
 using System.IO;
 using System.Linq;
+using CTA.Rules.Models;
 
 namespace CTA.Rules.Test
 {
@@ -18,6 +19,8 @@ namespace CTA.Rules.Test
         public string downloadLocation;
         private Dictionary<string, TestSolutionAnalysis> _resultsDict;
 
+        private static IEnumerable<string> TestCases = SupportedFrameworks.GetSupportedFrameworksList();
+
         [OneTimeSetUp]
         public void Setup()
         {
@@ -25,23 +28,23 @@ namespace CTA.Rules.Test
             downloadLocation = SetupTests.DownloadLocation;
 
             var solutionName = "WebFormsFull.sln";
-            var net31Results = CopySolutionToUniqueTempDirAndAnalyze(solutionName, ctaTestProjectsDir, TargetFramework.DotnetCoreApp31);
-            var net50Results = CopySolutionToUniqueTempDirAndAnalyze(solutionName, ctaTestProjectsDir, TargetFramework.Dotnet5);
-            var net60Results = CopySolutionToUniqueTempDirAndAnalyze(solutionName, ctaTestProjectsDir, TargetFramework.Dotnet6);
-            var net70Results = CopySolutionToUniqueTempDirAndAnalyze(solutionName, ctaTestProjectsDir, TargetFramework.Dotnet7);
+            var net31Results = CopySolutionToUniqueTempDirAndAnalyze(solutionName, ctaTestProjectsDir, SupportedFrameworks.Netcore31);
+            var net50Results = CopySolutionToUniqueTempDirAndAnalyze(solutionName, ctaTestProjectsDir, SupportedFrameworks.Net5);
+            var net60Results = CopySolutionToUniqueTempDirAndAnalyze(solutionName, ctaTestProjectsDir, SupportedFrameworks.Net6);
+            var net70Results = CopySolutionToUniqueTempDirAndAnalyze(solutionName, ctaTestProjectsDir, SupportedFrameworks.Net7);
 
             _resultsDict = new Dictionary<string, TestSolutionAnalysis>
             {
-                {TargetFramework.DotnetCoreApp31, net31Results},
-                {TargetFramework.Dotnet5, net50Results},
-                {TargetFramework.Dotnet6, net60Results},
-                {TargetFramework.Dotnet7, net70Results}
+                {SupportedFrameworks.Netcore31, net31Results},
+                {SupportedFrameworks.Net5, net50Results},
+                {SupportedFrameworks.Net6, net60Results},
+                {SupportedFrameworks.Net7, net70Results}
             };
         }
 
-        [TestCase(TargetFramework.DotnetCoreApp31)]
-        [TestCase(TargetFramework.Dotnet5)]
-        [TestCase(TargetFramework.Dotnet6)]
+        [TestCase(SupportedFrameworks.Netcore31)]
+        [TestCase(SupportedFrameworks.Net5)]
+        [TestCase(SupportedFrameworks.Net6)]
         public void TestProjectFilePortingResults(string version)
         {
             var results = _resultsDict[version];
@@ -54,7 +57,7 @@ namespace CTA.Rules.Test
             StringAssert.Contains(@"<PackageReference Include=""Microsoft.Data.SqlClient"" Version=""5.0.1"" />", webFormsFullResult.CsProjectContent);
         }
 
-        [TestCase(TargetFramework.Dotnet7)]
+        [TestCase(SupportedFrameworks.Net7)]
         public void TestProjectFilePortingResults_Dotnet7AndAbove(string version)
         {
             var results = _resultsDict[version];
@@ -67,10 +70,7 @@ namespace CTA.Rules.Test
             StringAssert.Contains(@"<PackageReference Include=""Microsoft.Data.SqlClient"" Version=""5.0.1"" />", webFormsFullResult.CsProjectContent);
         }
 
-        [TestCase(TargetFramework.DotnetCoreApp31)]
-        [TestCase(TargetFramework.Dotnet5)]
-        [TestCase(TargetFramework.Dotnet6)]
-        [TestCase(TargetFramework.Dotnet7)]
+        [Test, TestCaseSource("TestCases")]
         public void TestUserControlsPortingResults(string version)
         {
             var results = _resultsDict[version];
@@ -87,10 +87,7 @@ namespace CTA.Rules.Test
             StringAssert.DoesNotContain("public partial class ViewSwitcher : System.Web.UI.UserControl", viewSwitcherRazorCs);
         }
 
-        [TestCase(TargetFramework.DotnetCoreApp31)]
-        [TestCase(TargetFramework.Dotnet5)]
-        [TestCase(TargetFramework.Dotnet6)]
-        [TestCase(TargetFramework.Dotnet7)]
+        [Test, TestCaseSource("TestCases")]
         public void TestStaticFilesMovedToWwwroot(string version)
         {
             var results = _resultsDict[version];
@@ -112,10 +109,7 @@ namespace CTA.Rules.Test
             Assert.AreEqual(18, Directory.EnumerateFiles(scriptsDir, "*", SearchOption.AllDirectories).Count());
         }
 
-        [TestCase(TargetFramework.DotnetCoreApp31)]
-        [TestCase(TargetFramework.Dotnet5)]
-        [TestCase(TargetFramework.Dotnet6)]
-        [TestCase(TargetFramework.Dotnet7)]
+        [Test, TestCaseSource("TestCases")]
         public void TestProperHttpModulePortsCorrectly(string version)
         {
             var results = _resultsDict[version];
@@ -127,10 +121,7 @@ namespace CTA.Rules.Test
             StringAssert.AreEqualIgnoringCase(WebFormsFullExpectedOutputConstants.TestProperHttpModuleFile, content);
         }
 
-        [TestCase(TargetFramework.DotnetCoreApp31)]
-        [TestCase(TargetFramework.Dotnet5)]
-        [TestCase(TargetFramework.Dotnet6)]
-        [TestCase(TargetFramework.Dotnet7)]
+        [Test, TestCaseSource("TestCases")]
         public void TestProperHttpModuleAlternatePortsCorrectly(string version)
         {
             var results = _resultsDict[version];
@@ -146,10 +137,7 @@ namespace CTA.Rules.Test
             StringAssert.AreEqualIgnoringCase(WebFormsFullExpectedOutputConstants.TestProperHttpModuleAlternatePostResolveRequestCacheFile, spinoffContent);
         }
 
-        [TestCase(TargetFramework.DotnetCoreApp31)]
-        [TestCase(TargetFramework.Dotnet5)]
-        [TestCase(TargetFramework.Dotnet6)]
-        [TestCase(TargetFramework.Dotnet7)]
+        [Test, TestCaseSource("TestCases")]
         public void TestImproperHttpModulePortsCorrectly(string version)
         {
             var results = _resultsDict[version];
@@ -161,10 +149,7 @@ namespace CTA.Rules.Test
             StringAssert.AreEqualIgnoringCase(WebFormsFullExpectedOutputConstants.TestImproperHttpModuleFile, content);
         }
 
-        [TestCase(TargetFramework.DotnetCoreApp31)]
-        [TestCase(TargetFramework.Dotnet5)]
-        [TestCase(TargetFramework.Dotnet6)]
-        [TestCase(TargetFramework.Dotnet7)]
+        [Test, TestCaseSource("TestCases")]
         public void TestHttpHandlersMovedToMiddleware(string version)
         {
             var results = _resultsDict[version];
@@ -176,10 +161,7 @@ namespace CTA.Rules.Test
             StringAssert.AreEqualIgnoringCase(WebFormsFullExpectedOutputConstants.TestHttpHandlerFile, content);
         }
 
-        [TestCase(TargetFramework.DotnetCoreApp31)]
-        [TestCase(TargetFramework.Dotnet5)]
-        [TestCase(TargetFramework.Dotnet6)]
-        [TestCase(TargetFramework.Dotnet7)]
+        [Test, TestCaseSource("TestCases")]
         public void TestDefaultAspxMigrations(string version)
         {
             var results = _resultsDict[version];
@@ -212,10 +194,7 @@ namespace CTA.Rules.Test
             StringAssert.DoesNotContain("%>", defaultRazor);
         }
 
-        [TestCase(TargetFramework.DotnetCoreApp31)]
-        [TestCase(TargetFramework.Dotnet5)]
-        [TestCase(TargetFramework.Dotnet6)]
-        [TestCase(TargetFramework.Dotnet7)]
+        [Test, TestCaseSource("TestCases")]
         public void TestOtherPageAspxMigration(string version)
         {
             var results = _resultsDict[version];
@@ -253,10 +232,7 @@ namespace CTA.Rules.Test
             StringAssert.Contains(@"<label for=""RadioTest22"">", otherPageRazor);
         }
 
-        [TestCase(TargetFramework.DotnetCoreApp31)]
-        [TestCase(TargetFramework.Dotnet5)]
-        [TestCase(TargetFramework.Dotnet6)]
-        [TestCase(TargetFramework.Dotnet7)]
+        [Test, TestCaseSource("TestCases")]
         public void TestDefaultAspxCsMigrations(string version)
         {
             var results = _resultsDict[version];
@@ -268,10 +244,7 @@ namespace CTA.Rules.Test
             StringAssert.AreEqualIgnoringCase(WebFormsFullExpectedOutputConstants.DefaultRazorCsFile, defaultRazorCs);
         }
 
-        [TestCase(TargetFramework.DotnetCoreApp31)]
-        [TestCase(TargetFramework.Dotnet5)]
-        [TestCase(TargetFramework.Dotnet6)]
-        [TestCase(TargetFramework.Dotnet7)]
+        [Test, TestCaseSource("TestCases")]
         public void TestOtherPageAspxCsMigrations(string version)
         {
             var results = _resultsDict[version];
@@ -283,10 +256,7 @@ namespace CTA.Rules.Test
             StringAssert.AreEqualIgnoringCase(WebFormsFullExpectedOutputConstants.OtherPageRazorCsFile, otherPageRazorCs);
         }
 
-        [TestCase(TargetFramework.DotnetCoreApp31)]
-        [TestCase(TargetFramework.Dotnet5)]
-        [TestCase(TargetFramework.Dotnet6)]
-        [TestCase(TargetFramework.Dotnet7)]
+        [Test, TestCaseSource("TestCases")]
         public void TestHostFileCreation(string version)
         {
             var results = _resultsDict[version];
@@ -299,10 +269,7 @@ namespace CTA.Rules.Test
             StringAssert.AreEqualIgnoringCase(WebFormsFullExpectedOutputConstants.HostFile, hostFile);
         }
 
-        [TestCase(TargetFramework.DotnetCoreApp31)]
-        [TestCase(TargetFramework.Dotnet5)]
-        [TestCase(TargetFramework.Dotnet6)]
-        [TestCase(TargetFramework.Dotnet7)]
+        [Test, TestCaseSource("TestCases")]
         public void TestImportsFileCreation(string version)
         {
             var results = _resultsDict[version];
@@ -315,10 +282,7 @@ namespace CTA.Rules.Test
             StringAssert.AreEqualIgnoringCase(WebFormsFullExpectedOutputConstants.ImportsFile, importsFile);
         }
 
-        [TestCase(TargetFramework.DotnetCoreApp31)]
-        [TestCase(TargetFramework.Dotnet5)]
-        [TestCase(TargetFramework.Dotnet6)]
-        [TestCase(TargetFramework.Dotnet7)]
+        [Test, TestCaseSource("TestCases")]
         public void TestActivityIdHelperFileCreation(string version)
         {
             var results = _resultsDict[version];
@@ -331,10 +295,7 @@ namespace CTA.Rules.Test
             StringAssert.AreEqualIgnoringCase(WebFormsFullExpectedOutputConstants.ActivityIdHelperFile, activityIdHelperFile);
         }
 
-        [TestCase(TargetFramework.DotnetCoreApp31)]
-        [TestCase(TargetFramework.Dotnet5)]
-        [TestCase(TargetFramework.Dotnet6)]
-        [TestCase(TargetFramework.Dotnet7)]
+        [Test, TestCaseSource("TestCases")]
         public void TestAppFileCreation(string version)
         {
             var results = _resultsDict[version];
@@ -347,10 +308,7 @@ namespace CTA.Rules.Test
             StringAssert.AreEqualIgnoringCase(WebFormsFullExpectedOutputConstants.AppFile, appFile);
         }
 
-        [TestCase(TargetFramework.DotnetCoreApp31)]
-        [TestCase(TargetFramework.Dotnet5)]
-        [TestCase(TargetFramework.Dotnet6)]
-        [TestCase(TargetFramework.Dotnet7)]
+        [Test, TestCaseSource("TestCases")]
         public void TestAppSettingsFileCreation(string version)
         {
             var results = _resultsDict[version];
@@ -363,10 +321,7 @@ namespace CTA.Rules.Test
             StringAssert.AreEqualIgnoringCase(WebFormsFullExpectedOutputConstants.AppSettings, appSettingsFile);
         }
 
-        [TestCase(TargetFramework.DotnetCoreApp31)]
-        [TestCase(TargetFramework.Dotnet5)]
-        [TestCase(TargetFramework.Dotnet6)]
-        [TestCase(TargetFramework.Dotnet7)]
+        [Test, TestCaseSource("TestCases")]
         public void TestProgramFileCreation(string version)
         {
             var results = _resultsDict[version];
@@ -379,10 +334,7 @@ namespace CTA.Rules.Test
             StringAssert.AreEqualIgnoringCase(WebFormsFullExpectedOutputConstants.ProgramFile, programFile);
         }
 
-        [TestCase(TargetFramework.DotnetCoreApp31)]
-        [TestCase(TargetFramework.Dotnet5)]
-        [TestCase(TargetFramework.Dotnet6)]
-        [TestCase(TargetFramework.Dotnet7)]
+        [Test, TestCaseSource("TestCases")]
         public void TestStartupFileCreation(string version)
         {
             var results = _resultsDict[version];
@@ -395,10 +347,7 @@ namespace CTA.Rules.Test
             StringAssert.AreEqualIgnoringCase(WebFormsFullExpectedOutputConstants.StartupFile.Replace("\r\n", "\n"), startupFile.Replace("\r\n", "\n"));
         }
 
-        [TestCase(TargetFramework.DotnetCoreApp31)]
-        [TestCase(TargetFramework.Dotnet5)]
-        [TestCase(TargetFramework.Dotnet6)]
-        [TestCase(TargetFramework.Dotnet7)]
+        [Test, TestCaseSource("TestCases")]
         public void TestWebRequestInfoFileCreation(string version)
         {
             var results = _resultsDict[version];

@@ -1,4 +1,5 @@
-﻿using CTA.Rules.Test.Models;
+﻿using CTA.Rules.Models;
+using CTA.Rules.Test.Models;
 using NUnit.Framework;
 using System.Collections.Generic;
 using System.IO;
@@ -15,6 +16,8 @@ namespace CTA.Rules.Test
         private Dictionary<string, TestSolutionAnalysis> _paCoreWCFSupportResultsDict;
         private Dictionary<string, TestSolutionAnalysis> _wcfTCPSelfHostResultsDict;
 
+        private static IEnumerable<string> TestCases = SupportedFrameworks.GetSupportedFrameworksList();
+
         [OneTimeSetUp]
         public void Setup()
         {
@@ -22,36 +25,33 @@ namespace CTA.Rules.Test
             downloadLocation = SetupTests.DownloadLocation;
 
             var solutionName = "PACoreWCFSupport.sln";
-            var net31Results = CopySolutionToUniqueTempDirAndAnalyze(solutionName, ctaTestProjectsDir, TargetFramework.DotnetCoreApp31);
-            var net50Results = CopySolutionToUniqueTempDirAndAnalyze(solutionName, ctaTestProjectsDir, TargetFramework.Dotnet5);
-            var net60Results = CopySolutionToUniqueTempDirAndAnalyze(solutionName, ctaTestProjectsDir, TargetFramework.Dotnet6);
-            var net70Results = CopySolutionToUniqueTempDirAndAnalyze(solutionName, ctaTestProjectsDir, TargetFramework.Dotnet7);
+            var net31Results = CopySolutionToUniqueTempDirAndAnalyze(solutionName, ctaTestProjectsDir, SupportedFrameworks.Netcore31);
+            var net50Results = CopySolutionToUniqueTempDirAndAnalyze(solutionName, ctaTestProjectsDir, SupportedFrameworks.Net5);
+            var net60Results = CopySolutionToUniqueTempDirAndAnalyze(solutionName, ctaTestProjectsDir, SupportedFrameworks.Net6);
+            var net70Results = CopySolutionToUniqueTempDirAndAnalyze(solutionName, ctaTestProjectsDir, SupportedFrameworks.Net7);
             _paCoreWCFSupportResultsDict = new Dictionary<string, TestSolutionAnalysis>
             {
-                {TargetFramework.DotnetCoreApp31, net31Results},
-                {TargetFramework.Dotnet5, net50Results},
-                {TargetFramework.Dotnet6, net60Results},
-                {TargetFramework.Dotnet7, net70Results}
+                {SupportedFrameworks.Netcore31, net31Results},
+                {SupportedFrameworks.Net5, net50Results},
+                {SupportedFrameworks.Net6, net60Results},
+                {SupportedFrameworks.Net7, net70Results}
             };
             
             solutionName = "WCFTCPSelfHost.sln";
-            net31Results = CopySolutionToUniqueTempDirAndAnalyze(solutionName, ctaTestProjectsDir, TargetFramework.DotnetCoreApp31);
-            net50Results = CopySolutionToUniqueTempDirAndAnalyze(solutionName, ctaTestProjectsDir, TargetFramework.Dotnet5);
-            net60Results = CopySolutionToUniqueTempDirAndAnalyze(solutionName, ctaTestProjectsDir, TargetFramework.Dotnet6);
-            net70Results = CopySolutionToUniqueTempDirAndAnalyze(solutionName, ctaTestProjectsDir, TargetFramework.Dotnet7);
+            net31Results = CopySolutionToUniqueTempDirAndAnalyze(solutionName, ctaTestProjectsDir, SupportedFrameworks.Netcore31);
+            net50Results = CopySolutionToUniqueTempDirAndAnalyze(solutionName, ctaTestProjectsDir, SupportedFrameworks.Net5);
+            net60Results = CopySolutionToUniqueTempDirAndAnalyze(solutionName, ctaTestProjectsDir, SupportedFrameworks.Net6);
+            net70Results = CopySolutionToUniqueTempDirAndAnalyze(solutionName, ctaTestProjectsDir, SupportedFrameworks.Net7);
             _wcfTCPSelfHostResultsDict = new Dictionary<string, TestSolutionAnalysis>
             {
-                {TargetFramework.DotnetCoreApp31, net31Results},
-                {TargetFramework.Dotnet5, net50Results},
-                {TargetFramework.Dotnet6, net60Results},
-                {TargetFramework.Dotnet7, net70Results}
+                {SupportedFrameworks.Netcore31, net31Results},
+                {SupportedFrameworks.Net5, net50Results},
+                {SupportedFrameworks.Net6, net60Results},
+                {SupportedFrameworks.Net7, net70Results}
             };
         }
 
-        [TestCase(TargetFramework.Dotnet7)]
-        [TestCase(TargetFramework.Dotnet6)]
-        [TestCase(TargetFramework.Dotnet5)]
-        [TestCase(TargetFramework.DotnetCoreApp31)]
+        [Test, TestCaseSource("TestCases")]
         public void TestBasicHttpBindingAndTransportSecurity(string version)
         {
             var results = _paCoreWCFSupportResultsDict[version];
@@ -86,10 +86,7 @@ namespace CTA.Rules.Test
             StringAssert.Contains(@"using CoreWCF", service);
         }
 
-        [TestCase(TargetFramework.Dotnet7)]
-        [TestCase(TargetFramework.Dotnet6)]
-        [TestCase(TargetFramework.Dotnet5)]
-        [TestCase(TargetFramework.DotnetCoreApp31)]
+        [Test, TestCaseSource("TestCases")]
         public void TestBasicHttpTransportMessageCredUserName(string version)
         {
             var results = _paCoreWCFSupportResultsDict[version];
@@ -124,10 +121,7 @@ namespace CTA.Rules.Test
             StringAssert.Contains(@"using CoreWCF", service);
         }
 
-        [TestCase(TargetFramework.Dotnet7)]
-        [TestCase(TargetFramework.Dotnet6)]
-        [TestCase(TargetFramework.Dotnet5)]
-        [TestCase(TargetFramework.DotnetCoreApp31)]
+        [Test, TestCaseSource("TestCases")]
         public void TestBasicHttpTransportMessageCredCertificate(string version)
         {
             var results = _paCoreWCFSupportResultsDict[version];
@@ -162,10 +156,7 @@ namespace CTA.Rules.Test
             StringAssert.Contains(@"using CoreWCF", service);
         }
 
-        [TestCase(TargetFramework.Dotnet7)]
-        [TestCase(TargetFramework.Dotnet6)]
-        [TestCase(TargetFramework.Dotnet5)]
-        [TestCase(TargetFramework.DotnetCoreApp31)]
+        [Test, TestCaseSource("TestCases")]
         public void TestWSHttpBindingWithWindowsAuth(string version)
         {
             var results = _paCoreWCFSupportResultsDict[version];
@@ -200,10 +191,7 @@ namespace CTA.Rules.Test
             StringAssert.Contains(@"using CoreWCF", service);
         }
 
-        [TestCase(TargetFramework.Dotnet7)]
-        [TestCase(TargetFramework.Dotnet6)]
-        [TestCase(TargetFramework.Dotnet5)]
-        [TestCase(TargetFramework.DotnetCoreApp31)]
+        [Test, TestCaseSource("TestCases")]
         public void TestBasicHttpMessageSecurity(string version)
         {
             var results = _paCoreWCFSupportResultsDict[version];
@@ -223,10 +211,7 @@ namespace CTA.Rules.Test
             FileAssert.DoesNotExist(Path.Combine(projectDir, "Program.cs"));
         }
 
-        [TestCase(TargetFramework.Dotnet7)]
-        [TestCase(TargetFramework.Dotnet6)]
-        [TestCase(TargetFramework.Dotnet5)]
-        [TestCase(TargetFramework.DotnetCoreApp31)]
+        [Test, TestCaseSource("TestCases")]
         public void TestNetTCPBindingDefaultSecurity(string version)
         {
             var results = _paCoreWCFSupportResultsDict[version];
@@ -261,10 +246,7 @@ namespace CTA.Rules.Test
             StringAssert.Contains(@"using CoreWCF", service);
         }
 
-        [TestCase(TargetFramework.Dotnet7)]
-        [TestCase(TargetFramework.Dotnet6)]
-        [TestCase(TargetFramework.Dotnet5)]
-        [TestCase(TargetFramework.DotnetCoreApp31)]
+        [Test, TestCaseSource("TestCases")]
         public void TestNetPipeBindingDefault(string version)
         {
             var results = _paCoreWCFSupportResultsDict[version];
@@ -284,10 +266,7 @@ namespace CTA.Rules.Test
             FileAssert.DoesNotExist(Path.Combine(projectDir, "Program.cs"));
         }
 
-        [TestCase(TargetFramework.Dotnet7)]
-        [TestCase(TargetFramework.Dotnet6)]
-        [TestCase(TargetFramework.Dotnet5)]
-        [TestCase(TargetFramework.DotnetCoreApp31)]
+        [Test, TestCaseSource("TestCases")]
         public void TestBasicHttpAndNetTCPSupported(string version)
         {
             var results = _paCoreWCFSupportResultsDict[version];
@@ -322,10 +301,7 @@ namespace CTA.Rules.Test
             StringAssert.Contains(@"using CoreWCF", service);
         }
 
-        [TestCase(TargetFramework.Dotnet7)]
-        [TestCase(TargetFramework.Dotnet6)]
-        [TestCase(TargetFramework.Dotnet5)]
-        [TestCase(TargetFramework.DotnetCoreApp31)]
+        [Test, TestCaseSource("TestCases")]
         public void TestWsHttpAndNetPipe(string version)
         {
             var results = _paCoreWCFSupportResultsDict[version];
@@ -360,10 +336,7 @@ namespace CTA.Rules.Test
             StringAssert.Contains(@"using CoreWCF", service);
         }
 
-        [TestCase(TargetFramework.Dotnet7)]
-        [TestCase(TargetFramework.Dotnet6)]
-        [TestCase(TargetFramework.Dotnet5)]
-        [TestCase(TargetFramework.DotnetCoreApp31)]
+        [Test, TestCaseSource("TestCases")]
         public void TestCodeBasedBasicHttpDefaultSecurity(string version)
         {
             var results = _paCoreWCFSupportResultsDict[version];
@@ -393,10 +366,7 @@ namespace CTA.Rules.Test
             StringAssert.Contains(@"using CoreWCF", service);
         }
 
-        [TestCase(TargetFramework.Dotnet7)]
-        [TestCase(TargetFramework.Dotnet6)]
-        [TestCase(TargetFramework.Dotnet5)]
-        [TestCase(TargetFramework.DotnetCoreApp31)]
+        [Test, TestCaseSource("TestCases")]
         public void TestCodeBasicHttpTransportSecurity(string version)
         {
             var results = _paCoreWCFSupportResultsDict[version];
@@ -426,10 +396,7 @@ namespace CTA.Rules.Test
             StringAssert.Contains(@"using CoreWCF", service);
         }
 
-        [TestCase(TargetFramework.Dotnet7)]
-        [TestCase(TargetFramework.Dotnet6)]
-        [TestCase(TargetFramework.Dotnet5)]
-        [TestCase(TargetFramework.DotnetCoreApp31)]
+        [Test, TestCaseSource("TestCases")]
         public void TestCodeBasicHttpTransportMessageCredUserName(string version)
         {
             var results = _paCoreWCFSupportResultsDict[version];
@@ -459,10 +426,7 @@ namespace CTA.Rules.Test
             StringAssert.Contains(@"using CoreWCF", service);
         }
 
-        [TestCase(TargetFramework.Dotnet7)]
-        [TestCase(TargetFramework.Dotnet6)]
-        [TestCase(TargetFramework.Dotnet5)]
-        [TestCase(TargetFramework.DotnetCoreApp31)]
+        [Test, TestCaseSource("TestCases")]
         public void TestCodeBasicHttpNetTCPSupported(string version)
         {
             var results = _paCoreWCFSupportResultsDict[version];
@@ -492,10 +456,7 @@ namespace CTA.Rules.Test
             StringAssert.Contains(@"using CoreWCF", service);
         }
 
-        [TestCase(TargetFramework.Dotnet7)]
-        [TestCase(TargetFramework.Dotnet6)]
-        [TestCase(TargetFramework.Dotnet5)]
-        [TestCase(TargetFramework.DotnetCoreApp31)]
+        [Test, TestCaseSource("TestCases")]
         public void TestWCFClient(string version)
         {
             var results = _wcfTCPSelfHostResultsDict[version];
@@ -510,10 +471,7 @@ namespace CTA.Rules.Test
             StringAssert.Contains(@"System.ServiceModel.NetTcp", csProjContent);
         }
 
-        [TestCase(TargetFramework.Dotnet7)]
-        [TestCase(TargetFramework.Dotnet6)]
-        [TestCase(TargetFramework.Dotnet5)]
-        [TestCase(TargetFramework.DotnetCoreApp31)]
+        [Test, TestCaseSource("TestCases")]
         public void TestWCFServiceLibrary(string version)
         {
             var results = _wcfTCPSelfHostResultsDict[version];

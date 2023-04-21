@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using CTA.Rules.Models;
 using NUnit.Framework;
 
 namespace CTA.Rules.Test
@@ -19,38 +20,34 @@ namespace CTA.Rules.Test
         private string _ctaTestProjectsDir = "";
         private Dictionary<string, TestSolutionAnalysis> _resultsDict;
 
+        private static IEnumerable<string> TestCases = SupportedFrameworks.GetSupportedFrameworksList();
+
         [OneTimeSetUp]
         public void Setup()
         {
             _ctaTestProjectsDir = SetupTests.CtaTestProjectsDir;
-            var net31Results = CopySolutionToUniqueTempDirAndAnalyze(RuleContributionsSolutionFileName, _ctaTestProjectsDir, TargetFramework.DotnetCoreApp31);
-            var net50Results = CopySolutionToUniqueTempDirAndAnalyze(RuleContributionsSolutionFileName, _ctaTestProjectsDir, TargetFramework.Dotnet5);
-            var net60Results = CopySolutionToUniqueTempDirAndAnalyze(RuleContributionsSolutionFileName, _ctaTestProjectsDir, TargetFramework.Dotnet6);
-            var net70Results = CopySolutionToUniqueTempDirAndAnalyze(RuleContributionsSolutionFileName, _ctaTestProjectsDir, TargetFramework.Dotnet7);
+            var net31Results = CopySolutionToUniqueTempDirAndAnalyze(RuleContributionsSolutionFileName, _ctaTestProjectsDir, SupportedFrameworks.Netcore31);
+            var net50Results = CopySolutionToUniqueTempDirAndAnalyze(RuleContributionsSolutionFileName, _ctaTestProjectsDir, SupportedFrameworks.Net5);
+            var net60Results = CopySolutionToUniqueTempDirAndAnalyze(RuleContributionsSolutionFileName, _ctaTestProjectsDir, SupportedFrameworks.Net6);
+            var net70Results = CopySolutionToUniqueTempDirAndAnalyze(RuleContributionsSolutionFileName, _ctaTestProjectsDir, SupportedFrameworks.Net7);
 
             _resultsDict = new Dictionary<string, TestSolutionAnalysis>
             {
-                {TargetFramework.DotnetCoreApp31, net31Results},
-                {TargetFramework.Dotnet5, net50Results},
-                {TargetFramework.Dotnet6, net60Results},
-                {TargetFramework.Dotnet7, net70Results}
+                {SupportedFrameworks.Netcore31, net31Results},
+                {SupportedFrameworks.Net5, net50Results},
+                {SupportedFrameworks.Net6, net60Results},
+                {SupportedFrameworks.Net7, net70Results}
             };
         }
 
-        [TestCase(TargetFramework.DotnetCoreApp31)]
-        [TestCase(TargetFramework.Dotnet5)]
-        [TestCase(TargetFramework.Dotnet6)]
-        [TestCase(TargetFramework.Dotnet7)]
+        [Test, TestCaseSource("TestCases")]
         public void Porting_With_All_Contributed_Rules_Results_In_Zero_Build_Errors(string version)
         {
             var solutionPortingResult = _resultsDict[version];
             CollectionAssert.IsEmpty(solutionPortingResult.SolutionRunResult.BuildErrors);
         }
 
-        [TestCase(TargetFramework.DotnetCoreApp31)]
-        [TestCase(TargetFramework.Dotnet5)]
-        [TestCase(TargetFramework.Dotnet6)]
-        [TestCase(TargetFramework.Dotnet7)]
+        [Test, TestCaseSource("TestCases")]
         public void DynamicQuery_Package_Is_Added_And_Namespaces_Are_Replaced(string version)
         {
             var csFileName = "System.Linq.Dynamic.cs";
@@ -69,10 +66,7 @@ namespace CTA.Rules.Test
             StringAssert.DoesNotContain("using System.Linq.Dynamic;", ruleContributionsFileContent);
         }
 
-        [TestCase(TargetFramework.DotnetCoreApp31)]
-        [TestCase(TargetFramework.Dotnet5)]
-        [TestCase(TargetFramework.Dotnet6)]
-        [TestCase(TargetFramework.Dotnet7)]
+        [Test, TestCaseSource("TestCases")]
         public void BouncyCastleNetCore_Package_Is_Added(string version)
         {
             var solutionPortingResult = _resultsDict[version];
@@ -82,10 +76,7 @@ namespace CTA.Rules.Test
             StringAssert.Contains(@"PackageReference Include=""BouncyCastle.NetCore""", ruleContributionsResult.CsProjectContent);
         }
 
-        [TestCase(TargetFramework.DotnetCoreApp31)]
-        [TestCase(TargetFramework.Dotnet5)]
-        [TestCase(TargetFramework.Dotnet6)]
-        [TestCase(TargetFramework.Dotnet7)]
+        [Test, TestCaseSource("TestCases")]
         public void NPOI_Package_Is_Added(string version)
         {
             var solutionPortingResult = _resultsDict[version];
@@ -95,10 +86,7 @@ namespace CTA.Rules.Test
             StringAssert.Contains(@"PackageReference Include=""NPOI""", ruleContributionsResult.CsProjectContent);
         }
 
-        [TestCase(TargetFramework.DotnetCoreApp31)]
-        [TestCase(TargetFramework.Dotnet5)]
-        [TestCase(TargetFramework.Dotnet6)]
-        [TestCase(TargetFramework.Dotnet7)]
+        [Test, TestCaseSource("TestCases")]
         public void OracleManagedDataAccess_Package_Is_Added(string version)
         {
             var solutionPortingResult = _resultsDict[version];

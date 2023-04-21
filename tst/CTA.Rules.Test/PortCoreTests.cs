@@ -17,6 +17,8 @@ namespace CTA.Rules.Test
         public string tempDir;
         public string downloadLocation;
 
+        private static IEnumerable<string> TestCases = SupportedFrameworks.GetSupportedFrameworksList();
+
         [SetUp]
         public void Setup()
         {
@@ -29,7 +31,7 @@ namespace CTA.Rules.Test
         {
             string mvcMusicStorePath = Directory.EnumerateFiles(tempDir, "MvcMusicStore.sln", SearchOption.AllDirectories).FirstOrDefault();
             string mvcMusicStoreProjectPath = Directory.EnumerateFiles(tempDir, "MvcMusicStore.csproj", SearchOption.AllDirectories).FirstOrDefault();
-            string[] args = { "-p", mvcMusicStoreProjectPath, "-s", mvcMusicStorePath, "-r", Path.Combine(tempDir, "Input"), "-d", "true", "-a", "", "-v", "net5.0", "-m", "false" };
+            string[] args = { "-p", mvcMusicStoreProjectPath, "-s", mvcMusicStorePath, "-r", Path.Combine(tempDir, "Input"), "-d", "true", "-a", "", "-v", SupportedFrameworks.Net5, "-m", "false" };
             var cli = new PortCoreRulesCli();
             cli.HandleCommand(args);
             Assert.NotNull(cli);
@@ -48,14 +50,14 @@ namespace CTA.Rules.Test
         [Test]
         public void TestSampleWebApi3Solution()
         {
-            var solutionDir = TestWebApiApp(TargetFramework.DotnetCoreApp31);
+            var solutionDir = TestWebApiApp(SupportedFrameworks.Netcore31);
             SolutionPort.ResetCache();
-            TestWebApi(TargetFramework.Dotnet5, solutionDir);
+            TestWebApi(SupportedFrameworks.Net5, solutionDir);
         }
 
-        [TestCase(TargetFramework.Dotnet7)]
-        [TestCase(TargetFramework.Dotnet6)]
-        [TestCase(TargetFramework.Dotnet5)]
+        [TestCase(SupportedFrameworks.Net7)]
+        [TestCase(SupportedFrameworks.Net6)]
+        [TestCase(SupportedFrameworks.Net5)]
         public void TestWebApi(string version, string solutionDir = "")
         {
             TestWebApiApp(version, solutionDir);
@@ -129,7 +131,7 @@ namespace CTA.Rules.Test
             return Directory.GetParent(results.SolutionRunResult.SolutionPath).FullName;
         }
 
-        [TestCase(TargetFramework.DotnetCoreApp31)]
+        [TestCase(SupportedFrameworks.Netcore31)]
         public void TestWebApiWithReferences(string version)
         {
             var solutionPath = CopySolutionDirToUniqueTempDir("WebApiWithReferences.sln", tempDir);
@@ -138,7 +140,7 @@ namespace CTA.Rules.Test
             ValidateWebApiWithReferences(results);
         }
 
-        [TestCase(TargetFramework.DotnetCoreApp31)]
+        [TestCase(SupportedFrameworks.Netcore31)]
         public async Task TestWebApiWithReferencesUsingGenerator(string version)
         {
             var solutionPath = CopySolutionDirToUniqueTempDir("WebApiWithReferences.sln", tempDir);
@@ -263,10 +265,7 @@ namespace CTA.Rules.Test
             Assert.AreEqual(4, webApiProjectActions.Count);
         }
 
-        [TestCase(TargetFramework.Dotnet7)]
-        [TestCase(TargetFramework.Dotnet6)]
-        [TestCase(TargetFramework.Dotnet5)]
-        [TestCase(TargetFramework.DotnetCoreApp31)]
+        [Test, TestCaseSource("TestCases")]
         public void TestMvcMusicStore(string version)
         {
             var solutionPath = CopySolutionDirToUniqueTempDir("MvcMusicStore.sln", tempDir);
@@ -275,10 +274,7 @@ namespace CTA.Rules.Test
             ValidateMvcMusicStore(results, version);
         }
 
-        [TestCase(TargetFramework.Dotnet7)]
-        [TestCase(TargetFramework.Dotnet6)]
-        [TestCase(TargetFramework.Dotnet5)]
-        [TestCase(TargetFramework.DotnetCoreApp31)]
+        [Test, TestCaseSource("TestCases")]
         public void TestMvcMusicStoreWithReferences(string version)
         {
             var solutionPath = CopySolutionDirToUniqueTempDir("MvcMusicStore.sln", tempDir);
@@ -290,10 +286,7 @@ namespace CTA.Rules.Test
             ValidateMvcMusicStore(results, version);
         }
 
-        [TestCase(TargetFramework.Dotnet7)]
-        [TestCase(TargetFramework.Dotnet6)]
-        [TestCase(TargetFramework.Dotnet5)]
-        [TestCase(TargetFramework.DotnetCoreApp31)]
+        [Test, TestCaseSource("TestCases")]
         public void TestMvcMusicStoreWithoutProjectPort(string version)
         {
             var solutionPath = CopySolutionDirToUniqueTempDir("MvcMusicStore.sln", tempDir);
@@ -413,10 +406,7 @@ namespace CTA.Rules.Test
             Assert.AreEqual(4, mvcProjectActions.Count);
         }
 
-        [TestCase(TargetFramework.Dotnet7)]
-        [TestCase(TargetFramework.Dotnet6)]
-        [TestCase(TargetFramework.Dotnet5)]
-        [TestCase(TargetFramework.DotnetCoreApp31)]
+        [Test, TestCaseSource("TestCases")]
         public void TestAntlrSampleSolution(string version)
         {
             TestSolutionAnalysis results = AnalyzeSolution("AntlrSample.sln", tempDir, downloadLocation, version);
@@ -434,10 +424,7 @@ namespace CTA.Rules.Test
             StringAssert.Contains("Include=\"Antlr3.Runtime\"", csProjectContent);
         }
 
-        [TestCase(TargetFramework.Dotnet7)]
-        [TestCase(TargetFramework.Dotnet6)]
-        [TestCase(TargetFramework.Dotnet5)]
-        [TestCase(TargetFramework.DotnetCoreApp31)]
+        [Test, TestCaseSource("TestCases")]
         public void TestMvcConfigSampleSolution(string version)
         {
             TestSolutionAnalysis results = AnalyzeSolution("MvcConfigMigrationTest.sln", tempDir, downloadLocation, version);
@@ -448,10 +435,7 @@ namespace CTA.Rules.Test
             ValidateConfig(homeControllerText);
         }
 
-        [TestCase(TargetFramework.Dotnet7)]
-        [TestCase(TargetFramework.Dotnet6)]
-        [TestCase(TargetFramework.Dotnet5)]
-        [TestCase(TargetFramework.DotnetCoreApp31)]
+        [Test, TestCaseSource("TestCases")]
         public void TestWebApiConfigSampleSolution(string version)
         {
             TestSolutionAnalysis results = AnalyzeSolution("WebApiConfigTest.sln", tempDir, downloadLocation, version);
@@ -463,10 +447,7 @@ namespace CTA.Rules.Test
 
         }
 
-        [TestCase(TargetFramework.Dotnet7)]
-        [TestCase(TargetFramework.Dotnet6)]
-        [TestCase(TargetFramework.Dotnet5)]
-        [TestCase(TargetFramework.DotnetCoreApp31)]
+        [Test, TestCaseSource("TestCases")]
         public void TestBuildableMvcSolution(string version)
         {
             TestSolutionAnalysis resultWithoutCodePort = AnalyzeSolution("BuildableMvc.sln", tempDir, downloadLocation, version, portCode: false);
@@ -478,10 +459,7 @@ namespace CTA.Rules.Test
             Assert.AreEqual(0, buildErrors.Count);
         }
 
-        [TestCase(TargetFramework.Dotnet7)]
-        [TestCase(TargetFramework.Dotnet6)]
-        [TestCase(TargetFramework.Dotnet5)]
-        [TestCase(TargetFramework.DotnetCoreApp31)]
+        [Test, TestCaseSource("TestCases")]
         public void TestBuildableWebApiSolution(string version)
         {
             TestSolutionAnalysis resultWithoutCodePort = AnalyzeSolution(
@@ -506,10 +484,7 @@ namespace CTA.Rules.Test
             Assert.AreEqual(0, buildErrors.Count);
         }
 
-        [TestCase(TargetFramework.Dotnet7)]
-        [TestCase(TargetFramework.Dotnet6)]
-        [TestCase(TargetFramework.Dotnet5)]
-        [TestCase(TargetFramework.DotnetCoreApp31)]
+        [Test, TestCaseSource("TestCases")]
         public void TestSampleMvcWebApiSolution(string version)
         {
             TestSolutionAnalysis results = AnalyzeSolution("SampleMvcWebApp.sln", tempDir, downloadLocation, version);
@@ -523,10 +498,7 @@ namespace CTA.Rules.Test
             StringAssert.Contains("TryUpdateModelAsync", homeController);
         }
 
-        [TestCase(TargetFramework.Dotnet7)]
-        [TestCase(TargetFramework.Dotnet6)]
-        [TestCase(TargetFramework.Dotnet5)]
-        [TestCase(TargetFramework.DotnetCoreApp31)]
+        [Test, TestCaseSource("TestCases")]
         public void TestMemoryUsageForMvcWebApiSolution(string version)
         {
             // This upper limit was chosen by taking the avg memory consumption of this
@@ -572,10 +544,7 @@ namespace CTA.Rules.Test
             StringAssert.DoesNotContain(@"var appSetting3 = WebConfigurationManager.AppSettings[constAppSetting];", controllerText);
         }
 
-        [TestCase(TargetFramework.Dotnet7)]
-        [TestCase(TargetFramework.Dotnet6)]
-        [TestCase(TargetFramework.Dotnet5)]
-        [TestCase(TargetFramework.DotnetCoreApp31)]
+        [Test, TestCaseSource("TestCases")]
         public void TestIonicZipSampleSolution(string version)
         {
             TestSolutionAnalysis results = AnalyzeSolution("IonicZipSample.sln", tempDir, downloadLocation, version);

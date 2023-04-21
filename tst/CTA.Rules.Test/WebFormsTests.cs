@@ -1,4 +1,5 @@
-﻿using CTA.Rules.Test.Models;
+﻿using CTA.Rules.Models;
+using CTA.Rules.Test.Models;
 using NUnit.Framework;
 using System.Collections.Generic;
 using System.IO;
@@ -15,6 +16,8 @@ namespace CTA.Rules.Test
         private Dictionary<string, TestSolutionAnalysis> _aspnetWebFormsSolution;
         private Dictionary<string, TestSolutionAnalysis> _mvcAndDualWebFormsSolution;
 
+        private static IEnumerable<string> TestCases = SupportedFrameworks.GetSupportedFrameworksList();
+
         [OneTimeSetUp]
         public void Setup()
         {
@@ -22,38 +25,35 @@ namespace CTA.Rules.Test
             downloadLocation = SetupTests.DownloadLocation;
 
             var aspnetWebFormsSolutionName = "ASP.NET-WebForms.sln";
-            var net31Results = CopySolutionToUniqueTempDirAndAnalyze(aspnetWebFormsSolutionName, ctaTestProjectsDir, TargetFramework.DotnetCoreApp31);
-            var net50Results = CopySolutionToUniqueTempDirAndAnalyze(aspnetWebFormsSolutionName, ctaTestProjectsDir, TargetFramework.Dotnet5);
-            var net60Results = CopySolutionToUniqueTempDirAndAnalyze(aspnetWebFormsSolutionName, ctaTestProjectsDir, TargetFramework.Dotnet6);
-            var net70Results = CopySolutionToUniqueTempDirAndAnalyze(aspnetWebFormsSolutionName, ctaTestProjectsDir, TargetFramework.Dotnet7);
+            var net31Results = CopySolutionToUniqueTempDirAndAnalyze(aspnetWebFormsSolutionName, ctaTestProjectsDir, SupportedFrameworks.Netcore31);
+            var net50Results = CopySolutionToUniqueTempDirAndAnalyze(aspnetWebFormsSolutionName, ctaTestProjectsDir, SupportedFrameworks.Net5);
+            var net60Results = CopySolutionToUniqueTempDirAndAnalyze(aspnetWebFormsSolutionName, ctaTestProjectsDir, SupportedFrameworks.Net6);
+            var net70Results = CopySolutionToUniqueTempDirAndAnalyze(aspnetWebFormsSolutionName, ctaTestProjectsDir, SupportedFrameworks.Net7);
 
             _aspnetWebFormsSolution = new Dictionary<string, TestSolutionAnalysis>
             {
-                {TargetFramework.DotnetCoreApp31, net31Results},
-                {TargetFramework.Dotnet5, net50Results},
-                {TargetFramework.Dotnet6, net60Results},
-                {TargetFramework.Dotnet7, net70Results}
+                {SupportedFrameworks.Netcore31, net31Results},
+                {SupportedFrameworks.Net5, net50Results},
+                {SupportedFrameworks.Net6, net60Results},
+                {SupportedFrameworks.Net7, net70Results}
             };
 
             var mvcDualWebFormsSolutionName = "MvcAndDualWebForms.sln";
-            net31Results = CopySolutionToUniqueTempDirAndAnalyze(mvcDualWebFormsSolutionName, ctaTestProjectsDir, TargetFramework.DotnetCoreApp31);
-            net50Results = CopySolutionToUniqueTempDirAndAnalyze(mvcDualWebFormsSolutionName, ctaTestProjectsDir, TargetFramework.Dotnet5);
-            net60Results = CopySolutionToUniqueTempDirAndAnalyze(mvcDualWebFormsSolutionName, ctaTestProjectsDir, TargetFramework.Dotnet6);
-            net70Results = CopySolutionToUniqueTempDirAndAnalyze(mvcDualWebFormsSolutionName, ctaTestProjectsDir, TargetFramework.Dotnet7);
+            net31Results = CopySolutionToUniqueTempDirAndAnalyze(mvcDualWebFormsSolutionName, ctaTestProjectsDir, SupportedFrameworks.Netcore31);
+            net50Results = CopySolutionToUniqueTempDirAndAnalyze(mvcDualWebFormsSolutionName, ctaTestProjectsDir, SupportedFrameworks.Net5);
+            net60Results = CopySolutionToUniqueTempDirAndAnalyze(mvcDualWebFormsSolutionName, ctaTestProjectsDir, SupportedFrameworks.Net6);
+            net70Results = CopySolutionToUniqueTempDirAndAnalyze(mvcDualWebFormsSolutionName, ctaTestProjectsDir, SupportedFrameworks.Net7);
 
             _mvcAndDualWebFormsSolution = new Dictionary<string, TestSolutionAnalysis>
             {
-                {TargetFramework.DotnetCoreApp31, net31Results},
-                {TargetFramework.Dotnet5, net50Results},
-                {TargetFramework.Dotnet6, net60Results},
-                {TargetFramework.Dotnet7, net70Results}
+                {SupportedFrameworks.Netcore31, net31Results},
+                {SupportedFrameworks.Net5, net50Results},
+                {SupportedFrameworks.Net6, net60Results},
+                {SupportedFrameworks.Net7, net70Results}
             };
         }
 
-        [TestCase(TargetFramework.Dotnet7)]
-        [TestCase(TargetFramework.Dotnet6)]
-        [TestCase(TargetFramework.Dotnet5)]
-        [TestCase(TargetFramework.DotnetCoreApp31)]
+        [Test, TestCaseSource("TestCases")]
         public void TestAspNetWebFormsProject(string version)
         {
             var results = _aspnetWebFormsSolution[version];
@@ -72,9 +72,9 @@ namespace CTA.Rules.Test
                 Regex.Replace(programText, @"\r|\n|\t", ""));
         }
 
-        [TestCase(TargetFramework.DotnetCoreApp31)]
-        [TestCase(TargetFramework.Dotnet5)]
-        [TestCase(TargetFramework.Dotnet6)]
+        [TestCase(SupportedFrameworks.Netcore31)]
+        [TestCase(SupportedFrameworks.Net5)]
+        [TestCase(SupportedFrameworks.Net6)]
         public void TestSolutionWithMvcAndDualWebForms(string version)
         {
             var results = _mvcAndDualWebFormsSolution[version];
@@ -97,7 +97,7 @@ namespace CTA.Rules.Test
             VerifyMvc(someMvcResult);
         }
 
-        [TestCase(TargetFramework.Dotnet7)]
+        [TestCase(SupportedFrameworks.Net7)]
         public void TestSolutionWithMvcAndDualWebForms_Dotnet7AndAbove(string version)
         {
             var results = _mvcAndDualWebFormsSolution[version];

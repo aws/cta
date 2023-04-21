@@ -2,6 +2,8 @@
 using System.IO;
 using System.Linq;
 using System.Text;
+using CTA.Rules.Models;
+using Microsoft.CodeAnalysis.VisualBasic.Syntax;
 using Newtonsoft.Json;
 
 namespace CTA.Rules.RuleFiles
@@ -26,11 +28,7 @@ namespace CTA.Rules.RuleFiles
 
             _rootObject = JsonConvert.DeserializeObject<Rootobject>(rulesFileContent);
 
-            targetFrameworks = new List<TargetFramework>
-            {
-                new TargetFramework() { Name = "netcoreapp3.1", TargetCPU = { "x86", "x64", "ARM64" } },
-                new TargetFramework() { Name = "net5.0", TargetCPU = { "x86", "x64", "ARM64" } }
-            };
+            targetFrameworks = SupportedFrameworks.GetSupportedFrameworksList().Select(framework => new TargetFramework() { Name = framework, TargetCPU = SupportedCPUs.GetSupportedCPUsList() }).ToList();
         }
 
         /// <summary>

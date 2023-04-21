@@ -252,7 +252,7 @@ namespace CTA.Rules.RuleFiles
                     {
                         if (recommendedActions.Actions != null && recommendedActions.Actions.Count > 0)
                         {
-                            var targetCPUs = new List<string> { "x86", "x64", "ARM64" };
+                            var targetCPUs = new List<string> { SupportedCPUs.x86, SupportedCPUs.x64, SupportedCPUs.ARM64 };
                             try
                             {
                                 targetCPUs = recommendedActions.TargetFrameworks.FirstOrDefault(t => t.Name == _targetFramework)?.TargetCPU;

@@ -1,5 +1,8 @@
-﻿using CTA.Rules.Test.Models;
+﻿using CTA.Rules.Models;
+using CTA.Rules.Test.Models;
 using NUnit.Framework;
+using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -12,6 +15,8 @@ namespace CTA.Rules.Test
         public string tempDir = "";
         public string downloadLocation;
 
+        private static IEnumerable<string> TestCases = SupportedFrameworks.GetSupportedFrameworksList();
+
         [OneTimeSetUp]
         public void Setup()
         {
@@ -19,10 +24,7 @@ namespace CTA.Rules.Test
             downloadLocation = SetupTests.DownloadLocation;
         }
 
-        [TestCase(TargetFramework.Dotnet7)]
-        [TestCase(TargetFramework.Dotnet6)]
-        [TestCase(TargetFramework.Dotnet5)]
-        [TestCase(TargetFramework.DotnetCoreApp31)]
+        [Test, TestCaseSource("TestCases")]
         public void TestAspNetRoutes(string version)
         {
             TestSolutionAnalysis results = AnalyzeSolution("AspNetRoutes.sln", tempDir, downloadLocation, version);
@@ -43,7 +45,7 @@ namespace CTA.Rules.Test
 
             StringAssert.Contains(@"Microsoft.AspNetCore.Owin", csProjContent);
             StringAssert.Contains(@"Microsoft.AspNetCore.Diagnostics", csProjContent);
-            StringAssert.Contains(new[] { TargetFramework.Dotnet5, TargetFramework.Dotnet6, TargetFramework.Dotnet7}.Contains(version) 
+            StringAssert.Contains(new[] { SupportedFrameworks.Net5, SupportedFrameworks.Net6, SupportedFrameworks.Net7}.Contains(version) 
                 ? @"Microsoft.AspNetCore.Authentication.Google" 
                 : @"<PackageReference Include=""Microsoft.AspNetCore.Authentication.Google"" Version=""3.1.18"" />", 
                 csProjContent);
@@ -52,10 +54,7 @@ namespace CTA.Rules.Test
             Assert.True(csProjContent.IndexOf(string.Concat(">", version, "<")) > 0);
         }
 
-        [TestCase(TargetFramework.Dotnet7)]
-        [TestCase(TargetFramework.Dotnet6)]
-        [TestCase(TargetFramework.Dotnet5)]
-        [TestCase(TargetFramework.DotnetCoreApp31)]
+        [Test, TestCaseSource("TestCases")]
         public void TestBranchingPipelines(string version)
         {
             TestSolutionAnalysis results = AnalyzeSolution("BranchingPipelines.sln", tempDir, downloadLocation, version);
@@ -81,10 +80,7 @@ namespace CTA.Rules.Test
             //FileAssert.Exists(Path.Combine(projectDir, "Program.cs")); // This should be added but class library does not do this
         }
 
-        [TestCase(TargetFramework.Dotnet7)]
-        [TestCase(TargetFramework.Dotnet6)]
-        [TestCase(TargetFramework.Dotnet5)]
-        [TestCase(TargetFramework.DotnetCoreApp31)]
+        [Test, TestCaseSource("TestCases")]
         public void TestEmbedded(string version)
         {
             TestSolutionAnalysis results = AnalyzeSolution("Embedded.sln", tempDir, downloadLocation, version);
@@ -108,10 +104,7 @@ namespace CTA.Rules.Test
             Assert.True(csProjContent.IndexOf(string.Concat(">", version, "<")) > 0);
         }
 
-        [TestCase(TargetFramework.Dotnet7)]
-        [TestCase(TargetFramework.Dotnet6)]
-        [TestCase(TargetFramework.Dotnet5)]
-        [TestCase(TargetFramework.DotnetCoreApp31)]
+        [Test, TestCaseSource("TestCases")]
         public void TestCustomServer(string version)
         {
             TestSolutionAnalysis results = AnalyzeSolution("CustomServer.sln", tempDir, downloadLocation, version);
@@ -153,10 +146,7 @@ namespace CTA.Rules.Test
             Assert.True(customProjContent.IndexOf(string.Concat(">", version, "<")) > 0);
         }
 
-        [TestCase(TargetFramework.Dotnet7)]
-        [TestCase(TargetFramework.Dotnet6)]
-        [TestCase(TargetFramework.Dotnet5)]
-        [TestCase(TargetFramework.DotnetCoreApp31)]
+        [Test, TestCaseSource("TestCases")]
         public void TestHelloWorld(string version)
         {
             TestSolutionAnalysis results = AnalyzeSolution("HelloWorld.sln", tempDir, downloadLocation, version);
@@ -177,10 +167,7 @@ namespace CTA.Rules.Test
             Assert.True(csProjContent.IndexOf(string.Concat(">", version, "<")) > 0);
         }
 
-        [TestCase(TargetFramework.Dotnet7)]
-        [TestCase(TargetFramework.Dotnet6)]
-        [TestCase(TargetFramework.Dotnet5)]
-        [TestCase(TargetFramework.DotnetCoreApp31)]
+        [Test, TestCaseSource("TestCases")]
         public void TestHelloWorldRawOwin(string version)
         {
             TestSolutionAnalysis results = AnalyzeSolution("HelloWorldRawOwin.sln", tempDir, downloadLocation, version);
@@ -198,10 +185,7 @@ namespace CTA.Rules.Test
             Assert.True(csProjContent.IndexOf(string.Concat(">", version, "<")) > 0);
         }
 
-        [TestCase(TargetFramework.Dotnet7)]
-        [TestCase(TargetFramework.Dotnet6)]
-        [TestCase(TargetFramework.Dotnet5)]
-        [TestCase(TargetFramework.DotnetCoreApp31)]
+        [Test, TestCaseSource("TestCases")]
         public void TestOwinSelfHostSample(string version)
         {
             TestSolutionAnalysis results = AnalyzeSolution("OwinSelfhostSample.sln", tempDir, downloadLocation, version);
@@ -223,10 +207,7 @@ namespace CTA.Rules.Test
             Assert.True(csProjContent.IndexOf(string.Concat(">", version, "<")) > 0);
         }
 
-        [TestCase(TargetFramework.Dotnet7)]
-        [TestCase(TargetFramework.Dotnet6)]
-        [TestCase(TargetFramework.Dotnet5)]
-        [TestCase(TargetFramework.DotnetCoreApp31)]
+        [Test, TestCaseSource("TestCases")]
         public void TestSignalR(string version)
         {
             TestSolutionAnalysis results = AnalyzeSolution("SignalR.sln", tempDir, downloadLocation, version);
@@ -249,10 +230,7 @@ namespace CTA.Rules.Test
             Assert.True(csProjContent.IndexOf(string.Concat(">", version, "<")) > 0);
         }
 
-        [TestCase(TargetFramework.Dotnet7)]
-        [TestCase(TargetFramework.Dotnet6)]
-        [TestCase(TargetFramework.Dotnet5)]
-        [TestCase(TargetFramework.DotnetCoreApp31)]
+        [Test, TestCaseSource("TestCases")]
         public void TestStaticFilesSample(string version)
         {
             TestSolutionAnalysis results = AnalyzeSolution("StaticFilesSample.sln", tempDir, downloadLocation, version);
@@ -277,10 +255,7 @@ namespace CTA.Rules.Test
             Assert.True(csProjContent.IndexOf(string.Concat(">", version, "<")) > 0);
         }
 
-        [TestCase(TargetFramework.Dotnet7)]
-        [TestCase(TargetFramework.Dotnet6)]
-        [TestCase(TargetFramework.Dotnet5)]
-        [TestCase(TargetFramework.DotnetCoreApp31)]
+        [Test, TestCaseSource("TestCases")]
         public void TestWebApi(string version)
         {
             TestSolutionAnalysis results = AnalyzeSolution("OwinWebApi.sln", tempDir, downloadLocation, version);
@@ -292,7 +267,7 @@ namespace CTA.Rules.Test
             StringAssert.AreEqualIgnoringCase(ExpectedOutputConstants.OwinWebApiStartup.NormalizeNewLineChars(), startupText.NormalizeNewLineChars());
 
             //Check that package has been added:
-            StringAssert.Contains(new []{TargetFramework.Dotnet5, TargetFramework.Dotnet6, TargetFramework.Dotnet7}.Contains(version) 
+            StringAssert.Contains(new []{SupportedFrameworks.Net5, SupportedFrameworks.Net6, SupportedFrameworks.Net7}.Contains(version) 
                 ? @"Microsoft.AspNetCore.Authentication.OpenIdConnect" 
                 : @"<PackageReference Include=""Microsoft.AspNetCore.Authentication.OpenIdConnect"" Version=""3.1.15"" />", 
                 csProjContent);
@@ -302,10 +277,7 @@ namespace CTA.Rules.Test
             Assert.True(csProjContent.IndexOf(string.Concat(">", version, "<")) > 0);
         }
 
-        [TestCase(TargetFramework.Dotnet7)]
-        [TestCase(TargetFramework.Dotnet6)]
-        [TestCase(TargetFramework.Dotnet5)]
-        [TestCase(TargetFramework.DotnetCoreApp31)]
+        [Test, TestCaseSource("TestCases")]
         public void TestWebSocketSample(string version)
         {
             TestSolutionAnalysis results = AnalyzeSolution("WebSocketSample.sln", tempDir, downloadLocation, version);
@@ -339,10 +311,7 @@ namespace CTA.Rules.Test
             Assert.True(serverProjContent.IndexOf(string.Concat(">", version, "<")) > 0);
         }
 
-        [TestCase(TargetFramework.Dotnet7)]
-        [TestCase(TargetFramework.Dotnet6)]
-        [TestCase(TargetFramework.Dotnet5)]
-        [TestCase(TargetFramework.DotnetCoreApp31)]
+        [Test, TestCaseSource("TestCases")]
         public void TestOwinExtraAPI(string version)
         {
             TestSolutionAnalysis results = AnalyzeSolution("OwinExtraAPI.sln", tempDir, downloadLocation, version);
@@ -358,10 +327,7 @@ namespace CTA.Rules.Test
             Assert.True(csProjContent.IndexOf(string.Concat(">", version, "<")) > 0);
         }
 
-        [TestCase(TargetFramework.Dotnet7)]
-        [TestCase(TargetFramework.Dotnet6)]
-        [TestCase(TargetFramework.Dotnet5)]
-        [TestCase(TargetFramework.DotnetCoreApp31)]
+        [Test, TestCaseSource("TestCases")]
         public void TestOwinParadise(string version)
         {
             TestSolutionAnalysis results = AnalyzeSolution("OwinParadise.sln", tempDir, downloadLocation, version);

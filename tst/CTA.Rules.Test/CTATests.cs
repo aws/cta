@@ -18,7 +18,7 @@ namespace CTA.Rules.Test
         public string ctaTestProjectsDir = "";
         public string downloadLocation;
         public List<string> ctaFiles;
-        public string version = "net5.0"; //We don't care about version for CTA-only rules:
+        public string version = SupportedFrameworks.Net5; //We don't care about version for CTA-only rules:
 
         [SetUp]
         public void Setup()

@@ -259,8 +259,8 @@ namespace CTA.Rules.ProjectFile
         private bool? IsCoreProject() =>
             _projectType == ProjectType.CoreMvc
             || _projectType == ProjectType.CoreWebApi
-            || _projectFileXml.Descendants().Any(d => d.Name?.LocalName == "TargetFramework" && (d.Value?.Equals("net5.0") == true || d.Value?.Equals("netcoreapp3.1") == true))
-            || _projectFileXml.Descendants().Any(d => d.Name?.LocalName == "TargetFrameworks" && (d.Value?.Contains("net5.0") == true || d.Value?.Contains("netcoreapp3.1") == true));
+            || _projectFileXml.Descendants().Any(d => d.Name?.LocalName == "TargetFramework" && (d.Value?.Split(';').Intersect(SupportedFrameworks.GetSupportedFrameworksList()).Any()) == true)
+            || _projectFileXml.Descendants().Any(d => d.Name?.LocalName == "TargetFrameworks" && (d.Value?.Split(';').Intersect(SupportedFrameworks.GetSupportedFrameworksList()).Any()) == true);
 
 
 

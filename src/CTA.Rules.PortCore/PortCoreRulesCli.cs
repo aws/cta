@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using CommandLine;
+using CTA.Rules.Models;
 
 namespace CTA.Rules.PortCore
 {
@@ -21,7 +22,7 @@ namespace CTA.Rules.PortCore
         [Option('a', "assemblies-dir", Required = false, HelpText = "Action Assemblies Dir")]
         public string AssembliesDir { get; set; }
 
-        [Option('v', "version", Required = false, HelpText = "Version of net core to port to (netcoreapp3.1 or net5.0)")]
+        [Option('v', "version", Required = false, HelpText = "Version of net core to port to (" + SupportedFrameworks.SupportedFrameworksString + ")")]
         public string Version { get; set; }
 
         [Option('m', "mock-run", Required = false, HelpText = "Mock run to generate output only (no changes will be made)")]

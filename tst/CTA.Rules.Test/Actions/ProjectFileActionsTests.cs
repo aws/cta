@@ -33,22 +33,22 @@ namespace CTA.Rules.Test.Actions
         [Test]
         public void ProjectFileCreationMvcOneVersion()
         {
-            var result = CreateNewFile(ProjectType.Mvc, new List<string>() { "net5.0" }, new Dictionary<string, string>(), new List<string>());
-            StringAssert.Contains("net5.0", result);
+            var result = CreateNewFile(ProjectType.Mvc, new List<string>() { SupportedFrameworks.Net5 }, new Dictionary<string, string>(), new List<string>());
+            StringAssert.Contains(SupportedFrameworks.Net5, result);
         }
 
         [Test]
         public void ProjectFileCreationMvcTwoVersions()
         {
-            var result = CreateNewFile(ProjectType.Mvc, new List<string>() { "netcoreapp3.1", "net5.0" }, new Dictionary<string, string>(), new List<string>());
-            StringAssert.Contains("netcoreapp3.1", result);
+            var result = CreateNewFile(ProjectType.Mvc, new List<string>() { SupportedFrameworks.Netcore31, SupportedFrameworks.Net5 }, new Dictionary<string, string>(), new List<string>());
+            StringAssert.Contains(SupportedFrameworks.Netcore31, result);
         }
 
         [Test]
         public void ProjectFileCreationWebClassLibrary()
         {
-            var result = CreateNewFile(ProjectType.WebClassLibrary, new List<string>() { "net5.0" }, new Dictionary<string, string>(), new List<string>());
-            StringAssert.Contains("net5.0", result);
+            var result = CreateNewFile(ProjectType.WebClassLibrary, new List<string>() { SupportedFrameworks.Net5 }, new Dictionary<string, string>(), new List<string>());
+            StringAssert.Contains(SupportedFrameworks.Net5, result);
             StringAssert.Contains("Microsoft.AspNetCore.App", result);
         }
 
