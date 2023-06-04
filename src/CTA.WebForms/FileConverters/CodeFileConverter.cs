@@ -49,8 +49,8 @@ namespace CTA.WebForms.FileConverters
                 
                 var oldFileModel = sourcefileBuildResult?.SemanticModel;
                 var oldTree = sourcefileBuildResult?.SyntaxTree;
-                SyntaxTree newTree;
-                if (fullPath.EndsWith(".cs"))
+                SyntaxTree newTree = null;
+                if ( fullPath.EndsWith(".cs"))
                 {
                     var languageVersion = ((Microsoft.CodeAnalysis.CSharp.CSharpParseOptions)(sourcefileBuildResult?.SemanticModel?.SyntaxTree?.Options)).LanguageVersion;
                     var options = CSharpParseOptions.Default.WithLanguageVersion(languageVersion);
@@ -62,11 +62,7 @@ namespace CTA.WebForms.FileConverters
                     var options = VisualBasicParseOptions.Default.WithLanguageVersion(vblanguageVersion);
                     newTree = VisualBasicSyntaxTree.ParseText(File.ReadAllText(fullPath), options);
                 }
-                else
-                {
-                    newTree = null;
-                    LogHelper.LogError($"invalid source code language for {fullPath}");
-                }
+                
 
                 if (newTree != null)
                 {
@@ -74,7 +70,8 @@ namespace CTA.WebForms.FileConverters
                     _fileModel = newCompilation?.GetSemanticModel(newTree);
                 }
                 else {
-                    _fileModel = null;
+                    _fileModel = _webFormsProjectAnaylzer.AnalyzerResult.ProjectBuildResult?.SourceFileBuildResults?
+                   .Single(r => r.SourceFileFullPath.Equals(fullPath, StringComparison.OrdinalIgnoreCase))?.SemanticModel;
                 }
 
             }
