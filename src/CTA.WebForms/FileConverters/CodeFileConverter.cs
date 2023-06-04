@@ -13,6 +13,7 @@ using CTA.WebForms.ProjectManagement;
 using CTA.WebForms.Services;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.VisualBasic;
 
 namespace CTA.WebForms.FileConverters
 {
@@ -45,11 +46,31 @@ namespace CTA.WebForms.FileConverters
             {
                 var sourcefileBuildResult = _webFormsProjectAnaylzer.AnalyzerResult.ProjectBuildResult?.SourceFileBuildResults?
                     .Single(r => r.SourceFileFullPath.Equals(fullPath, StringComparison.OrdinalIgnoreCase));
-                var oldFileModel = sourcefileBuildResult.SemanticModel;
-                var oldTree = sourcefileBuildResult.SyntaxTree;
-                var newTree = CSharpSyntaxTree.ParseText(File.ReadAllText(fullPath));
-                var newCompilation = oldFileModel.Compilation.ReplaceSyntaxTree(oldTree, newTree);
-                _fileModel = newCompilation.GetSemanticModel(newTree);
+                var oldFileModel = sourcefileBuildResult?.SemanticModel;
+                var oldTree = sourcefileBuildResult?.SyntaxTree;
+                SyntaxTree newTree;
+                if (fullPath.EndsWith(".cs"))
+                {
+                    newTree = CSharpSyntaxTree.ParseText(File.ReadAllText(fullPath));
+                }
+                else if (fullPath.EndsWith(".vb"))
+                {
+                    newTree = VisualBasicSyntaxTree.ParseText(File.ReadAllText(fullPath));
+                }
+                else
+                {
+                    newTree = null;
+                    LogHelper.LogError($"invalid source code language for {fullPath}");
+                }
+
+                if (newTree != null)
+                {
+                    var newCompilation = oldFileModel?.Compilation?.ReplaceSyntaxTree(oldTree, newTree);
+                    _fileModel = newCompilation?.GetSemanticModel(newTree);
+                }
+                else {
+                    _fileModel = null;
+                }
 
             }
             catch (IOException e)
