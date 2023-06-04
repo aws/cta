@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using CTA.Rules.Config;
@@ -11,6 +12,7 @@ using CTA.WebForms.Metrics;
 using CTA.WebForms.ProjectManagement;
 using CTA.WebForms.Services;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 
 namespace CTA.WebForms.FileConverters
 {
@@ -41,8 +43,19 @@ namespace CTA.WebForms.FileConverters
 
             try
             {
-                _fileModel = _webFormsProjectAnaylzer.AnalyzerResult.ProjectBuildResult?.SourceFileBuildResults?
-                    .Single(r => r.SourceFileFullPath.Equals(fullPath, StringComparison.OrdinalIgnoreCase))?.SemanticModel;
+                var sourcefileBuildResult = _webFormsProjectAnaylzer.AnalyzerResult.ProjectBuildResult?.SourceFileBuildResults?
+                    .Single(r => r.SourceFileFullPath.Equals(fullPath, StringComparison.OrdinalIgnoreCase));
+                var oldFileModel = sourcefileBuildResult.SemanticModel;
+                var oldTree = sourcefileBuildResult.SyntaxTree;
+                var newTree = CSharpSyntaxTree.ParseText(File.ReadAllText(fullPath));
+                var newCompilation = oldFileModel.Compilation.ReplaceSyntaxTree(oldTree, newTree);
+                _fileModel = newCompilation.GetSemanticModel(newTree);
+
+            }
+            catch (IOException e)
+            {
+                LogHelper.LogError(e, $"{Rules.Config.Constants.WebFormsErrorTag}Exception occurred when trying to reload source file  [{FullPath}] syntax tree. " +
+                                      "Semantic Model will default to null.");
             }
             catch (Exception e)
             {
