@@ -46,16 +46,21 @@ namespace CTA.WebForms.FileConverters
             {
                 var sourcefileBuildResult = _webFormsProjectAnaylzer.AnalyzerResult.ProjectBuildResult?.SourceFileBuildResults?
                     .Single(r => r.SourceFileFullPath.Equals(fullPath, StringComparison.OrdinalIgnoreCase));
+                
                 var oldFileModel = sourcefileBuildResult?.SemanticModel;
                 var oldTree = sourcefileBuildResult?.SyntaxTree;
                 SyntaxTree newTree;
                 if (fullPath.EndsWith(".cs"))
                 {
-                    newTree = CSharpSyntaxTree.ParseText(File.ReadAllText(fullPath));
+                    var languageVersion = ((Microsoft.CodeAnalysis.CSharp.CSharpParseOptions)(sourcefileBuildResult?.SemanticModel?.SyntaxTree?.Options)).LanguageVersion;
+                    var options = CSharpParseOptions.Default.WithLanguageVersion(languageVersion);
+                    newTree = CSharpSyntaxTree.ParseText(File.ReadAllText(fullPath), options);
                 }
                 else if (fullPath.EndsWith(".vb"))
                 {
-                    newTree = VisualBasicSyntaxTree.ParseText(File.ReadAllText(fullPath));
+                    var vblanguageVersion = ((Microsoft.CodeAnalysis.VisualBasic.VisualBasicParseOptions)(sourcefileBuildResult?.SemanticModel?.SyntaxTree?.Options)).LanguageVersion;
+                    var options = VisualBasicParseOptions.Default.WithLanguageVersion(vblanguageVersion);
+                    newTree = VisualBasicSyntaxTree.ParseText(File.ReadAllText(fullPath), options);
                 }
                 else
                 {

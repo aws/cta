@@ -46,9 +46,10 @@ using WebFormsFull.Modules;
 using log4net;
 using System;
 using System.Configuration;
-using System.Data.Entity;
 using System.Diagnostics;
-using System.Web;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Http;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 
 namespace WebFormsFull
