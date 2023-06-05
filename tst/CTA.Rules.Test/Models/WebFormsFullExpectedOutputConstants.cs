@@ -46,9 +46,10 @@ using WebFormsFull.Modules;
 using log4net;
 using System;
 using System.Configuration;
-using System.Data.Entity;
 using System.Diagnostics;
-using System.Web;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Http;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 
 namespace WebFormsFull
@@ -140,10 +141,10 @@ using WebFormsFull.Modules;
 using log4net;
 using System;
 using System.Configuration;
-using System.Data.Entity;
 using System.Diagnostics;
-using System.Web;
-using eShopLegacyWebForms.HttpHandlers;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Http;
+using System.Threading.Tasks;
 using eShopLegacyWebForms.HttpModules;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Builder;
@@ -155,6 +156,7 @@ namespace WebFormsFull
 {
     public class Startup
     {
+        RequestDelegate _next = null;
         private static readonly ILog _log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         static IContainerProvider _containerProvider;
         IContainer container;
@@ -221,9 +223,6 @@ namespace WebFormsFull
                 _log.Debug(""Application_PreRequestHandlerExecute"");
                 await next();
             });
-            // This middleware was originally an http handler,
-            // use conditions must be added manually
-            app.UseMiddleware<TestHttpHandler>();
             // This code replaces the original handling
             // of the EndRequest event
             app.UseMiddleware<TestProperHttpModule>();
@@ -244,7 +243,7 @@ namespace WebFormsFull
         private void ConfigureContainer()
         {
             var builder = new ContainerBuilder();
-            var mockData = bool.Parse(ConfigurationManager.AppSettings[""UseMockData""]);
+            var mockData = bool.Parse(ConfigurationManager.Configuration.GetSection(""appSettings"")[""UseMockData""]);
             builder.RegisterModule(new ApplicationModule(mockData));
             container = builder.Build();
             _containerProvider = new ContainerProvider(container);
@@ -252,7 +251,7 @@ namespace WebFormsFull
 
         private void ConfigDataBase()
         {
-            var mockData = bool.Parse(ConfigurationManager.AppSettings[""UseMockData""]);
+            var mockData = bool.Parse(ConfigurationManager.Configuration.GetSection(""appSettings"")[""UseMockData""]);
             if (!mockData)
             {
                 Database.SetInitializer<CatalogDBContext>(container.Resolve<CatalogDBInitializer>());
@@ -278,9 +277,10 @@ using WebFormsFull.Modules;
 using log4net;
 using System;
 using System.Configuration;
-using System.Data.Entity;
 using System.Diagnostics;
-using System.Web;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Http;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 
 namespace WebFormsFull
@@ -299,12 +299,15 @@ using WebFormsFull.Services;
 using WebFormsFull.ViewModel;
 using System;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Http;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 
 namespace WebFormsFull
 {
     public partial class _Default : ComponentBase, IDisposable
     {
+        RequestDelegate _next = null;
         public const int DefaultPageIndex = 0;
         public const int DefaultPageSize = 2;
         public ICatalogService CatalogService { get; set; }
@@ -319,6 +322,10 @@ namespace WebFormsFull
         {
             PeopleModel.Add(new People(""New"", ""New"", ""New""));
              // PeopleGrid.DataBind();
+        }
+
+        public _Default(RequestDelegate next)
+        {
         }
 
         public Object PeopleGrid_DataSource { get; set; }
@@ -408,19 +415,24 @@ namespace WebFormsFull
 
         public const string OtherPageRazorCsFile = @"using log4net;
 using System;
+using Microsoft.AspNetCore.Http;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 
 namespace WebFormsFull
 {
     public partial class OtherPage : ComponentBase
     {
+        RequestDelegate _next = null;
+        public OtherPage(RequestDelegate next)
+        {
+        }
     }
 }";
 
         public const string TestHttpHandlerFile = @"using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
 
@@ -429,6 +441,7 @@ namespace eShopLegacyWebForms.HttpHandlers
     public class TestHttpHandler
     {
         private readonly RequestDelegate _next;
+        RequestDelegate _next = null;
         public bool IsReusable => false;
         public TestHttpHandler(RequestDelegate next)
         {
@@ -437,8 +450,15 @@ namespace eShopLegacyWebForms.HttpHandlers
 
         public async Task Invoke(HttpContext context)
         {
+            // Could not identify ProcessRequest method,
+            // dependant middleware Invoke method population
+            // operation must be done manually
+            
+        }
+
+        public async Task Invoke(HttpContext context)
+        {
             // Do some request handling
-            // The following lines were extracted from ProcessRequest
             context.Response.StatusCode = 200;
         }
     }
@@ -447,7 +467,6 @@ namespace eShopLegacyWebForms.HttpHandlers
         public const string TestProperHttpModuleFile = @"using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
 
@@ -456,8 +475,10 @@ namespace eShopLegacyWebForms.HttpModules
     public class TestProperHttpModule
     {
         private readonly RequestDelegate _next;
+        RequestDelegate _next = null;
         public TestProperHttpModule(RequestDelegate next)
         {
+            _next = next;
             _next = next;
         }
 
@@ -478,7 +499,6 @@ namespace eShopLegacyWebForms.HttpModules
         public const string TestProperHttpModuleAlternateResolveRequestCacheFile = @"using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
 
@@ -491,10 +511,12 @@ namespace eShopLegacyWebForms.HttpModules
     public class TestProperHttpModuleAlternateResolveRequestCache
     {
         private readonly RequestDelegate _next;
+        RequestDelegate _next = null;
         public string X { get; set; }
 
         public TestProperHttpModuleAlternateResolveRequestCache(RequestDelegate next)
         {
+            _next = next;
             _next = next;
         }
 
@@ -515,7 +537,6 @@ namespace eShopLegacyWebForms.HttpModules
         public const string TestProperHttpModuleAlternatePostResolveRequestCacheFile = @"using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
 
@@ -528,10 +549,12 @@ namespace eShopLegacyWebForms.HttpModules
     public class TestProperHttpModuleAlternatePostResolveRequestCache
     {
         private readonly RequestDelegate _next;
+        RequestDelegate _next = null;
         public string X { get; set; }
 
         public TestProperHttpModuleAlternatePostResolveRequestCache(RequestDelegate next)
         {
+            _next = next;
             _next = next;
         }
 
@@ -555,7 +578,6 @@ namespace eShopLegacyWebForms.HttpModules
         public const string TestImproperHttpModuleFile = @"using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
 
@@ -564,8 +586,10 @@ namespace eShopLegacyWebForms.HttpModules
     public class TestImproperHttpModule
     {
         private readonly RequestDelegate _next;
+        RequestDelegate _next = null;
         public TestImproperHttpModule(RequestDelegate next)
         {
+            _next = next;
             _next = next;
         }
 
