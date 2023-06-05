@@ -23,7 +23,7 @@ namespace CTA.WebForms.FileConverters
     {
         private const string ChildActionType = "CodeFileConverter";
         private readonly SemanticModel _fileModel;
-        private readonly SemanticModel _orignalModel;
+        private readonly SemanticModel _orignialModel;
         private readonly WorkspaceManagerService _blazorWorkspaceBuilder;
         private readonly ProjectAnalyzer _webFormsProjectAnaylzer;
         private readonly ClassConverterFactory _classConverterFactory;
@@ -44,19 +44,19 @@ namespace CTA.WebForms.FileConverters
             _webFormsProjectAnaylzer = webFormsProjectAnalyzer;
             _classConverterFactory = classConverterFactory;
             _metricsContext = metricsContext;
-            Dictionary<string, string> symbolClassConverterDic = new Dictionary<string, string>();
+            var symbolClassConverterDic = new Dictionary<string, string>();
             try
             {
 
                 var sourcefileBuildResult = _webFormsProjectAnaylzer.AnalyzerResult.ProjectBuildResult?.SourceFileBuildResults?
                     .Single(r => r.SourceFileFullPath.Equals(fullPath, StringComparison.OrdinalIgnoreCase));
 
-                _orignalModel = sourcefileBuildResult?.SemanticModel;
+                _orignialModel = sourcefileBuildResult?.SemanticModel;
                 var sourceFileRelativePath = sourcefileBuildResult?.SourceFileFullPath;
-                var namespaceLevelTypes = _orignalModel?.SyntaxTree?.GetNamespaceLevelTypes();
+                var namespaceLevelTypes = _orignialModel?.SyntaxTree?.GetNamespaceLevelTypes();
                 foreach (var namespaceLevelType in namespaceLevelTypes)
                 {
-                    var symbol = _orignalModel?.GetDeclaredSymbol(namespaceLevelType);
+                    var symbol = _orignialModel?.GetDeclaredSymbol(namespaceLevelType);
 
                     if (symbol.GetAllInheritedBaseTypes().Any(typeSymbol => typeSymbol.Name.Equals(Constants.ExpectedGlobalBaseClass))
                         && sourceFileRelativePath.EndsWith(Constants.ExpectedGlobalFileName, StringComparison.InvariantCultureIgnoreCase))
@@ -95,7 +95,7 @@ namespace CTA.WebForms.FileConverters
                     symbolClassConverterDic.TryAdd(symbol.ToDisplayString(), "UnknownClassConverter");
 
                 }
-                var oldFileModel = sourcefileBuildResult?.SemanticModel;
+
                 var oldTree = sourcefileBuildResult?.SyntaxTree;
                 var oldEncoding = oldTree.Encoding;
                 SyntaxTree newTree = null;
@@ -116,7 +116,7 @@ namespace CTA.WebForms.FileConverters
 
                 if (newTree != null && newTree != oldTree)
                 {
-                    var newCompilation = oldFileModel?.Compilation?.ReplaceSyntaxTree(oldTree, newTree);
+                    var newCompilation = _orignialModel?.Compilation?.ReplaceSyntaxTree(oldTree, newTree);
                     _fileModel = newCompilation?.GetSemanticModel(newTree);
                 }
                 
@@ -133,7 +133,7 @@ namespace CTA.WebForms.FileConverters
             }
 
             
-            if (_orignalModel != null && _fileModel!= null)
+            if (_fileModel!= null)
             {
                 _classConverters = _classConverterFactory.BuildMany(symbolClassConverterDic, RelativePath, _fileModel );
             }
