@@ -9,6 +9,7 @@ using System;
 using CTA.WebForms.Metrics;
 using CTA.WebForms.Services;
 using CTA.Rules.Config;
+using Codelyzer.Analysis;
 
 namespace CTA.WebForms.Factories
 {
@@ -36,7 +37,7 @@ namespace CTA.WebForms.Factories
             // via constructor parameters
         }
 
-        public ClassConverter Build(string sourceFileRelativePath, SemanticModel model, TypeDeclarationSyntax typeDeclarationNode)
+        public ClassConverter Build(string sourceFileRelativePath, SemanticModel model,  TypeDeclarationSyntax typeDeclarationNode)
         {
             try
             {
@@ -89,11 +90,63 @@ namespace CTA.WebForms.Factories
             }
         }
 
-        public IEnumerable<ClassConverter> BuildMany(string sourceFileRelativePath, SemanticModel model)
+
+        public ClassConverter Build(Dictionary<string, string> symbolClassConverterDic, string sourceFileRelativePath, SemanticModel model, TypeDeclarationSyntax typeDeclarationNode)
         {
-            return model.SyntaxTree.GetNamespaceLevelTypes().Select(node => Build(sourceFileRelativePath, model, node))
+            try
+            {
+                // TODO: Add extra handling for non-ClassDeclarationSyntax
+                // TypeDeclarationSyntax derived types (interfaces, enums, etc.)
+
+                var symbol = model.GetDeclaredSymbol(typeDeclarationNode);
+                var classConvertName = string.Empty;
+                symbolClassConverterDic.TryGetValue(symbol.ToDisplayString(), out classConvertName);
+
+                if (classConvertName == "GlobalClassConverter")
+                {
+                    return new GlobalClassConverter(sourceFileRelativePath, _sourceProjectPath, model, typeDeclarationNode, symbol, _lifecycleManager, _taskManager, _metricsContext);
+                }
+                // NOTE: The order is important from this point on, mainly because
+                // Page-derived classes are also IHttpHandler derived
+                if (classConvertName == "PageCodeBehindClassConverter")
+                {
+                    return new PageCodeBehindClassConverter(sourceFileRelativePath, _sourceProjectPath, model, typeDeclarationNode, symbol, _taskManager, _codeBehindLinkerService, _metricsContext);
+                }
+
+                if (classConvertName == "ControlCodeBehindClassConverter")
+                {
+                    return new ControlCodeBehindClassConverter(sourceFileRelativePath, _sourceProjectPath, model, typeDeclarationNode, symbol, _taskManager, _codeBehindLinkerService, _metricsContext);
+                }
+
+                if (classConvertName == "MasterPageCodeBehindClassConverter")
+                {
+                    return new MasterPageCodeBehindClassConverter(sourceFileRelativePath, _sourceProjectPath, model, typeDeclarationNode, symbol, _taskManager, _codeBehindLinkerService, _metricsContext);
+                }
+
+                if (classConvertName == "HttpHandlerClassConverter")
+                {
+                    return new HttpHandlerClassConverter(sourceFileRelativePath, _sourceProjectPath, model, typeDeclarationNode, symbol, _lifecycleManager, _taskManager, _metricsContext);
+                }
+                if (classConvertName == "HttpModuleClassConverter")
+                {
+                    return new HttpModuleClassConverter(sourceFileRelativePath, _sourceProjectPath, model, typeDeclarationNode, symbol, _lifecycleManager, _taskManager, _metricsContext);
+                }
+
+                return new UnknownClassConverter(sourceFileRelativePath, _sourceProjectPath, model, typeDeclarationNode, symbol, _taskManager, _metricsContext);
+            }
+            catch (Exception e)
+            {
+                LogHelper.LogError(e, $"{Rules.Config.Constants.WebFormsErrorTag}Failed to build class converter for {sourceFileRelativePath}");
+                return null;
+            }
+        }
+
+        public IEnumerable<ClassConverter> BuildMany(Dictionary<string, string> symbolClassConverterDic, string sourceFileRelativePath, SemanticModel model)
+        {
+            return model.SyntaxTree.GetNamespaceLevelTypes().Select(node => Build(symbolClassConverterDic, sourceFileRelativePath, model, node))
                 .Where(classConverter => classConverter != null)
                 .ToList();
+            
         }
     }
 }

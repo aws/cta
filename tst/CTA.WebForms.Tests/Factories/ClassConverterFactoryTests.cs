@@ -107,7 +107,7 @@ namespace CTA.WebForms.Tests.Factories
             var testDocumentPath = Path.Combine("C:", "Directory1", "Directory2", testFileName);
             var did = _workspaceManager.AddDocument(_primaryProjectId, "TestDocument", testDocumentText);
             var model = await _workspaceManager.GetCurrentDocumentSemanticModel(did);
-            var classConverter = _classConverterFactory.BuildMany(testDocumentPath, model).Single();
+            var classConverter = _classConverterFactory.BuildMany(new Dictionary<string, string>() { { "TestNamespace.TestPage" , "PageCodeBehindClassConverter" } }, testDocumentPath, model).Single();
 
             Assert.IsInstanceOf(targetType, classConverter);
         }
@@ -120,7 +120,7 @@ namespace CTA.WebForms.Tests.Factories
             var testDocumentPath = Path.Combine("C:", "Directory1", "Directory2", "TestDocumentName.cs");
             var did = _workspaceManager.AddDocument(_primaryProjectId, "TestDocument", DocumentMultiClassText);
             var model = await _workspaceManager.GetCurrentDocumentSemanticModel(did);
-            var classConverters = _classConverterFactory.BuildMany(testDocumentPath, model);
+            var classConverters = _classConverterFactory.BuildMany(new Dictionary<string, string>(), testDocumentPath, model);
 
             Assert.AreEqual(4, classConverters.Count());
         }

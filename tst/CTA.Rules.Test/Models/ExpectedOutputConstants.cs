@@ -1672,17 +1672,18 @@ namespace ASP.NET_WebForms
 @"using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
+using Microsoft.AspNetCore.Http;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-
 namespace ASP.NET_WebForms
 {
     public class Startup
     {
+        RequestDelegate _next = null;
         public IConfiguration Configuration { get; }
 
         public IWebHostEnvironment Env { get; }

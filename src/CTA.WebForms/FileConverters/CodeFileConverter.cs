@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using CTA.Rules.Config;
 using CTA.Rules.Models;
 using CTA.WebForms.ClassConverters;
+using CTA.WebForms.Extensions;
 using CTA.WebForms.Factories;
 using CTA.WebForms.FileInformationModel;
 using CTA.WebForms.Metrics;
@@ -21,6 +23,7 @@ namespace CTA.WebForms.FileConverters
     {
         private const string ChildActionType = "CodeFileConverter";
         private readonly SemanticModel _fileModel;
+        private readonly SemanticModel _orignalModel;
         private readonly WorkspaceManagerService _blazorWorkspaceBuilder;
         private readonly ProjectAnalyzer _webFormsProjectAnaylzer;
         private readonly ClassConverterFactory _classConverterFactory;
@@ -41,39 +44,82 @@ namespace CTA.WebForms.FileConverters
             _webFormsProjectAnaylzer = webFormsProjectAnalyzer;
             _classConverterFactory = classConverterFactory;
             _metricsContext = metricsContext;
-
+            Dictionary<string, string> symbolClassConverterDic = new Dictionary<string, string>();
             try
             {
+
                 var sourcefileBuildResult = _webFormsProjectAnaylzer.AnalyzerResult.ProjectBuildResult?.SourceFileBuildResults?
                     .Single(r => r.SourceFileFullPath.Equals(fullPath, StringComparison.OrdinalIgnoreCase));
-                
+
+                _orignalModel = sourcefileBuildResult?.SemanticModel;
+                var sourceFileRelativePath = sourcefileBuildResult?.SourceFileFullPath;
+                var namespaceLevelTypes = _orignalModel?.SyntaxTree?.GetNamespaceLevelTypes();
+                foreach (var namespaceLevelType in namespaceLevelTypes)
+                {
+                    var symbol = _orignalModel?.GetDeclaredSymbol(namespaceLevelType);
+
+                    if (symbol.GetAllInheritedBaseTypes().Any(typeSymbol => typeSymbol.Name.Equals(Constants.ExpectedGlobalBaseClass))
+                        && sourceFileRelativePath.EndsWith(Constants.ExpectedGlobalFileName, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        symbolClassConverterDic.TryAdd(symbol.ToDisplayString(), "GlobalClassConverter");
+                    }
+                    // NOTE: The order is important from this point on, mainly because
+                    // Page-derived classes are also IHttpHandler derived
+                    if (symbol.GetAllInheritedBaseTypes().Any(typeSymbol => typeSymbol.Name.Equals(Constants.ExpectedPageBaseClass))
+                        && sourceFileRelativePath.EndsWith(Constants.PageCodeBehindExtension, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        symbolClassConverterDic.TryAdd(symbol.ToDisplayString(), "PageCodeBehindClassConverter");
+                    }
+
+                    if (symbol.GetAllInheritedBaseTypes().Any(typeSymbol => typeSymbol.Name.Equals(Constants.ExpectedControlBaseClass))
+                        && sourceFileRelativePath.EndsWith(Constants.ControlCodeBehindExtension, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        symbolClassConverterDic.TryAdd(symbol.ToDisplayString(), "ControlCodeBehindClassConverter");
+                    }
+
+                    if (symbol.GetAllInheritedBaseTypes().Any(typeSymbol => typeSymbol.Name.Equals(Constants.ExpectedMasterPageBaseClass))
+                        && sourceFileRelativePath.EndsWith(Constants.MasterPageCodeBehindExtension, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        symbolClassConverterDic.TryAdd(symbol.ToDisplayString(), "MasterPageCodeBehindClassConverter");
+                    }
+
+                    if (symbol.AllInterfaces.Any(interfaceSymbol => interfaceSymbol.Name.Equals(Constants.HttpHandlerInterface)))
+                    {
+                        symbolClassConverterDic.TryAdd(symbol.ToDisplayString(), "HttpHandlerClassConverter");
+                    }
+
+                    if (symbol.AllInterfaces.Any(interfaceSymbol => interfaceSymbol.Name.Equals(Constants.HttpModuleInterface)))
+                    {
+                        symbolClassConverterDic.TryAdd(symbol.ToDisplayString(), "HttpModuleClassConverter");
+                    }
+                    symbolClassConverterDic.TryAdd(symbol.ToDisplayString(), "UnknownClassConverter");
+
+                }
                 var oldFileModel = sourcefileBuildResult?.SemanticModel;
                 var oldTree = sourcefileBuildResult?.SyntaxTree;
+                var oldEncoding = oldTree.Encoding;
                 SyntaxTree newTree = null;
                 if ( fullPath.EndsWith(".cs"))
                 {
                     var languageVersion = ((Microsoft.CodeAnalysis.CSharp.CSharpParseOptions)(sourcefileBuildResult?.SemanticModel?.SyntaxTree?.Options)).LanguageVersion;
                     var options = CSharpParseOptions.Default.WithLanguageVersion(languageVersion);
-                    newTree = CSharpSyntaxTree.ParseText(File.ReadAllText(fullPath), options);
+                    newTree = CSharpSyntaxTree.ParseText(File.ReadAllText(fullPath), options).WithFilePath(fullPath);
+                    
                 }
                 else if (fullPath.EndsWith(".vb"))
                 {
                     var vblanguageVersion = ((Microsoft.CodeAnalysis.VisualBasic.VisualBasicParseOptions)(sourcefileBuildResult?.SemanticModel?.SyntaxTree?.Options)).LanguageVersion;
                     var options = VisualBasicParseOptions.Default.WithLanguageVersion(vblanguageVersion);
-                    newTree = VisualBasicSyntaxTree.ParseText(File.ReadAllText(fullPath), options);
+                    newTree = VisualBasicSyntaxTree.ParseText(File.ReadAllText(fullPath), options).WithFilePath(fullPath);
                 }
-                
 
-                if (newTree != null)
+
+                if (newTree != null && newTree != oldTree)
                 {
                     var newCompilation = oldFileModel?.Compilation?.ReplaceSyntaxTree(oldTree, newTree);
                     _fileModel = newCompilation?.GetSemanticModel(newTree);
                 }
-                else {
-                    _fileModel = _webFormsProjectAnaylzer.AnalyzerResult.ProjectBuildResult?.SourceFileBuildResults?
-                   .Single(r => r.SourceFileFullPath.Equals(fullPath, StringComparison.OrdinalIgnoreCase))?.SemanticModel;
-                }
-
+                
             }
             catch (IOException e)
             {
@@ -85,10 +131,11 @@ namespace CTA.WebForms.FileConverters
                 LogHelper.LogError(e, $"{Rules.Config.Constants.WebFormsErrorTag}Exception occurred when trying to retrieve semantic model for the file {FullPath}. " +
                                       "Semantic Model will default to null.");
             }
+
             
-            if (_fileModel != null)
+            if (_orignalModel != null && _fileModel!= null)
             {
-                _classConverters = _classConverterFactory.BuildMany(RelativePath, _fileModel);
+                _classConverters = _classConverterFactory.BuildMany(symbolClassConverterDic, RelativePath, _fileModel );
             }
             else
             {
