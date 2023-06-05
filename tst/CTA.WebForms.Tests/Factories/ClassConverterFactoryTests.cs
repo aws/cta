@@ -107,7 +107,15 @@ namespace CTA.WebForms.Tests.Factories
             var testDocumentPath = Path.Combine("C:", "Directory1", "Directory2", testFileName);
             var did = _workspaceManager.AddDocument(_primaryProjectId, "TestDocument", testDocumentText);
             var model = await _workspaceManager.GetCurrentDocumentSemanticModel(did);
-            var classConverter = _classConverterFactory.BuildMany(new Dictionary<string, string>() { { "TestNamespace.TestPage" , "PageCodeBehindClassConverter" } }, testDocumentPath, model).Single();
+            var dict = new Dictionary<string, string>() { { "TestNamespace.TestPage", "PageCodeBehindClassConverter" } ,
+                {"TestNamespace.Global", "GlobalClassConverter" },
+                { "TestNamespace.TestHandler", "HttpHandlerClassConverter"},
+                { "TestNamespace.TestModule", "HttpModuleClassConverter"},
+                { "TestNamespace.TestComponent", "ControlCodeBehindClassConverter"},
+                { "TestNamespace.TestMasterPage", "MasterPageCodeBehindClassConverter"},
+                { "TestNamespace.TestUnknownClass", "UnknownClassConverter"},
+            };
+            var classConverter = _classConverterFactory.BuildMany( dict, testDocumentPath, model).Single();
 
             Assert.IsInstanceOf(targetType, classConverter);
         }
