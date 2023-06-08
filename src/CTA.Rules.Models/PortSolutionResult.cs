@@ -13,6 +13,7 @@ namespace CTA.Rules.Models
         public HashSet<string> References { get; set; }
         public HashSet<string> DownloadedFiles { get; set; }
         public string SolutionPath { get; set; }
+        private string VisualStudioVersion { get; set; }
 
         public PortSolutionResult(string solutionPath) : base()
         {
@@ -27,6 +28,7 @@ namespace CTA.Rules.Models
             References = new HashSet<string>();
             DownloadedFiles = new HashSet<string>();
             this.ProjectResults = solutionResult.ProjectResults;
+            VisualStudioVersion = solutionResult.VisualStudioVersion;
         }
 
         // Solution build errors grouped by project
@@ -52,6 +54,7 @@ namespace CTA.Rules.Models
         public void AddSolutionResult(SolutionResult solutionResult)
         {
             this.ProjectResults = solutionResult.ProjectResults;
+            this.VisualStudioVersion = solutionResult.VisualStudioVersion;
         }
 
         private Dictionary<string, Dictionary<string, int>> GetSolutionBuildErrors()
@@ -173,7 +176,7 @@ namespace CTA.Rules.Models
 
         private CodeAnalyzerByLanguage GetCodeAnalyzer()
         {
-            AnalyzerConfiguration analyzerConfiguration = new AnalyzerConfiguration(LanguageOptions.CSharp);
+            AnalyzerConfiguration analyzerConfiguration = new AnalyzerConfiguration(LanguageOptions.CSharp, VisualStudioVersion);
             ExportSettings exportSettings = new ExportSettings() { GenerateGremlinOutput = false, GenerateJsonOutput = false, GenerateRDFOutput = false };
             MetaDataSettings metaDataSettings = new MetaDataSettings()
             {

@@ -9,5 +9,6 @@ namespace CTA.Rules.Models
             ProjectResults = new BlockingCollection<ProjectResult>();
         }
         public BlockingCollection<ProjectResult> ProjectResults;
+        public string VisualStudioVersion;
     }
 }

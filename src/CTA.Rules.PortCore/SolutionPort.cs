@@ -37,6 +37,7 @@ namespace CTA.Rules.PortCore
         private SolutionResult _solutionAnalysisResult;
         private SolutionResult _solutionRunResult;
         internal ConcurrentDictionary<string,bool> SkipDownloadFiles;
+        private string _visualStudioVersion;
 
 
         public SolutionPort(string solutionFilePath, ILogger logger = null)
@@ -45,7 +46,6 @@ namespace CTA.Rules.PortCore
             {
                 LogHelper.Logger = logger;
             }
-
             _portSolutionResult = new PortSolutionResult(solutionFilePath);
             _solutionPath = solutionFilePath;
             _context = new MetricsContext(solutionFilePath);
@@ -63,7 +63,7 @@ namespace CTA.Rules.PortCore
         /// </summary>
         /// <param name="solutionFilePath">Path to solution file</param>
         /// <param name="solutionConfiguration">Configuration for each project in solution to be built</param>
-        public SolutionPort(string solutionFilePath, List<PortCoreConfiguration> solutionConfiguration, ILogger logger = null)
+        public SolutionPort(string solutionFilePath, List<PortCoreConfiguration> solutionConfiguration, ILogger logger = null, string visualStudioVersion= null)
         {
             if (logger != null)
             {
@@ -72,7 +72,8 @@ namespace CTA.Rules.PortCore
             _portSolutionResult = new PortSolutionResult(solutionFilePath);
             SkipDownloadFiles = new ConcurrentDictionary<string, bool>();
             _solutionPath = solutionFilePath;
-            AnalyzerConfiguration analyzerConfiguration = new AnalyzerConfiguration(LanguageOptions.CSharp)
+            _visualStudioVersion = visualStudioVersion;
+            AnalyzerConfiguration analyzerConfiguration = new AnalyzerConfiguration(LanguageOptions.CSharp, visualStudioVersion)
             {
                 MetaDataSettings = new MetaDataSettings
                 {
@@ -107,12 +108,13 @@ namespace CTA.Rules.PortCore
             InitSolutionRewriter(analyzerResults, solutionConfiguration);
         }
 
-        public SolutionPort(string solutionFilePath, List<AnalyzerResult> analyzerResults, List<PortCoreConfiguration> solutionConfiguration, ILogger logger = null)
+        public SolutionPort(string solutionFilePath, List<AnalyzerResult> analyzerResults, List<PortCoreConfiguration> solutionConfiguration, ILogger logger = null, string visualStudioVersion = null)
         {
             if (logger != null)
             {
                 LogHelper.Logger = logger;
             }
+            _visualStudioVersion = visualStudioVersion ?? string.Empty;
             _portSolutionResult = new PortSolutionResult(solutionFilePath);
             SkipDownloadFiles = new ConcurrentDictionary<string, bool>();
             _solutionPath = solutionFilePath;
@@ -289,6 +291,7 @@ namespace CTA.Rules.PortCore
             }
 
             _solutionAnalysisResult = _solutionRewriter.AnalysisRun();
+            _solutionAnalysisResult.VisualStudioVersion = _visualStudioVersion;
             return GenerateAnalysisResult();
         }
 
