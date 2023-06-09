@@ -63,7 +63,7 @@ namespace CTA.Rules.PortCore
         /// </summary>
         /// <param name="solutionFilePath">Path to solution file</param>
         /// <param name="solutionConfiguration">Configuration for each project in solution to be built</param>
-        public SolutionPort(string solutionFilePath, List<PortCoreConfiguration> solutionConfiguration, ILogger logger = null)
+        public SolutionPort(string solutionFilePath, List<PortCoreConfiguration> solutionConfiguration, ILogger logger = null, string visualStudioVersion = null)
         {
             if (logger != null)
             {
@@ -72,7 +72,7 @@ namespace CTA.Rules.PortCore
             _portSolutionResult = new PortSolutionResult(solutionFilePath);
             SkipDownloadFiles = new ConcurrentDictionary<string, bool>();
             _solutionPath = solutionFilePath;
-            AnalyzerConfiguration analyzerConfiguration = new AnalyzerConfiguration(LanguageOptions.CSharp)
+            AnalyzerConfiguration analyzerConfiguration = new AnalyzerConfiguration(LanguageOptions.CSharp, visualStudioVersion)
             {
                 MetaDataSettings = new MetaDataSettings
                 {
