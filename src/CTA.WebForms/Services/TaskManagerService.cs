@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Timers;
 using CTA.Rules.Config;
+using Timer = System.Timers.Timer;
 
 namespace CTA.WebForms.Services
 {
@@ -82,6 +84,72 @@ namespace CTA.WebForms.Services
             _managedTasks.TryRemove(taskId, out var _);
             LogHelper.LogInformation(string.Format(TaskStatusUpdateLogTemplate, GetType().Name, taskId, RetiredLogAction));
             UpdateStallState();
+        }
+        
+        private Timer _watchdogTimer;
+        private int _maxWaitBetweenTaskCompletionInMs;
+        private int _lastSize;
+        private long _lastUpdate;
+        public void InitializeWatchdog(int intervalInMs = 1000, int maxWaitBetweenTaskCompletionInMs = 30000)
+        {
+            LogHelper.LogInformation("Initializing watchdog.");
+            _maxWaitBetweenTaskCompletionInMs = maxWaitBetweenTaskCompletionInMs;
+            _lastSize = _managedTasks.Count;
+            _lastUpdate = DateTime.Now.Ticks;
+
+            // Create a watchdog timer triggers an event every intervalInMs.
+            // The event will check if the number of scheduled migration tasks
+            // has changed. If the number of tasks has not changed in maxWaitBetweenTaskCompletionInMs,
+            // then we assume we have reached a task deadlock and tasks will be cancelled.
+            _watchdogTimer = new Timer(intervalInMs);
+            _watchdogTimer.Elapsed += ReleaseTasksOnDeadlock;
+            _watchdogTimer.AutoReset = true;
+            _watchdogTimer.Enabled = true;
+        }
+
+        public void DisableWatchdog()
+        {
+            if (_watchdogTimer == null)
+            {
+                return;
+            }
+
+            LogHelper.LogWarning("Disabling watchdog.");
+            _watchdogTimer.Enabled = false;
+            _watchdogTimer = null;
+        }
+
+        private void ReleaseTasksOnDeadlock(object source, ElapsedEventArgs e)
+        {
+            LogHelper.LogDebug("Watchdog: Scanning...");
+            var now = DateTime.Now.Ticks;
+            var currentSize = _managedTasks.Count;
+            if (currentSize != _lastSize)
+            {
+                LogHelper.LogDebug("Watchdog: Tasks are being processed. Continuing.");
+                _lastSize = currentSize;
+                _lastUpdate = now;
+            }
+            else
+            {
+                var timeElapsed = (now - _lastUpdate) / TimeSpan.TicksPerMillisecond;
+                LogHelper.LogDebug($"Watchdog: No tasks completed in {timeElapsed}ms");
+                if (timeElapsed > _maxWaitBetweenTaskCompletionInMs)
+                {
+                    CancelRemainingManagedTasks();
+                    DisableWatchdog();
+                }
+            }
+        }
+
+        private void CancelRemainingManagedTasks()
+        {
+            LogHelper.LogWarning($"Watchdog timer exceeded. All {_managedTasks.Count} remaining tasks will be cancelled.");
+            foreach (var (taskId, managedTask) in _managedTasks)
+            {
+                managedTask.CancelTask();
+                LogHelper.LogWarning($"Watchdog cancelling Task {taskId} (check logs for a description of this task).");
+            }
         }
 
         private void UpdateStallState()
