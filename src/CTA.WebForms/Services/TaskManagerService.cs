@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
@@ -35,12 +37,11 @@ namespace CTA.WebForms.Services
             _managedTasks = new ConcurrentDictionary<int, ManagedTask>();
             _stallTimeoutMs = stallTimeout;
         }
-
-        public int RegisterNewTask()
+        public int RegisterNewTask(IDictionary<string, string> descriptionProperties = null)
         {
-            var newManagedTask = new ManagedTask(_nextAvailableTaskId);
+            var newManagedTask = new ManagedTask(_nextAvailableTaskId, descriptionProperties);
             _nextAvailableTaskId += 1;
-
+            
             // It should be impossible for the key to already exist in the dictionary, but
             // if it does we choose to overwrite it to avoid having a stale managed task that
             // may result in extra stalls
@@ -54,7 +55,7 @@ namespace CTA.WebForms.Services
 
         public async Task<TResult> ManagedRun<TResult>(int taskId, Func<CancellationToken, Task<TResult>> func)
         {
-            LogHelper.LogInformation(string.Format(TaskStatusUpdateLogTemplate, GetType().Name, taskId, EnterManagedRunLogAction));
+            LogHelper.LogInformation(string.Format(TaskStatusUpdateLogTemplate, GetType().Name, GetTaskDescription(taskId), EnterManagedRunLogAction));
 
             TResult result;
             var managedTask = _managedTasks[taskId];
@@ -86,12 +87,14 @@ namespace CTA.WebForms.Services
         }
         
         private Timer _watchdogTimer;
+        private CodeBehindReferenceLinkerService _codeBehindReferenceLinkerService;
         private int _maxWaitBetweenTaskCompletionInMs;
         private int _lastSize;
         private long _lastUpdate;
-        public void InitializeWatchdog(int intervalInMs = 1000, int maxWaitBetweenTaskCompletionInMs = 30000)
+        public void InitializeWatchdog(CodeBehindReferenceLinkerService codeBehindReferenceLinkerService, int intervalInMs = 1000, int maxWaitBetweenTaskCompletionInMs = 30000)
         {
             LogHelper.LogInformation("Initializing watchdog.");
+            _codeBehindReferenceLinkerService = codeBehindReferenceLinkerService;
             _maxWaitBetweenTaskCompletionInMs = maxWaitBetweenTaskCompletionInMs;
             _lastSize = _managedTasks.Count;
             _lastUpdate = DateTime.Now.Ticks;
@@ -118,6 +121,16 @@ namespace CTA.WebForms.Services
             _watchdogTimer = null;
         }
 
+        public string GetTaskDescription(int taskId)
+        {
+            if (_managedTasks.TryGetValue(taskId, out var managedTask))
+            {
+                return managedTask.TaskDescription;
+            }
+
+            return $"TaskId: {taskId}";
+        }
+
         private void ReleaseTasksOnDeadlock(object source, ElapsedEventArgs e)
         {
             LogHelper.LogDebug("Watchdog: Scanning...");
@@ -135,8 +148,10 @@ namespace CTA.WebForms.Services
                 LogHelper.LogDebug($"Watchdog: No tasks completed in {timeElapsed}ms");
                 if (timeElapsed > _maxWaitBetweenTaskCompletionInMs)
                 {
+                    _watchdogTimer.AutoReset = false;
+                    _watchdogTimer.Enabled = false;
+                    _codeBehindReferenceLinkerService.CancelRemainingTagCodeBehindLinks();
                     CancelRemainingManagedTasks();
-                    DisableWatchdog();
                 }
             }
         }
@@ -201,6 +216,7 @@ namespace CTA.WebForms.Services
             private CancellationTokenSource _currentCancellationTokenSource;
 
             public int TaskId { get { return _taskId; } }
+            public string TaskDescription { get; private set; } = string.Empty;
             public TaskState CurrentTaskState {
                 get
                 {
@@ -214,10 +230,29 @@ namespace CTA.WebForms.Services
             }
             public DateTime LastStatusChange { get { return _lastStatusChange; } }
             
-            public ManagedTask(int taskId)
+            public ManagedTask(int taskId, IDictionary<string, string> descriptionProperties = null)
             {
                 _taskId = taskId;
+                TaskDescription = CreateTaskDescriptionFromProperties(taskId, descriptionProperties);
                 CurrentTaskState = TaskState.Active;
+            }
+
+            private string CreateTaskDescriptionFromProperties(int taskId, IDictionary<string, string> descriptionProperties)
+            {
+                var descriptionBuilder = new StringBuilder();
+                descriptionBuilder.Append($"TaskId: {taskId}");
+
+                if (descriptionProperties == null)
+                {
+                    return descriptionBuilder.ToString();
+                }
+
+                foreach (var (property, value) in descriptionProperties)
+                {
+                    descriptionBuilder.Append($", {property}: {value}");
+                }
+
+                return descriptionBuilder.ToString();
             }
 
             public CancellationToken SetWaiting()

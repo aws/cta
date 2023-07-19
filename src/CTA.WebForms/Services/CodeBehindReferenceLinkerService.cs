@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using CTA.Rules.Config;
 using CTA.WebForms.Helpers.TagConversion;
 using CTA.WebForms.TagCodeBehindHandlers;
 using Microsoft.CodeAnalysis;
@@ -155,8 +156,8 @@ namespace CTA.WebForms.Services
         private bool IsCodeBehindLinkValid(string viewFilePath)
         {
             return IsCodeBehindLinkCreated(viewFilePath)
-                && _tagCodeBehindLinks[viewFilePath].ViewFileExists
-                && _tagCodeBehindLinks[viewFilePath].CodeBehindFileExists;
+                   && _tagCodeBehindLinks[viewFilePath].ViewFileExists
+                   && _tagCodeBehindLinks[viewFilePath].CodeBehindFileExists;
         }
 
         /// <summary>
@@ -295,6 +296,31 @@ namespace CTA.WebForms.Services
             }
 
             return classDeclaration;
+        }
+
+        public void CancelRemainingTagCodeBehindLinks()
+        {
+            LogHelper.LogWarning("Cancelling remaining tasks in TagCodeBehindLinks...");
+
+            LogHelper.LogInformation("Cancelling remaining TagCodeBehindLink ClassDeclaration tasks...");
+            foreach (var (_, tagCodeBehindLink) in _tagCodeBehindLinks)
+            {
+                if (!tagCodeBehindLink.ClassDeclarationRegisteredTaskSource.Task.IsCompleted)
+                {
+                    tagCodeBehindLink.ClassDeclarationRegisteredTaskSource.SetCanceled();
+                }
+            }
+
+            LogHelper.LogInformation("Cancelling remaining TagCodeBehindLink Handler tasks...");
+            foreach (var (_, tagCodeBehindLink) in _tagCodeBehindLinks)
+            {
+                if (!tagCodeBehindLink.HandlersStagingTaskSource.Task.IsCompleted)
+                {
+                    tagCodeBehindLink.HandlersStagingTaskSource.SetCanceled();
+                }
+            }
+
+            LogHelper.LogInformation("Remaining tasks in TagCodeBehindLinks have been cancelled.");
         }
 
         /// <summary>

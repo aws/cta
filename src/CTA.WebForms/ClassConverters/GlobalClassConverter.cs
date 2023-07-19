@@ -176,7 +176,8 @@ namespace CTA.WebForms.ClassConverters
                     Rules.Config.Constants.WebFormsErrorTag,
                     GetType().Name,
                     typeof(LifecycleManagerService).Name,
-                    GetMiddlewareNamespacesLogCall));
+                    $"{GetMiddlewarePipelineAdditionsLogCall}, " +
+                    $"Path: {_relativePath}"));
 
                 return CodeSyntaxHelper.BuildUsingStatements(typeRequiredNamespaceNames)
                     .AddComment(string.Format(Constants.OperationFailedCommentTemplate, AddMiddlewareUsingsOperation));
@@ -222,7 +223,8 @@ namespace CTA.WebForms.ClassConverters
                     Rules.Config.Constants.WebFormsErrorTag,
                     GetType().Name,
                     typeof(LifecycleManagerService).Name,
-                    GetMiddlewarePipelineAdditionsLogCall));
+                    $"{GetMiddlewarePipelineAdditionsLogCall}, " +
+                    $"Path: {_relativePath}"));
 
                 var failureComment = string.Format(Constants.OperationFailedCommentTemplate, ConfigureRequestPipelineOperation);
 

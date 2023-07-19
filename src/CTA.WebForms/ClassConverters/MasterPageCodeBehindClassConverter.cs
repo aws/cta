@@ -97,7 +97,9 @@ namespace CTA.WebForms.ClassConverters
                     Rules.Config.Constants.WebFormsErrorTag,
                     GetType().Name,
                     nameof(CodeBehindReferenceLinkerService),
-                    nameof(CodeBehindReferenceLinkerService.ExecuteTagCodeBehindHandlersAsync)));
+                    $"{nameof(CodeBehindReferenceLinkerService.ExecuteTagCodeBehindHandlersAsync)}, " +
+                    $"Class: {classDeclaration.Identifier}, " +
+                    $"Path: {_relativePath}"));
             }
             catch (Exception e)
             {
