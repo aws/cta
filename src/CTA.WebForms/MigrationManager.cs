@@ -79,7 +79,7 @@ namespace CTA.WebForms
             var deleteFilesStack = new ConcurrentBag<(string filePath, string pathLimit)>();
             var writeFilesStack = new ConcurrentBag<FileInformation>();
 
-            _taskManager.InitializeWatchdog();
+            _taskManager.InitializeWatchdog(_codeBehindLinkerService);
             var migrationTasks = fileConverterCollection.Select(fileConverter =>
                 // ContinueWith specifies the action to be run after each task completes,
                 // in this case it sends each generated file to the project builder
