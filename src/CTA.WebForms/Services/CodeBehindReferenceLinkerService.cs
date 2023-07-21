@@ -155,9 +155,22 @@ namespace CTA.WebForms.Services
         /// <returns><c>true</c> if the code behind link exists, and both files have been registered <c>false</c> otherwise.</returns>
         private bool IsCodeBehindLinkValid(string viewFilePath)
         {
-            return IsCodeBehindLinkCreated(viewFilePath)
-                   && _tagCodeBehindLinks[viewFilePath].ViewFileExists
-                   && _tagCodeBehindLinks[viewFilePath].CodeBehindFileExists;
+            var isLinkCreated = IsCodeBehindLinkCreated(viewFilePath);
+            var isViewFileExists = _tagCodeBehindLinks[viewFilePath].ViewFileExists;
+            var isCodeBehindFIleExists = _tagCodeBehindLinks[viewFilePath].CodeBehindFileExists;
+            var isValid = isLinkCreated 
+                          && isViewFileExists
+                          && isCodeBehindFIleExists;
+
+            if (!isValid)
+            {
+                LogHelper.LogWarning($"Invalid codebehind link found. Porting actions will not be applied to for {viewFilePath} or its codebehind. " +
+                                     $"{nameof(isLinkCreated)}: {isLinkCreated}, " +
+                                     $"{nameof(isViewFileExists)}: {isViewFileExists}, " +
+                                     $"{nameof(isCodeBehindFIleExists)}: {isCodeBehindFIleExists}");
+            }
+
+            return isValid;
         }
 
         /// <summary>
@@ -285,7 +298,7 @@ namespace CTA.WebForms.Services
             ClassDeclarationSyntax classDeclaration,
             CancellationToken token)
         {
-            if (IsCodeBehindLinkCreated(viewFilePath))
+            if (IsCodeBehindLinkCreated(viewFilePath) && IsCodeBehindLinkValid(viewFilePath))
             {
                 RegisterClassDeclaration(viewFilePath, semanticModel, classDeclaration);
                 await WaitForAllHandlerConversionsStaged(viewFilePath, token);
@@ -296,31 +309,6 @@ namespace CTA.WebForms.Services
             }
 
             return classDeclaration;
-        }
-
-        public void CancelRemainingTagCodeBehindLinks()
-        {
-            LogHelper.LogWarning("Cancelling remaining tasks in TagCodeBehindLinks...");
-
-            LogHelper.LogInformation("Cancelling remaining TagCodeBehindLink ClassDeclaration tasks...");
-            foreach (var (_, tagCodeBehindLink) in _tagCodeBehindLinks)
-            {
-                if (!tagCodeBehindLink.ClassDeclarationRegisteredTaskSource.Task.IsCompleted)
-                {
-                    tagCodeBehindLink.ClassDeclarationRegisteredTaskSource.SetCanceled();
-                }
-            }
-
-            LogHelper.LogInformation("Cancelling remaining TagCodeBehindLink Handler tasks...");
-            foreach (var (_, tagCodeBehindLink) in _tagCodeBehindLinks)
-            {
-                if (!tagCodeBehindLink.HandlersStagingTaskSource.Task.IsCompleted)
-                {
-                    tagCodeBehindLink.HandlersStagingTaskSource.SetCanceled();
-                }
-            }
-
-            LogHelper.LogInformation("Remaining tasks in TagCodeBehindLinks have been cancelled.");
         }
 
         /// <summary>
