@@ -298,7 +298,7 @@ namespace CTA.WebForms.Services
             ClassDeclarationSyntax classDeclaration,
             CancellationToken token)
         {
-            if (IsCodeBehindLinkCreated(viewFilePath) && IsCodeBehindLinkValid(viewFilePath))
+            if (IsCodeBehindLinkCreated(viewFilePath))
             {
                 RegisterClassDeclaration(viewFilePath, semanticModel, classDeclaration);
                 await WaitForAllHandlerConversionsStaged(viewFilePath, token);
