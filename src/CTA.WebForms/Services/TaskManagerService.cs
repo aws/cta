@@ -87,14 +87,12 @@ namespace CTA.WebForms.Services
         }
         
         private Timer _watchdogTimer;
-        private CodeBehindReferenceLinkerService _codeBehindReferenceLinkerService;
         private int _maxWaitBetweenTaskCompletionInMs;
         private int _lastSize;
         private long _lastUpdate;
-        public void InitializeWatchdog(CodeBehindReferenceLinkerService codeBehindReferenceLinkerService, int intervalInMs = 1000, int maxWaitBetweenTaskCompletionInMs = 30000)
+        public void InitializeWatchdog(int intervalInMs = 1000, int maxWaitBetweenTaskCompletionInMs = 30000)
         {
             LogHelper.LogInformation("Initializing watchdog.");
-            _codeBehindReferenceLinkerService = codeBehindReferenceLinkerService;
             _maxWaitBetweenTaskCompletionInMs = maxWaitBetweenTaskCompletionInMs;
             _lastSize = _managedTasks.Count;
             _lastUpdate = DateTime.Now.Ticks;
@@ -150,7 +148,6 @@ namespace CTA.WebForms.Services
                 {
                     _watchdogTimer.AutoReset = false;
                     _watchdogTimer.Enabled = false;
-                    _codeBehindReferenceLinkerService.CancelRemainingTagCodeBehindLinks();
                     CancelRemainingManagedTasks();
                 }
             }
