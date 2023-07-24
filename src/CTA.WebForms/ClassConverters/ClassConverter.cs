@@ -44,7 +44,13 @@ namespace CTA.WebForms.ClassConverters
             // We want to force the use of the task manager even if each class doesn't
             // necessarily have to do any managed runs, this is because they may end up
             // unblocking other processes by simply running normally
-            _taskId = _taskManager.RegisterNewTask();
+            var taskDescriptionProperties = new Dictionary<string, string>
+            {
+                { "Type", GetType().Name },
+                { "Class", OriginalClassName },
+                { "Path", FullPath }
+            };
+            _taskId = _taskManager.RegisterNewTask(taskDescriptionProperties);
             LogHelper.LogInformation(string.Format(
                 Constants.RegisteredAsTaskLogTemplate,
                 GetType().Name,

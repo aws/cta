@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using CTA.Rules.Config;
 using CTA.WebForms.Helpers.TagConversion;
 using CTA.WebForms.TagCodeBehindHandlers;
 using Microsoft.CodeAnalysis;
@@ -154,9 +155,22 @@ namespace CTA.WebForms.Services
         /// <returns><c>true</c> if the code behind link exists, and both files have been registered <c>false</c> otherwise.</returns>
         private bool IsCodeBehindLinkValid(string viewFilePath)
         {
-            return IsCodeBehindLinkCreated(viewFilePath)
-                && _tagCodeBehindLinks[viewFilePath].ViewFileExists
-                && _tagCodeBehindLinks[viewFilePath].CodeBehindFileExists;
+            var isLinkCreated = IsCodeBehindLinkCreated(viewFilePath);
+            var isViewFileExists = _tagCodeBehindLinks[viewFilePath].ViewFileExists;
+            var isCodeBehindFIleExists = _tagCodeBehindLinks[viewFilePath].CodeBehindFileExists;
+            var isValid = isLinkCreated 
+                          && isViewFileExists
+                          && isCodeBehindFIleExists;
+
+            if (!isValid)
+            {
+                LogHelper.LogWarning($"Invalid codebehind link found. Porting actions will not be applied to for {viewFilePath} or its codebehind. " +
+                                     $"{nameof(isLinkCreated)}: {isLinkCreated}, " +
+                                     $"{nameof(isViewFileExists)}: {isViewFileExists}, " +
+                                     $"{nameof(isCodeBehindFIleExists)}: {isCodeBehindFIleExists}");
+            }
+
+            return isValid;
         }
 
         /// <summary>

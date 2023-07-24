@@ -9,7 +9,6 @@ using System;
 using CTA.WebForms.Metrics;
 using CTA.WebForms.Services;
 using CTA.Rules.Config;
-using Codelyzer.Analysis;
 
 namespace CTA.WebForms.Factories
 {

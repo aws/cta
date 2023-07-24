@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using CTA.Rules.Config;
 using CTA.WebForms.FileConverters;
-using CTA.WebForms.Helpers;
 using CTA.WebForms.Helpers.TagConversion;
 using CTA.WebForms.Metrics;
 using CTA.WebForms.ProjectManagement;
@@ -78,10 +77,10 @@ namespace CTA.WebForms.Factories
                     fc = new CodeFileConverter(_sourceProjectPath, document.FullName, _blazorWorkspaceManager,
                         _webFormsProjectAnalyzer, _classConverterFactory, _taskManagerService, _metricsContext);
                 }
-                else if (extension.Equals(Constants.WebFormsPageMarkupFileExtension)
-                         || extension.Equals(Constants.WebFormsControlMarkupFileExtenion)
-                         || extension.Equals(Constants.WebFormsMasterPageMarkupFileExtension)
-                         || extension.Equals(Constants.WebFormsGlobalMarkupFileExtension))
+                else if (extension.Equals(Constants.WebFormsPageMarkupFileExtension, StringComparison.InvariantCultureIgnoreCase)
+                         || extension.Equals(Constants.WebFormsControlMarkupFileExtenion, StringComparison.InvariantCultureIgnoreCase)
+                         || extension.Equals(Constants.WebFormsMasterPageMarkupFileExtension, StringComparison.InvariantCultureIgnoreCase)
+                         || extension.Equals(Constants.WebFormsGlobalMarkupFileExtension, StringComparison.InvariantCultureIgnoreCase))
                 {
                     fc = new ViewFileConverter(_sourceProjectPath, document.FullName, _viewImportService,
                         _codeBehindLinkerService, _taskManagerService, _tagConfigParser, _metricsContext);

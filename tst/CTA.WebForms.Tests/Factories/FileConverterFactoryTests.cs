@@ -91,5 +91,19 @@ namespace CTA.WebForms.Tests.Factories
             Assert.True(typeof(StaticResourceFileConverter).IsInstanceOfType(fileObjects[1]));
             Assert.True(typeof(ViewFileConverter).IsInstanceOfType(fileObjects[2]));
         }
+
+        [Test]
+        public void TestBuildCreatesAViewFileConverterForMasterViewsIgnoringCase()
+        {
+            var files = new[]
+            {
+                new FileInfo("somefile.Master"),
+                new FileInfo("someFile.master")
+            };
+
+            List<FileConverter> fileObjects = _fileConverterFactory.BuildMany(files).ToList();
+            Assert.True(typeof(ViewFileConverter).IsInstanceOfType(fileObjects[0]));
+            Assert.True(typeof(ViewFileConverter).IsInstanceOfType(fileObjects[1]));
+        }
     }
 }

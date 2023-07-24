@@ -2,9 +2,12 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Timers;
 using CTA.Rules.Config;
+using Timer = System.Timers.Timer;
 
 namespace CTA.WebForms.Services
 {
@@ -34,12 +37,11 @@ namespace CTA.WebForms.Services
             _managedTasks = new ConcurrentDictionary<int, ManagedTask>();
             _stallTimeoutMs = stallTimeout;
         }
-
-        public int RegisterNewTask()
+        public int RegisterNewTask(IDictionary<string, string> descriptionProperties = null)
         {
-            var newManagedTask = new ManagedTask(_nextAvailableTaskId);
+            var newManagedTask = new ManagedTask(_nextAvailableTaskId, descriptionProperties);
             _nextAvailableTaskId += 1;
-
+            
             // It should be impossible for the key to already exist in the dictionary, but
             // if it does we choose to overwrite it to avoid having a stale managed task that
             // may result in extra stalls
@@ -53,7 +55,7 @@ namespace CTA.WebForms.Services
 
         public async Task<TResult> ManagedRun<TResult>(int taskId, Func<CancellationToken, Task<TResult>> func)
         {
-            LogHelper.LogInformation(string.Format(TaskStatusUpdateLogTemplate, GetType().Name, taskId, EnterManagedRunLogAction));
+            LogHelper.LogInformation(string.Format(TaskStatusUpdateLogTemplate, GetType().Name, GetTaskDescription(taskId), EnterManagedRunLogAction));
 
             TResult result;
             var managedTask = _managedTasks[taskId];
@@ -82,6 +84,83 @@ namespace CTA.WebForms.Services
             _managedTasks.TryRemove(taskId, out var _);
             LogHelper.LogInformation(string.Format(TaskStatusUpdateLogTemplate, GetType().Name, taskId, RetiredLogAction));
             UpdateStallState();
+        }
+        
+        private Timer _watchdogTimer;
+        private int _maxWaitBetweenTaskCompletionInMs;
+        private int _lastSize;
+        private long _lastUpdate;
+        public void InitializeWatchdog(int intervalInMs = 1000, int maxWaitBetweenTaskCompletionInMs = 30000)
+        {
+            LogHelper.LogInformation("Initializing watchdog.");
+            _maxWaitBetweenTaskCompletionInMs = maxWaitBetweenTaskCompletionInMs;
+            _lastSize = _managedTasks.Count;
+            _lastUpdate = DateTime.Now.Ticks;
+
+            // Create a watchdog timer triggers an event every intervalInMs.
+            // The event will check if the number of scheduled migration tasks
+            // has changed. If the number of tasks has not changed in maxWaitBetweenTaskCompletionInMs,
+            // then we assume we have reached a task deadlock and tasks will be cancelled.
+            _watchdogTimer = new Timer(intervalInMs);
+            _watchdogTimer.Elapsed += ReleaseTasksOnDeadlock;
+            _watchdogTimer.AutoReset = true;
+            _watchdogTimer.Enabled = true;
+        }
+
+        public void DisableWatchdog()
+        {
+            if (_watchdogTimer == null)
+            {
+                return;
+            }
+
+            LogHelper.LogWarning("Disabling watchdog.");
+            _watchdogTimer.Enabled = false;
+            _watchdogTimer = null;
+        }
+
+        public string GetTaskDescription(int taskId)
+        {
+            if (_managedTasks.TryGetValue(taskId, out var managedTask))
+            {
+                return managedTask.TaskDescription;
+            }
+
+            return $"TaskId: {taskId}";
+        }
+
+        private void ReleaseTasksOnDeadlock(object source, ElapsedEventArgs e)
+        {
+            LogHelper.LogDebug("Watchdog: Scanning...");
+            var now = DateTime.Now.Ticks;
+            var currentSize = _managedTasks.Count;
+            if (currentSize != _lastSize)
+            {
+                LogHelper.LogDebug("Watchdog: Tasks are being processed. Continuing.");
+                _lastSize = currentSize;
+                _lastUpdate = now;
+            }
+            else
+            {
+                var timeElapsed = (now - _lastUpdate) / TimeSpan.TicksPerMillisecond;
+                LogHelper.LogDebug($"Watchdog: No tasks completed in {timeElapsed}ms");
+                if (timeElapsed > _maxWaitBetweenTaskCompletionInMs)
+                {
+                    _watchdogTimer.AutoReset = false;
+                    _watchdogTimer.Enabled = false;
+                    CancelRemainingManagedTasks();
+                }
+            }
+        }
+
+        private void CancelRemainingManagedTasks()
+        {
+            LogHelper.LogWarning($"Watchdog timer exceeded. All {_managedTasks.Count} remaining tasks will be cancelled.");
+            foreach (var (taskId, managedTask) in _managedTasks)
+            {
+                managedTask.CancelTask();
+                LogHelper.LogWarning($"Watchdog cancelling Task {taskId} (check logs for a description of this task).");
+            }
         }
 
         private void UpdateStallState()
@@ -134,6 +213,7 @@ namespace CTA.WebForms.Services
             private CancellationTokenSource _currentCancellationTokenSource;
 
             public int TaskId { get { return _taskId; } }
+            public string TaskDescription { get; private set; } = string.Empty;
             public TaskState CurrentTaskState {
                 get
                 {
@@ -147,10 +227,29 @@ namespace CTA.WebForms.Services
             }
             public DateTime LastStatusChange { get { return _lastStatusChange; } }
             
-            public ManagedTask(int taskId)
+            public ManagedTask(int taskId, IDictionary<string, string> descriptionProperties = null)
             {
                 _taskId = taskId;
+                TaskDescription = CreateTaskDescriptionFromProperties(taskId, descriptionProperties);
                 CurrentTaskState = TaskState.Active;
+            }
+
+            private string CreateTaskDescriptionFromProperties(int taskId, IDictionary<string, string> descriptionProperties)
+            {
+                var descriptionBuilder = new StringBuilder();
+                descriptionBuilder.Append($"TaskId: {taskId}");
+
+                if (descriptionProperties == null)
+                {
+                    return descriptionBuilder.ToString();
+                }
+
+                foreach (var (property, value) in descriptionProperties)
+                {
+                    descriptionBuilder.Append($", {property}: {value}");
+                }
+
+                return descriptionBuilder.ToString();
             }
 
             public CancellationToken SetWaiting()
