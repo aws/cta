@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using Codelyzer.Analysis;
+using Codelyzer.Analysis.Model;
 using CTA.Rules.Models;
 using CTA.WebForms.ProjectManagement;
 using NUnit.Framework;

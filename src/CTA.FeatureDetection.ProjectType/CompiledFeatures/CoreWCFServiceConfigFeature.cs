@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using Codelyzer.Analysis;
+using Codelyzer.Analysis.Model;
 using CTA.FeatureDetection.Common.Models.Features.Base;
 using CTA.FeatureDetection.Common.Models.WCF;
 using CTA.FeatureDetection.Common.WCFConfigUtils;

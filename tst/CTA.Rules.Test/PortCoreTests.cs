@@ -145,7 +145,7 @@ namespace CTA.Rules.Test
         {
             var solutionPath = CopySolutionDirToUniqueTempDir("WebApiWithReferences.sln", tempDir);
 
-            AnalyzerConfiguration configuration = new AnalyzerConfiguration(LanguageOptions.CSharp)
+            AnalyzerConfiguration configuration = new AnalyzerConfiguration(LanguageOptions.CSharp, null)
             {
                 ExportSettings =
                 {
