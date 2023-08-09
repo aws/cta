@@ -101,7 +101,7 @@ namespace CTA.Rules.Test
         {
             var solutionPath = CopySolutionDirToUniqueTempDir("MixedClassLibrary.sln", _tempDir);
 
-            AnalyzerConfiguration configuration = new AnalyzerConfiguration(LanguageOptions.CSharp)
+            AnalyzerConfiguration configuration = new AnalyzerConfiguration(LanguageOptions.CSharp, null)
             {
                 ExportSettings =
                 {

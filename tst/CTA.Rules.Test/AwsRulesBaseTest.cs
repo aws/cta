@@ -1,5 +1,6 @@
 ﻿using Codelyzer.Analysis;
 using Codelyzer.Analysis.Analyzer;
+using Codelyzer.Analysis.Model;
 using CTA.Rules.Config;
 using CTA.Rules.Models;
 using CTA.Rules.PortCore;
@@ -365,7 +366,7 @@ namespace CTA.Rules.Test
 
         protected List<AnalyzerResult> GetBuildResults(string solutionPath)
         {
-            AnalyzerConfiguration configuration = new AnalyzerConfiguration(LanguageOptions.CSharp)
+            AnalyzerConfiguration configuration = new AnalyzerConfiguration(LanguageOptions.CSharp, null)
             {
                 ExportSettings =
                 {
@@ -395,7 +396,7 @@ namespace CTA.Rules.Test
 
         protected List<AnalyzerResult> GenerateSolutionAnalysis(string solutionPath)
         {
-            AnalyzerConfiguration configuration = new AnalyzerConfiguration(LanguageOptions.CSharp)
+            AnalyzerConfiguration configuration = new AnalyzerConfiguration(LanguageOptions.CSharp, null)
             {
                 ExportSettings =
                 {

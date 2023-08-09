@@ -1,4 +1,5 @@
 ﻿using Codelyzer.Analysis;
+using Codelyzer.Analysis.Model;
 
 namespace CTA.FeatureDetection.AuthType.CompiledFeatures
 {

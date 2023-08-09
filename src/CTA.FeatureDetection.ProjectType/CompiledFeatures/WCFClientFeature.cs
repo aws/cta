@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using Codelyzer.Analysis;
+using Codelyzer.Analysis.Model;
 using CTA.FeatureDetection.Common.Models.Features.Base;
 using CTA.Rules.Common.WebConfigManagement;
 

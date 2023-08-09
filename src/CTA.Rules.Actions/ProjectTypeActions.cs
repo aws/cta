@@ -2,6 +2,7 @@
 using System.IO;
 using System.Threading.Tasks;
 using Codelyzer.Analysis;
+using Codelyzer.Analysis.Model;
 using CTA.Rules.Config;
 using CTA.Rules.Models;
 using CTA.WebForms;
