@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Codelyzer.Analysis;
+using Codelyzer.Analysis.Model;
 using CTA.Rules.Config;
 
 namespace CTA.Rules.Metrics

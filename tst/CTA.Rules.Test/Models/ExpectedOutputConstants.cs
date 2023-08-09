@@ -49,7 +49,9 @@ namespace AspNetRoutes
         public async Task<bool> SignUpUser(HttpContext authenticationManager, ISecureDataFormat<AuthenticationTicket> df)
         {
             List<ClaimsIdentity> claims = new List<ClaimsIdentity>()
-            {new ClaimsIdentity()};
+            {
+                new ClaimsIdentity()
+            };
             AuthenticationProperties authProp = new AuthenticationProperties();
             var authResult = await authenticationManager.AuthenticateAsync("""");
             /* Added by CTA: Please use your AuthenticationProperties object with this ChallengeAsync api if needed. You can also include a scheme. */
@@ -81,13 +83,20 @@ namespace AspNetRoutes
             string prot = df.Protect(at);
             AuthenticationTicket unProtectedAT = df.Unprotect(prot);
             OAuthAuthorizationServerOptions auth = new OAuthAuthorizationServerOptions()
-            {AccessTokenExpireTimeSpan = new TimeSpan(), AllowInsecureHttp = true, };
+            {
+                AccessTokenExpireTimeSpan = new TimeSpan(),
+                AllowInsecureHttp = true,
+            };
             return at.Equals(unProtectedAT);
         }
 
         public void Protector(IDataProtectionProvider protector)
         {
-            string[] purposes = new string[]{"""", """"};
+            string[] purposes = new string[]
+            {
+                """",
+                """"
+            };
             IDataProtector prot1 = protector.CreateProtector(purposes);
             DpapiDataProtectionProvider dpapi = /* Added by CTA: DpapiDataProtectionProvider should be replaced with a Dependency injection for the IDataProtectionProvider interface. Please include a parameter with this interface to replace this class. */
             new DpapiDataProtectionProvider();
@@ -320,8 +329,7 @@ namespace Embedded
         {
             string baseUrl = ""http://localhost:12345/"";
             using (/* Added by CTA: Replace Microsoft.Owin.Hosting.WebApp.Start with WebHostBuilder such as: var host = new WebHostBuilder().UseKestrel().UseUrls(URL_HERE).UseStartup<Startup>().Build(); host.Start(); Start options can be added into the new format as needed. */
-            WebApp.Start<Startup>(new StartOptions(baseUrl)
-            {ServerFactory = ""Microsoft.Owin.Host.HttpListener""}))
+            WebApp.Start<Startup>(new StartOptions(baseUrl) { ServerFactory = ""Microsoft.Owin.Host.HttpListener"" }))
             {
                 // Launch the browser
                 Process.Start(baseUrl);
@@ -364,8 +372,7 @@ namespace MyApp
         {
             string baseUrl = ""http://localhost:12345/"";
             using (/* Added by CTA: Replace Microsoft.Owin.Hosting.WebApp.Start with WebHostBuilder such as: var host = new WebHostBuilder().UseKestrel().UseUrls(URL_HERE).UseStartup<Startup>().Build(); host.Start(); Start options can be added into the new format as needed. */
-            WebApp.Start<Startup>(new StartOptions(baseUrl)
-            {ServerFactory = ""MyCustomServer""}))
+            WebApp.Start<Startup>(new StartOptions(baseUrl) { ServerFactory = ""MyCustomServer"" }))
             {
                 // Note: CustomServer has not actually been implemented, no requests will be accepted.
                 // Launch the browser
@@ -442,8 +449,14 @@ namespace HelloWorld
             // See http://owin.org/spec/owin-1.0.0.html for standard environment keys.
             Stream responseStream = (Stream)environment[""owin.ResponseBody""];
             IDictionary<string, string[]> responseHeaders = (IDictionary<string, string[]>)environment[""owin.ResponseHeaders""];
-            responseHeaders[""Content-Length""] = new string[]{responseBytes.Length.ToString(CultureInfo.InvariantCulture)};
-            responseHeaders[""Content-Type""] = new string[]{""text/plain""};
+            responseHeaders[""Content-Length""] = new string[]
+            {
+                responseBytes.Length.ToString(CultureInfo.InvariantCulture)
+            };
+            responseHeaders[""Content-Type""] = new string[]
+            {
+                ""text/plain""
+            };
             return Task.Factory.FromAsync(responseStream.BeginWrite, responseStream.EndWrite, responseBytes, 0, responseBytes.Length, null);
         // 4.5: return responseStream.WriteAsync(responseBytes, 0, responseBytes.Length);
         }
@@ -463,12 +476,7 @@ namespace OwinSelfhostSample
         {
             // Configure Web API for Self-Host
             HttpConfiguration config = new HttpConfiguration();
-            config.Routes.MapHttpRoute(name: ""DefaultApi"", routeTemplate: ""api/{controller}/{id}"", defaults: new
-            {
-            id = RouteParameter.Optional
-            }
-
-            );
+            config.Routes.MapHttpRoute(name: ""DefaultApi"", routeTemplate: ""api/{controller}/{id}"", defaults: new { id = RouteParameter.Optional });
             /* Added by CTA: Please add a new ConfigureServices method: public void ConfigureServices(IServiceCollection services) { services.AddControllers(); } */
             appBuilder.UseEndpoints(endpoints =>
             {
@@ -571,21 +579,18 @@ namespace StaticFilesSample
             // Remap '/' to '.\defaults\'.
             // Turns on static files and default files.
             app.UseFileServer(/* Added by CTA: For FileServerOptions, if FileSystem was not present before FileProvider was added, please initialize this new value. */
-            new FileServerOptions()
-            {RequestPath = PathString.Empty, FileProvider = defaultFS, });
+            new FileServerOptions() { RequestPath = PathString.Empty, FileProvider = defaultFS, });
             // Only serve files requested by name.
             app.UseStaticFiles(""/files"");
             // Turns on static files, directory browsing, and default files.
             app.UseFileServer(/* Added by CTA: For FileServerOptions, if FileSystem was not present before FileProvider was added, please initialize this new value. */
-            new FileServerOptions()
-            {RequestPath = new PathString(""/public""), EnableDirectoryBrowsing = true, FileProvider = new PhysicalFileProvider(@"""")});
+            new FileServerOptions() { RequestPath = new PathString(""/public""), EnableDirectoryBrowsing = true, FileProvider = new PhysicalFileProvider(@"""") });
             // Browse the root of your application (but do not serve the files).
             // NOTE: Avoid serving static files from the root of your application or bin folder,
             // it allows people to download your application binaries, config files, etc..
             /* Added by CTA: Please add a new ConfigureServices method: public void ConfigureServices(IServiceCollection services) { services.AddDirectoryBrowser(); } */
             app.UseDirectoryBrowser(/* Added by CTA: For DirectoryBrowserOptions, if FileSystem was not present before FileProvider was added, please initialize this new value. */
-            new DirectoryBrowserOptions()
-            {RequestPath = new PathString(""/src""), FileProvider = new PhysicalFileProvider(@""""), });
+            new DirectoryBrowserOptions() { RequestPath = new PathString(""/src""), FileProvider = new PhysicalFileProvider(@""""), });
             // Anything not handled will land at the welcome page.
             app.UseWelcomePage();
         }
@@ -631,12 +636,7 @@ namespace WebApi
         public void Configuration(IApplicationBuilder builder)
         {
             HttpConfiguration config = new HttpConfiguration();
-            config.Routes.MapHttpRoute(""Default"", ""{controller}/{customerID}"", new
-            {
-            controller = ""Customer"", customerID = RouteParameter.Optional
-            }
-
-            );
+            config.Routes.MapHttpRoute(""Default"", ""{controller}/{customerID}"", new { controller = ""Customer"", customerID = RouteParameter.Optional });
             config.Formatters.XmlFormatter.UseXmlSerializer = true;
             config.Formatters.Remove(config.Formatters.JsonFormatter);
             // config.Formatters.JsonFormatter.UseDataContractJsonSerializer = true;
@@ -808,12 +808,13 @@ namespace OwinExtraAPI
         public void OwinAuthorization(IAuthorizationRequirement req)
         {
             List<IAuthorizationRequirement> listReq = new List<IAuthorizationRequirement>()
-            {req};
+            {
+                req
+            };
             AuthorizationHandlerContext ahc = new AuthorizationHandlerContext(listReq, new ClaimsPrincipal(), null);
             ahc.Succeed(req);
             AuthorizationOptions aops = new AuthorizationOptions();
-            AuthorizationPolicy apol = new AuthorizationPolicy(listReq, new List<string>()
-            {""""});
+            AuthorizationPolicy apol = new AuthorizationPolicy(listReq, new List<string>() { """" });
             aops.AddPolicy("""", apol);
             aops.AddPolicy("""", policy =>
             {

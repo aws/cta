@@ -6,6 +6,7 @@ using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using Codelyzer.Analysis;
+using Codelyzer.Analysis.Model;
 using CTA.FeatureDetection.Common.Models.Configuration;
 using CTA.FeatureDetection.Common.Models.Features.Conditions.Base;
 using Microsoft.Extensions.Logging;

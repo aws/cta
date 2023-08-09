@@ -11,6 +11,7 @@ using CTA.WebForms.FileConverters;
 using CTA.WebForms.Metrics;
 using CTA.WebForms.ProjectManagement;
 using CTA.WebForms.Helpers.TagConversion;
+using Codelyzer.Analysis.Model;
 
 namespace CTA.WebForms.Tests.Factories
 {

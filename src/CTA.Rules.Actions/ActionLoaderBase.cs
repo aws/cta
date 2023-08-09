@@ -9,6 +9,7 @@ using CTA.Rules.Config;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Editing;
 using Newtonsoft.Json;
+using Codelyzer.Analysis.Model;
 
 namespace CTA.Rules.Actions;
 

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Codelyzer.Analysis;
 using Codelyzer.Analysis.Analyzer;
 using Codelyzer.Analysis.Build;
+using Codelyzer.Analysis.Model;
 using CTA.Rules.Config;
 using CTA.Rules.Models;
 
@@ -32,7 +33,7 @@ namespace CTA.Rules.Update
             DownloadResourceFiles();
             _solutionResult = new SolutionResult();
             _projectRewriterFactory = projectRewriterFactory ?? new DefaultProjectRewriterFactory();
-            AnalyzerConfiguration analyzerConfiguration = new AnalyzerConfiguration(LanguageOptions.CSharp)
+            AnalyzerConfiguration analyzerConfiguration = new AnalyzerConfiguration(LanguageOptions.CSharp, null)
             {
                 MetaDataSettings = new MetaDataSettings()
                 {
