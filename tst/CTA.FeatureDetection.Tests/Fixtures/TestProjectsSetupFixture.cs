@@ -1,4 +1,5 @@
 ﻿using Codelyzer.Analysis;
+using Codelyzer.Analysis.Model;
 using CTA.FeatureDetection.Common.Models;
 using CTA.FeatureDetection.Tests.Utils;
 using CTA.Rules.Config;

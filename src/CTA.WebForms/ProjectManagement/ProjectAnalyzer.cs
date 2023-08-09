@@ -7,6 +7,7 @@ using Codelyzer.Analysis;
 using CTA.Rules.Models;
 using Microsoft.Extensions.Logging;
 using CTA.Rules.Config;
+using Codelyzer.Analysis.Model;
 
 namespace CTA.WebForms.ProjectManagement
 {

@@ -16,7 +16,7 @@ namespace CTA.FeatureDetection.Common.Models.Features.Conditions.Base
             PopulateProperties(conditionMetadata.Properties);
         }
 
-        public abstract bool IsConditionMet(AnalyzerResult analyzerResult);
+        public abstract bool IsConditionMet(Codelyzer.Analysis.Model.AnalyzerResult analyzerResult);
 
         private void PopulateProperties(Dictionary<string, object> properties)
         {

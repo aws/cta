@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Codelyzer.Analysis;
+using Codelyzer.Analysis.Model;
 
 namespace CTA.Rules.Models
 {

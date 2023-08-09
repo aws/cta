@@ -4,6 +4,7 @@ using System.IO;
 using Codelyzer.Analysis;
 using Codelyzer.Analysis.Analyzer;
 using Codelyzer.Analysis.Common;
+using Codelyzer.Analysis.Model;
 using CTA.FeatureDetection.Common;
 using CTA.FeatureDetection.Common.Models;
 using CTA.FeatureDetection.Common.Models.Configuration;
@@ -165,7 +166,7 @@ namespace CTA.FeatureDetection
             var analyzerOutputDir = Path.Combine("..", "..");
             var cli = new AnalyzerCLI
             {
-                Configuration = new AnalyzerConfiguration(LanguageOptions.CSharp)
+                Configuration = new AnalyzerConfiguration(LanguageOptions.CSharp, null)
                 {
                     ExportSettings =
                     {

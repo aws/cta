@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Codelyzer.Analysis;
 using Codelyzer.Analysis.Analyzer;
+using Codelyzer.Analysis.Model;
 using CTA.Rules.Config;
 
 namespace CTA.Rules.Models
@@ -173,7 +174,7 @@ namespace CTA.Rules.Models
 
         private CodeAnalyzerByLanguage GetCodeAnalyzer()
         {
-            AnalyzerConfiguration analyzerConfiguration = new AnalyzerConfiguration(LanguageOptions.CSharp);
+            AnalyzerConfiguration analyzerConfiguration = new AnalyzerConfiguration(LanguageOptions.CSharp, null);
             ExportSettings exportSettings = new ExportSettings() { GenerateGremlinOutput = false, GenerateJsonOutput = false, GenerateRDFOutput = false };
             MetaDataSettings metaDataSettings = new MetaDataSettings()
             {

@@ -1,5 +1,6 @@
 ﻿using Codelyzer.Analysis;
 using Codelyzer.Analysis.Analyzer;
+using Codelyzer.Analysis.Model;
 using CTA.FeatureDetection.Common;
 using System.Collections.Generic;
 using System.IO;
@@ -35,7 +36,7 @@ namespace CTA.FeatureDetection.Tests.Utils
             };
             AnalyzerCLI cli = new AnalyzerCLI();
             cli.HandleCommand(args);
-            cli.Configuration = new AnalyzerConfiguration(language)
+            cli.Configuration = new AnalyzerConfiguration(language, null)
             {
                 ExportSettings =
                 {

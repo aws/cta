@@ -1,5 +1,6 @@
 ﻿using Codelyzer.Analysis;
 using Codelyzer.Analysis.Build;
+using Codelyzer.Analysis.Model;
 using CTA.Rules.Models;
 using CTA.Rules.Update;
 

@@ -364,7 +364,11 @@ namespace WebFormsFull
             EventsTriggered += 1;
             Model = CatalogService.GetCatalogItemsPaginated(DefaultPageSize, DefaultPageIndex);
             PeopleModel = new List<People>()
-            {new People(""Andy"", ""Wayne"", ""PG""), new People(""Bill"", ""Johnson"", ""SD""), new People(""Caroline"", ""Barry"", ""Manager"")};
+            {
+                new People(""Andy"", ""Wayne"", ""PG""),
+                new People(""Bill"", ""Johnson"", ""SD""),
+                new People(""Caroline"", ""Barry"", ""Manager"")
+            };
             PeopleGrid_DataSource = PeopleModel;
              // PeopleGrid.DataBind();
             productList_DataSource = Model.Data;

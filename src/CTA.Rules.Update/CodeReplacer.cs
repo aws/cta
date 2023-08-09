@@ -6,6 +6,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Codelyzer.Analysis;
 using Codelyzer.Analysis.Build;
+using Codelyzer.Analysis.Model;
+using Codelyzer.Analysis.Model.Build;
 using CTA.FeatureDetection.Common.Extensions;
 using CTA.Rules.Config;
 using CTA.Rules.Models;
