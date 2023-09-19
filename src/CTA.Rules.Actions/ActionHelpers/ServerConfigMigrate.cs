@@ -137,7 +137,8 @@ namespace CTA.Rules.Actions
         private void HandleHttpRedirect(XElement httpRedirectElement)
         {
             StringBuilder sb = new StringBuilder("new RewriteOptions()");
-            bool isRedirectionEnabled = bool.Parse(GetAttributeValue(httpRedirectElement, Constants.Enabled));
+            string? redirectionString = GetAttributeValue(httpRedirectElement, Constants.Enabled);
+            bool isRedirectionEnabled = redirectionString is not null && bool.Parse(redirectionString);
             if (!isRedirectionEnabled)
                 return;
 
@@ -184,7 +185,7 @@ namespace CTA.Rules.Actions
                 {
                     var handlerName = GetAttributeValue(handler, Constants.Type);
                     var handlerPath = GetAttributeValue(handler, Constants.PathAttribute, "*");
-                    if(!ServerConfigTemplates.UnsupportedHandlers.Contains(handlerName.Trim()))
+                    if(handlerName is not null && handlerPath is not null && !ServerConfigTemplates.UnsupportedHandlers.Contains(handlerName.Trim()))
                         _middleWareExpressions[ServerConfigTemplates.ConfigureMiddlewareMethod].Add(string.Format(ServerConfigTemplates.ConfigurationExpressionTemplates[WebServerConfigAttributes.Handlers.ToString()], handlerPath, handlerName));
                 }
             }
@@ -207,8 +208,9 @@ namespace CTA.Rules.Actions
                         if (mimeType.Name.ToString().Trim().Equals(Constants.Add))
                         {
                             var mimeTypeSupported = GetAttributeValue(mimeType, Constants.MimeType);
-                            bool isMimeTypeEnabled = bool.Parse(GetAttributeValue(mimeType, Constants.Enabled));
-                            if (isMimeTypeEnabled)
+                            string? mimeTypeEnabledString = GetAttributeValue(mimeType, Constants.Enabled);
+                            bool isMimeTypeEnabled = mimeTypeEnabledString is not null && bool.Parse(mimeTypeEnabledString);
+                            if (mimeTypeSupported is not null && isMimeTypeEnabled)
                             {
                                 mimeTypeList.Add(mimeTypeSupported);
                             }
@@ -241,7 +243,8 @@ namespace CTA.Rules.Actions
                 // window authentication
                 if (authenticationType.Name.ToString().Equals(WebServerConfigAttributes.WindowsAuthentication.ToString(), System.StringComparison.OrdinalIgnoreCase))
                 {
-                    bool isAuthEnabled = bool.Parse(GetAttributeValue(authenticationType, Constants.Enabled, ""));
+                    string? authEnabledString = GetAttributeValue(authenticationType, Constants.Enabled, "");
+                    bool isAuthEnabled = authEnabledString is not null && bool.Parse(authEnabledString);
                     if (isAuthEnabled)
                     {
                         string windowsAuthentication = WebServerConfigAttributes.WindowsAuthentication.ToString();
@@ -366,7 +369,7 @@ namespace CTA.Rules.Actions
             _startupRoot = CommentHelper.AddCSharpComment(_startupRoot, sb.ToString());
         }
 
-        private string GetAttributeValue(XElement element, string attributeName, string splitChar = null)
+        private string? GetAttributeValue(XElement element, string attributeName, string splitChar = null)
         {
             if (string.IsNullOrEmpty(splitChar))
             {
