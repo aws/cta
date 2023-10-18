@@ -91,9 +91,11 @@ namespace CTA.Rules.Models
         public const string Net5 = "net5.0";
         public const string Net6 = "net6.0";
         public const string Net7 = "net7.0";
+        public const string Net8 = "net8.0";
 
         //Needs to be a constant since this is used at compile time for CTA.Rules.PortCore\PortCoreRulesCli.cs
-        public const string SupportedFrameworksString = Netcore31 + ", " + Net5 + ", " + Net6 + ", " + Net7;
+        public const string SupportedFrameworksString = Netcore31 + ", " + Net5 + ", " + Net6 + ", " + Net7 + ", " + 
+                                                        Net8;
 
         public static List<string> GetSupportedFrameworksList()
         {
