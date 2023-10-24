@@ -28,13 +28,14 @@ jobs:
           git secrets --scan -r ../
           echo "Repository scan completed"
     - name: Setup .NET Versions
-      uses: actions/setup-dotnet@v1
+      uses: actions/setup-dotnet@v3
       with:
         dotnet-version: | 
           3.1.x
           5.0.x
           6.0.x
           7.0.x
+          8.0.x
     - name: Install dependencies
       run: dotnet restore src/CTA.Rules.sln
     - name: Build
