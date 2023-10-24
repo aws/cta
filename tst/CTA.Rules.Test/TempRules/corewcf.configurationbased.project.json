@@ -1,22 +1,20 @@
 {
-  "Name": "NPOI.SS.UserModel",
+  "Name": "CoreWCF.ConfigurationBased.Project",
   "Version": "1.0.0",
   "Packages": [
     {
-      "Name": "NPOI.Excel",
-      "Type": "Nuget"
+      "Name": "Project",
+      "Type": "Project"
     }
   ],
   "Recommendations": [
     {
-      "Type": "Namespace",
-      "Name": "NPOI.*",
-      "Value": "NPOI.*",
-      "KeyType": "Name",
-      "ContainingType": "",
+      "Type": "Project",
+      "Name": "Project",
+      "Value": "WCFConfigBasedService",
       "RecommendedActions": [
         {
-          "Source": "External",
+          "Source": "Amazon",
           "Preferred": "Yes",
           "TargetFrameworks": [
             {
@@ -65,13 +63,37 @@
               ]
             }
           ],
-          "Description": "Add Package NPOI",
+          "Description": "",
           "Actions": [
             {
               "Name": "AddPackage",
               "Type": "Package",
-              "Value": "NPOI",
-              "Description": "Add package NPOI"
+              "Value": "CoreWCF.Primitives",
+              "Description": "Add package CoreWCF.Primitives."
+            },
+            {
+              "Name": "AddPackage",
+              "Type": "Package",
+              "Value": "CoreWCF.Http",
+              "Description": "Add package CoreWCF.Http."
+            },
+            {
+              "Name": "AddPackage",
+              "Type": "Package",
+              "Value": "CoreWCF.NetTcp",
+              "Description": "Add package CoreWCF.NetTcp."
+            },
+            {
+              "Name": "AddPackage",
+              "Type": "Package",
+              "Value": "Microsoft.AspNetCore",
+              "Description": "Add package Microsoft.AspNetCore."
+            },
+            {
+              "Name": "AddPackage",
+              "Type": "Package",
+              "Value": "CoreWCF.ConfigurationManager",
+              "Description": "Add package CoreWCF.ConfigurationManager."
             }
           ]
         }

@@ -1,22 +1,22 @@
 {
-  "Name": "NPOI.SS.UserModel",
+  "Name": "Microsoft.AspNet.Identity.Owin",
   "Version": "1.0.0",
   "Packages": [
     {
-      "Name": "NPOI.Excel",
+      "Name": "Microsoft.AspNet.Identity.Owin",
       "Type": "Nuget"
     }
   ],
   "Recommendations": [
     {
       "Type": "Namespace",
-      "Name": "NPOI.*",
-      "Value": "NPOI.*",
+      "Name": "Microsoft.AspNet.Identity.Owin",
+      "Value": "Microsoft.AspNet.Identity.Owin",
       "KeyType": "Name",
       "ContainingType": "",
       "RecommendedActions": [
         {
-          "Source": "External",
+          "Source": "Amazon",
           "Preferred": "Yes",
           "TargetFrameworks": [
             {
@@ -65,13 +65,35 @@
               ]
             }
           ],
-          "Description": "Add Package NPOI",
+          "Description": "Add a reference to Microsoft.AspNetCore.Identity and remove Microsoft.AspNet.Identity.Owin.",
           "Actions": [
             {
-              "Name": "AddPackage",
-              "Type": "Package",
-              "Value": "NPOI",
-              "Description": "Add package NPOI"
+              "Name": "AddDirective",
+              "Type": "Using",
+              "Value": "Microsoft.AspNetCore.Identity",
+              "Description": "Add Microsoft.AspNetCore.Identity namespace",
+              "ActionValidation": {
+                "Contains": "using Microsoft.AspNetCore.Identity;",
+                "NotContains": ""
+              },
+              "VbActionValidation": {
+                "Contains": "Imports Microsoft.AspNetCore.Identity",
+                "NotContains": ""
+              }
+            },
+            {
+              "Name": "RemoveDirective",
+              "Type": "Using",
+              "Value": "Microsoft.AspNet.Identity.Owin",
+              "Description": "Remove Microsoft.AspNet.Identity.Owin namespace",
+              "ActionValidation": {
+                "Contains": "",
+                "NotContains": "using Microsoft.AspNet.Identity.Owin;"
+              },
+              "VbActionValidation": {
+                "Contains": "",
+                "NotContains": "Imports Microsoft.AspNet.Identity.Owin"
+              }
             }
           ]
         }

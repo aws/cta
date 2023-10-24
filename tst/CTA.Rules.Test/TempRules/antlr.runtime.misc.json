@@ -1,22 +1,21 @@
 {
-  "Name": "NPOI.SS.UserModel",
+  "Name": "Antlr.Runtime.Misc",
   "Version": "1.0.0",
   "Packages": [
     {
-      "Name": "NPOI.Excel",
       "Type": "Nuget"
     }
   ],
   "Recommendations": [
     {
       "Type": "Namespace",
-      "Name": "NPOI.*",
-      "Value": "NPOI.*",
+      "Name": "Antlr.Runtime.Misc",
+      "Value": "Antlr.Runtime.Misc",
       "KeyType": "Name",
       "ContainingType": "",
       "RecommendedActions": [
         {
-          "Source": "External",
+          "Source": "Amazon",
           "Preferred": "Yes",
           "TargetFrameworks": [
             {
@@ -65,13 +64,13 @@
               ]
             }
           ],
-          "Description": "Add Package NPOI",
+          "Description": "Add reference to Antlr3.Runtime",
           "Actions": [
             {
               "Name": "AddPackage",
               "Type": "Package",
-              "Value": "NPOI",
-              "Description": "Add package NPOI"
+              "Value": "Antlr3.Runtime",
+              "Description": "Add package Antlr3.Runtime"
             }
           ]
         }

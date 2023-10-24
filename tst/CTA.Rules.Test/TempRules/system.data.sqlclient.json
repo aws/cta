@@ -1,0 +1,121 @@
+{
+  "Name": "System.Data.SqlClient",
+  "Version": "1.0.0",
+  "Packages": [
+    {
+      "Name": "System.Data",
+      "Type": "SDK"
+    }
+  ],
+  "Recommendations": [
+    {
+      "Type": "Namespace",
+      "Name": "System.Data.SqlClient",
+      "Value": "System.Data.SqlClient",
+      "KeyType": "Name",
+      "ContainingType": "",
+      "RecommendedActions": [
+        {
+          "Source": "Amazon",
+          "Preferred": "Yes",
+          "TargetFrameworks": [
+            {
+              "Name": "netstandard2.1",
+              "TargetCPU": [
+                "x86",
+                "x64",
+                "ARM32",
+                "ARM64"
+              ]
+            },
+            {
+              "Name": "netcoreapp3.1",
+              "TargetCPU": [
+                "x86",
+                "x64",
+                "ARM32",
+                "ARM64"
+              ]
+            },
+            {
+              "Name": "net5.0",
+              "TargetCPU": [
+                "x86",
+                "x64",
+                "ARM32",
+                "ARM64"
+              ]
+            },
+            {
+              "Name": "net6.0",
+              "TargetCPU": [
+                "x86",
+                "x64",
+                "ARM32",
+                "ARM64"
+              ]
+            },
+            {
+              "Name": "net7.0",
+              "TargetCPU": [
+                "x86",
+                "x64",
+                "ARM32",
+                "ARM64"
+              ]
+            },
+            {
+              "Name": "net8.0",
+              "TargetCPU": [
+                "x86",
+                "x64",
+                "ARM32",
+                "ARM64"
+              ]
+            }
+          ],
+          "Description": "Add the package Microsoft.Data.SqlClient to the project. In addition, System.Data.SqlClient namespace will be replaced with Microsoft.Data.SqlClient.",
+          "Actions": [
+            {
+              "Name": "AddPackage",
+              "Type": "Package",
+              "Value": {
+                "Name": "Microsoft.Data.SqlClient",
+                "Version": "5.0.1"
+              },
+              "Description": "Add reference to Microsoft.Data.SqlClient."
+            },
+            {
+              "Name": "AddDirective",
+              "Type": "Using",
+              "Value": "Microsoft.Data.SqlClient",
+              "Description": "Add Microsoft.Data.SqlClient namespace.",
+              "ActionValidation": {
+                "Contains": "using Microsoft.Data.SqlClient;",
+                "NotContains": ""
+              },
+              "VbActionValidation": {
+                "Contains": "Imports Microsoft.Data.SqlClient",
+                "NotContains": ""
+              }
+            },
+            {
+              "Name": "RemoveDirective",
+              "Type": "Using",
+              "Value": "System.Data.SqlClient",
+              "Description": "Remove System.Data.SqlClient namespace.",
+              "ActionValidation": {
+                "Contains": "",
+                "NotContains": "using System.Data.SqlClient;"
+              },
+              "VbActionValidation": {
+                "Contains": "",
+                "NotContains": "Imports System.Data.SqlClient"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

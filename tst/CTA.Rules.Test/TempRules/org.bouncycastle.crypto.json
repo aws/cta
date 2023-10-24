@@ -1,17 +1,17 @@
 {
-  "Name": "NPOI.SS.UserModel",
+  "Name": "Org.BouncyCastle.Crypto",
   "Version": "1.0.0",
   "Packages": [
     {
-      "Name": "NPOI.Excel",
+      "Name": "BouncyCastle",
       "Type": "Nuget"
     }
   ],
   "Recommendations": [
     {
       "Type": "Namespace",
-      "Name": "NPOI.*",
-      "Value": "NPOI.*",
+      "Name": "Org.BouncyCastle.Crypto",
+      "Value": "Org.BouncyCastle.Crypto",
       "KeyType": "Name",
       "ContainingType": "",
       "RecommendedActions": [
@@ -65,13 +65,13 @@
               ]
             }
           ],
-          "Description": "Add Package NPOI",
+          "Description": "Add a reference to BouncyCastle.NetCore",
           "Actions": [
             {
               "Name": "AddPackage",
               "Type": "Package",
-              "Value": "NPOI",
-              "Description": "Add package NPOI"
+              "Value": "BouncyCastle.NetCore",
+              "Description": "Add package BouncyCastle.NetCore"
             }
           ]
         }

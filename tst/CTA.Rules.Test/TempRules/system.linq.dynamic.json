@@ -1,22 +1,21 @@
 {
-  "Name": "NPOI.SS.UserModel",
+  "Name": "System.Linq.Dynamic",
   "Version": "1.0.0",
   "Packages": [
     {
-      "Name": "NPOI.Excel",
       "Type": "Nuget"
     }
   ],
   "Recommendations": [
     {
       "Type": "Namespace",
-      "Name": "NPOI.*",
-      "Value": "NPOI.*",
+      "Name": "System.Linq.Dynamic",
+      "Value": "System.Linq.Dynamic",
       "KeyType": "Name",
       "ContainingType": "",
       "RecommendedActions": [
         {
-          "Source": "External",
+          "Source": "Amazon",
           "Preferred": "Yes",
           "TargetFrameworks": [
             {
@@ -65,13 +64,41 @@
               ]
             }
           ],
-          "Description": "Add Package NPOI",
+          "Description": "Add a reference to System.Linq.Dynamic.Core",
           "Actions": [
             {
               "Name": "AddPackage",
               "Type": "Package",
-              "Value": "NPOI",
-              "Description": "Add package NPOI"
+              "Value": "System.Linq.Dynamic.Core",
+              "Description": "Add package System.Linq.Dynamic.Core"
+            },
+            {
+              "Name": "AddDirective",
+              "Type": "Using",
+              "Value": "System.Linq.Dynamic.Core",
+              "Description": "Add System.Linq.Dynamic.Core namespace.",
+              "ActionValidation": {
+                "Contains": "using System.Linq.Dynamic.Core;",
+                "NotContains": ""
+              },
+              "VbActionValidation": {
+                "Contains": "Imports System.Linq.Dynamic.Core",
+                "NotContains": ""
+              }
+            },
+            {
+              "Name": "RemoveDirective",
+              "Type": "Using",
+              "Value": "System.Linq.Dynamic",
+              "Description": "Remove System.Linq.Dynamic namespace.",
+              "ActionValidation": {
+                "Contains": "",
+                "NotContains": "using System.Linq.Dynamic;"
+              },
+              "VbActionValidation": {
+                "Contains": "",
+                "NotContains": "Imports System.Linq.Dynamic"
+              }
             }
           ]
         }

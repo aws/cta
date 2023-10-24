@@ -1,22 +1,21 @@
 {
-  "Name": "NPOI.SS.UserModel",
+  "Name": "Ionic.Zlib",
   "Version": "1.0.0",
   "Packages": [
     {
-      "Name": "NPOI.Excel",
       "Type": "Nuget"
     }
   ],
   "Recommendations": [
     {
       "Type": "Namespace",
-      "Name": "NPOI.*",
-      "Value": "NPOI.*",
+      "Name": "Ionic.Zlib",
+      "Value": "Ionic.Zlib",
       "KeyType": "Name",
       "ContainingType": "",
       "RecommendedActions": [
         {
-          "Source": "External",
+          "Source": "Amazon",
           "Preferred": "Yes",
           "TargetFrameworks": [
             {
@@ -65,13 +64,13 @@
               ]
             }
           ],
-          "Description": "Add Package NPOI",
+          "Description": "Add a reference to DotNetZip.",
           "Actions": [
             {
               "Name": "AddPackage",
               "Type": "Package",
-              "Value": "NPOI",
-              "Description": "Add package NPOI"
+              "Value": "DotNetZip",
+              "Description": "Add package DotNetZip"
             }
           ]
         }

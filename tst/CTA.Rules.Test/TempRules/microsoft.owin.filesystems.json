@@ -1,22 +1,22 @@
 {
-  "Name": "NPOI.SS.UserModel",
+  "Name": "Microsoft.Owin.FileSystems",
   "Version": "1.0.0",
   "Packages": [
     {
-      "Name": "NPOI.Excel",
+      "Name": "Microsoft.Owin.FileSystems",
       "Type": "Nuget"
     }
   ],
   "Recommendations": [
     {
-      "Type": "Namespace",
-      "Name": "NPOI.*",
-      "Value": "NPOI.*",
-      "KeyType": "Name",
+      "Type": "Class",
+      "Name": "PhysicalFileSystem",
+      "Value": "Microsoft.Owin.FileSystems.PhysicalFileSystem",
+      "KeyType": "Identifier",
       "ContainingType": "",
       "RecommendedActions": [
         {
-          "Source": "External",
+          "Source": "Amazon",
           "Preferred": "Yes",
           "TargetFrameworks": [
             {
@@ -65,13 +65,17 @@
               ]
             }
           ],
-          "Description": "Add Package NPOI",
+          "Description": "Replace PhysicalFileSystem with PhysicalFileProvider.",
           "Actions": [
             {
-              "Name": "AddPackage",
-              "Type": "Package",
-              "Value": "NPOI",
-              "Description": "Add package NPOI"
+              "Name": "ReplaceIdentifier",
+              "Type": "Identifier",
+              "Value": "PhysicalFileProvider",
+              "Description": "Replace PhysicalFileSystem with PhysicalFileProvider",
+              "ActionValidation": {
+                "Contains": "PhysicalFileProvider",
+                "NotContains": "PhysicalFileSystem"
+              }
             }
           ]
         }

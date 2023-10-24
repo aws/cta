@@ -73,6 +73,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="TempRules" />
     <Folder Include="TempTagConfigs\" />
   </ItemGroup>
 
