@@ -45,7 +45,7 @@ namespace CTA.Rules.Test
 
             StringAssert.Contains(@"Microsoft.AspNetCore.Owin", csProjContent);
             StringAssert.Contains(@"Microsoft.AspNetCore.Diagnostics", csProjContent);
-            StringAssert.Contains(new[] { SupportedFrameworks.Net5, SupportedFrameworks.Net6, SupportedFrameworks.Net7}.Contains(version) 
+            StringAssert.Contains(new[] { SupportedFrameworks.Net5, SupportedFrameworks.Net6, SupportedFrameworks.Net7, SupportedFrameworks.Net8}.Contains(version) 
                 ? @"Microsoft.AspNetCore.Authentication.Google" 
                 : @"<PackageReference Include=""Microsoft.AspNetCore.Authentication.Google"" Version=""3.1.18"" />", 
                 csProjContent);
@@ -267,7 +267,7 @@ namespace CTA.Rules.Test
             StringAssert.AreEqualIgnoringCase(ExpectedOutputConstants.OwinWebApiStartup.NormalizeNewLineChars(), startupText.NormalizeNewLineChars());
 
             //Check that package has been added:
-            StringAssert.Contains(new []{SupportedFrameworks.Net5, SupportedFrameworks.Net6, SupportedFrameworks.Net7}.Contains(version) 
+            StringAssert.Contains(new []{SupportedFrameworks.Net5, SupportedFrameworks.Net6, SupportedFrameworks.Net7, SupportedFrameworks.Net8}.Contains(version) 
                 ? @"Microsoft.AspNetCore.Authentication.OpenIdConnect" 
                 : @"<PackageReference Include=""Microsoft.AspNetCore.Authentication.OpenIdConnect"" Version=""3.1.15"" />", 
                 csProjContent);

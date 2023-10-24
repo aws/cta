@@ -29,13 +29,15 @@ namespace CTA.Rules.Test
             var net50Results = CopySolutionToUniqueTempDirAndAnalyze(aspnetWebFormsSolutionName, ctaTestProjectsDir, SupportedFrameworks.Net5);
             var net60Results = CopySolutionToUniqueTempDirAndAnalyze(aspnetWebFormsSolutionName, ctaTestProjectsDir, SupportedFrameworks.Net6);
             var net70Results = CopySolutionToUniqueTempDirAndAnalyze(aspnetWebFormsSolutionName, ctaTestProjectsDir, SupportedFrameworks.Net7);
+            var net80Results = CopySolutionToUniqueTempDirAndAnalyze(aspnetWebFormsSolutionName, ctaTestProjectsDir, SupportedFrameworks.Net8);
 
             _aspnetWebFormsSolution = new Dictionary<string, TestSolutionAnalysis>
             {
                 {SupportedFrameworks.Netcore31, net31Results},
                 {SupportedFrameworks.Net5, net50Results},
                 {SupportedFrameworks.Net6, net60Results},
-                {SupportedFrameworks.Net7, net70Results}
+                {SupportedFrameworks.Net7, net70Results},
+                {SupportedFrameworks.Net8, net80Results}
             };
 
             var mvcDualWebFormsSolutionName = "MvcAndDualWebForms.sln";
@@ -43,13 +45,15 @@ namespace CTA.Rules.Test
             net50Results = CopySolutionToUniqueTempDirAndAnalyze(mvcDualWebFormsSolutionName, ctaTestProjectsDir, SupportedFrameworks.Net5);
             net60Results = CopySolutionToUniqueTempDirAndAnalyze(mvcDualWebFormsSolutionName, ctaTestProjectsDir, SupportedFrameworks.Net6);
             net70Results = CopySolutionToUniqueTempDirAndAnalyze(mvcDualWebFormsSolutionName, ctaTestProjectsDir, SupportedFrameworks.Net7);
-
+            net80Results = CopySolutionToUniqueTempDirAndAnalyze(mvcDualWebFormsSolutionName, ctaTestProjectsDir, SupportedFrameworks.Net8);
+            
             _mvcAndDualWebFormsSolution = new Dictionary<string, TestSolutionAnalysis>
             {
                 {SupportedFrameworks.Netcore31, net31Results},
                 {SupportedFrameworks.Net5, net50Results},
                 {SupportedFrameworks.Net6, net60Results},
-                {SupportedFrameworks.Net7, net70Results}
+                {SupportedFrameworks.Net7, net70Results},
+                {SupportedFrameworks.Net8, net80Results}
             };
         }
 
@@ -98,6 +102,7 @@ namespace CTA.Rules.Test
         }
 
         [TestCase(SupportedFrameworks.Net7)]
+        [TestCase(SupportedFrameworks.Net8)]
         public void TestSolutionWithMvcAndDualWebForms_Dotnet7AndAbove(string version)
         {
             var results = _mvcAndDualWebFormsSolution[version];
