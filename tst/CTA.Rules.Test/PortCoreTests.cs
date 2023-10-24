@@ -55,6 +55,7 @@ namespace CTA.Rules.Test
             TestWebApi(SupportedFrameworks.Net5, solutionDir);
         }
 
+        [TestCase(SupportedFrameworks.Net8)]
         [TestCase(SupportedFrameworks.Net7)]
         [TestCase(SupportedFrameworks.Net6)]
         [TestCase(SupportedFrameworks.Net5)]

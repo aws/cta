@@ -29,12 +29,14 @@ namespace CTA.Rules.Test
             var net50Results = CopySolutionToUniqueTempDirAndAnalyze(solutionName, ctaTestProjectsDir, SupportedFrameworks.Net5);
             var net60Results = CopySolutionToUniqueTempDirAndAnalyze(solutionName, ctaTestProjectsDir, SupportedFrameworks.Net6);
             var net70Results = CopySolutionToUniqueTempDirAndAnalyze(solutionName, ctaTestProjectsDir, SupportedFrameworks.Net7);
+            var net80Results = CopySolutionToUniqueTempDirAndAnalyze(solutionName, ctaTestProjectsDir, SupportedFrameworks.Net8);
             _paCoreWCFSupportResultsDict = new Dictionary<string, TestSolutionAnalysis>
             {
                 {SupportedFrameworks.Netcore31, net31Results},
                 {SupportedFrameworks.Net5, net50Results},
                 {SupportedFrameworks.Net6, net60Results},
-                {SupportedFrameworks.Net7, net70Results}
+                {SupportedFrameworks.Net7, net70Results},
+                {SupportedFrameworks.Net8, net80Results}
             };
             
             solutionName = "WCFTCPSelfHost.sln";
@@ -42,12 +44,14 @@ namespace CTA.Rules.Test
             net50Results = CopySolutionToUniqueTempDirAndAnalyze(solutionName, ctaTestProjectsDir, SupportedFrameworks.Net5);
             net60Results = CopySolutionToUniqueTempDirAndAnalyze(solutionName, ctaTestProjectsDir, SupportedFrameworks.Net6);
             net70Results = CopySolutionToUniqueTempDirAndAnalyze(solutionName, ctaTestProjectsDir, SupportedFrameworks.Net7);
+            net80Results = CopySolutionToUniqueTempDirAndAnalyze(solutionName, ctaTestProjectsDir, SupportedFrameworks.Net8);
             _wcfTCPSelfHostResultsDict = new Dictionary<string, TestSolutionAnalysis>
             {
                 {SupportedFrameworks.Netcore31, net31Results},
                 {SupportedFrameworks.Net5, net50Results},
                 {SupportedFrameworks.Net6, net60Results},
-                {SupportedFrameworks.Net7, net70Results}
+                {SupportedFrameworks.Net7, net70Results},
+                {SupportedFrameworks.Net8, net80Results}
             };
         }
 
