@@ -101,6 +101,17 @@ namespace CTA.Rules.Actions
 
             return func;
         }
+        
+        public Func<string, ProjectType, string> GetCreateNet8FolderHierarchyAction(string _)
+        {
+            static string func(string projectDir, ProjectType projectType)
+            {
+                FolderUpdate folderUpdate = new FolderUpdate(projectDir, projectType);
+                return folderUpdate.Run();
+            }
+
+            return func;
+        }
 
         public Func<string, ProjectType, string> GetMigrateConfigAction(string _)
         {
