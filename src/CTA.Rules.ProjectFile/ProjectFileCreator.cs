@@ -295,10 +295,14 @@ namespace CTA.Rules.ProjectFile
                 .GroupBy(d => d.Name).Select(d => d.FirstOrDefault())
                 .ToDictionary(p => p.Name, p => p.Version);
 
-            _packages = _packages.Where(p => existingPackages.Keys?.Contains(p.Key) == false).ToDictionary(d => d.Key, d => d.Value);
+            // if packages is empty, or every key in _packages is contained in existing packages, return
+            if (_packages.Count == 0 ||
+                _packages.All(p => existingPackages.Keys?.Contains(p.Key) ?? true))
+            {
+                return;
+            }
 
-            //No packages to add
-            if (_packages.Count == 0) return;
+            _packages = _packages.Where(p => existingPackages.Keys?.Contains(p.Key) == false).ToDictionary(d => d.Key, d => d.Value);
 
             var packages = GetPackagesSection();
             if (existingPackages.Count == 0)
