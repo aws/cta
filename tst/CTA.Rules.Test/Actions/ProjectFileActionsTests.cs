@@ -1,4 +1,5 @@
-﻿using CTA.Rules.Actions;
+﻿using Amazon.Runtime.Internal.Transform;
+using CTA.Rules.Actions;
 using CTA.Rules.Config;
 using CTA.Rules.Models;
 using NUnit.Framework;
@@ -52,9 +53,51 @@ namespace CTA.Rules.Test.Actions
             StringAssert.Contains("Microsoft.AspNetCore.App", result);
         }
 
-        private string CreateNewFile(ProjectType projectType, List<string> targetVersions, Dictionary<string, string> packageReferences, List<string> projectReferences)
+        [Test]
+        public void ProjectFileCreationNoPackages()
         {
-            ResetProjectFile();
+            var result = CreateNewFile(
+                ProjectType.CoreMvc, 
+                new List<string>() { SupportedFrameworks.Net8 },
+                new Dictionary<string, string>(), new List<string>(),
+                isNetCore: true);
+            StringAssert.Contains(SupportedFrameworks.Net8, result);
+        }
+
+        [Test]
+        public void ProjectFileCreationHandleExistingPackages()
+        {
+            var result = CreateNewFile(
+                ProjectType.CoreMvc,
+                new List<string>() { SupportedFrameworks.Net8 },
+                new Dictionary<string, string>()
+                {
+                    {"Microsoft.EntityFrameworkCore.Design", "2.2.6"}
+                }, new List<string>(),
+                isNetCore: true);
+            StringAssert.Contains(SupportedFrameworks.Net8, result);
+        }
+
+        [Test]
+        public void ProjectFileCreationAddsPackages()
+        {
+            var result = CreateNewFile(
+                ProjectType.CoreMvc,
+                new List<string>() { SupportedFrameworks.Net8 },
+                new Dictionary<string, string>()
+                {
+                    {"Newtonsoft.Json", "2.2.6"}
+                }, new List<string>(),
+                isNetCore: true);
+            StringAssert.Contains(SupportedFrameworks.Net8, result);
+            //verify both new and old package reference remain
+            StringAssert.Contains("<PackageReference Include=\"Newtonsoft.Json\" Version=\"2.2.6\" />", result);
+            StringAssert.Contains("<PackageReference Include=\"Microsoft.EntityFrameworkCore.Design\" Version=\"2.2.6\" />", result);
+        }
+
+        private string CreateNewFile(ProjectType projectType, List<string> targetVersions, Dictionary<string, string> packageReferences, List<string> projectReferences, bool isNetCore = false)
+        {
+            ResetProjectFile(isNetCore: isNetCore);
             var migrationProjectFileAction = _projectFileActions.GetMigrateProjectFileAction("");
             var metaRefs = new List<string>
             {
@@ -64,11 +107,24 @@ namespace CTA.Rules.Test.Actions
             return string.Concat(result, File.ReadAllText(_projectFile));
         }
 
-        private void ResetProjectFile(string newContent = "")
+        private void ResetProjectFile(string newContent = "", bool isNetCore = false)
         {
             if (!string.IsNullOrEmpty(newContent))
             {
                 File.WriteAllText(_projectFile, newContent);
+            }
+            else if (isNetCore)
+            {
+                File.WriteAllText(_projectFile,
+                    @"
+<Project Sdk=""Microsoft.NET.Sdk"">
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include=""Microsoft.EntityFrameworkCore.Design"" Version=""2.2.6"" />
+  </ItemGroup>
+</Project>");
             }
             else
             {
