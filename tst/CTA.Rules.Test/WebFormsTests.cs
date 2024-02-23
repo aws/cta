@@ -79,6 +79,7 @@ namespace CTA.Rules.Test
         [TestCase(SupportedFrameworks.Netcore31)]
         [TestCase(SupportedFrameworks.Net5)]
         [TestCase(SupportedFrameworks.Net6)]
+        [TestCase(SupportedFrameworks.Net7)]
         public void TestSolutionWithMvcAndDualWebForms(string version)
         {
             var results = _mvcAndDualWebFormsSolution[version];
@@ -101,9 +102,8 @@ namespace CTA.Rules.Test
             VerifyMvc(someMvcResult);
         }
 
-        [TestCase(SupportedFrameworks.Net7)]
         [TestCase(SupportedFrameworks.Net8)]
-        public void TestSolutionWithMvcAndDualWebForms_Dotnet7AndAbove(string version)
+        public void TestSolutionWithMvcAndDualWebForms_Dotnet8AndAbove(string version)
         {
             var results = _mvcAndDualWebFormsSolution[version];
 
