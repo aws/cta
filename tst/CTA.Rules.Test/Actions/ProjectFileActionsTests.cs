@@ -118,6 +118,33 @@ namespace CTA.Rules.Test.Actions
             StringAssert.Contains("<PackageReference Include=\"Newtonsoft.Json\" Version=\"2.2.6\" />", result);
         }
 
+        [Test]
+        public void ProjectFileCreationHandlePackageReferenceNoVersion()
+        {
+            const string projectFile = @"
+<Project Sdk=""Microsoft.NET.Sdk"">
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include=""Microsoft.EntityFrameworkCore.Design""/>
+  </ItemGroup>
+</Project>";
+
+            var result = CreateNewFile(
+                ProjectType.CoreMvc,
+                new List<string>() { SupportedFrameworks.Net8 },
+                new Dictionary<string, string>()
+                {
+                    {"Newtonsoft.Json", "2.2.6"}
+                }, new List<string>(),
+                newContent: projectFile);
+            StringAssert.Contains(SupportedFrameworks.Net8, result);
+            //verify both new and old package reference remain
+            StringAssert.Contains("<PackageReference Include=\"Newtonsoft.Json\" Version=\"2.2.6\" />", result);
+            StringAssert.Contains("<PackageReference Include=\"Microsoft.EntityFrameworkCore.Design\" />", result);
+        }
+
         private string CreateNewFile(ProjectType projectType, List<string> targetVersions, Dictionary<string, string> packageReferences, List<string> projectReferences, bool isNetCore = false, string newContent="")
         {
             ResetProjectFile(newContent: newContent, isNetCore: isNetCore);
