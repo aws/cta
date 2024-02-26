@@ -47,6 +47,7 @@ namespace CTA.Rules.Test
         [TestCase(SupportedFrameworks.Netcore31)]
         [TestCase(SupportedFrameworks.Net5)]
         [TestCase(SupportedFrameworks.Net6)]
+        [TestCase(SupportedFrameworks.Net7)]
         public void TestProjectFilePortingResults(string version)
         {
             var results = _resultsDict[version];
@@ -59,9 +60,8 @@ namespace CTA.Rules.Test
             StringAssert.Contains(@"<PackageReference Include=""Microsoft.Data.SqlClient"" Version=""5.0.1"" />", webFormsFullResult.CsProjectContent);
         }
 
-        [TestCase(SupportedFrameworks.Net7)]
         [TestCase(SupportedFrameworks.Net8)]
-        public void TestProjectFilePortingResults_Dotnet7AndAbove(string version)
+        public void TestProjectFilePortingResults_Dotnet8AndAbove(string version)
         {
             var results = _resultsDict[version];
             var webFormsFullResult = results.ProjectResults.First(proj => proj.CsProjectPath.EndsWith("WebFormsFull.csproj"));
